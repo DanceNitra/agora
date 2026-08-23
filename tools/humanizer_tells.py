@@ -36,16 +36,46 @@ BANNED_WORDS = (
 
 #: CONSTRUCTIONS, which is where most of the tell lives. A word list cannot see these.
 CONSTRUCTIONS = {
-    # "the honest minimum is", "an honest verdict is" -- an abstraction given a human virtue.
+    # "the honest minimum is", "the honest version of" -- an abstraction given a human virtue.
+    #
+    # The article is load-bearing here, and the first version of this pattern got it wrong in a way
+    # its own docstring above forbids: it included `a|an`, so it rejected "an honest null result" --
+    # named four paragraphs up as a phrase we have published and stand behind. Measured 2026-08-23
+    # when a negative fixture for exactly that sentence failed.
+    #
+    # `an honest X` is a real X that happens to be honest, which is ordinary English. `THE honest X`
+    # is the construction @jason-sachs described: it presupposes a single true version and awards it
+    # a human virtue. Both of his examples take the definite article, and so did our own escape --
+    # "that is the honest version of §2.1", sent to deepseek-ai/DeepSeek-V3#1591 on 2026-08-23.
     "the-honest-X": re.compile(
-        r"\b(?:the|an|a|its|our|their|his|her|this|that)\s+honest\s+[a-z]+\b", re.I),
+        r"\b(?:the|its|our|their|his|her|this|that)\s+honest\s+[a-z]+\b", re.I),
     # persuasive-speech emphasis, diluted by repetition
     "worth-saying": re.compile(r"\bworth\s+(?:saying|noting|stating|repeating)\b", re.I),
     # the "not X, but Y" antithesis, once per paragraph, is the rhythm people notice
     "not-X-but-Y": re.compile(
         r"\b(?:is|was|are|were)\s+not\s+\w+(?:\s+\w+){0,3},\s+(?:it|they)\s+(?:is|was|are|were)\b",
         re.I),
-    # an em-dash clause explaining the sentence just written -- Stratogain's own count, and ours
+}
+
+#: Constructions we REPORT but do not block on, because measured against our own sent comments they
+#: do not isolate the tell they name.
+#:
+#: `em-dash-gloss` is the case, and it is worth keeping the reason rather than the verdict.
+#: @Stratogain named his own tell as "an em-dash clause explaining the sentence I just wrote,
+#: roughly once a paragraph". The regex below matches a PAIRED em-dash parenthetical, which is a
+#: different thing and ordinary English. Run over the 21 comments we sent between 21 and 23 August
+#: it fired four times and **all four were legitimate**: "the line stopped appearing — twelve
+#: comments in a row without it — and the length doubled", "three tip vertices — the outer corners
+#: — and no edge joins two of them", and a pair wrapping two Chinese record labels. A trailing-clause
+#: variant (`—[^—\n]{15,}?[.!?]`) is worse in the other direction: 45 hits over the same 21
+#: comments, i.e. a banner.
+#:
+#: So neither regex separates the construction, and a blocking check with a measured 4/4 false
+#: positive rate teaches the operator to wave the gate through, which costs more than it catches.
+#: What DOES track the tell is the rate: `em_dash_rate` ran 0.00-0.82 per 100 words across our
+#: 22 August comments and climbed back to 1.41-1.77 in the four sent after that, which is the
+#: regression a paired-parenthetical count could not see. Demoted to a number, not deleted.
+REPORT_ONLY_CONSTRUCTIONS = {
     "em-dash-gloss": re.compile(r"—[^—\n]{15,}—"),
 }
 
@@ -89,7 +119,22 @@ def report(text: str) -> str:
         lines.append("no tells")
     for name, got, off in hits:
         lines.append("  %-14s %r  @%d" % (name, got, off))
+    for name, got, off in find_tells(text, banned=(), constructions=REPORT_ONLY_CONSTRUCTIONS):
+        lines.append("  [report only] %-14s %r  @%d" % (name, got, off))
     return "\n".join(lines)
+
+
+def line_of(text: str, offset: int) -> int:
+    """1-indexed line number, so a hit can be found in the draft rather than hunted."""
+    return text.count("\n", 0, offset) + 1
+
+
+def gate(text: str) -> tuple[list, str]:
+    """(blocking hits, human-readable report). Empty list means nothing to acknowledge.
+
+    Separated from `report` so a caller can decide, rather than parse prose to find out.
+    """
+    return find_tells(text), report(text)
 
 
 if __name__ == "__main__":

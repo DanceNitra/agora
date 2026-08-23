@@ -18,6 +18,20 @@ So approval is bound to bytes here instead. Two steps:
 Editing after approval is exactly the failure mode, so an edit invalidates the approval by construction
 rather than by my remembering that it should.
 
+THIRD GATE, added 2026-08-23: HOW IT READS. The owner's standing rule since 2026-08-21 is a humanizer
+pass on EVERY outbound draft, after @jason-sachs read a hundred of our comments on claude-code#34556
+and named the constructions that make them read as generated. We built `tools/humanizer_tells.py` from
+his reading the same day -- and then imported it in exactly ONE place, a gate for one specific draft,
+never here. Measured 2026-08-23 across the 21 comments we sent in the two days after promising him
+"the prologue goes in front of the drafting from here on": the tool fires on four of them, and one is
+the comment we sent to DeepSeek-V3#1591 at 05:45 that morning, carrying "that is the honest version
+of §2.1" -- the exact construction he had explained eleven hours earlier. The rule existed, the
+detector existed, the detector was correct, and nothing ran it. Same shape as the two gates above, so
+it gets the same remedy: wired, not remembered.
+
+`show` prints the report before the owner ever sees the draft, which is where a tell costs nothing to
+fix. `post` refuses on a blocking hit unless --ack-tells says a human looked and kept the wording.
+
 SECOND GATE, added 2026-08-14: WHAT WE ALREADY SAID IN THAT THREAD. Approval binds the bytes; it says
 nothing about whether the claim inside them is refuted by our own earlier comment. On 2026-08-14 the
 draft "80.7/4.1 appears nowhere in the package" was aimed at a thread where WE had computed 80.7/4.1
@@ -37,6 +51,7 @@ from pathlib import Path
 
 # Direct-script runs put tools/ on sys.path automatically; an import from a test does not.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import humanizer_tells as ht  # noqa: E402
 import prior_statement_check as psc  # noqa: E402
 
 
@@ -165,6 +180,33 @@ def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | 
     print("  Read them, then either fix the draft (which changes the hash, so it is re-approved) or")
     print("  pass --ack-prior to record that they were read and are not a contradiction.")
     return 1 if code == 1 else 2
+
+
+def _tells_gate(body: str, acked: bool) -> int | None:
+    """Refuse a draft carrying a construction that reads as generated. None means proceed.
+
+    Deliberately NOT waivable by the digest: the hash proves the owner saw these bytes, and he saw
+    them because we handed them over. He is not the reader this gate is for. The acknowledgement is
+    a separate flag so that keeping a wording is a decision somebody made, not a step nobody took.
+    """
+    hits = ht.find_tells(body)
+    if not hits:
+        return None
+    print("The draft carries %d construction%s that read as generated:"
+          % (len(hits), "" if len(hits) == 1 else "s"))
+    for name, got, off in hits:
+        i = max(0, off - 55)
+        ctx = " ".join(body[i:off + len(got) + 55].split())
+        print("  line %-4d %-14s %r" % (ht.line_of(body, off), name, got))
+        print("            ...%s..." % ctx)
+    print("")
+    print("  %s" % ht.report(body).splitlines()[0])
+    if acked:
+        print("--ack-tells given: a human read these and is keeping the wording. Proceeding.")
+        return None
+    print("  REFUSED. Rewrite them -- which invalidates the approved hash, so re-show the draft --")
+    print("  or pass --ack-tells to record that a human read them and chose to keep them.")
+    return 1
 
 
 def _survive_a_narrow_console() -> None:
@@ -359,6 +401,8 @@ def main(argv=None):
     ap.add_argument("--ack-thread", action="store_true",
                     help="record that a human read what happened in the thread SINCE this draft was "
                          "written, including a close, and still wants it sent unchanged")
+    ap.add_argument("--ack-tells", action="store_true",
+                    help="record that a human read the flagged constructions and is keeping them")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
     # swallows later options too, so `post f --sha X -- gh ...` lost the --sha and the tool refused a
     # correctly approved draft. A gate that fails closed on its own argument parsing is still a gate
@@ -382,6 +426,10 @@ def main(argv=None):
         print("sha256 : %s" % now)
         print("bytes  : %d" % len(raw))
         print("words  : %d" % len(body.split()))
+        # Before the owner sees it, because this is the only point where a tell costs nothing to
+        # fix: rewriting after approval invalidates the hash by design.
+        print("")
+        print(ht.report(body))
         if a.thread:
             print("")
             print(psc.check(body, a.thread)[1])
@@ -412,6 +460,13 @@ def main(argv=None):
         print("REFUSED: %s" % bound)
         return 2
     cmd, stdin = bound
+
+    # Local and free, so it runs before the gates that cost network calls: being refused on the
+    # wording after waiting for two `gh api --paginate` round trips is how a gate earns a reputation
+    # for being in the way. Gates the PAYLOAD, not the file, for the same reason bind_payload exists.
+    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells)
+    if refuse is not None:
+        return refuse
 
     refuse = _new_thread_gate(a.file, cmd, a.ack_thread)
     if refuse is not None:
