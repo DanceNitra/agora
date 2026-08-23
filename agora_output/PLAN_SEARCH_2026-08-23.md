@@ -87,7 +87,62 @@ tag.**
 > graph gives a median of 3 inbound links per page and **3 orphans, not 124**. A number that alarming
 > should be checked against its own instrument before it reaches a plan.
 
-## 4. What did change, and how confident I am
+## 4. ANSWERED — the coverage export, and it is a third state
+
+*Added later on 2026-08-23, from the owner's `Coverage` export (`Indexovanie → Stránky`, "all known
+pages"). It answers §5's blocking question and it overrides the attribution in §4 below, which is kept
+because being wrong in a documented way is cheaper than quietly editing it out.*
+
+**Google has never known more than three URLs of the 135 in our sitemap.**
+
+| date | URLs Google knows | indexed | not indexed |
+|---|---|---|---|
+| 2026-06-30 | 2 | 2 | 0 |
+| 2026-07-01 | **3** | 3 | 0 |
+| 2026-07-11 | 3 | 2 | 1 |
+| 2026-08-06 → today | 3 | **1** | 2 |
+
+Maximum ever discovered: **3**. Currently indexed: **one page**. The two non-indexed are "Alternate
+page with proper canonical tag" (the crucible `index.html`, working as designed) and "Crawled –
+currently not indexed".
+
+So §5's question — *not indexed, or indexed and never ranking?* — had a third answer I did not offer:
+**132 of 135 URLs were never discovered at all.** Not crawled and rejected. Not seen.
+
+And the impressions track the index count almost exactly:
+
+| period | index state | impressions/day (mean) | median |
+|---|---|---|---|
+| 06-30 → 07-10 | 3 indexed | 9.91 | 7.0 |
+| 07-11 → 07-24 | 2 indexed | 10.64 | 8.5 |
+| **07-25 → 08-05** | **2 indexed** | **2.50** | **2.0** |
+| 08-06 → 08-17 | 1 indexed | 1.67 | 1.5 |
+
+Control, with the four spike days (≥25 impressions) removed, the ordering holds: 7.22 / 6.15 / 1.67.
+
+**There are two separate hits, not one, and I had merged them:**
+
+- **A · 2026-07-25** — impressions fall from 10.6 to 2.5 a day **while the index count does not move**.
+  This is a ranking loss on pages that stayed indexed. It is four days after the 2026-07-21 rebrand,
+  which is the only site-wide content change in range.
+- **B · 2026-08-06** — a page is dropped from the index, 2 → 1, and the site settles at 1.67 a day.
+
+Hit B is not the rebrand: it is fifteen days later and it is a deindexing, not a demotion.
+
+**What this does to the plan below.** S2 (query targeting) is premature — you cannot rank pages Google
+has not found. S4 (title lengths) is cosmetic on 132 invisible pages. The entire problem is
+**discovery**, and the sitemap that declares 135 URLs has produced **zero** discovered URLs in eight
+weeks, which is the strongest available evidence that **Google is not processing our sitemap at all**.
+
+That is now the one thing to check, and it is one screen: **Search Console → Indexovanie → Sitemapy** —
+does it say success, and how many URLs did it report discovering? A note in our own memory says it once
+showed *"Nie je možné načítať"* and we recorded that as "async, normal". On this evidence that
+assumption was never re-checked and may have been wrong for two months.
+
+## 4b. What did change, and how confident I am
+*(Written before the coverage export arrived. §4 above corrects it: the Jul-25 hit is real and still
+unexplained, but the August collapse is a separate deindexing event, and the dominant fact — that only
+three URLs were ever discovered — is not about the rebrand at all.)*
 
 Two site-wide changes sit in the window:
 
@@ -145,30 +200,83 @@ Ordered by expected effect on the actual bottleneck, not by how much it looks li
 on-page fixes are near the bottom on purpose: they improve pages that get impressions, and 132 pages
 get none.
 
-### S0 — Get the indexation report *(blocking, 5 minutes, owner)*
-Search Console → *Indexovanie → Stránky* → export. It returns the split between indexed and
-not-indexed with a reason ("Crawled – currently not indexed", "Discovered – currently not indexed",
-"Duplicate", "Excluded by noindex").
-**Decides:** whether S1 or S2 is the real work.
-**Success:** we know the number. Everything below is provisional until we do.
+### S0 — DONE. Answer: 3 of 135 URLs discovered, 1 indexed
+See §4. The pages are not "indexed and not ranking" and not "crawled and rejected" — they were never
+found. This kills S2 and S4 as first moves and makes everything below about discovery.
 
-### S1 — If the pages are NOT indexed: earn crawl demand
-A site on a GitHub Pages subdirectory with essentially no inbound links has almost no crawl budget.
-"Crawled – currently not indexed" on a 1,200-word technical post is Google saying *this is fine and
-nobody has given me a reason to keep it*.
-- Link the three orphans: `/public/leaderboard/`, `/public/compare/`, `/agora/sk/public/posts/`.
-- 37 pages have exactly one inbound link. Every post should be reachable in two clicks from the home
-  page and linked from at least two sibling posts on the same topic.
-- Real backlinks are the lever, and we already have the sources: the DeepSeek-V3, claude-code, CML,
-  memex and RAMR threads where our work is cited by name. A Zenodo DOI. PyPI. These are the only
-  external signals we own — and none of them currently point at a *post*, they point at repos.
-**Expected effect:** this is the one that can move a zero. Slow — weeks.
+### S0b — Is Google reading our sitemap at all? *(blocking, 2 minutes, owner)*
+**Search Console → Indexovanie → Sitemapy.** For `sitemap.xml` and `sitemap_index.xml`, report back
+three things: the **status** (Úspešné / Nie je možné načítať / Má chyby), the **date last read**, and
+the **"Zistené stránky"** count.
 
-### S2 — If the pages ARE indexed: we are writing for queries nobody types
-The evidence is already in the export. The single biggest query is **"zero proof ai mcp receipts"** —
-63 impressions at position 8.48 — a problem-shaped phrase. Second is **"crucible ai"**, 20
-impressions at position 58.85. Everything else is one impression each, including three junk matches
-for other products called Agora.
+A valid sitemap listing 135 URLs that yields 3 discovered URLs in eight weeks is either not being
+fetched, or being fetched and rejected. Those have different fixes and the screen says which.
+
+I verified everything on our side today, so the failure is not in the file:
+
+| check | result |
+|---|---|
+| `sitemap.xml` HTTP | 200, `application/xml`, 19,912 bytes, no BOM |
+| XML well-formed | yes, correct `sitemaps.org/schemas/sitemap/0.9` namespace |
+| `<loc>` entries | 135, all absolute `https://` URLs matching the property prefix |
+| `<lastmod>` | 125 entries, **0 malformed** |
+| `sitemap_index.xml` | 200, valid, points at `sitemap.xml` |
+| root `robots.txt` | 200, `Allow: /`, declares both sitemaps |
+| `X-Robots-Tag` header | **absent** on homepage, posts index and sitemap |
+| crawl path from home | 25 unique internal `<a>` links, including the posts index and 14 posts |
+
+**If the status is "Nie je možné načítať":** resubmit both, and if it persists the working alternative
+is the account-root sitemap declaration plus Bing/IndexNow, which we already have a key for.
+
+### S1 — Earn discovery and crawl demand *(the actual work)*
+Discovery has two channels and both are currently producing nothing. Work them in this order.
+
+**S1a — force the first URLs in by hand (today, owner, ~20 minutes).**
+Search Console → **Kontrola adresy URL** (URL Inspection) → paste a URL → **Požiadať o indexovanie**.
+There is a daily quota of roughly ten, so this is not how 135 pages get indexed — it is how we find
+out whether Google will accept *any* of them, and it seeds the crawler with a starting set.
+Pick these first, because they are the pages worth ranking and the ones other things link to:
+
+1. `https://dancenitra.github.io/agora/public/posts/` — the index, because it links to every post
+2. `https://dancenitra.github.io/agora/public/crucible/`
+3. `https://dancenitra.github.io/agora/public/leaderboard/`
+4. `https://dancenitra.github.io/agora/public/compare/`
+5. `https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html` — the topic of our
+   only real query, *"zero proof ai mcp receipts"*, 63 impressions at position 8.48
+
+**Read what the inspection says before requesting.** "URL nie je v službe Google" plus "Zistenie:
+Adresa URL nie je v žiadnej mape stránok" would mean the sitemap is not connected to this property at
+all, which is S0b's answer arriving from the other side.
+
+**S1b — IndexNow, for Bing and everything downstream of it.**
+We already have the key file (`104dc9a7a9aa51c3cfd78e6a87842424.txt`) at the account root, and a
+previous submission of 125 agora URLs was accepted (HTTP 202). Bing feeds ChatGPT search, so this is
+worth doing on its own merits and it is a second, independent discovery channel that does not depend
+on whatever is wrong with the Google sitemap. Re-submit the current 135.
+
+**S1c — the three orphans and the thin internal links.**
+`/public/leaderboard/`, `/public/compare/` and `/agora/sk/public/posts/` have zero inbound internal
+links; 37 pages have exactly one. Every post should be two clicks from the home page and linked from
+at least two siblings on the same topic. Cheap, and it is what turns one indexed page into a crawl
+path.
+
+**S1d — external links, the only real lever.**
+A `github.io` subdirectory with no inbound links gets almost no crawl budget, and that is the whole
+story of "3 URLs discovered in eight weeks". The sources we already own and do not use:
+the DeepSeek-V3, claude-code, CML, memex and RAMR threads where our work is cited by name; the Zenodo
+DOI; PyPI. **Every one of them currently points at a repository, never at a post.** The next time we
+cite our own work in a thread, cite the page, not the repo.
+
+**Expected effect:** S1a and S1b can change the number this week. S1d is what makes it stay changed,
+and it is slow — weeks.
+
+### S2 — Query targeting *(after discovery, not before)*
+Deferred, and the reason is §4: you cannot rank a page Google has not found. Keeping the analysis
+because it is still true and it decides what we do once pages exist in the index.
+
+The single biggest query is **"zero proof ai mcp receipts"** — 63 impressions at position 8.48, a
+problem-shaped phrase. Second is **"crucible ai"**, 20 impressions at position 58.85. Everything else
+is one impression each, including three junk matches for other products called Agora.
 
 Meanwhile our titles read like this:
 - *"We looked for the grounding 'tipping point' in AI self-training…"* (119 chars)
@@ -177,11 +285,9 @@ Meanwhile our titles read like this:
 
 These are essay titles. They are good essay titles. Nobody searches them.
 - Pick **five** queries with real volume that our existing work already answers, and build or retitle
-  one page each. We have no keyword-volume data in-house — this needs a source (GSC's own query
-  report once there is traffic, or a keyword tool).
-- The one page that already earns impressions at position 8.48 gets **zero clicks**. That is a
-  title/snippet problem on a page we already rank on, and it is the cheapest CTR win available.
-**Expected effect:** the only route to non-zero clicks that does not depend on authority.
+  one page each. We have no keyword-volume data in-house — this needs a source.
+- The page that already ranks at position 8.48 gets **zero clicks**. Once discovery is fixed, that is
+  the cheapest CTR win on the site.
 
 ### S3 — Settle the brand, once, in writing
 Decide whether the entity is Agora, inspeximus, or Agora-the-org publishing inspeximus-the-product,
@@ -204,7 +310,7 @@ internal link equity of a site that has very little of either.
 **This is the owner's call, not mine** — there may be reasons for the Slovak half that have nothing to
 do with search. But it should be a decision, not a default.
 
-### S6 — Stop measuring this channel weekly
+### S6 — Measure the right number, monthly
 At 1.5 impressions a day, week-to-week movement is noise. A single query drifting three positions
 moves the percentage more than anything we do. Review on a **monthly** cadence against the two numbers
 that matter, both currently zero: *pages with at least one impression* (3 of 135) and *external
@@ -212,17 +318,26 @@ clicks* (0).
 
 ---
 
-## What I would do first, if it were my call
+## What I would do first
 
-**S0 today** — it is five minutes and it decides everything else.
+**S0b and S1a today**, in that order, both in Search Console and both the owner's hands: read the
+Sitemaps screen, then request indexing on the five URLs in S1a. Between them they answer the only
+question left — *will Google take our pages at all* — and they take under half an hour.
 
-Then, whatever S0 says: **S1's backlink half**, because it is the only item on this list that
-addresses why 132 pages are invisible, and because it is the same work `PLAYBOOK_DISTRIBUTION.md`
-already argues for on its own merits. Those GitHub threads are the only external signal we have, and
-right now every one of them points at a repository instead of at a page that could rank.
+**S1b this week** — resubmit the 135 URLs to IndexNow. Independent of whatever is wrong on the Google
+side, and Bing is what ChatGPT search reads.
 
-The on-page work — S3, S4 — is a day's scripting and should be done, but nobody should expect it to
-show up in the numbers. It is hygiene on a site whose problem is that almost nothing links to it.
+Then **S1d**, which is the only durable item on the list and the one that overlaps with
+`PLAYBOOK_DISTRIBUTION.md`: the GitHub threads where our work is already cited are the only external
+signal we own, and every one of them points at a repository instead of at a page. That is free to fix
+and we control it entirely.
+
+The on-page work — S3, S4 — is a day's scripting and should be done, but nobody should expect it in
+the numbers. It is hygiene on 132 pages Google has never seen.
+
+**Track one number, weekly, and only this one until it moves:** *URLs Google knows about*. It has been
+3 since 2026-07-01. Impressions, positions and CTR are downstream of it and reading them first is what
+produced the wrong diagnosis in §4b.
 
 **And one thing not to do:** do not revert the July SEO work. It is measurably correct on the live
 site, and rolling it back would trade a clean technical layer for a hypothesis I have already said
