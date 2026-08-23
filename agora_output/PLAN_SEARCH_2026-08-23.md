@@ -139,6 +139,52 @@ does it say success, and how many URLs did it report discovering? A note in our 
 showed *"Nie je možné načítať"* and we recorded that as "async, normal". On this evidence that
 assumption was never re-checked and may have been wrong for two months.
 
+## 4c. It is not our sitemap. It is the whole host.
+
+*Added after verifying `https://dancenitra.github.io/` as a second property on 2026-08-23.*
+
+The root property lists **four sitemaps, across three projects, submitted on four different dates**,
+and every one of them reads the same:
+
+| sitemap | submitted | status | discovered | last read |
+|---|---|---|---|---|
+| `/sitemap.xml` | 2026-08-23 | Nie je možné načítať | 0 | — |
+| `/agora/sitemap.xml` | 2026-08-23 | Nie je možné načítať | 0 | — |
+| `/danchi/sitemap.xml` | 2026-08-05 | Nie je možné načítať | 0 | — |
+| `/inspeximus/sitemap.xml` | 2026-07-30 | Nie je možné načítať | 0 | — |
+
+Four files, three projects, four dates, one failure. **So it was never the agora sitemap**, and every
+hour spent inside that file was spent in the wrong place — including several of mine.
+
+Everything on our side is now ruled out, with receipts:
+
+| candidate | result |
+|---|---|
+| sitemap content | spec-clean on nine checks |
+| fetchability | 20/20 HTTP 200, plus HEAD, gzip, no-UA, Googlebot UA, HTTP/1.1 |
+| GSC's own live URL test | "stránka je k dispozícii" |
+| root `robots.txt` | read in full, **no `Disallow` anywhere** |
+| homepage `<base>` / `meta robots` / `nofollow` | none / none / **0 of 50 internal links** |
+| homepage HTML | complete, `</html>` present, self-canonical |
+| **all four GitHub Pages edge nodes** | `185.199.108–111.153` each serve `/sitemap.xml`, `/agora/sitemap.xml` and `/robots.txt` at **200** |
+| host root 404 | fixed — a sitemap index now lives at `https://dancenitra.github.io/sitemap.xml` |
+
+**The one path I could not test is IPv6.** The host has AAAA records (`2606:50c0:8000–8003::153`,
+confirmed by an authoritative DoH lookup, not by this machine's resolver) and Google prefers IPv6 when
+it is available. GitHub Pages IPv6 serves millions of sites, so this is unlikely — but it is the only
+technical unknown left, and I am recording it as untested rather than as cleared.
+
+**The most probable remaining explanation is not technical.** A sitemap is a hint, not an instruction.
+For a host with essentially no inbound links, Google assigns near-zero crawl budget and is free to
+never fetch the hint at all — which matches every number here: three URLs discovered in eight weeks,
+an index count decaying 3 → 2 → 1, and four sitemaps sitting unread across three projects.
+
+**The screen that settles it: Nastavenia → Štatistiky prehľadávania (Crawl stats).** It reports total
+crawl requests to this host over 90 days. Near zero confirms crawl budget and closes this line of
+investigation for good; a healthy number means something else is wrong and we look again.
+
+If it is crawl budget, then S1d — external links — is not one item on the list. It is the whole list.
+
 ## 4b. What did change, and how confident I am
 *(Written before the coverage export arrived. §4 above corrects it: the Jul-25 hit is real and still
 unexplained, but the August collapse is a separate deindexing event, and the dominant fact — that only
