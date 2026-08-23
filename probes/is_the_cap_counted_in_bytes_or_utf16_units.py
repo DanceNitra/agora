@@ -134,11 +134,15 @@ def main() -> int:
         # session still fabricated a canary (246, in a 200-line file) in 1 of 9 trials on
         # 2026-08-23 -- see a_probe_with_tools_enabled_can_answer_from_disk.result.json. A single
         # trial cannot tell a read from an invention, so take the mode and record the spread.
-        answers, seen, used = [], [], []
+        answers, seen, used, offers = [], [], [], []
         for _ in range(TRIALS):
-            _, ans_i, offered2, used_i = run(cwd, ASK)
+            _, ans_i, offered_i, used_i = run(cwd, ASK)
             used += used_i
-            mi = re.search(r"CANARY-L(\d{4})", (ans_i or "").split("WARNING")[0])
+            offers.append(len(offered_i))     # every trial, not just the last one
+            h_i = (ans_i or "").split("WARNING")[0]
+            mi = (re.search(r"LAST\s*=\s*\**\s*CANARY-L(\d{4})", h_i)
+                  or re.search(r"CANARY-L(\d{4})", h_i))   # anchored first: a reply that lists
+            #   several canaries must not be read by whichever one happens to come first
             answers.append(int(mi.group(1)) if mi else None)
             seen.append(ans_i or "")
         # the mode, tie broken toward the earliest trial
@@ -146,7 +150,8 @@ def main() -> int:
                    key=lambda x: (answers.count(x), -answers.index(x)), default=None)
         ans = next((s_ for s_, a_ in zip(seen, answers) if a_ == mode), seen[0])
         head = (ans or "").split("WARNING")[0]
-        m = re.search(r"CANARY-L(\d{4})", head)
+        m = (re.search(r"LAST\s*=\s*\**\s*CANARY-L(\d{4})", head)
+             or re.search(r"CANARY-L(\d{4})", head))
         row = {
             "label": label, "lines": n, "width_chars": w, "filler_codepoint": ord(ch[0]),
             "bytes": os.path.getsize(path),
@@ -154,7 +159,8 @@ def main() -> int:
             "utf16_units": len(text.encode("utf-16-le")) // 2,
             "last_line_loaded": int(m.group(1)) if m else None,
             "warned": "NO-INDICATOR" not in (ans or "").upper(),
-            "tools_offered": len(offered2),
+            "tools_offered": max(offers),
+            "tools_offered_per_trial": offers,
             "tool_uses": used,
             "trials": answers,
             "unanimous": len(set(answers)) == 1 and answers[0] is not None,
@@ -182,8 +188,12 @@ def main() -> int:
         v["every_arm_is_unanimous_across_trials"] = all(r["unanimous"] for r in by.values())
         v["no_tools_were_offered"] = all(r.get("tools_offered") == 0 for r in by.values())
         v["no_tool_was_called"] = all(not r.get("tool_uses") for r in by.values())
-        v["answers_are_not_the_files_last_line"] = any(
-            r["last_line_loaded"] != r["lines"] for r in by.values())
+        # `any` was the wrong quantifier: three of four arms could have been disk reads and this
+        # still passed. The negative control is EXEMPT and cannot help here -- it loads whole, so
+        # its correct answer (200) is also exactly what a disk read returns. It can never
+        # discriminate, and pretending otherwise is how a control certifies the thing it misses.
+        v["every_truncating_arm_reports_a_cut"] = all(
+            r["last_line_loaded"] < r["lines"] for r in (a, c, e))
         v["negative_control_loads_whole"] = (n["warned"] is False
                                              and n["last_line_loaded"] == n["lines"])
         v["not_bytes__cjk_cuts_where_ascii_cuts"] = (
@@ -191,9 +201,22 @@ def main() -> int:
         v["not_code_points__emoji_cuts_earlier_at_equal_code_points"] = (
             e["code_points"] == c["code_points"]
             and e["last_line_loaded"] < c["last_line_loaded"])
-        v["utf16_units_predict_both_cuts"] = all(
-            abs(r["last_line_loaded"] - min(r["lines"], int(25000 / (r["utf16_units"] / r["lines"])))) <= 3
-            for r in (a, c, e))
+        # Was: |measured - floor(25000/units_per_line)| <= 3. Two faults, both fatal to its
+        # purpose. It ASSUMED the cap is exactly 25,000 -- a documented round number, never a
+        # measured one -- and its +/-3 tolerance is wider than the floor/ceil gap of 1, so it
+        # passed under either reading and discriminated nothing. What the arms actually support is
+        # a BRACKET: under a whole-line rule, every line reported loaded must fit and the next
+        # must not. If one interval survives across arms of different widths, a single cap
+        # explains them all; the interval, not 25,000, is the measured quantity.
+        lo, hi = 0, 10 ** 9
+        for r in by.values():
+            upl = r["utf16_units"] / r["lines"]
+            lo = max(lo, upl * r["last_line_loaded"])
+            if r["last_line_loaded"] < r["lines"]:
+                hi = min(hi, upl * (r["last_line_loaded"] + 1))
+        v["a_single_cap_explains_every_arm"] = lo < hi
+        v["that_cap_is_consistent_with_the_documented_25000"] = lo <= 25000 < hi
+        cap_bracket = [int(lo), int(hi)]
         v["warning_reports_units_over_1024_not_kb"] = bool(
             re.search(r"is (\d+\.\d+)KB", c["answer"]) and
             abs(float(re.search(r"is (\d+\.\d+)KB", c["answer"]).group(1))
@@ -204,7 +227,8 @@ def main() -> int:
     json.dump({"probe": "is_the_cap_counted_in_bytes_or_utf16_units",
                "claude_version": subprocess.run([CLAUDE, "--version"], capture_output=True,
                                                 text=True).stdout.strip(),
-               "ask": ASK, "verdicts": v, "rows": rows},
+               "ask": ASK, "cap_bracket_utf16_units": cap_bracket,
+               "verdicts": v, "rows": rows},
               open(out, "w", encoding="utf-8"), indent=2)
 
     print("\n=== ROWS ===")
