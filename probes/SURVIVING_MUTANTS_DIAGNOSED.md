@@ -118,3 +118,35 @@ The five real ones fall into two shapes, and neither is exotic:
    straight through into a published-looking table.
 
 Neither is caught by any existing check because seven of the eight probes assert nothing at all.
+
+---
+
+## Status: all six fixed, each tested in both directions
+
+Every fix below had to satisfy two conditions before it shipped: the clean run still exits 0, and the
+mutant that exposed the hole now fires. That is not ceremony. **Three of the seven first attempts
+failed one of the two conditions**, and only the test found it:
+
+| file | guard added | clean | mutant fires |
+|---|---|---|---|
+| `llm_judge_length_null.py` | baseline agreement must exceed chance | 0 | yes |
+| `llm_judge_length_null.py` | explicit word/char dispatch, `else: raise` | 0 | yes |
+| `nudge_pubbias_artifact.py` | `TRUE_D` interpolated, not frozen in prose | 0 | n/a (correctness fix) |
+| `founder_survivorship_null.py` | survival band `0.5 < s <= 1.0` | 0 | yes |
+| `founder_survivorship_null.py` | included subset above its **own** cohort mean | 0 | yes |
+| `good_to_great_null.py` | `trait_prev` is a probability; band is ordered | 0 | yes |
+
+The three that failed first time:
+
+1. The survival assert does not reach the inclusion-cutoff hole at all — survival stays 1.00/1.00
+   whichever way that comparison points. A second, different guard was needed.
+2. That second guard first compared the included subset with the **pooled** mean and failed on clean
+   data: the founder cohort's fatter right tail drags the pooled mean above the professional cohort's
+   own top half, 13.512 against 13.830, with nothing wrong. Comparing each subset with its own cohort
+   mean is the property that actually separates "top" from "bottom".
+3. The word/char swap was first going to be an assert on the two counts. There is no such invariant to
+   assert — word counts and char counts have no fixed order across datasets. An explicit dispatch with
+   a raising `else` was the honest fix: it makes the same edit loud instead of provable.
+
+The three probes that needed no fix keep their NOT A HOLE verdict.
+

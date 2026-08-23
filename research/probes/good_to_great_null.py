@@ -36,6 +36,16 @@ SEEDS = 200
 
 
 def run(seed, leap_mult=3.0, mediocre_band=(0.5, 1.5), K_traits=60, trait_prev=0.6):
+    # trait_prev feeds `rng.random(...) < trait_prev`, so anything >= 1 makes every draw True
+    # and the probe reports "~60 of 60 traits shared by ALL selected firms by chance" against
+    # a real baseline of ~0 of 60 -- a result that looks like a finding and is an invalid
+    # input. Nothing checked the domain of a parameter the headline sentence is built on.
+    assert 0.0 < trait_prev < 1.0, (
+        "trait_prev=%r is not a probability; every trait would be shared by construction and\n"
+        "the traits-shared-by-chance line below would be arithmetic, not a null result."
+        % (trait_prev,))
+    assert 0 < mediocre_band[0] < mediocre_band[1], (
+        "mediocre_band=%r is not an ordered positive band" % (mediocre_band,))
     rng = np.random.default_rng(seed)
     r = rng.normal(MU, SIGMA, size=(N, 3 * MONTHS))          # iid returns, IDENTICAL params -> no skill
     def cumret(a):

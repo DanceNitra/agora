@@ -45,7 +45,16 @@ def asst_len(conv, mode):
     for m in conv:
         if m.get("role") == "assistant":
             c = m.get("content", "") or ""
-            n += len(c.split()) if mode == "word" else len(c)
+            # An explicit dispatch, not a ternary. Inverting `mode == "word"` in the ternary
+            # silently sent word-mode down the char branch and back: rows [2] and [3] simply
+            # exchanged values and the table kept its labels. With an else that raises, the
+            # same edit is loud instead of a quiet mislabel.
+            if mode == "word":
+                n += len(c.split())
+            elif mode == "char":
+                n += len(c)
+            else:
+                raise ValueError("unknown length mode %r (expected 'word' or 'char')" % mode)
     return n
 
 
