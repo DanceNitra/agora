@@ -61,6 +61,13 @@ def build():
               "aiaudit", "langgraph-gdpr-erasure"):
         if (ROOT / "public" / d / "index.html").exists():
             urls.append((f"{SITE}/public/{d}/", None))
+    # Pages under public/posts/ that the site links and serves but posts.json does not list, so the
+    # loop below never sees them. deep-dive-hot-hand is linked from the homepage, the Crucible and the
+    # Slovak homepage, and was undeclared for that reason alone. Checked before adding: it
+    # self-canonicalises in both languages and is not noindex.
+    for f in ("deep-dive-hot-hand.html",):
+        if (ROOT / "public" / "posts" / f).exists():
+            urls.append((f"{SITE}/public/posts/{f}", None))
     try:
         posts = json.loads((ROOT / "public" / "posts" / "posts.json").read_text(encoding="utf-8"))
     except Exception:
