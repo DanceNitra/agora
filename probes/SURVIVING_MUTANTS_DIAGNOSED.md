@@ -157,3 +157,57 @@ identifier edits in a data table. It was already the only GATE of the eight. `ad
 and `arena_style_only.py` had no flagged survivors to diagnose, so they are untouched and unjudged
 here rather than cleared.
 
+---
+
+## Adversarial re-read of the four NOT A HOLE verdicts
+
+Those four were judged by me and by nobody else, which is the weakest evidence in this document. Each
+was attacked with the specific argument most likely to overturn it. **All four survived** — and a
+re-read that always confirms is worth no more than the first read, so what each attack actually did
+is recorded below rather than just the outcome.
+
+### `founder_survivorship_null.py` L34 `SIG_PROF 0.05 -> 0.1` — attacked, stands
+
+The attack: the probe ends with a verdict that is conditional on one number and asserts a second,
+
+    print("VERDICT (mechanism):", "FAILED -- ... tail-driven (median << mean)."
+          if gap >= 2.0 else "PARTIAL.")
+
+`gap >= 2.0` is measured. **`median << mean` is not looked at anywhere.** That is the same shape as
+the "~80% human parity" hole ruled REAL above, so it should have fallen.
+
+The falsifier: sweep every reachable operating point and find one where `gap >= 2.0` while the median
+is NOT far below the mean. 24 points qualified. The median/mean ratio maxes at **0.642** (sig_f=0.09,
+inc=70, gap 2.42, median 1.55) and falls to 0.000 by sig_f=0.30. The clause is never asserted falsely
+in any configuration this probe can reach.
+
+Verdict stands, and now for a measured reason rather than an assertion. The hardcoded clause is still
+a latent risk if the parameter space ever widens — noted, not fixed, because fixing it today would
+mean guarding a condition nothing can currently violate.
+
+### `good_to_great_null.py` L38 `mediocre_band 0.5 -> 1.0` — attacked, stands, with a limitation
+
+The attack: line 82 prints a hand-written `"(mediocre 15y, then >=Nx market 15y)"`. With the band
+mutated to (1.0, 1.5) the cohort is at-or-above market, so the word "mediocre" would be doing what
+"top 50%" did in the cutoff hole.
+
+It does not land. (1.0, 1.5) is still *around* market, not exceptional, so the label is narrowed
+rather than falsified — unlike the cutoff case, which was a clean inversion.
+
+**The limitation found instead:** the guard added tonight only asserts `0 < lo < hi`. A band of
+(2.0, 3.0) would select clearly above-market firms and still print "mediocre". Not fixed, because the
+honest invariant would have to encode what "mediocre" means and inventing one to have something to
+assert is the mistake this document already records under the word/char swap.
+
+### `meta_audit_scoring.py` L67/L73/L79 — attacked, stands
+
+The attack: the flagged mutation turns post id 17 into 34, and 34 is not in the table (ids run 1-31,
+36, 42 across 32 rows). A reader following that list finds nothing. So: does anything validate ids?
+
+Sharpened to the case that would actually bite — mutate 17 into **18**, a duplicate of an existing
+id. The probe exits 1 against a base exit of 0. Its own assertions catch it, which is consistent with
+it being the only GATE of the eight. The original mutation produces a unique-but-unused id and the
+probe reports the new data faithfully, which is what mutating a datum should do.
+
+Verdict stands.
+
