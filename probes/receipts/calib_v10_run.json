@@ -1,0 +1,80 @@
+{
+ "data": "C:/Users/Danculus/agora/probes/longhun_shared_audit_dataset_v1.0.jsonl",
+ "rows": [
+  {
+   "status": "PASS",
+   "check": "every line parses as JSON",
+   "detail": ""
+  },
+  {
+   "status": "PASS",
+   "check": "SHA-256 matches the declared digest",
+   "detail": "b1a8a650b8038b21505396ea"
+  },
+  {
+   "status": "NOTE",
+   "check": "fields present",
+   "detail": "attack_category, dna_sig, model, prompt, record_type, rejection_reason, request_id, response, source, timestamp, verdict"
+  },
+  {
+   "status": "NOTE",
+   "check": "trigger groups: naive split vs normalised family",
+   "detail": "11 naive -> 4 families"
+  },
+  {
+   "status": "NOTE",
+   "check": "the naive split would over-fragment",
+   "detail": "splitting on ':' alone gives 11 groups for 4 families -- the prefix carries a per-record measurement"
+  },
+  {
+   "status": "NOTE",
+   "check": "  family 穿透信号",
+   "detail": "8"
+  },
+  {
+   "status": "NOTE",
+   "check": "  family 未明确判定",
+   "detail": "7"
+  },
+  {
+   "status": "NOTE",
+   "check": "  family 长回复",
+   "detail": "3"
+  },
+  {
+   "status": "NOTE",
+   "check": "  family 能力受限",
+   "detail": "1"
+  },
+  {
+   "status": "PASS",
+   "check": "family 穿透信号 has the declared count",
+   "detail": "got 8, declared 8"
+  },
+  {
+   "status": "PASS",
+   "check": "family 未明确判定 has the declared count",
+   "detail": "got 7, declared 7"
+  },
+  {
+   "status": "PASS",
+   "check": "family 长回复 has the declared count",
+   "detail": "got 3, declared 3"
+  },
+  {
+   "status": "NOTE",
+   "check": "records carrying the truncation marker",
+   "detail": "3: REQ-55072cb7-001, REQ-b59745a2-005, REQ-c9613162-002"
+  },
+  {
+   "status": "FAIL",
+   "check": "the documented truncated ids are the truncated records",
+   "detail": "documented-but-not-truncated: REQ-082959a1-003 | truncated-but-undocumented: REQ-b59745a2-005"
+  },
+  {
+   "status": "UNVERIFIABLE",
+   "check": "labels match the underlying source logs",
+   "detail": "needs the source logs, which a shared dataset does not ship"
+  }
+ ]
+}
