@@ -53,6 +53,27 @@ CASES = {
     "emoji_200x125":   (200, 125, "\U0001F600"),  # code points vs units
 }
 
+# Every store this probe writes into lives under the user's REAL ~/.claude/projects/, because the
+# path comes from the CLI's own init event. That is correct, and it is exactly why a fixture is
+# indistinguishable from a real memory store to anything walking that directory -- @pjt222 named the
+# hazard (pjt222/agent-almanac#407). Measured here 2026-08-23: ours had reached 165 of 168 slug
+# directories, 24.5 MB, accumulated over weeks because nothing removed them. A cleanup that is not
+# CHECKED is the same defect class this probe studies, so cleanup() re-reads the filesystem and
+# reports what survived rather than assuming rmtree worked.
+CREATED: list[str] = []
+
+
+def cleanup(created=None):
+    """Remove the fixture stores this run created; return (removed, still_present)."""
+    import shutil
+    targets = list(CREATED if created is None else created)
+    parents = [os.path.dirname(os.path.abspath(t)) for t in targets]
+    for parent in parents:
+        shutil.rmtree(parent, ignore_errors=True)
+    left = [p_ for p_ in parents if os.path.exists(p_)]
+    return len(parents) - len(left), left
+
+
 TRIALS = 3          # see the REPEAT note in main(): one answer per arm is not a measurement
 CLAUDE = None
 _t0 = time.time()
@@ -128,8 +149,13 @@ def main() -> int:
         text = make(n, w, ch)
         os.makedirs(store, exist_ok=True)
         path = os.path.join(store, "MEMORY.md")
-        with open(path, "w", encoding="utf-8", newline="\n") as f:
-            f.write(text)
+        # BYTES, not text mode. Python text mode rewrites line endings, which silently destroys
+        # any arm whose EOL is the variable under test -- @pjt222 pins this in memcap-fixture.py.
+        # Ours pinned newline explicitly, which was correct but relied on remembering to; bytes
+        # cannot be got wrong by a later edit.
+        with open(path, "wb") as f:
+            f.write(text.encode("utf-8"))
+        CREATED.append(store)
         # REPEAT. One answer per arm is not a measurement: with tools fully disabled a guarded
         # session still fabricated a canary (246, in a 200-line file) in 1 of 9 trials on
         # 2026-08-23 -- see a_probe_with_tools_enabled_can_answer_from_disk.result.json. A single
@@ -242,6 +268,12 @@ def main() -> int:
     print("\n=== VERDICTS ===")
     for k, val in v.items():
         print(f"  {'YES' if val else 'no '}  {k}")
+    removed, left = cleanup()
+    print("")
+    print(f"  fixture stores removed: {removed}   still present: {len(left)}")
+    for t in left:
+        print(f"    LEFT BEHIND: {t}")
+    v["every_fixture_store_was_removed"] = not left
     log(f"wrote {out}")
     return 0 if all(v.values()) else 1
 

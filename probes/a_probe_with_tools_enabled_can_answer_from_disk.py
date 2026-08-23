@@ -80,8 +80,9 @@ def arm(root, name, no_tools):
     if not store:
         raise SystemExit("REFUSED: store not resolved -- nothing here would be evidence")
     os.makedirs(store, exist_ok=True)
-    with open(os.path.join(store, "MEMORY.md"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(U.make(200, 125, "x"))
+    with open(os.path.join(store, "MEMORY.md"), "wb") as f:      # bytes, not text mode
+        f.write(U.make(200, 125, "x").encode("utf-8"))
+    U.CREATED.append(store)
     out = []
     for label, prompt in PHRASINGS.items():
         for i in range(TRIALS):
@@ -164,6 +165,9 @@ def main():
     print("\n=== VERDICTS ===")
     for k, val in v.items():
         print(f"  {'YES' if val else 'no '}  {k}")
+    removed, left = U.cleanup()
+    print(f"  fixture stores removed: {removed}   still present: {len(left)}")
+    v["every_fixture_store_was_removed"] = not left
     print(f"\nwrote {out}")
     return 0 if all(v.values()) else 1
 
