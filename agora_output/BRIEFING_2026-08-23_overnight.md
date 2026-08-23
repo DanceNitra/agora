@@ -60,7 +60,14 @@ sweep over 24 operating points to settle, and it settled in their favour.
 
 ## State
 
-Fourteen commits on agora main, one on inspeximus main with CI green 3/3. Three of the fourteen are corrections
+16 commits on agora main, one on inspeximus main with CI green 3/3. Three of the fourteen are corrections
 to my own earlier work from the same night — including the count in this paragraph, which said ten
 and then two until it was checked against the log. Nothing outward, nothing awaiting your approval
 except the two decisions at the top.
+
+**Added after the brief was first written.** The last bucket, the 29 probes flagged as too slow: 15 of
+the 17 unchecked ones finish in under 2.4 seconds when run alone. That bucket was mostly my own
+12-worker load, not the probes. The one real find is worse than slowness — `outcome_propagation_probe.py`
+computes for 225 seconds and then throws all of it away on its last line, writing its receipt to a path
+relative to the caller rather than to itself. Fixed and verified; it now saves the run and announces its
+cost in the first second.
