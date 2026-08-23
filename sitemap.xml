@@ -8,6 +8,12 @@
   <url><loc>https://dancenitra.github.io/agora/public/forecast.html</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/leaderboard/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/compare/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/integrity/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/ai-claims/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/audit/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/self-audit/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/aiaudit/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/a-status-nobody-earned.html</loc><lastmod>2026-08-22</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-22</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/a-green-suite-that-never-ran.html</loc><lastmod>2026-08-13</lastmod></url>
@@ -73,6 +79,8 @@
   <url><loc>https://dancenitra.github.io/agora/public/posts/causal-inference-phase-diagram.html</loc><lastmod>2026-06-29</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/sk/public/self-audit/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/sk/public/aiaudit/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/a-status-nobody-earned.html</loc><lastmod>2026-08-22</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-22</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/a-green-suite-that-never-ran.html</loc><lastmod>2026-08-13</lastmod></url>
