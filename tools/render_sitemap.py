@@ -51,7 +51,14 @@ def build():
     # itself disavows. I added it as a "missing page" earlier today and rewrote its canonical to match,
     # on the untested assumption that the target was dead because the DOMAIN ROOT 404s; it is not, and
     # the cross-site canonical was correct all along. Both changes reverted.
-    for d in ("leaderboard", "compare"):
+    # Every directory page the site serves and does not disavow. Measured 2026-08-23 by crawling from
+    # the homepage instead of from the sitemap: eight live pages were reachable and undeclared, which
+    # is the sitemap failing at the one job it has. Each was checked first -- all eight carry a
+    # SELF-referential canonical and none is noindex -- because the note above records what happens
+    # when a URL is added that the page itself points away from. `self-audit` and `aiaudit` also exist
+    # under sk/, and the mirroring block below picks those up on its own.
+    for d in ("leaderboard", "compare", "integrity", "ai-claims", "audit", "self-audit",
+              "aiaudit", "langgraph-gdpr-erasure"):
         if (ROOT / "public" / d / "index.html").exists():
             urls.append((f"{SITE}/public/{d}/", None))
     try:
