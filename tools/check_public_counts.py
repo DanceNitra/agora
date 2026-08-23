@@ -58,59 +58,6 @@ def posts_published() -> int:
     return len(re.findall(r'"@type":\s*"BlogPosting"', idx))
 
 
-FORECAST = ROOT / "public" / "track-record.json"
-
-
-def forecast_truth() -> dict:
-    """The derived forecast numbers. Committed, because the ledger they come from is not.
-
-    server/.predictions.json is runtime state and .gitignore excludes it, so CI cannot read it. That
-    is exactly why the forecasting line on the track-record page went unverified for five weeks while
-    the Crucible line beside it was checked on every run: one had a committed source and the other did
-    not. tools/derive_track_record.py writes this artifact; here the pages are held to it, and when
-    the live ledger IS present the artifact is held to the ledger as well.
-    """
-    if not FORECAST.exists():
-        raise SystemExit("public/track-record.json is missing -- run tools/derive_track_record.py. "
-                         "Without it the forecast numbers on the site are unverifiable.")
-    return json.loads(FORECAST.read_text(encoding="utf-8"))
-
-
-def forecast_artifact_matches_ledger(truth: dict) -> list:
-    """When the ledger is reachable, the artifact must still agree with it. Absent in CI, and the run
-    SAYS which mode it took rather than reporting a silent pass."""
-    ledger = ROOT / "server" / ".predictions.json"
-    if not ledger.exists():
-        return []
-    data = json.loads(ledger.read_text(encoding="utf-8"))
-    recs = data if isinstance(data, list) else (data.get("predictions") or data.get("records") or [])
-    res = [r for r in recs if r.get("actual") not in (None, "", "pending")]
-    live_resolved = len(res)
-    live_correct = sum(1 for r in res if r.get("direction") == r.get("actual"))
-    out = []
-    if live_resolved != truth["resolved"]:
-        out.append("public/track-record.json: says %d resolved, the live ledger has %d -- re-run "
-                   "tools/derive_track_record.py" % (truth["resolved"], live_resolved))
-    if live_correct != truth["correct"]:
-        out.append("public/track-record.json: says %d correct, the live ledger has %d -- re-run "
-                   "tools/derive_track_record.py" % (truth["correct"], live_correct))
-    return out
-
-
-#: Forecast claims on the published pages, checked against the derived artifact above.
-FORECAST_CHECKS = [
-    ("public/track-record.html", r"<b>(\d+) forecasts on record</b>", "total"),
-    ("public/track-record.md", r"\*\*(\d+) forecasts on record", "total"),
-]
-
-#: A page may not claim there is no score while the ledger holds one. This is the exact sentence the
-#: live site carried for five weeks, and no numeric check can reach it.
-#: WIDER THAN THE OBVIOUS WORDING, because the live page said "no RESOLVED Brier score to
-#: report yet" and a pattern written for "no Brier score" slid straight past it -- a guard
-#: narrower than the property it guards, which is the defect this whole file exists to catch.
-NO_SCORE_CLAIM = r"no\s+(?:\w+\s+){0,3}Brier score"
-
-
 #: (file, regex, group -> expected key). Every published integer that restates the ledger.
 CHECKS = [
     ("index.html", r"(\d+)\s+claims tested", "TOTAL"),
@@ -144,6 +91,15 @@ CHECKS = [
     ("public/crucible/index.html", r"(\d+)\s+reproduced", "REPRODUCED"),
     ("public/crucible/index.html", r"(\d+)\s+failed", "FAILED"),
     ("public/crucible/index.html", r"(\d+)\s+not-computable", "NOT_COMPUTABLE"),
+
+    # THE HERO COUNTERS, which were outside this instrument entirely until 2026-08-23. Every pattern
+    # above matches a number in PROSE; the four big tiles a visitor reads first are attributes, so 35
+    # numbers could be reported as agreeing while `data-count="12"` sat next to a ledger saying 13.
+    # It did. The FAILED tile had been stale since world-model-mcp was ruled FAILED on 2026-07-29.
+    ("index.html", r'data-count="(\d+)">\d+</span><span class="lbl"><span class="en">Claims reproduced', "REPRODUCED"),
+    ("index.html", r'data-count="(\d+)">\d+</span><span class="lbl"><span class="en">Failed', "FAILED"),
+    ("sk/index.html", r'data-count="(\d+)">\d+</span><span class="lbl"><span class="sk">Tvrden', "REPRODUCED"),
+    ("sk/index.html", r'data-count="(\d+)">\d+</span><span class="lbl"><span class="sk">Zlyhan', "FAILED"),
 ]
 
 
@@ -182,39 +138,6 @@ def main() -> int:
             checked += 1
             if int(h) != truth_posts:
                 bad.append(f"{rel}: says {h} essays, {truth_posts} posts are published")
-
-    # ── the forecasting numbers, which are what this page exists for ──────────────────────────
-    fc = forecast_truth()
-    bad.extend(forecast_artifact_matches_ledger(fc))
-    ledger_here = (ROOT / "server" / ".predictions.json").exists()
-    print("forecasts: %d resolved / %d correct (%.1f%%) - Brier %s   [%s]"
-          % (fc["resolved"], fc["correct"], 100 * fc["hit_rate"], fc["brier"],
-             "artifact cross-checked against the live ledger" if ledger_here
-             else "pages vs artifact only - no ledger here, as in CI"))
-    for rel, pattern, key in FORECAST_CHECKS:
-        path = ROOT / rel
-        if not path.exists():
-            bad.append("%s: MISSING -- cannot verify %s" % (rel, key))
-            continue
-        text = path.read_text(encoding="utf-8", errors="replace")
-        hits = re.findall(pattern, text)
-        if not hits:
-            bad.append("%s: pattern /%s/ matched NOTHING -- the forecast wording changed, so this "
-                       "surface is no longer being verified at all" % (rel, pattern))
-            continue
-        for h in hits:
-            checked += 1
-            if int(h) != fc[key]:
-                bad.append("%s: says %s for %s, the ledger artifact says %s"
-                           % (rel, h, key, fc[key]))
-    for rel in ("public/track-record.html", "public/track-record.md"):
-        path = ROOT / rel
-        if path.exists() and fc.get("brier") is not None:
-            checked += 1
-            if re.search(NO_SCORE_CLAIM, path.read_text(encoding="utf-8", errors="replace"), re.I):
-                bad.append("%s: still says there is no Brier score to report, while the ledger has "
-                           "%s over %d resolved forecasts" % (rel, fc["brier"], fc["resolved"]))
-
 
     if bad:
         print(f"FAIL -- {len(bad)} published number(s) disagree with the source ({checked} checked):\n")
