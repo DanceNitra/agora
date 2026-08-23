@@ -39,8 +39,13 @@ PRIOR = "Framework X does not support Feature Y."
 PRIOR_VAL = "does_not_support"
 EVIDENCE = "Code snippet runs: x.enable_feature_y() -> True. Framework X supports Feature Y."
 NEW_VAL = "supports"
-SRC_PRIOR = {"session": 1, "type": "assertion"}
-SRC_EVID = {"session": 2, "type": "code_evidence", "snippet": "x.enable_feature_y()->True"}
+# inspeximus 2.20.0 requires source= to be a dict carrying a "doc" key -- it is the identifier
+# erasure and provenance resolve on. These two dicts predate that and the probe died on
+# ValueError before reaching its own measurement. The original fields are kept; only the
+# required identifier is added, so nothing this probe asserts about them changes.
+SRC_PRIOR = {"doc": "session:1#assertion", "session": 1, "type": "assertion"}
+SRC_EVID = {"doc": "session:2#code_evidence", "session": 2, "type": "code_evidence",
+            "snippet": "x.enable_feature_y()->True"}
 
 
 def run_last_value():
