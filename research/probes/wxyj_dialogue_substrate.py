@@ -38,6 +38,19 @@ near chance; supersession_replication.py) is on English text and is referenced, 
 multilingual corpus. One supersession step per pair. MIT, zero-dependency.
 Run: python research/probes/wxyj_dialogue_substrate.py
 """
+import sys
+
+# This probe prints non-ASCII (en dashes, a Unicode minus, Cyrillic and CJK samples) and the
+# console here is cp1250, so it died with UnicodeEncodeError before reaching its own result.
+# CLAUDE.md rule 11 already requires this reconfigure; it was applied in the servers and not
+# in the probes. errors='replace' rather than a crash: a mangled character is a better outcome
+# than losing the measurement.
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 import json, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from inspeximus import Inspeximus
@@ -94,6 +107,7 @@ for subj, old, new, src, kind in PAIRS:
 
 # raw CSV (matrix side-by-side format)
 import csv, io
+
 buf = io.StringIO()
 w = csv.DictWriter(buf, fieldnames=["scenario", "pair", "kind", "source_turn", "old", "new", "instrument",
                                      "update", "provenance_retained", "supersession_explicit", "live_value"])
@@ -110,6 +124,6 @@ out = {"scenario": "wxyj_v2_dialogue_identity_drift", "n_pairs": len(PAIRS),
                "for substrate parity only, NOT counted as supersessions. Substrate mechanics are "
                "language-independent; cosine contradiction-vs-replacement detection AUROC ~0.61 (near chance) "
                "measured separately on English (supersession_replication.py), not recomputed here."}
-json.dump(out, open(os.path.join(os.path.dirname(__file__), "wxyj_dialogue_substrate_result.json"), "w"),
+json.dump(out, open(os.path.join(os.path.dirname(__file__), "wxyj_dialogue_substrate_result.json"), "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
 print("saved: research/probes/wxyj_dialogue_substrate_result.json")
