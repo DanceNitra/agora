@@ -87,22 +87,18 @@
     0
    ],
    "n": 12,
-   "guarded": 0,
+   "guarded": 3,
    "crashed": 2,
-   "caught": 0,
+   "caught": 3,
    "unnoticed": [
-    "line 34: 0.05 -> 0.1",
-    "line 43: < -> >",
-    "line 55: >= -> <=",
-    "line 69: 0.07 -> 0.14",
-    "line 70: 50 -> 100.0",
-    "line 78: 100 -> 200.0",
-    "line 78: 100 -> 200.0",
-    "line 82: 1 -> 2.0",
-    "line 87: >= -> <="
+    "line 35: 0.15 -> 0.3",
+    "line 56: == -> !=",
+    "line 84: 0.11 -> 0.22",
+    "line 99: 100 -> 200.0",
+    "line 103: 2.1 -> 4.2"
    ],
-   "inert": 1,
-   "kind": "REPORT-ONLY"
+   "inert": 2,
+   "kind": "WEAK-GATE"
   },
   {
    "name": "good_to_great_null.py",
@@ -111,20 +107,17 @@
     0
    ],
    "n": 12,
-   "guarded": 0,
-   "crashed": 5,
-   "caught": 0,
+   "guarded": 1,
+   "crashed": 7,
+   "caught": 1,
    "unnoticed": [
-    "line 38: 0.5 -> 1.0",
-    "line 38: 0.6 -> 1.2",
-    "line 42: 1.0 -> 2.0",
-    "line 47: >= -> <=",
-    "line 50: == -> !=",
-    "line 55: 1 -> 2.0",
-    "line 75: 4.0 -> 8.0"
+    "line 57: >= -> <=",
+    "line 58: >= -> <=",
+    "line 62: < -> >",
+    "line 90: 100.0 -> 200.0"
    ],
    "inert": 0,
-   "kind": "REPORT-ONLY"
+   "kind": "WEAK-GATE"
   },
   {
    "name": "llm_judge_length_null.py",
@@ -133,21 +126,20 @@
     0
    ],
    "n": 12,
-   "guarded": 0,
+   "guarded": 1,
    "crashed": 3,
-   "caught": 0,
+   "caught": 1,
    "unnoticed": [
-    "line 48: == -> !=",
-    "line 66: 1 -> 2.0",
-    "line 102: == -> !=",
-    "line 111: 100 -> 200.0",
-    "line 122: 0 -> 1.0",
-    "line 129: 1 -> 2.0",
-    "line 136: <= -> >=",
-    "line 147: 0.0 -> 1.0"
+    "line 76: == -> !=",
+    "line 126: 0.5 -> 1.0",
+    "line 134: or -> and",
+    "line 140: < -> >",
+    "line 152: <= -> >=",
+    "line 163: 0.05 -> 0.1",
+    "line 164: 0.30 -> 0.6"
    ],
    "inert": 1,
-   "kind": "REPORT-ONLY"
+   "kind": "WEAK-GATE"
   },
   {
    "name": "meta_audit_auditor_roc.py",
@@ -220,5 +212,5 @@
   }
  ],
  "limit": 12,
- "elapsed_s": 234.5893998146057
+ "elapsed_s": 228.84766840934753
 }
