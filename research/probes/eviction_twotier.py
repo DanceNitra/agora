@@ -19,6 +19,13 @@ MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspexim
 """
 import numpy as np
 
+# A reader who starts this sees NOTHING for 70 seconds on the machine it was written on,
+# which is indistinguishable from a hang. Measured alone, not under parallel load, where it
+# runs several times slower. Printed before any work so the cost arrives in the first
+# second rather than after the result.
+print("COST: about 70s on a 12-core desktop (SEEDS=15 x cap sweep). No network, no GPU.", flush=True)
+
+
 CAP = 150
 SEEDS = 15
 
