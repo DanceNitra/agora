@@ -139,6 +139,51 @@ does it say success, and how many URLs did it report discovering? A note in our 
 showed *"Nie je možné načítať"* and we recorded that as "async, normal". On this evidence that
 assumption was never re-checked and may have been wrong for two months.
 
+## 4d. ANSWERED, with a date: Googlebot stopped visiting on 2026-07-30
+
+*The root property's `robots.txt` report, readable only after verifying the host-root property today.*
+
+```
+https://dancenitra.github.io/robots.txt
+  Posledná kontrola:  30. 7. 2026 19:26
+  Stav:               Načítané          995 B      Problémy: —
+```
+
+Google fetched it successfully and **has not fetched it since — 24 days**. Googlebot re-reads
+`robots.txt` roughly daily for any host it actually crawls. Twenty-four days without a re-read means
+one thing:
+
+> **Googlebot has not been crawling `dancenitra.github.io` since 2026-07-30.**
+
+It fits every number in this document:
+
+| evidence | date |
+|---|---|
+| last `robots.txt` fetch | **2026-07-30** |
+| index fell 2 → 1 | 2026-08-06 |
+| impressions settle at 1.67/day | from 2026-08-06 |
+| four sitemaps, never read | submitted 07-30, 08-05, 08-23, 08-23 |
+| URLs Google knows | 3, since 2026-07-01 |
+
+**And it re-reads the sitemap status.** "Nie je možné načítať" does not mean the fetch failed. It means
+the fetch was **never attempted**, because the host is not being crawled. That is why all four failed
+identically regardless of file, project or submission date — and it is why hours spent inside the
+sitemap XML were hours spent on a file Google never asked for. Mine included.
+
+**So nothing is misconfigured.** Not the sitemap, not `robots.txt`, not the canonicals, not the titles.
+All verified clean. The site has no crawl demand, because almost nothing links to it, and an invitation
+does not help when the guest has stopped coming.
+
+The only thing that brings Googlebot back is links from hosts it crawls daily. Not a setting, and not a
+button in Search Console. This is why the manual "request indexing" calls are worth making — each one
+is a per-URL invitation that bypasses crawl budget — and why Bing, which accepted all 135 URLs through
+IndexNow, is currently the more useful index for us.
+
+**Done the same day:** the `agora` README now links six published pages (it linked none), which also
+gives the leaderboard and comparison pages their first inbound path; the root repo's homepage field is
+set. Both are nofollow and pass no authority — they are discovery paths, recorded as such and not as a
+fix.
+
 ## 4c. It is not our sitemap. It is the whole host.
 
 *Added after verifying `https://dancenitra.github.io/` as a second property on 2026-08-23.*
