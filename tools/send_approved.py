@@ -30,7 +30,9 @@ detector existed, the detector was correct, and nothing ran it. Same shape as th
 it gets the same remedy: wired, not remembered.
 
 `show` prints the report before the owner ever sees the draft, which is where a tell costs nothing to
-fix. `post` refuses on a blocking hit unless --ack-tells says a human looked and kept the wording.
+fix. `post` refuses on a blocking hit unless --ack-tells says a human looked and kept the wording. This module is NOT the humanizer skill; it is a
+regex over a fraction of it, and `post` refuses unless --humanizer-skill-ran says the real
+skill (.claude/skills/humanizer/SKILL.md) was run on the draft.
 
 SECOND GATE, added 2026-08-14: WHAT WE ALREADY SAID IN THAT THREAD. Approval binds the bytes; it says
 nothing about whether the claim inside them is refuted by our own earlier comment. On 2026-08-14 the
@@ -182,13 +184,26 @@ def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | 
     return 1 if code == 1 else 2
 
 
-def _tells_gate(body: str, acked: bool) -> int | None:
+def _tells_gate(body: str, acked: bool, skill_ran: bool) -> int | None:
     """Refuse a draft carrying a construction that reads as generated. None means proceed.
 
     Deliberately NOT waivable by the digest: the hash proves the owner saw these bytes, and he saw
     them because we handed them over. He is not the reader this gate is for. The acknowledgement is
     a separate flag so that keeping a wording is a decision somebody made, not a step nobody took.
     """
+    # THIS MODULE IS NOT THE HUMANIZER, and saying so is half of what this gate is for. On
+    # 2026-08-23 I wrote tools/humanizer_tells.py, wired it in here INSTEAD of
+    # .claude/skills/humanizer/SKILL.md, and then reported its green result as "humanizer clean"
+    # on three drafts that shipped. The skill is 622 lines over 33 pattern classes; this file is a
+    # regex over a handful of them and cannot see a negative parallelism, an announcement opener,
+    # or a voice mismatch against a sample. So the gate refuses to be mistaken for it.
+    if not skill_ran:
+        print("REFUSED: the humanizer SKILL has not been run on this draft.")
+        print("  This module is a regex over a handful of that skill's 33 pattern classes.")
+        print("  It is NOT the humanizer, and a green result here is not a humanizer pass.")
+        print("  Run .claude/skills/humanizer/SKILL.md on the draft, then pass")
+        print("  --humanizer-skill-ran to record that it was actually run.")
+        return 1
     hits = ht.find_tells(body)
     if not hits:
         return None
@@ -401,6 +416,9 @@ def main(argv=None):
     ap.add_argument("--ack-thread", action="store_true",
                     help="record that a human read what happened in the thread SINCE this draft was "
                          "written, including a close, and still wants it sent unchanged")
+    ap.add_argument("--humanizer-skill-ran", action="store_true",
+                    help="record that .claude/skills/humanizer/SKILL.md was actually RUN on this "
+                         "draft. This module is not that skill and refuses to run without it.")
     ap.add_argument("--ack-tells", action="store_true",
                     help="record that a human read the flagged constructions and is keeping them")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
@@ -464,7 +482,7 @@ def main(argv=None):
     # Local and free, so it runs before the gates that cost network calls: being refused on the
     # wording after waiting for two `gh api --paginate` round trips is how a gate earns a reputation
     # for being in the way. Gates the PAYLOAD, not the file, for the same reason bind_payload exists.
-    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells)
+    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells, a.humanizer_skill_ran)
     if refuse is not None:
         return refuse
 

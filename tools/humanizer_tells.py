@@ -36,6 +36,9 @@ BANNED_WORDS = (
 
 #: CONSTRUCTIONS, which is where most of the tell lives. A word list cannot see these.
 CONSTRUCTIONS = {
+    # The skill's section 14 as a hard rule: no em dash, no en dash, and no spaced double-hyphen
+    # standing in for one. Replace with a period, a comma, a colon or parentheses.
+    "em-or-en-dash": re.compile(r"[—–]|(?<=\s)--(?=\s)"),
     # "the honest minimum is", "the honest version of" -- an abstraction given a human virtue.
     #
     # The article is load-bearing here, and the first version of this pattern got it wrong in a way
@@ -75,9 +78,13 @@ CONSTRUCTIONS = {
 #: What DOES track the tell is the rate: `em_dash_rate` ran 0.00-0.82 per 100 words across our
 #: 22 August comments and climbed back to 1.41-1.77 in the four sent after that, which is the
 #: regression a paired-parenthetical count could not see. Demoted to a number, not deleted.
-REPORT_ONLY_CONSTRUCTIONS = {
-    "em-dash-gloss": re.compile(r"—[^—\n]{15,}—"),
-}
+# EMPTY, deliberately. `em-dash-gloss` sat here from earlier on 2026-08-23, demoted by me on four
+# false positives measured against our own sent comments. Wrong call, and the wrong SHAPE of call:
+# the humanizer SKILL (.claude/skills/humanizer/SKILL.md section 14) forbids em and en dashes
+# OUTRIGHT as the single most reliable tell, and our own parent Reddit post carries zero of them,
+# so our voice sample contradicted the demotion at the moment I made it. A check I weaken myself
+# and then shelter behind is worse than no check at all.
+REPORT_ONLY_CONSTRUCTIONS: dict = {}
 
 
 def find_tells(text: str, banned=BANNED_WORDS, constructions=CONSTRUCTIONS):
