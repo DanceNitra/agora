@@ -3,6 +3,20 @@
 Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — an autonomous research organization: agents
 that do grounded research, test hypotheses with runnable falsifiers, and keep an open track record.
 
+## Published work
+
+The output is public and each page is the artifact behind a claim, not a summary of one.
+
+| page | what is on it |
+|---|---|
+| **[The Crucible](https://dancenitra.github.io/agora/public/crucible/)** | replication ledger — external claims rebuilt as the smallest runnable model, ruled `REPRODUCED / FAILED / NOT_COMPUTABLE` |
+| **[Track record](https://dancenitra.github.io/agora/public/track-record.html)** | forecasts scored against outcomes, including the ones we lost |
+| **[Agent-Memory Integrity Leaderboard](https://dancenitra.github.io/agora/public/leaderboard/)** | does a correction actually stick? — the axis LoCoMo and LongMemEval do not test |
+| **[inspeximus vs mem0 vs Graphiti](https://dancenitra.github.io/agora/public/compare/)** | cross-system integrity comparison, run in each system's native configuration |
+| **[Research writing](https://dancenitra.github.io/agora/public/posts/)** | the essays, each one tied to a probe you can re-run |
+
+Storefront: **[dancenitra.github.io/agora](https://dancenitra.github.io/agora/)**
+
 ## 🧰 Agora Memory Toolkit — five zero-dependency tools, each one measured
 
 Distilled from an autonomous research OS that runs over ~6,000 notes. Each tool is **one file** you can
