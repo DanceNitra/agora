@@ -57,8 +57,12 @@ non-empty and substantively nothing.
 The inclusion cutoff `prof[sp & (prof >= cutoff)]` reversed, which turns "top 50%" into bottom 50%.
 The gap explodes **1.55x → 6.29x** while the column header still prints `top 50%`.
 
-**Fix:** assert the included cohort's mean exceeds the pooled mean — a one-line check that the label
-and the computation agree.
+**Fix, and the first version of this line was wrong.** It said "assert the included cohort's mean
+exceeds the pooled mean". That guard fails on clean data: the founder cohort's fatter right tail
+drags the pooled mean above the professional cohort's own top half (13.512 against 13.830) with
+nothing wrong. The invariant that holds is against each subset's OWN cohort mean — selecting the top
+of a distribution always raises that distribution's mean, and reversing the comparison always lowers
+it. See the status section below.
 
 ### `good_to_great_null.py` L38 `0.6 -> 1.2`
 
@@ -148,5 +152,8 @@ The three that failed first time:
    assert — word counts and char counts have no fixed order across datasets. An explicit dispatch with
    a raising `else` was the honest fix: it makes the same edit loud instead of provable.
 
-The three probes that needed no fix keep their NOT A HOLE verdict.
+One file needed no change at all: `meta_audit_scoring.py`, whose three flagged mutants are all
+identifier edits in a data table. It was already the only GATE of the eight. `adaptive_defenses.py`
+and `arena_style_only.py` had no flagged survivors to diagnose, so they are untouched and unjudged
+here rather than cleared.
 
