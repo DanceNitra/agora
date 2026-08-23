@@ -66,7 +66,14 @@ BOTH DENOMINATORS ARE PRINTED. Dividing by ALL records silently multiplies disti
 and reports neither; doing that turned a ~27,000x difference into "170x" in a draft. The ratio that
 matches the shipped `distinct_source_ratio` field is `/sourced`.
 
-Run:  python probes/a_provenance_field_at_100_percent_with_one_distinct_value.py
+Run on OUR stores:      python probes/a_provenance_field_at_100_percent_with_one_distinct_value.py
+Run on YOURS:           python a_provenance_field_at_100_percent_with_one_distinct_value.py STORE.json
+                        python a_provenance_field_at_100_percent_with_one_distinct_value.py DIR/ ...
+
+It reads any JSON that is a list of records, or an object with an `items` list, and looks for
+`source` (or `meta.source`) on each -- a bare string, or an object with `doc` / `uri` / `path`.
+The two controls run first and must both PASS, or your own zero means nothing. If it finds no
+stores it exits 1 and says so rather than reporting a zero over an empty scan.
 """
 from __future__ import annotations
 import collections
@@ -87,7 +94,31 @@ SKIP = (".bak", ".tombstones.json", ".corrupt", ".torn", ".embedid", ".lock",
         "config.json", "nudge.json", "decisions.json", ".update_check.json")
 
 
-def live_stores():
+def live_stores(argv=None):
+    """Stores to scan: whatever is on the command line, else this repo's own.
+
+    ADDED 2026-08-22, and it should have been here before the post went out. The published version
+    scanned four hard-coded directories of THIS repository, so the invitation in the write-up --
+    point it at your store and tell me the two integers -- could not actually be accepted by anyone.
+    It failed loud rather than reporting a fake zero, which is the control doing its job, but a
+    stranger's only possible outcome was `FAIL -- no stores read`. An artifact offered publicly as
+    runnable has to run somewhere other than where it was written.
+
+    Usage:  python a_provenance_field...py [PATH ...]
+            PATH may be a .json store or a directory of them; repeat for several.
+    """
+    args = [a for a in (argv if argv is not None else sys.argv[1:]) if not a.startswith("-")]
+    if args:
+        out = []
+        for a in args:
+            if os.path.isdir(a):
+                out += [os.path.join(a, f) for f in sorted(os.listdir(a))
+                        if f.endswith(".json") and os.path.isfile(os.path.join(a, f))]
+            elif os.path.isfile(a):
+                out.append(a)
+            else:
+                print("no such path: %s" % a, file=sys.stderr)
+        return out
     out = []
     for d in STORE_DIRS:
         if not os.path.isdir(d):

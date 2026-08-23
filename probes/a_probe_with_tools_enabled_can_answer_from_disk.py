@@ -15,18 +15,27 @@ because our own probe escaped the trap on 2026-08-21 and the question is whether
 CONTROL, and it is the whole point: the guarded configuration runs the SAME phrasings and must
 never trap. A mitigation measured only where the defect is absent has measured nothing.
 
-THE TRAP IS INTERMITTENT, which is the finding that outlives the fix. Same fixture, same prompts,
-same 2.1.241, hours apart: 2/6, then 4/9 (with `Bash` and `Read` calls returning the file's last
-line), then 0/9. So an unrestricted batch CANNOT be cleared by observing that it looks clean --
-this run would have cleared itself. The path has to be closed, not inspected. Runs accumulate in
-`runs` in the receipt for exactly this reason; a single run's rate is not the rate.
+DISABLING TOOLS IS NECESSARY AND NOT SUFFICIENT -- the finding that outlives the fix. Measured
+across 3 recorded runs, 27 guarded trials, zero tools offered and zero called, on one fixture
+whose context answer is 198:
 
-AND THE WORDING MOVES THE ANSWER EVEN WITH ZERO TOOLS. On one unchanged fixture whose context
-answer is 198, the guarded arm returned 190, 198, 243 under "the last token in MEMORY.md" and
-twice returned no canary at all under the neutral wording, while "the last token you can SEE"
-returned 198 in every trial of every run. A line number in a published cap table is therefore
-partly a property of the prompt. Offered as a candidate for unexplained one-line disagreements
-between independent measurements, not as their cause -- this probe cannot attribute anyone else's.
+    "the last CANARY token you can SEE"   9/9 correct
+    neutral wording                       2/9 correct, 2 impossible, 5 no answer at all
+    "the last CANARY token in MEMORY.md"  4/9 correct, 3 impossible, 2 wrong
+
+    15/27 correct overall. Impossible values returned: 214, 242, 246, 248, 250 -- line numbers
+    that do not exist in a 200-line file, so no read of any kind produces them.
+
+So `last line loaded` is a SELF-REPORT whose accuracy depends on how it is asked, and closing the
+tool path removes one way the instrument lies, not the lying. A one-line disagreement between two
+independent measurements of this cap sits well inside that noise. Offered as a reason such a
+disagreement cannot be settled by self-report, not as a verdict on anyone's number.
+
+THE DISK-READ TRAP ITSELF: 0/27 under this script, across every run recorded in `runs`. It was
+observed firing before this script existed -- ad-hoc runs on the same day returned 200 with `Bash`
+and `Read` calls in the stream -- but those runs have NO RECEIPT here and no rate is claimed from
+them. Two consequences, and the second is the operational one: the rate is unknown, and a clean
+unrestricted batch is therefore not clearance. Close the path; do not inspect it.
 
 The mitigation is an allowlist emptied to zero, NOT a denylist. Measured on 2.1.241:
 

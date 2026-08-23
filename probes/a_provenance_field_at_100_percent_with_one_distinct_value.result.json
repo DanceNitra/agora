@@ -1,6 +1,6 @@
 {
- "records": 235055,
- "source_pct": 92.6,
+ "records": 235987,
+ "source_pct": 92.23,
  "recheckable": 0,
  "full_coverage_stores": 8,
  "full_coverage_records": 217549,
@@ -13,7 +13,7 @@
   "distinct_sources": 3,
   "top": [
    [
-    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmp32ycv035\\runbook.md",
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmpu79p15ym\\runbook.md",
     1
    ],
    [
@@ -27,10 +27,10 @@
  "unreadable": [],
  "per_store": [
   {
-   "records": 16215,
-   "with_source": 102,
+   "records": 17147,
+   "with_source": 107,
    "recheckable": 0,
-   "distinct_sources": 101,
+   "distinct_sources": 106,
    "top": [
     [
      "git:162de50e1702",
@@ -41,8 +41,8 @@
      1
     ]
    ],
-   "ratio_over_sourced": 0.990196,
-   "ratio_over_all": 0.006229,
+   "ratio_over_sourced": 0.990654,
+   "ratio_over_all": 0.006182,
    "store": ".inspeximus/coding_memory.json"
   },
   {

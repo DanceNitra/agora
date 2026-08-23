@@ -101,9 +101,26 @@ def run(base, sitemap_xml, fetch_fn, min_pages=10):
     ck(not unreachable, "every DECLARED page is reachable by following links",
        ", ".join(u.replace(base, "/") for u in unreachable[:6]))
 
-    undeclared = sorted(u for u in reached if u not in declared and not u.rstrip("/") + "/" in declared)
-    ck(not undeclared, "every REACHABLE page is declared in the sitemap",
+    # A page that points its canonical somewhere else has DISAVOWED itself, and a sitemap must not
+    # submit a URL the page argues against -- /public/inspeximus/ canonicalises cross-site to the
+    # product's own Pages site and is excluded from the generator for exactly that reason. So the rule
+    # is the property, not a name: undeclared is a defect only where the page claims itself.
+    def self_canonical(u):
+        _, html = fetch_fn(u)
+        m = re.search(r'<link[^>]+rel=["\']canonical["\'][^>]*>', html, re.I)
+        if not m:
+            return True                     # no opinion -> it should be declared
+        h = re.search(r'href=["\']([^"\']+)["\']', m.group(0))
+        return not h or norm(h.group(1)).rstrip("/") == u.rstrip("/")
+
+    cand = [u for u in reached if u not in declared and u.rstrip("/") + "/" not in declared]
+    undeclared = sorted(u for u in cand if self_canonical(u))
+    disavowed = sorted(set(cand) - set(undeclared))
+    ck(not undeclared, "every REACHABLE page that claims itself is declared in the sitemap",
        ", ".join(u.replace(base, "/") for u in undeclared[:6]))
+    if disavowed:
+        rows.append((True, "reachable but self-disavowed, correctly undeclared",
+                     ", ".join(u.replace(base, "/") for u in disavowed[:4])))
 
     dead = sorted(u for u, (c, _) in graph.items() if c not in (200, None))
     ck(not dead, "no internal link points at a non-200",
@@ -145,7 +162,7 @@ def self_test():
     ok &= check("a declared page nothing links to", good_pages,
                 good_map + f"<loc>{B}orphan/</loc>", "every DECLARED page is reachable")
     ok &= check("a reachable page the sitemap omits", good_pages,
-                f"<loc>{B}</loc><loc>{B}a/</loc>", "every REACHABLE page is declared")
+                f"<loc>{B}</loc><loc>{B}a/</loc>", "that claims itself is declared")
     ok &= check("an internal link to a 404",
                 {**good_pages, B: (200, '<a href="a/">A</a><a href="b/">B</a><a href="gone/">X</a>')},
                 good_map, "no internal link points at a non-200")
@@ -156,6 +173,26 @@ def self_test():
                  B: (200, '<a href="a/">A</a><a href="b/">B</a><a href="a">A no slash</a>'),
                  B + "a": (200, "")},
                 good_map, "no directory is live at both")
+
+    # the new behaviour needs its own control in BOTH directions: a page that points its canonical
+    # elsewhere must NOT be reported, and one that claims itself must.
+    disavow = {**good_pages,
+               B: (200, '<a href="a/">A</a><a href="b/">B</a><a href="elsewhere/">E</a>'),
+               B + "elsewhere/": (200, '<link rel="canonical" href="https://other/">')}
+    run(B, good_map, site(disavow), min_pages=2)
+    row = [(o, l) for o, l, _ in rows if "that claims itself is declared" in l]
+    quiet = bool(row) and row[0][0]
+    print(f"  {'OK  ' if quiet else 'FAIL'}  a self-disavowed page is NOT reported as undeclared")
+    ok &= quiet
+
+    claims = {**good_pages,
+              B: (200, '<a href="a/">A</a><a href="b/">B</a><a href="mine/">M</a>'),
+              B + "mine/": (200, f'<link rel="canonical" href="{B}mine/">')}
+    run(B, good_map, site(claims), min_pages=2)
+    row = [(o, l) for o, l, _ in rows if "that claims itself is declared" in l]
+    fires = bool(row) and not row[0][0]
+    print(f"  {'OK  ' if fires else 'FAIL'}  a self-claiming undeclared page IS reported")
+    ok &= fires
 
     run(B, good_map, site(good_pages), min_pages=2)
     clean = all(o for o, _, _ in rows)

@@ -5,10 +5,19 @@
   "disk_answer": 200,
   "trap_rate_tools_on": "0/9",
   "trap_rate_guarded": "0/9",
-  "guarded_context_answer_rate": "7/9",
+  "guarded_context_answer_rate": "4/9",
   "guarded_fabricated": [
     {
-      "last": 246,
+      "last": null,
+      "tools_offered": 0,
+      "used": [],
+      "arm": "guarded",
+      "phrasing": "neutral",
+      "trial": 1,
+      "trapped": false
+    },
+    {
+      "last": null,
       "tools_offered": 0,
       "used": [],
       "arm": "guarded",
@@ -22,6 +31,24 @@
       "used": [],
       "arm": "guarded",
       "phrasing": "neutral",
+      "trial": 3,
+      "trapped": false
+    },
+    {
+      "last": 250,
+      "tools_offered": 0,
+      "used": [],
+      "arm": "guarded",
+      "phrasing": "names_the_file",
+      "trial": 1,
+      "trapped": false
+    },
+    {
+      "last": 242,
+      "tools_offered": 0,
+      "used": [],
+      "arm": "guarded",
+      "phrasing": "names_the_file",
       "trial": 3,
       "trapped": false
     }
@@ -150,7 +177,7 @@
       "trapped": false
     },
     {
-      "last": 198,
+      "last": null,
       "tools_offered": 0,
       "used": [],
       "arm": "guarded",
@@ -159,7 +186,7 @@
       "trapped": false
     },
     {
-      "last": 246,
+      "last": null,
       "tools_offered": 0,
       "used": [],
       "arm": "guarded",
@@ -177,7 +204,7 @@
       "trapped": false
     },
     {
-      "last": 198,
+      "last": 250,
       "tools_offered": 0,
       "used": [],
       "arm": "guarded",
@@ -195,7 +222,7 @@
       "trapped": false
     },
     {
-      "last": 198,
+      "last": 242,
       "tools_offered": 0,
       "used": [],
       "arm": "guarded",
@@ -396,6 +423,406 @@
         },
         {
           "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 3,
+          "trapped": false
+        }
+      ]
+    },
+    {
+      "claude_version": "2.1.241 (Claude Code)",
+      "trap_rate_tools_on": "0/9",
+      "trap_rate_guarded": "0/9",
+      "by_phrasing_tools_on": {
+        "ours_you_can_see": "0/3",
+        "neutral": "0/3",
+        "names_the_file": "0/3"
+      },
+      "guarded_answers": {
+        "ours_you_can_see": [
+          198,
+          198,
+          198
+        ],
+        "neutral": [
+          null,
+          214,
+          198
+        ],
+        "names_the_file": [
+          248,
+          190,
+          190
+        ]
+      },
+      "verdicts": {
+        "guarded_arm_never_traps": true,
+        "guarded_arm_offered_zero_tools": true,
+        "guarded_arm_never_reports_the_disk_answer": true,
+        "our_phrasing_answers_the_context_every_time": true
+      },
+      "data": {
+        "trap_seen_in_this_run": false
+      },
+      "rows": [
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": null,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 214,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 248,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 190,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 190,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 3,
+          "trapped": false
+        }
+      ]
+    },
+    {
+      "claude_version": "2.1.241 (Claude Code)",
+      "trap_rate_tools_on": "0/9",
+      "trap_rate_guarded": "0/9",
+      "by_phrasing_tools_on": {
+        "ours_you_can_see": "0/3",
+        "neutral": "0/3",
+        "names_the_file": "0/3"
+      },
+      "guarded_answers": {
+        "ours_you_can_see": [
+          198,
+          198,
+          198
+        ],
+        "neutral": [
+          null,
+          null,
+          null
+        ],
+        "names_the_file": [
+          250,
+          198,
+          242
+        ]
+      },
+      "verdicts": {
+        "guarded_arm_never_traps": true,
+        "guarded_arm_offered_zero_tools": true,
+        "guarded_arm_never_reports_the_disk_answer": true,
+        "our_phrasing_answers_the_context_every_time": true
+      },
+      "data": {
+        "trap_seen_in_this_run": false
+      },
+      "rows": [
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "ours_you_can_see",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "neutral",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 161,
+          "used": [],
+          "arm": "tools_on",
+          "phrasing": "names_the_file",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "ours_you_can_see",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": null,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": null,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": null,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "neutral",
+          "trial": 3,
+          "trapped": false
+        },
+        {
+          "last": 250,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 1,
+          "trapped": false
+        },
+        {
+          "last": 198,
+          "tools_offered": 0,
+          "used": [],
+          "arm": "guarded",
+          "phrasing": "names_the_file",
+          "trial": 2,
+          "trapped": false
+        },
+        {
+          "last": 242,
           "tools_offered": 0,
           "used": [],
           "arm": "guarded",
