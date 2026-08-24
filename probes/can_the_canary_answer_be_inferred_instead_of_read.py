@@ -25,6 +25,28 @@ Tools are disabled through the same allowlist the main probe uses, and every arm
 one answer cannot tell a read from an invention: a guarded session has returned 214, 242, 246, 248
 and 250 on a 200-line file.
 
+NEITHER ARM IS OUR DESIGN, and a skeptic pass found that before this was posted anywhere.
+ABSENT is the closed-book baseline, standard and named: Liu et al., TACL 2024, "In the closed-book
+setting, models are not given any documents in their input context, and must rely on their
+parametric memory" (arXiv 2307.03172). SHUFFLED is corpus substitution / counterfactual context:
+Longpre, Perisetla, Chen, Ramesh, DuBois, Singh, "Entity-Based Knowledge Conflicts in Question
+Answering", EMNLP 2021 (arXiv 2109.05052), which replaces the answer inside the context so that
+reading and reconstructing produce different strings. Identical logic. Comparing a canary against
+equally-random non-inserted sequences is Carlini et al., USENIX Security 2019. No new name is owed
+to us for any of it.
+
+WHAT THIS CONTROL DOES NOT ESTABLISH, stated because it is easy to overread a green run:
+
+  * `CUT` is HARDCODED at 198, not measured here. The arm asks whether the reply is `perm[CUT-1]`,
+    so it presumes the cut position it then validates against. It shows the answer was not computed
+    from the cap arithmetic; it does not independently establish where the cut is.
+  * "the last token you can SEE" is the recency-favoured position. Echoing the final surviving line
+    of a context requires no comprehension of any cap, so a pass here is consistent with a model
+    that understands nothing about truncation and simply repeats what it last saw.
+  * The seed was screened on FIXTURE GEOMETRY (distance from the inferable answer, zero fixed
+    points) before any model was called, never on the model's answers. Said in those words on
+    purpose: screening on the outcome would be a forking path, and this was not that.
+
 Run only with an explicit go-ahead: 2 arms x (1 init + TRIALS) `claude -p` sessions.
 """
 from __future__ import annotations
