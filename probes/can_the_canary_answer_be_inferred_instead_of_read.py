@@ -25,15 +25,26 @@ Tools are disabled through the same allowlist the main probe uses, and every arm
 one answer cannot tell a read from an invention: a guarded session has returned 214, 242, 246, 248
 and 250 on a 200-line file.
 
-NEITHER ARM IS OUR DESIGN, and a skeptic pass found that before this was posted anywhere.
-ABSENT is the closed-book baseline, standard and named: Liu et al., TACL 2024, "In the closed-book
-setting, models are not given any documents in their input context, and must rely on their
-parametric memory" (arXiv 2307.03172). SHUFFLED is corpus substitution / counterfactual context:
-Longpre, Perisetla, Chen, Ramesh, DuBois, Singh, "Entity-Based Knowledge Conflicts in Question
-Answering", EMNLP 2021 (arXiv 2109.05052), which replaces the answer inside the context so that
-reading and reconstructing produce different strings. Identical logic. Comparing a canary against
-equally-random non-inserted sequences is Carlini et al., USENIX Security 2019. No new name is owed
-to us for any of it.
+NEITHER ARM IS OUR DESIGN, and naming the ancestry correctly took two passes.
+
+ABSENT is an UNANSWERABLE-QUESTION control in the SQuAD 2.0 sense (Rajpurkar, Jia, Liang, ACL 2018,
+https://aclanthology.org/P18-2124/): the context is present, the target is not, and no correct answer
+exists anywhere. An earlier version of this docstring called it the closed-book baseline of Liu et
+al. (TACL 2024) and that was wrong -- closed-book removes the DOCUMENTS and keeps a question the
+model may answer from parametric memory, which measures what retrieval adds. Nothing parametric can
+supply `CANARY-L0198`, so the constructs are not the same, and Lost in the Middle is a positional
+paper we had already cited in this thread for a different ancestry.
+
+SHUFFLED is the same move as the substitution framework of Longpre, Perisetla, Chen, Ramesh, DuBois
+and Singh, "Entity-Based Knowledge Conflicts in Question Answering", EMNLP 2021
+(https://aclanthology.org/2021.emnlp-main.565/): replace the answer inside the context so that
+reading and reconstructing return different strings. Two honest differences. That paper does not use
+the phrase "entity substitution", and its conflict is context against PARAMETRIC memory, while ours
+is context against in-context ARITHMETIC. The design move is theirs; the conflict is not the same one.
+
+Comparing a canary against equally-random non-inserted sequences is Carlini et al., USENIX Security
+2019 -- cited here only as a neighbour, since that work concerns training-data memorisation rather
+than in-context recall and the analogy is looser than an earlier version of this file claimed.
 
 WHAT THIS CONTROL DOES NOT ESTABLISH, stated because it is easy to overread a green run:
 
@@ -46,6 +57,12 @@ WHAT THIS CONTROL DOES NOT ESTABLISH, stated because it is easy to overread a gr
   * The seed was screened on FIXTURE GEOMETRY (distance from the inferable answer, zero fixed
     points) before any model was called, never on the model's answers. Said in those words on
     purpose: screening on the outcome would be a forking path, and this was not that.
+  * THE TWO ARMS ARE NOT ASKED THE SAME QUESTION. `ASK_ABSENT` offers the model `NONE`; the shuffled
+    arm inherits `U.ASK`, which does not. So the absent arm's 3/3 measures uptake of an offered
+    option, not the absence of an invention channel, and it is the weaker of the two. Worse, `U.ASK`
+    is the phrasing that scored 9/9 in probes/a_probe_with_tools_enabled_can_answer_from_disk.py
+    against 4/9 and 2/9 for two others, so the shuffled arm runs at the best-measured operating
+    point and that was not disclosed. Prompt-matching both arms is the fix and has not been done.
 
 Run only with an explicit go-ahead: 2 arms x (1 init + TRIALS) `claude -p` sessions.
 """
