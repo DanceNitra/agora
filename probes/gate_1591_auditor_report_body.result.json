@@ -1,0 +1,35 @@
+{
+  "probe": "gate_1591_auditor_report_body.py",
+  "verdicts": {
+    "dataset_digest_matches": true,
+    "body_says_19_records_and_there_are_19": true,
+    "the_elided_sha_head_and_tail_are_real": true,
+    "the_full_sha_in_the_command_is_the_files": true,
+    "body_says_15_and_10_checks": true,
+    "family_counts_in_the_command_match_the_file": true,
+    "the_three_truncated_ids_in_the_command_are_the_truncated_records": true,
+    "the_utf8_byte_counts_428_877_412_are_right": true,
+    "bodies_are_400_code_points": true,
+    "the_generator_lines_are_30_and_51": true,
+    "the_three_expected_markers_named_in_the_body_are_the_raw_counts": true,
+    "all_three_actually_read_500": true,
+    "signature_count_in_the_body_matches_the_directory": true,
+    "exactly_one_unsigned_file_and_it_is_the_extractor": true,
+    "the_delta_list_in_the_body_is_the_real_one": true,
+    "ten_records_carry_a_count": true,
+    "schema_table_span_133_to_242": true,
+    "the_zero_delta_record_is_named_correctly": true,
+    "eleven_of_nineteen_carry_only_wufenlei": true,
+    "the_six_split_four_one_one": true,
+    "multi_category_count_matches_the_word_in_the_body": true,
+    "quoted_schema_strings_are_present_upstream": true,
+    "CONTROL_a_wrong_signature_count_would_fail": true,
+    "CONTROL_the_body_is_not_the_provenance_block": true,
+    "CONTROL_a_missing_claim_fails_rather_than_passes": true
+  },
+  "non_signature_files": 9,
+  "signed": 8,
+  "unsigned": [
+    "lh_shared_audit_extract.py"
+  ]
+}
