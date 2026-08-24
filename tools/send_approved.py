@@ -508,7 +508,64 @@ def main(argv=None):
 
     print("approved digest matches; publishing %d bytes from memory (stdin), not from the file"
           % len(stdin))
-    return subprocess.run(cmd, input=stdin).returncode
+    rc = subprocess.run(cmd, input=stdin).returncode
+    if rc == 0:
+        _verify_landed(stdin, a.thread)
+    return rc
+
+
+def _verify_landed(stdin: bytes, thread: str) -> None:
+    """Fetch what actually landed and compare it byte for byte with what we sent.
+
+    Every gate above this line checks the payload BEFORE it leaves. None of them can see the
+    transport. Measured 2026-08-24 on anthropics/claude-code#82056: `gh issue comment
+    --body-file -` decoded our UTF-8 stdin as the Windows ANSI codepage, so the em dash inside a
+    VERBATIM QUOTE of the CLI's own output was published as `a<euro>"`. 2,333 bytes in, 2,338 out,
+    exit 0, no warning anywhere. In a comment whose whole subject is exact strings.
+
+    It is not a blanket failure, which is why nothing caught it: a comment sent an hour earlier
+    the same way, carrying both an em dash and an en dash among a lot of CJK, round-tripped
+    byte-identical. Whatever heuristic picks the decoding, it is data-dependent, so the only
+    reliable check is to read back what landed.
+
+    Reports rather than raises: the comment is already public by this point, and the operator
+    needs the diff and the repair recipe, not a traceback. The repair is a PATCH whose body is
+    JSON with ensure_ascii=True, so nothing multibyte ever crosses a codepage boundary.
+    """
+    import json as _json
+    import re as _re
+    m = _re.search(r"github\.com/([^/]+)/([^/]+)/(?:issues|pull)/(\d+)", thread or "")
+    if not m:
+        print("NOTE: no thread url given, so what landed was not read back. "
+              "Pass --thread to enable the transport check.")
+        return
+    owner, repo, num = m.groups()
+    out = subprocess.run(["gh", "api", f"repos/{owner}/{repo}/issues/{num}/comments",
+                          "--paginate"], capture_output=True)
+    try:
+        me = subprocess.run(["gh", "api", "user", "--jq", ".login"],
+                            capture_output=True, text=True).stdout.strip()
+        mine = [c for c in _json.loads(out.stdout.decode("utf-8"))
+                if (c.get("user") or {}).get("login") == me]
+        landed = mine[-1]["body"].encode("utf-8")
+        cid = mine[-1]["id"]
+    except Exception as e:                                          # noqa: BLE001
+        print(f"NOTE: could not read the comment back ({type(e).__name__}); transport unchecked.")
+        return
+    if landed == stdin:
+        print(f"transport verified: comment {cid} is byte-identical to what was approved.")
+        return
+    print(f"!! WHAT LANDED IS NOT WHAT WAS SENT. comment {cid}: "
+          f"{len(stdin)} bytes sent, {len(landed)} bytes live.")
+    a, b = stdin.decode("utf-8", "replace"), landed.decode("utf-8", "replace")
+    for i, (x, y) in enumerate(zip(a, b)):
+        if x != y:
+            print(f"   first difference at character {i}:")
+            print(f"     sent : {a[max(0, i - 40):i + 20]!r}")
+            print(f"     live : {b[max(0, i - 40):i + 20]!r}")
+            break
+    print("   REPAIR: write {\"body\": <text>} with json.dump(..., ensure_ascii=True) to a file,")
+    print(f"   then: gh api --method PATCH repos/{owner}/{repo}/issues/comments/{cid} --input FILE")
 
 
 if __name__ == "__main__":
