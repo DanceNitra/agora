@@ -1,30 +1,30 @@
 {
  "generated_by": "tools/derive_track_record.py",
- "total": 249,
- "resolved": 241,
+ "total": 251,
+ "resolved": 243,
  "correct": 46,
- "hit_rate": 0.1909,
- "brier": 0.304,
+ "hit_rate": 0.1893,
+ "brier": 0.305,
  "called": {
   "DOWN": 19,
-  "FLAT": 164,
+  "FLAT": 166,
   "UP": 58
  },
  "actual": {
-  "DOWN": 64,
+  "DOWN": 66,
   "FLAT": 82,
   "UP": 95
  },
  "always_baselines": {
-  "DOWN": 0.2656,
-  "FLAT": 0.3402,
-  "UP": 0.3942
+  "DOWN": 0.2716,
+  "FLAT": 0.3374,
+  "UP": 0.3909
  },
  "best_always_baseline": {
   "label": "UP",
-  "rate": 0.3942
+  "rate": 0.3909
  },
- "chance_agreement": 0.3473,
- "z_vs_chance": -4.56,
- "note": "hit_rate is measured against the same resolved set as the baselines. A Brier near 0.25 is not 'about a coin flip' here: chance agreement under our own marginals is 0.3473 and the best always-one-answer baseline is 0.3942, both far above the observed 0.1909."
+ "chance_agreement": 0.3451,
+ "z_vs_chance": -4.57,
+ "note": "hit_rate is measured against the same resolved set as the baselines. A Brier near 0.25 is not 'about a coin flip' here: chance agreement under our own marginals is 0.3451 and the best always-one-answer baseline is 0.3909, both far above the observed 0.1893."
 }
