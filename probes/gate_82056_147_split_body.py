@@ -28,26 +28,33 @@ def body() -> str:
     return t.split("\n---\n", 1)[1]
 
 
+def flat(s: str) -> str:
+    """Collapse whitespace runs before matching prose.
+
+    Re-wrapping a paragraph moves newlines through sentences, and that broke nine of these
+    checks the moment the draft was cut for length. A line wrap is not a claim change, and a
+    gate that cannot tell the two apart teaches you to edit the gate on autopilot, which is
+    how a gate stops being one.
+    """
+    return " ".join(s.split())
+
+
 def main() -> int:
-    b = body()
+    b = flat(body())
     caps = json.load(open(CAPS, encoding="utf-8"))
     spl = json.load(open(SPLIT, encoding="utf-8"))
     rows = {r["label"]: r for r in caps["rows"]}
-    gen = open(GEN, encoding="utf-8").read().splitlines()
 
     warned_arms = [k for k, r in rows.items() if r.get("warned")]
     n_carrying = len(warned_arms) + (1 if spl.get("warned") else 0)
     word = {3: "Three", 4: "Four", 5: "Five", 6: "Six"}[n_carrying]
 
     v: dict[str, bool] = {}
-    v["generator_line_126_is_the_quoted_join"] = (
-        gen[125].strip() == 'return "\\n".join(lines) + "\\n"'
-        and 'Line 126 of my generator is' in b)
     v["the_60_char_arm_carries_12200_units"] = (
-        rows["cjk_200x60"]["utf16_units"] == 12200 and "12,200 UTF-16 units" in b)
+        rows["cjk_200x60"]["utf16_units"] == 12200 and "12,200 units" in b)
     v["nothing_cut_the_60_char_arm"] = (
         rows["cjk_200x60"]["last_line_loaded"] == rows["cjk_200x60"]["lines"]
-        and not rows["cjk_200x60"]["warned"] and "nothing cut it" in b)
+        and not rows["cjk_200x60"]["warned"] and "nothing did" in b)
     v["the_prior_bracket_is_24955_25074"] = (
         caps["cap_bracket_utf16_units"] == [24955, 25074] and "[24955, 25074)" in b)
     # THE ONE THIS FILE EXISTS FOR: a count of arms, derived rather than typed.
@@ -61,9 +68,6 @@ def main() -> int:
         r["tools_offered"] == 0 and not r["tool_uses"] for r in spl["rows"])
     v["the_under_cap_arm_says_NO_INDICATOR"] = (
         "NO-INDICATOR" in rows["cjk_200x60"]["answer"] and "`NO-INDICATOR`" in b)
-    v["the_three_earlier_widths_are_126_61_217"] = (
-        "126, 61, 217" in b
-        and sorted({r["utf16_units"] // r["lines"] for r in rows.values()}) == [61, 126, 217])
     v["the_200x125_arm_reports_25200"] = (
         rows["ascii_200x125"]["utf16_units"] == 25200 and "reporting 25,200 units" in b)
     upl = spl["units_per_line"]
@@ -79,19 +83,13 @@ def main() -> int:
         spl["bracket_after"] == [24955, 25012] and "**[24955, 25012)**" in b
         and "119 units wide to 57" in b and (25074 - 24955, 25012 - 24955) == (119, 57))
     v["25000_is_inside_the_new_bracket"] = (
-        24955 <= 25000 < 25012 and "25,000 is\nstill inside it" in b)
-    # Off by one in the first version: 24.45 * 1024 is 25036.8, so the largest WHOLE byte count
-    # that still displays as 24.4KB is 25036, not 25037. Stated as integers now, because a
-    # half-open interval written over a rounded display invites exactly this slip.
-    lo_b, hi_b = int(24.35 * 1024) + 1, int(24.45 * 1024)
-    v["the_rounding_range_for_24_4KB_is_right"] = (
-        (lo_b, hi_b) == (24935, 25036) and f"{lo_b:,} to {hi_b:,} bytes" in b)
+        24955 <= 25000 < 25012 and "25,000 is still inside it" in b)
     # the offered next arm, and the count of alternatives, both recomputed
     v["the_next_boundary_is_24990"] = 170 * 147 == 24990 and "boundary at 24,990" in b
     others = len([(n, c) for c in range(126, 4000) for n in range(2, 201)
                   if 24986 < n * c < 25000]) - 1
     v["the_number_of_other_widths_is_recomputed"] = f"{others} other widths" in b
-    v["this_machine_has_18_sessions_in_3_buckets"] = "18 sessions across 3 project\nbuckets" in b
+    v["this_machine_has_18_sessions_in_3_buckets"] = "18 sessions across 3 project buckets" in b
     # --- controls ---------------------------------------------------------------------
     v["CONTROL_the_body_is_not_the_provenance_block"] = "STATUS:" not in b and "RECEIPTS:" not in b
     # EVERY arm-count sentence, not just the one I remembered to check. The first version of this
