@@ -42,6 +42,7 @@ MARKER = "...[truncated:500chars]"
 SCHEMA_STATED_CUT = 500          # SCHEMA.md §2, rule text AND the emitted suffix
 SCHEMA_STATED_MAX_DELTA = 242    # SCHEMA.md §2, "3-242 characters"
 GUIDE_UNCHECKED_CHARS = 656      # usage guide §6.2, "656 字符未检查"
+SCHEMA_TABLE_PUBLISHED_LEN = 423  # SCHEMA.md §2, the "发布版 response 长度" column, all three rows
 
 
 def load(path: str) -> list[dict]:
@@ -77,6 +78,13 @@ def main() -> int:
     v["every_body_is_cut_at_the_SAME_length"] = len(body_lens) == 1
     v["that_length_is_400_not_the_stated_500"] = actual_cut == 400 != SCHEMA_STATED_CUT
     v["the_emitted_marker_itself_states_500"] = "500" in MARKER
+    # The tightest form of the defect needs nothing outside SCHEMA §2 itself: the sentence above
+    # the table says the cut is at character 500, and every row of the table beneath it gives the
+    # published length as 423. A 500-char body plus this 23-char marker is 523.
+    v["the_tables_own_published_length_matches_the_file"] = (
+        actual_cut + len(MARKER) == SCHEMA_TABLE_PUBLISHED_LEN)
+    v["and_contradicts_the_sentence_above_it"] = (
+        SCHEMA_STATED_CUT + len(MARKER) != SCHEMA_TABLE_PUBLISHED_LEN)
     # the two published figures, each reconstructed from the actual cut and from the stated one
     v["SCHEMAs_own_max_delta_reconstructs_at_400"] = (
         max(w - (400 + len(MARKER)) for w in raws) == SCHEMA_STATED_MAX_DELTA)

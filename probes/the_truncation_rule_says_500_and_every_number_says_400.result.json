@@ -6,6 +6,8 @@
     "every_body_is_cut_at_the_SAME_length": true,
     "that_length_is_400_not_the_stated_500": true,
     "the_emitted_marker_itself_states_500": true,
+    "the_tables_own_published_length_matches_the_file": true,
+    "and_contradicts_the_sentence_above_it": true,
     "SCHEMAs_own_max_delta_reconstructs_at_400": true,
     "SCHEMAs_own_max_delta_does_NOT_reconstruct_at_500": true,
     "the_guides_656_reconstructs_at_400": true,
