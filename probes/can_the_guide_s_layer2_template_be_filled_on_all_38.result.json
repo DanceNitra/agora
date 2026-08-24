@@ -11,7 +11,8 @@
     "every_literal_prefix_does_occur": true,
     "every_long_response_row_is_flagged_penetration": true,
     "none_of_them_is_a_rejection": true,
-    "CONTROL_a_renamed_prefix_breaks_the_8_7_3_count": true
+    "CONTROL_any_SINGLE_row_flip_breaks_the_8_7_3_count": true,
+    "CONTROL_the_absence_check_flips_when_the_name_is_spiked": true
   },
   "positive_families": {
     "长回复": 3,
@@ -22,6 +23,8 @@
   "negative_families": {
     "模型明确拒绝": 19
   },
+  "mutants_killed": 18,
+  "mutants_survived": 0,
   "stratifiable": 18,
   "total": 38
 }
