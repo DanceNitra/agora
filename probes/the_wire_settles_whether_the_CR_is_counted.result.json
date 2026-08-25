@@ -1,0 +1,31 @@
+{
+  "probe": "the_wire_settles_whether_the_CR_is_counted.py",
+  "verdicts": {
+    "the_wire_carries_an_index_at_all": true,
+    "the_cut_is_at_124": true,
+    "carriage_returns_survive_into_the_prompt": true,
+    "there_is_one_CR_per_kept_line_boundary": true,
+    "the_segment_length_matches_CR_COUNTED": true,
+    "it_does_NOT_match_CR_STRIPPED": true,
+    "the_two_models_differ_by_exactly_the_CR_count": true,
+    "no_tool_was_offered_on_the_wire": true,
+    "CONTROL_the_line_count_alone_cannot_discriminate": true,
+    "CONTROL_the_fixture_was_larger_than_what_arrived": true,
+    "CONTROL_the_segment_is_substantial": true,
+    "CONTROL_CR_and_LF_are_counted_separately": true
+  },
+  "segment_units": 24922,
+  "predicted_cr_counted": 24922,
+  "predicted_cr_stripped": 24799,
+  "cr_in_segment": 123,
+  "lf_in_segment": 123,
+  "last_kept_line": 124,
+  "fixture": {
+    "lines": 150,
+    "chars": 199,
+    "terminator": "CRLF"
+  },
+  "verdict": "strip-then-cap is REFUTED: the sent index still carries its carriage returns and its length matches CR-counted exactly",
+  "instrument_credit": "wire capture method from @pjt222, anthropics/claude-code#82056 comment 5412833938",
+  "platform": "win32"
+}
