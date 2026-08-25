@@ -35,6 +35,17 @@ COMPETITORS = [
     ("MemOS / MemTensor", "MemTensor/MemOS", "memoryos"),
     ("txtai", "neuml/txtai", "txtai"),
     ("Memanto", "moorcheh-ai/memanto", ""),
+    # ADDED 2026-08-25, and the gap is the point. Hindsight shipped "Reversible Memory Curation"
+    # (edit / invalidate / revert, history preserved) in 0.8.2 on 2026-06-12 -- our exact axis, from
+    # a 21k-star product -- and this watcher, whose whole reason for existing is to catch a
+    # competitor shipping a revert, did not have them on the list. Ten weeks later it surfaced by
+    # accident, while charting an unrelated inbox task. A watcher is only as wide as its roster, and
+    # nothing in it fails when a name is missing: it reports a clean scan over the ones it knows.
+    #
+    # No PyPI name on purpose. `hindsight` on PyPI is version 0.1.7, "Python tools for Hindsight
+    # Software", an unrelated project -- wiring it in would have had this organ reporting a
+    # stranger's releases as a competitor's, which is worse than not watching at all.
+    ("Hindsight / Vectorize", "vectorize-io/hindsight", ""),
 ]
 
 # Orgs that ship a competing memory product AND things we partner with. Their competitor repo is
@@ -42,7 +53,13 @@ COMPETITORS = [
 # with us, while langgraph is a partner that merged our integration docs (langchain-ai/docs#5019) and
 # whose InMemoryStore we pass an operation-by-operation parity audit against. An org-wide rule here
 # would have blacklisted the single best distribution channel we have.
-_MIXED_ORGS = {"langchain-ai"}
+# vectorize-io joined on 2026-08-25 for the same reason and it was NOT optional: adding
+# vectorize-io/hindsight to the roster above immediately blacklisted the whole org, including
+# vectorize-io/agent-memory-benchmark -- the thread we opened on 2026-07-16 offering our
+# integrity axis for their manifesto, still open, and the collaboration the owner actually wants.
+# Measured by running is_competitor_repo across the org right after the edit rather than assuming
+# the blast radius: hindsight True, agent-memory-benchmark True. The second one is the mistake.
+_MIXED_ORGS = {"langchain-ai", "vectorize-io"}
 
 
 def is_competitor_repo(repo: str) -> bool:
