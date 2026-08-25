@@ -1,0 +1,31 @@
+{
+  "probe": "the_cap_is_stated_in_the_prompt_on_windows_too.py",
+  "verdicts": {
+    "exactly_one_request_was_captured": true,
+    "the_notice_is_present_on_the_wire": true,
+    "it_is_byte_identical_to_the_one_he_published": true,
+    "it_rides_in_messages_0_content_0": true,
+    "it_is_NOT_in_the_system_block": true,
+    "the_tools_array_on_the_wire_is_empty": true,
+    "the_wire_carries_canaries_at_all": true,
+    "they_are_contiguous_from_one": true,
+    "the_cut_is_at_124": true,
+    "124_is_floor_of_the_stated_cap_over_the_line_width": true,
+    "that_is_the_number_he_measured_on_linux": true,
+    "CONTROL_the_prompt_is_large_enough_to_hold_the_index": true,
+    "CONTROL_the_fixture_was_larger_than_what_arrived": true,
+    "CONTROL_the_matcher_finds_an_unrelated_known_string": true
+  },
+  "canaries_on_wire": 124,
+  "last_kept_line": 124,
+  "notice_verbatim": "WARNING: MEMORY.md is 29.4KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+  "tools_on_wire": 0,
+  "fixture": {
+    "lines": 150,
+    "chars": 200,
+    "units_per_line": 201,
+    "total_units": 30150
+  },
+  "platform": "win32",
+  "replication_of": "anthropics/claude-code#82056 comment 5412833938 (@pjt222), linux-x64, same fixture geometry by coincidence"
+}
