@@ -42,10 +42,12 @@ COMPETITORS = [
     # accident, while charting an unrelated inbox task. A watcher is only as wide as its roster, and
     # nothing in it fails when a name is missing: it reports a clean scan over the ones it knows.
     #
-    # No PyPI name on purpose. `hindsight` on PyPI is version 0.1.7, "Python tools for Hindsight
-    # Software", an unrelated project -- wiring it in would have had this organ reporting a
-    # stranger's releases as a competitor's, which is worse than not watching at all.
-    ("Hindsight / Vectorize", "vectorize-io/hindsight", ""),
+    # THE PYPI NAME IS `hindsight-api`, NOT `hindsight`. Bare `hindsight` on PyPI is version 0.1.7,
+    # "Python tools for Hindsight Software", an unrelated project -- wiring that in would have had
+    # this organ reporting a stranger's releases as a competitor's, which is worse than not
+    # watching. The real one is confirmed by its metadata naming vectorize; `hindsight-all` and
+    # `hindsight-client` are the same release train and do not need separate rows.
+    ("Hindsight / Vectorize", "vectorize-io/hindsight", "hindsight-api"),
 ]
 
 # Orgs that ship a competing memory product AND things we partner with. Their competitor repo is
