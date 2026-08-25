@@ -1,0 +1,21 @@
+{
+  "task": "is the resulting state reproducible across identical runs",
+  "metric": "byte_identical recall payloads across two passes on a fresh store",
+  "caveat": "non-determinism is the price of LLM extraction, not a defect. Extraction buys absorbing a fact from prose without a key. What it costs is the ability to re-derive a past state by re-running its writes.",
+  "results": {
+    "inspeximus": {
+      "system": "inspeximus",
+      "n": 20,
+      "run1_sha256": "360ee80dbb7d903da42f7c7fb70e7237",
+      "run2_sha256": "360ee80dbb7d903da42f7c7fb70e7237",
+      "byte_identical": true,
+      "cases_that_differ": 0,
+      "differing_indexes": [],
+      "model_calls_per_run": 0,
+      "seconds_run1": 0.003,
+      "seconds_run2": 0.002,
+      "example_diff": null,
+      "measured_utc": "2026-08-25T18:13Z"
+    }
+  }
+}
