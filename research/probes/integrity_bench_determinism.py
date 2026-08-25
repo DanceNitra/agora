@@ -53,8 +53,22 @@ ENTS = rev.ENTS
 NL = chr(10)
 
 
+import re
+
+# TIMESTAMPS ARE NOT NON-DETERMINISM, and the first run of this cell counted them as if they were.
+# Hindsight stamps each extracted fact with a wall-clock time, so two passes minutes apart differ
+# for a reason that has nothing to do with the model -- and our own arm puts no timestamp in its
+# payload at all, so the comparison was not like for like. Any system that records time would have
+# 'failed' this cell. Stripped before hashing; what remains is what the store actually decided.
+_TS = re.compile(r'\d{4}-\d{2}-\d{2}(?:T[\d:.+\-]+)?')
+
+
+def strip_time(payload: str) -> str:
+    return _TS.sub("<TS>", payload)
+
+
 def digest(payloads) -> str:
-    return hashlib.sha256(chr(31).join(payloads).encode("utf-8")).hexdigest()
+    return hashlib.sha256(chr(31).join(strip_time(p) for p in payloads).encode("utf-8")).hexdigest()
 
 
 def inspeximus_pass(cases):
@@ -114,7 +128,8 @@ def measure(name, runner, cases):
     p2, c2 = runner(cases, "b") if name == "hindsight" else runner(cases)
     t2 = time.time()
     d1, d2 = digest(p1), digest(p2)
-    differing = [i for i, (a, b) in enumerate(zip(p1, p2)) if a != b]
+    differing = [i for i, (a, b) in enumerate(zip(p1, p2))
+                 if strip_time(a) != strip_time(b)]
     return {"system": name, "n": len(cases),
             "run1_sha256": d1[:32], "run2_sha256": d2[:32],
             "byte_identical": d1 == d2,
@@ -122,6 +137,7 @@ def measure(name, runner, cases):
             "differing_indexes": differing[:8],
             "model_calls_per_run": c1,
             "seconds_run1": round(t1 - t0, 3), "seconds_run2": round(t2 - t1, 3),
+            "payloads_run1": p1, "payloads_run2": p2,
             "example_diff": ({"case": ENTS[differing[0]][0],
                               "run1": p1[differing[0]][:300],
                               "run2": p2[differing[0]][:300]} if differing else None)}
@@ -141,7 +157,7 @@ def main() -> int:
     if "inspeximus" in want:
         print("inspeximus (local, no model on the write path)...")
         out["inspeximus"] = measure("inspeximus", inspeximus_pass, cases)
-        print(json.dumps({k: v for k, v in out["inspeximus"].items() if k != "example_diff"}))
+        print(json.dumps({k: v for k, v in out["inspeximus"].items() if k not in ("example_diff","payloads_run1","payloads_run2")}))
     if "hindsight" in want:
         print(NL + "hindsight (native, gpt-5-mini extraction on every retain)...")
         try:
@@ -149,7 +165,7 @@ def main() -> int:
         except Exception as ex:                                      # noqa: BLE001
             print(f"    [hindsight FAILED: {type(ex).__name__}: {str(ex)[:160]}]", flush=True)
             out["hindsight"] = {"system": "hindsight", "error": f"{type(ex).__name__}: {ex}"[:300]}
-        print(json.dumps({k: v for k, v in out["hindsight"].items() if k != "example_diff"}))
+        print(json.dumps({k: v for k, v in out["hindsight"].items() if k not in ("example_diff","payloads_run1","payloads_run2")}))
 
     p = os.path.join(os.path.dirname(__file__), "integrity_bench_determinism_result.json")
     prev = {}
