@@ -1,0 +1,63 @@
+{
+  "probe": "how_wrong_could_the_OUT_cells_be.py",
+  "verdicts": {
+    "there_is_at_least_one_known_IN_needle_per_arm": true,
+    "the_flap_is_real_and_counted": true,
+    "the_load_bearing_cell_is_an_OUT_cell": true,
+    "CONTROL_the_estimate_is_not_vacuous": true,
+    "CONTROL_the_upper_bound_is_looser_than_the_point": true
+  },
+  "trials_on_known_IN_needles": 15,
+  "false_negatives": 1,
+  "p_hat": 0.06666666666666667,
+  "wilson95": [
+    0.011866588606194859,
+    0.29817077552423993
+  ],
+  "out_cells": [
+    [
+      "LF",
+      "126",
+      25199
+    ],
+    [
+      "LF",
+      "138",
+      27599
+    ],
+    [
+      "CRLF",
+      "125",
+      25123
+    ],
+    [
+      "CRLF",
+      "126",
+      25324
+    ],
+    [
+      "CRLF",
+      "138",
+      27736
+    ]
+  ],
+  "risk": [
+    {
+      "basis": "point estimate",
+      "p": 0.06666666666666667,
+      "p_cubed": 0.0002962962962962963,
+      "family_wise": 0.0014806038266141908
+    },
+    {
+      "basis": "Wilson 95% UPPER",
+      "p": 0.29817077552423993,
+      "p_cubed": 0.026509114726810386,
+      "family_wise": 0.12570207426022528
+    }
+  ],
+  "load_bearing_cell": [
+    "CRLF",
+    "125"
+  ],
+  "load_bearing_worst_case": 0.026509114726810386
+}
