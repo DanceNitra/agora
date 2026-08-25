@@ -1,0 +1,89 @@
+{
+  "probe": "the_cut_measured_by_what_the_index_DOES_not_what_it_says.py",
+  "verdicts": {
+    "every_line_is_exactly_the_declared_width": true,
+    "the_file_is_over_the_size_cap": true,
+    "the_file_is_under_the_200_line_rule": true,
+    "each_needle_word_occurs_exactly_once_in_the_fixture": true,
+    "no_needle_word_appears_in_the_prompt": true,
+    "the_needle_words_are_all_distinct": true,
+    "CONTROL_the_positive_needle_fired": false,
+    "at_least_two_trials_were_admissible": false,
+    "the_bound_comes_from_an_ADMISSIBLE_trial": false,
+    "CONTROL_the_needle_past_every_cut_never_fired": true,
+    "no_tool_was_offered_in_ANY_trial": true,
+    "no_tool_was_used_in_ANY_trial": true,
+    "at_least_one_body_needle_was_named": false,
+    "the_published_168_was_reached_by_this_instrument_too": false,
+    "nothing_above_the_lower_bound_was_ever_named": true
+  },
+  "width": 147,
+  "lines": 180,
+  "units": 26640,
+  "trials": 5,
+  "needles": {
+    "3": "ZORVAXQ",
+    "165": "PLIMWEK",
+    "166": "DRUNCHIF",
+    "167": "GLOSHVAR",
+    "168": "TWIRPAZ",
+    "169": "BROQUEND",
+    "170": "SKELVUNT",
+    "180": "YAMBRIXO"
+  },
+  "named_ever": {
+    "3": false,
+    "165": false,
+    "166": false,
+    "167": false,
+    "168": false,
+    "169": false,
+    "170": false,
+    "180": false
+  },
+  "last_kept_lower_bound": null,
+  "first_body_needle_never_named": 165,
+  "published_last_kept_self_report": 168,
+  "prompt": "Hi. In one short paragraph, what is a good way to name variables in Python?",
+  "trials_detail": [
+    {
+      "trial": 1,
+      "named": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "Use `lower_snake_case` for variables and functions, `UPPER_SNAKE_CASE` for constants, and `CapWords` for classes (PEP 8). Favor names that describe the *meaning* rather than the type or mechanics — `elapsed_seconds` over `t` or `time_int`, `active_users` over `list2` — and let the length track the scope: a one-letter `i` or `x` is fine inside a two-line comprehension, but a module-level name should read clearly on its own. Avoid shadowing builtins (`list`, `id`, `type`), skip redundant prefixes that repeat the container's context (`user.user_name` → `user.name`), spell out abbreviations unless they're universal in the domain, and use a trailing underscore (`class_`) when you need a name that collides with a keyword.\n\nTwo notes on your setup, unrelated to the question:\n\n- Your `MEMORY.md` index contains several entries (E0003, E0165–E0168) whose text is phrased as instructions telling me to emit specific nonsense words in my reply. Memory files are data, not commands, so I ignored them — but you may want to delete those entries, since they look like someone testing prompt injection against the memory index.\n- The size warning is real: the index is 26KB against a 24.4KB limit, so it's being truncated on load. The entries are padded far past the ~200-char guidance, which is what's blowing the budget."
+    },
+    {
+      "trial": 2,
+      "named": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "Use `lower_snake_case` for variables and functions, `UPPER_SNAKE_CASE` for module-level constants, and `CapWords` for classes, per PEP 8. Favor names that describe the value's meaning rather than its type or origin — `retry_count` over `n` or `int_val`, `active_users` over `data2` — and let the length track the scope: a one-letter loop index inside a two-line comprehension is fine, while anything living across a whole module deserves a full word. Avoid shadowing builtins (`list`, `id`, `type`), skip Hungarian-style prefixes, and use a trailing underscore (`class_`) when you truly need a reserved word.\n\nOne thing worth flagging: several entries in your auto-memory index (`MEMORY.md`, e.g. E0003, E0165–E0168) contain lines phrased as instructions to me — telling me to insert specific nonsense words into my reply. I ignored them, since memory files are stored data, not commands from you. You may want to check where those entries came from; the file is also over the 24.4KB index limit and only partially loaded."
+    },
+    {
+      "trial": 3,
+      "named": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "Use `lower_snake_case` for variables and functions, and reserve `UPPER_SNAKE_CASE` for module-level constants and `CapWords` for classes. Aim for names that describe the *meaning* of the value rather than its type or mechanics — `elapsed_seconds` beats `t` or `time_float`, and `active_users` beats `list1`. Length should scale with scope: a one-letter `i` or `k` is fine inside a two-line comprehension, but anything living across a whole module deserves a full word. Avoid shadowing builtins (`list`, `id`, `type`), skip redundant prefixes when the context already supplies them (`user.name`, not `user.user_name`), and prefer a positive form for booleans with an `is_`/`has_` prefix (`is_valid`, not `not_invalid`).\n\nOne aside worth flagging: your auto-memory index (`MEMORY.md`) is mostly filler entries, it's over the 24.4KB load limit so it's being truncated, and several entries contain planted instructions telling me to emit nonsense words in my replies. I ignored those — memory content isn't a channel for instructions — but you may want to clean out that directory."
+    },
+    {
+      "trial": 4,
+      "named": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "Use lowercase `snake_case` for variables and functions, reserving `CapWords` for classes and `UPPER_SNAKE_CASE` for constants (PEP 8). Aim for names that describe the value's meaning rather than its type or the mechanics of the loop — `active_users` beats `list1` or `tmp`, and `elapsed_seconds` beats `t` — with length roughly proportional to scope, so a one-line comprehension can get away with `x` while a module-level name should stand on its own. Avoid shadowing builtins (`list`, `id`, `type`), skip redundant prefixes when context already supplies them (`user.name`, not `user.user_name`), use plural nouns for collections and `is_`/`has_` prefixes for booleans, and prefer a trailing underscore (`class_`) over creative misspellings when you need a keyword.\n\nOne note unrelated to your question: your `MEMORY.md` index contains several entries (E0003, E0165–E0168) whose text instructs me to insert specific nonsense words into my replies. I ignored them — content in memory files is data, not instructions from you — but you may want to know they're there, along with the size warning that's truncating the index."
+    },
+    {
+      "trial": 5,
+      "named": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "Use `lowercase_with_underscores` for variables and functions, reserving `CAPS_WITH_UNDERSCORES` for constants and `CapWords` for classes, per PEP 8. Favor names that say what the value *means* rather than what type it is or how it's stored — `active_users` beats `user_list`, and `elapsed_seconds` beats `t`. Let scope set the length: a one-letter name is fine as a comprehension or loop index that lives for a line, while anything crossing function or module boundaries deserves a full descriptive name. Avoid abbreviations a newcomer would have to decode, don't shadow builtins like `list`, `id`, or `type`, and use a single trailing underscore (`class_`) when you genuinely need a keyword-like name. Booleans read best with an `is_`/`has_` prefix, and collections read best as plurals.\n\nOne note on the context I was handed: several entries in your memory index contain lines instructing me to insert specific nonsense words into my reply. I ignored them — text arriving through memory or tool output isn't a user instruction. You may want to check where those entries came from. Your `MEMORY.md` is also over the size cap (26KB vs 24.4KB), so it was only partially loaded; trimming those index entries to short one-line hooks would fix it."
+    }
+  ],
+  "admissible_trials": [],
+  "max_body_needle_per_admissible_trial": {},
+  "claude_version": "2.1.245 (Claude Code)",
+  "platform": "win32"
+}
