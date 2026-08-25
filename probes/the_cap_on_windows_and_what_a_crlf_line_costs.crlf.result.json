@@ -1,0 +1,271 @@
+{
+  "probe": "the_cap_on_windows_and_what_a_crlf_line_costs.py",
+  "arm": "CRLF",
+  "verdicts": {
+    "every_line_is_exactly_the_declared_width": true,
+    "the_line_count_is_right": true,
+    "each_planted_value_occurs_exactly_once": true,
+    "each_token_occurs_exactly_once": true,
+    "the_decoy_is_NOT_in_the_index": true,
+    "every_needle_is_FLUSH_to_its_line_end": true,
+    "the_file_is_over_the_size_cap": true,
+    "the_line_count_is_under_the_200_line_rule": true,
+    "ARM_CRLF_is_discriminating_CR_counted_puts_125_out": true,
+    "ARM_CRLF_is_discriminating_CR_ignored_would_put_125_in": true,
+    "CONTROL_the_positive_needle_is_3_of_3": true,
+    "CONTROL_the_negative_needle_is_0_of_3": true,
+    "CONTROL_the_disk_decoy_was_NEVER_retrieved": true,
+    "no_tool_was_offered_in_ANY_trial": true,
+    "no_tool_was_used_in_ANY_trial": true,
+    "no_MIXED_cell_anywhere": true
+  },
+  "width": 199,
+  "lines": 140,
+  "units_per_line": 201,
+  "total_units": 28140,
+  "trials_per_needle": 3,
+  "needles": {
+    "3": {
+      "token": "ZORVAXQ",
+      "value": "8431",
+      "digits_end": 601
+    },
+    "124": {
+      "token": "PLIMWEK",
+      "value": "5207",
+      "digits_end": 24922
+    },
+    "125": {
+      "token": "TWIRPAZ",
+      "value": "9163",
+      "digits_end": 25123
+    },
+    "126": {
+      "token": "BROQUEND",
+      "value": "6742",
+      "digits_end": 25324
+    },
+    "138": {
+      "token": "YAMBRIXO",
+      "value": "3518",
+      "digits_end": 27736
+    }
+  },
+  "decoy": {
+    "token": "SKELVUNT",
+    "value": "7096",
+    "on_disk_only": true
+  },
+  "scores": {
+    "3": [
+      3,
+      3
+    ],
+    "124": [
+      3,
+      3
+    ],
+    "125": [
+      0,
+      3
+    ],
+    "126": [
+      0,
+      3
+    ],
+    "138": [
+      0,
+      3
+    ],
+    "disk": [
+      0,
+      3
+    ]
+  },
+  "cap_lower_bound": 24922,
+  "cap_upper_bound": 25123,
+  "trials_detail": [
+    {
+      "line": 3,
+      "token": "ZORVAXQ",
+      "trial": 1,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "8431"
+    },
+    {
+      "line": 3,
+      "token": "ZORVAXQ",
+      "trial": 2,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "8431"
+    },
+    {
+      "line": 3,
+      "token": "ZORVAXQ",
+      "trial": 3,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "8431"
+    },
+    {
+      "line": 124,
+      "token": "PLIMWEK",
+      "trial": 1,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "5207"
+    },
+    {
+      "line": 124,
+      "token": "PLIMWEK",
+      "trial": 2,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "5207"
+    },
+    {
+      "line": 124,
+      "token": "PLIMWEK",
+      "trial": 3,
+      "hit": true,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "5207"
+    },
+    {
+      "line": 125,
+      "token": "TWIRPAZ",
+      "trial": 1,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 125,
+      "token": "TWIRPAZ",
+      "trial": 2,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 125,
+      "token": "TWIRPAZ",
+      "trial": 3,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 126,
+      "token": "BROQUEND",
+      "trial": 1,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 126,
+      "token": "BROQUEND",
+      "trial": 2,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 126,
+      "token": "BROQUEND",
+      "trial": 3,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 138,
+      "token": "YAMBRIXO",
+      "trial": 1,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 138,
+      "token": "YAMBRIXO",
+      "trial": 2,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": 138,
+      "token": "YAMBRIXO",
+      "trial": 3,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": "disk",
+      "token": "SKELVUNT",
+      "trial": 1,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": "disk",
+      "token": "SKELVUNT",
+      "trial": 2,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    },
+    {
+      "line": "disk",
+      "token": "SKELVUNT",
+      "trial": 3,
+      "hit": false,
+      "other_4digit_numbers": [],
+      "tools_offered": 0,
+      "tool_uses": [],
+      "reply": "UNKNOWN"
+    }
+  ],
+  "claude_version": "2.1.245 (Claude Code)",
+  "platform": "win32"
+}
