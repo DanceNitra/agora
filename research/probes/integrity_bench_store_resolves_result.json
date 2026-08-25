@@ -3,6 +3,20 @@
   "metric": "store_resolution_rate = recall returns the corrected value and NOT the retired one; no judge involved",
   "caveat": "returning both is not automatically worse -- a bitemporal store doing it with validity markers is being honest. It does mean disambiguation is the caller's job, which is a different promise from ours.",
   "results": {
+    "mem0": {
+      "system": "mem0",
+      "n": 20,
+      "errors": 0,
+      "resolved_at_store": 1,
+      "both_returned": 18,
+      "only_stale": 0,
+      "neither": 1,
+      "store_resolution_rate": 0.05,
+      "ci95": [
+        0.009,
+        0.236
+      ]
+    },
     "inspeximus": {
       "system": "inspeximus",
       "n": 20,
@@ -15,7 +29,8 @@
       "ci95": [
         0.839,
         1.0
-      ]
+      ],
+      "measured_utc": "2026-08-25T16:48Z"
     },
     "hindsight": {
       "system": "hindsight",
@@ -29,7 +44,8 @@
       "ci95": [
         -0.0,
         0.161
-      ]
+      ],
+      "measured_utc": "2026-08-25T17:02Z"
     }
   }
 }

@@ -50,6 +50,9 @@ import integrity_bench_revert as rev                 # noqa: E402
 ENTS = rev.ENTS
 
 
+NL_JOIN = chr(10)
+
+
 def classify(payload: str, A: str, B: str) -> str:
     a, b = A.lower() in payload.lower(), B.lower() in payload.lower()
     if b and not a:
@@ -121,6 +124,60 @@ def run_hindsight(cases):
     return out
 
 
+def run_mem0(cases):
+    """mem0 on its own recommended stack, the same one cell 1 and cell 2 use."""
+    try:
+        from mem0 import Memory
+    except ImportError:
+        print('    [mem0 not importable in this venv]', flush=True)
+        return ['error'] * len(cases)
+    cfg = {'llm': {'provider': 'openai', 'config': {'model': 'gpt-4o-mini', 'temperature': 0.1}},
+           'embedder': {'provider': 'openai', 'config': {'model': 'text-embedding-3-small'}}}
+    try:
+        mem = Memory.from_config(cfg)
+    except Exception as ex:
+        print(f'    [mem0 init FAILED: {str(ex)[:120]}]', flush=True)
+        return ['error'] * len(cases)
+    out = []
+    for i, (e, A, B) in enumerate(cases):
+        try:
+            uid = f'store{i}'
+            mem.add(f'the {e} is {A}', user_id=uid)
+            mem.add(f'correction: the {e} is now {B}', user_id=uid)
+            mem.add(f'the {e} is {A}', user_id=uid)
+            ga = mem.get_all(filters={'user_id': uid}, top_k=30)
+            ms = ga.get('results', ga) if isinstance(ga, dict) else ga
+            payload = NL_JOIN.join((x.get('memory') or x.get('text') or str(x)) for x in (ms or []))
+            out.append(classify(payload, A, B))
+        except Exception as ex:
+            print(f'    [mem0 store {i} error: {str(ex)[:90]}]', flush=True)
+            out.append('error')
+        if (i + 1) % 5 == 0:
+            print(f'    mem0 {i+1}/{len(cases)}', flush=True)
+    return out
+
+
+def run_graphiti(cases):
+    """Graphiti against a LIVE neo4j. Refuses loudly rather than scoring an unreachable database,
+    because an arm that cannot connect returns the same shape as an arm that found nothing."""
+    try:
+        from graphiti_core import Graphiti
+        from graphiti_core.nodes import EpisodeType
+    except ImportError:
+        print('    [graphiti_core not importable in this venv]', flush=True)
+        return ['error'] * len(cases)
+    import socket
+    sk = socket.socket(); sk.settimeout(3)
+    try:
+        sk.connect(('127.0.0.1', 7687))
+    except Exception:
+        print('    [graphiti: neo4j bolt 7687 unreachable -- REFUSING rather than reporting an empty graph as a result]', flush=True)
+        return ['error'] * len(cases)
+    finally:
+        sk.close()
+    return ['error'] * len(cases)   # wired in the follow-up once neo4j is up
+
+
 def score(name, verdicts, n_cases):
     c = {k: sum(1 for v in verdicts if v == k)
          for k in ("resolved_at_store", "both_returned", "only_stale", "neither")}
@@ -150,17 +207,42 @@ def main() -> int:
         out["hindsight"] = score("hindsight", run_hindsight(cases), len(cases))
         print(json.dumps(out["hindsight"]))
 
+    if "mem0" in want:
+        print(chr(10) + "mem0 (native, gpt-4o-mini + text-embedding-3-small)...")
+        out["mem0"] = score("mem0", run_mem0(cases), len(cases))
+        print(json.dumps(out["mem0"]))
+    if "graphiti" in want:
+        print(chr(10) + "graphiti (native, live neo4j)...")
+        out["graphiti"] = score("graphiti", run_graphiti(cases), len(cases))
+        print(json.dumps(out["graphiti"]))
+
     p = os.path.join(os.path.dirname(__file__), "integrity_bench_store_resolves_result.json")
+    # MERGE, never overwrite. Running one arm alone used to clobber the others' numbers, so a cheap
+    # re-run of the free arm silently destroyed two paid ones. Each arm carries the UTC minute it was
+    # measured, because a merged file otherwise reads as one simultaneous run and is not.
+    prev = {}
+    _p = os.path.join(os.path.dirname(__file__), "integrity_bench_store_resolves_result.json")
+    if os.path.exists(_p):
+        try:
+            prev = (json.load(open(_p, encoding="utf-8")) or {}).get("results", {}) or {}
+        except Exception:                                            # noqa: BLE001
+            prev = {}
+    import datetime as _dt
+    stamp = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+    for k in out:
+        out[k]["measured_utc"] = stamp
+    merged = {**prev, **out}
+
     json.dump({"task": "who resolves the correction, the store or the reader",
                "metric": "store_resolution_rate = recall returns the corrected value and NOT the "
                          "retired one; no judge involved",
                "caveat": "returning both is not automatically worse -- a bitemporal store doing it "
                          "with validity markers is being honest. It does mean disambiguation is "
                          "the caller's job, which is a different promise from ours.",
-               "results": out}, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+               "results": merged}, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
     print("\n=== WHO RESOLVES IT ===")
-    for k, v in out.items():
+    for k, v in merged.items():
         print(f"  {k:11s} store-resolved={v['store_resolution_rate']:.2f}  "
               f"(resolved={v['resolved_at_store']} both={v['both_returned']} "
               f"stale={v['only_stale']} neither={v['neither']}, n={v['n']})")
