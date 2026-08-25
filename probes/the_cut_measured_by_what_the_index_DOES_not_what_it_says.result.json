@@ -85,5 +85,37 @@
   "admissible_trials": [],
   "max_body_needle_per_admissible_trial": {},
   "claude_version": "2.1.245 (Claude Code)",
-  "platform": "win32"
+  "platform": "win32",
+  "rescored_offline": {
+    "note": "verdicts below recomputed from the stored replies after the 0x08 regex fix; no session was run",
+    "named_ever": {
+      "3": true,
+      "165": true,
+      "166": true,
+      "167": true,
+      "168": true,
+      "169": false,
+      "170": false,
+      "180": false
+    },
+    "admissible_trials": [
+      1,
+      2,
+      4
+    ],
+    "last_kept_lower_bound": 168,
+    "needle_WORDS_present_in_stored_replies": [],
+    "entry_ids_named_individually": [
+      3,
+      165,
+      168
+    ],
+    "entry_id_ranges_the_model_wrote": [
+      [
+        165,
+        168
+      ]
+    ],
+    "replies_truncated_at_400_chars": false
+  }
 }

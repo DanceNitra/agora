@@ -96,5 +96,24 @@
     }
   ],
   "claude_version": "2.1.245 (Claude Code)",
-  "platform": "win32"
+  "platform": "win32",
+  "rescored_offline": {
+    "note": "verdicts below recomputed from the stored replies after the 0x08 regex fix; no session was run",
+    "named_ever": {
+      "3": false,
+      "165": false,
+      "166": false,
+      "167": false,
+      "168": false,
+      "169": false,
+      "170": false,
+      "180": false
+    },
+    "admissible_trials": [],
+    "last_kept_lower_bound": null,
+    "needle_WORDS_present_in_stored_replies": [],
+    "entry_ids_named_individually": [],
+    "entry_id_ranges_the_model_wrote": [],
+    "replies_truncated_at_400_chars": true
+  }
 }
