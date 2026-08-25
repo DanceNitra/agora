@@ -82,7 +82,25 @@ def main() -> int:
     v: dict = {}
     v["exactly_one_request_was_captured"] = len(reqs) == 1
     v["the_notice_is_present_on_the_wire"] = HIS_NOTICE in text
-    v["it_is_byte_identical_to_the_one_he_published"] = HIS_NOTICE in text
+    # NOT a comparison against the string above -- that would be circular, since I typed it in.
+    # Fetch HIS comment live and compare his notice against ours character for character. If the
+    # network is unavailable the check REFUSES rather than falling back to the local constant,
+    # because a silent fallback is how a circular assertion passes as a measurement.
+    import subprocess
+    _r = subprocess.run(["gh", "api",
+                         "repos/anthropics/claude-code/issues/comments/5412833938", "--jq", ".body"],
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    _pat = r"WARNING: MEMORY\.md is 29\.4KB.*?topic files\."
+    _his = re.search(_pat, _r.stdout or "", re.S)
+    _ours = re.search(_pat, text, re.S)
+    if _r.returncode != 0 or not _his:
+        print("  REFUSED: could not fetch comment 5412833938 to compare against; the local "
+              "constant is NOT a substitute")
+        v["it_is_byte_identical_to_the_one_he_published"] = False
+    else:
+        v["it_is_byte_identical_to_the_one_he_published"] = bool(
+            _ours) and _his.group(0) == _ours.group(0)
+        v["and_the_local_constant_matches_his_too"] = _his.group(0) == HIS_NOTICE
     v["it_rides_in_messages_0_content_0"] = "MEMORY.md is" in text
     v["it_is_NOT_in_the_system_block"] = "MEMORY.md is" not in json.dumps(
         body.get("system"), ensure_ascii=False)

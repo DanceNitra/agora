@@ -4,6 +4,7 @@
     "exactly_one_request_was_captured": true,
     "the_notice_is_present_on_the_wire": true,
     "it_is_byte_identical_to_the_one_he_published": true,
+    "and_the_local_constant_matches_his_too": true,
     "it_rides_in_messages_0_content_0": true,
     "it_is_NOT_in_the_system_block": true,
     "the_tools_array_on_the_wire_is_empty": true,
