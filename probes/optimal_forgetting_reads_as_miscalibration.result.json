@@ -1,0 +1,74 @@
+{
+  "probe": "optimal_forgetting_reads_as_miscalibration.py",
+  "verdicts": {
+    "leak_free_sits_near_chance_everywhere": true,
+    "the_optimal_lambda_is_below_one_everywhere": true,
+    "forgetting_buys_real_accuracy_gain_over_0.05": true,
+    "the_audit_reads_the_forgetter_as_MORE_conservative": true,
+    "faster_drift_means_more_forgetting": true,
+    "CONTROL_leak_free_was_a_candidate": true,
+    "CONTROL_the_gain_exceeds_the_seed_spread": true
+  },
+  "rows": [
+    {
+      "flip_p": 0.005,
+      "lambda_star": 0.9,
+      "acc_leakfree": 0.51,
+      "acc_lambda_star": 0.956,
+      "acc_gain": 0.446,
+      "audit_gap_leakfree": 0.0,
+      "audit_gap_lambda_star": -0.018,
+      "acc_spread_across_seeds": 0.0002
+    },
+    {
+      "flip_p": 0.02,
+      "lambda_star": 0.84,
+      "acc_leakfree": 0.511,
+      "acc_lambda_star": 0.896,
+      "acc_gain": 0.384,
+      "audit_gap_leakfree": 0.0,
+      "audit_gap_lambda_star": -0.039,
+      "acc_spread_across_seeds": 0.0045
+    },
+    {
+      "flip_p": 0.08,
+      "lambda_star": 0.7,
+      "acc_leakfree": 0.507,
+      "acc_lambda_star": 0.805,
+      "acc_gain": 0.299,
+      "audit_gap_leakfree": 0.0,
+      "audit_gap_lambda_star": -0.056,
+      "acc_spread_across_seeds": 0.001
+    }
+  ],
+  "params": {
+    "steps": 60000,
+    "obs_acc": 0.75,
+    "audit_block": 200,
+    "seeds": [
+      11,
+      12,
+      13
+    ],
+    "lambdas": [
+      1.0,
+      0.98,
+      0.96,
+      0.94,
+      0.92,
+      0.9,
+      0.88,
+      0.86,
+      0.84,
+      0.82,
+      0.8,
+      0.78,
+      0.76,
+      0.74,
+      0.72,
+      0.7
+    ]
+  },
+  "why": "the note's three lab ids (8cc533, 56e5de, 6d8e4f) have rotated out of .lab.json, so this re-derives the result in the current cycle",
+  "scope": "a toy 2-state drift world. It isolates a mechanism and is not a calibrated number for any real system."
+}
