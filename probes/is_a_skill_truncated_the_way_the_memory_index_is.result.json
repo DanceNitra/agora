@@ -4,6 +4,8 @@
     "CONTROL_the_route_is_exercised_at_all": true,
     "EVERY_NAME_ARRIVES_it_is_the_DESCRIPTION_that_is_dropped": true,
     "CONTROL_and_the_uncut_arms_have_no_name_only_entries": true,
+    "the_delivered_listing_size_was_measured": true,
+    "NO_WORD_IN_THE_BODY_ANNOUNCES_THE_DEGRADATION": true,
     "CONTROL_a_small_listing_arrives_whole": true,
     "CONTROL_every_arm_reached_the_recorder": true,
     "CONTROL_every_sweep_arm_planted_the_same_24000_units": true,
@@ -22,6 +24,16 @@
       "names_on_wire": 3,
       "bodies_on_wire": 0,
       "name_only_entries": 0,
+      "delivered_listing_units": 239,
+      "notice_words_in_whole_body": {
+        "truncat": 7,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D003",
       "wire_chars": 41968
     },
@@ -35,6 +47,16 @@
       "names_on_wire": 60,
       "bodies_on_wire": 0,
       "name_only_entries": 0,
+      "delivered_listing_units": 4799,
+      "notice_words_in_whole_body": {
+        "truncat": 7,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D060",
       "wire_chars": 46528
     },
@@ -48,6 +70,16 @@
       "names_on_wire": 60,
       "bodies_on_wire": 0,
       "name_only_entries": 34,
+      "delivered_listing_units": 10919,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D026",
       "wire_chars": 49988
     },
@@ -61,6 +93,16 @@
       "names_on_wire": 40,
       "bodies_on_wire": 0,
       "name_only_entries": 22,
+      "delivered_listing_units": 11159,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D018",
       "wire_chars": 49964
     },
@@ -74,6 +116,16 @@
       "names_on_wire": 30,
       "bodies_on_wire": 0,
       "name_only_entries": 17,
+      "delivered_listing_units": 10659,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D013",
       "wire_chars": 49992
     },
@@ -87,6 +139,16 @@
       "names_on_wire": 120,
       "bodies_on_wire": 0,
       "name_only_entries": 73,
+      "delivered_listing_units": 10339,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D047",
       "wire_chars": 49990
     },
@@ -100,6 +162,16 @@
       "names_on_wire": 200,
       "bodies_on_wire": 0,
       "name_only_entries": 134,
+      "delivered_listing_units": 9239,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D066",
       "wire_chars": 49988
     },
@@ -113,6 +185,16 @@
       "names_on_wire": 80,
       "bodies_on_wire": 0,
       "name_only_entries": 47,
+      "delivered_listing_units": 10559,
+      "notice_words_in_whole_body": {
+        "truncat": 6,
+        "omitted": 3,
+        "not loaded": 0,
+        "only part": 0,
+        "more skill": 0,
+        "description omitted": 0,
+        "listing": 10
+      },
       "last_description_seen": "SKILLCAN-D033",
       "wire_chars": 49934
     }
@@ -134,5 +216,6 @@
     "the exact constant: delivered lands in 9,228-11,148 units across the six widths, and pinning it needs a boundary-free fixture",
     "whether a name-only skill can still be invoked usefully; its name is present and no skill name appears in the tools array at all, so invocation goes through some other path this probe did not test",
     "one build, one platform"
-  ]
+  ],
+  "claude_version": "2.1.246 (Claude Code)"
 }

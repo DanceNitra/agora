@@ -165,16 +165,38 @@ def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
     # the model still knows the skill exists and no longer knows what it does. Counting one field
     # and reporting it as the object is the same error this probe exists to study.
     n_seen = [c["skill"] for c in cans if c["skill"] in text]
+    # The listing segment, measured rather than estimated. From the first entry to the end of the
+    # last one that still carries a description.
+    delivered = 0
+    if d_seen:
+        start = text.find("- " + cans[0]["skill"])
+        last = text.find("- " + cans[len(d_seen) - 1]["skill"])
+        if start >= 0 and last >= start:
+            end = text.find(NL, last + len(cans[0]["skill"]) + desc_chars)
+            delivered = units(text[start:end if end > 0 else last])
+    # Does anything in the WHOLE request body announce the degradation? Scanned over the entire
+    # body, not one field, and reported as a count per word so "no wording" is never asserted when
+    # the word is present for an unrelated reason.
+    whole = BODIES[-1] if BODIES else ""
+    notice = {w: whole.lower().count(w)
+              for w in ("truncat", "omitted", "not loaded", "only part", "more skill",
+                        "description omitted", "listing")}
     total_desc = sum(c["desc_units"] for c in cans)
     row = {"arm": label, "skills": n, "desc_chars": desc_chars, "body_chars": body_chars,
            "planted_desc_units": total_desc,
            "descriptions_on_wire": len(d_seen), "names_on_wire": len(n_seen),
            "bodies_on_wire": len(b_seen),
            "name_only_entries": len(n_seen) - len(d_seen),
+           "delivered_listing_units": delivered,
+           "notice_words_in_whole_body": notice,
            "last_description_seen": d_seen[-1] if d_seen else None,
            "wire_chars": len(text)}
     shutil.rmtree(root, ignore_errors=True)
     return row
+
+
+def sweep_rows(rows: list) -> list:
+    return [r for r in rows if r["arm"].startswith("w")]
 
 
 def main() -> int:
@@ -208,6 +230,14 @@ def main() -> int:
         r["names_on_wire"] == r["skills"] for r in rows)
     v["CONTROL_and_the_uncut_arms_have_no_name_only_entries"] = (
         by["small"]["name_only_entries"] == 0 and by["many_short"]["name_only_entries"] == 0)
+    # MEASURED, not asserted. These two were stated in a draft with no receipt behind them.
+    v["the_delivered_listing_size_was_measured"] = all(
+        r["delivered_listing_units"] > 0 for r in sweep_rows(rows))
+    v["NO_WORD_IN_THE_BODY_ANNOUNCES_THE_DEGRADATION"] = all(
+        r["notice_words_in_whole_body"].get("description omitted", 0) == 0
+        and r["notice_words_in_whole_body"].get("more skill", 0) == 0
+        and r["notice_words_in_whole_body"].get("not loaded", 0) == 0
+        for r in sweep_rows(rows))
     v["CONTROL_a_small_listing_arrives_whole"] = (
         by["small"]["descriptions_on_wire"] == by["small"]["skills"])
     v["CONTROL_every_arm_reached_the_recorder"] = all(r["wire_chars"] > 500 for r in rows)
@@ -252,7 +282,9 @@ def main() -> int:
                                "whether a name-only skill can still be invoked usefully; its name "
                                "is present and no skill name appears in the tools array at all, so "
                                "invocation goes through some other path this probe did not test",
-                               "one build, one platform"]},
+                               "one build, one platform"],
+               "claude_version": subprocess.run([CLAUDE, "--version"], capture_output=True,
+                                                text=True).stdout.strip()},
               io.open(os.path.join(HERE, os.path.basename(__file__).replace(".py", ".result.json")),
                       "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     return 0 if all(v.values()) else 1
