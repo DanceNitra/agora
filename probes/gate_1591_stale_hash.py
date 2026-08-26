@@ -118,6 +118,14 @@ def check(draft: str, live: dict, cs: list) -> dict:
     v["CONTROL_the_retraction_check_has_a_target"] = bool(retracted)
     v["the_draft_does_not_reopen_the_retracted_id"] = "25890147-027" not in draft
 
+    # THE HUMANIZER IS WIRED, NOT REMEMBERED. Owner, 2026-08-26: "kazdy komentar pojde cez SKILL
+    # HUMANIZER lebo to stale nepouzivas." The receipt is keyed by the draft's CONTENT sha256, so
+    # running the skill and then editing the sentence it objected to invalidates it.
+    import subprocess as _sp
+    _r = _sp.run([sys.executable, os.path.join(ROOT, "tools", "humanizer_receipt.py"),
+                  "check", DRAFT], capture_output=True, text=True)
+    v["the_humanizer_SKILL_ran_on_THESE_bytes"] = _r.returncode == 0
+
     # ---- house style -----------------------------------------------------------------------------
     v["no_em_or_en_dash_survives_the_humanizer_rule"] = not (
         "—" in draft or "–" in draft or " -- " in draft)
@@ -125,9 +133,26 @@ def check(draft: str, live: dict, cs: list) -> dict:
     v["length_is_reasonable_for_this_thread"] = 200 < w < 700
     v["every_at_handle_is_a_real_participant"] = all(
         h in {c["user"] for c in cs} for h in set(re.findall(r"@([A-Za-z0-9]+)", draft)))
-    v["the_ai_disclosure_is_present"] = "AI assistance" in draft
+    # NO AI-disclosure line in this thread. It was a standing owner rule, set after a third party
+    # called our comments AI-sounding, and he lifted it HERE on 2026-08-26: "to sem nepatri".
+    # Measured before changing anything: only 3 of our 9 comments here carry one, and none of
+    # @UID9622, @qingkong66 or @icophy discloses at all, so dropping it matches the thread rather
+    # than breaking a pattern. The rule stands on other destinations until he says otherwise.
+    v["no_ai_disclosure_line_in_a_1591_draft"] = "AI assistance" not in draft
     v["it_says_the_repository_is_not_at_fault"] = "not the repository" in draft
     v["it_owns_that_most_instances_are_ours"] = "most of it is mine" in draft
+
+    # IDENTITY. In this thread we are @DanceNitra and nothing else. Measured 2026-08-26: we signed
+    # "-- Rastislav" in six of our nine comments here and NOBODY else in the thread has ever used
+    # the name, so it is present only because we put it there. The EDRN thread is the opposite --
+    # 157 uses by the collaborators themselves, who address him that way -- which is exactly why
+    # this cannot be a habit carried between threads and has to be a check per destination.
+    v["no_personal_name_in_a_1591_draft"] = not re.search(
+        r"[Rr]astislav|Draho[sš]", draft)
+    v["CONTROL_the_name_check_has_something_to_find_in_the_thread"] = bool(
+        re.search(r"[Rr]astislav", by("DanceNitra")))
+    v["the_handle_is_how_we_are_addressed_here"] = "DanceNitra" in " ".join(
+        c["body"] for c in cs if c["user"] != "DanceNitra")
     return v
 
 
@@ -174,7 +199,10 @@ def main() -> int:
                 ("blame shift", "not the repository", "not our comments"),
                 ("ownership", "most of it is mine", "most of it is his"),
                 ("em dash", "All of it verifies:", "All of it verifies —:"),
-                ("disclosure", "AI assistance", "no assistance")]
+                ("disclosure", "in DanceNitra/agora.",
+                 "in DanceNitra/agora." + chr(10) * 2 + "*(Written with AI assistance.)*"),
+                ("identity", "in DanceNitra/agora.",
+                 "in DanceNitra/agora." + chr(10) * 2 + chr(45) * 2 + " Rastislav")]
         caught = 0
         for label, a, b in muts:
             if a not in draft:

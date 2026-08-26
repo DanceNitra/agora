@@ -197,6 +197,14 @@ def check(draft: str, rc: dict, aug: dict, thread: list, live: bool) -> dict:
     v["CONTROL_a_string_absent_from_the_thread_would_fail_that"] = (
         "deliberately never attempted, because it is confounded" not in unmd(joined))
 
+    # THE HUMANIZER IS WIRED, NOT REMEMBERED. Owner, 2026-08-26: "kazdy komentar pojde cez SKILL
+    # HUMANIZER lebo to stale nepouzivas." The receipt is keyed by the draft's CONTENT sha256, so
+    # running the skill and then editing the sentence it objected to invalidates it.
+    import subprocess as _sp
+    _r = _sp.run([sys.executable, os.path.join(ROOT, "tools", "humanizer_receipt.py"),
+                  "check", DRAFT], capture_output=True, text=True)
+    v["the_humanizer_SKILL_ran_on_THESE_bytes"] = _r.returncode == 0
+
     # ---- house style -----------------------------------------------------------------------------
     # The humanizer rule bans EN dashes too, and this gate checked only the em dash: the draft
     # carried "lines 1–124" through a clean run of it.

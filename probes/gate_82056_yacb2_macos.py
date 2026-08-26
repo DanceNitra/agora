@@ -126,6 +126,14 @@ def check(draft: str, nest: dict, thread: list, live: bool) -> dict:
     v["nobody_has_reported_the_nested_check_on_windows"] = not re.search(
         r"win32.{0,120}CLAUDE_CODE_CHILD_SESSION|CLAUDE_CODE_CHILD_SESSION.{0,120}win32", joined)
 
+    # THE HUMANIZER IS WIRED, NOT REMEMBERED. Owner, 2026-08-26: "kazdy komentar pojde cez SKILL
+    # HUMANIZER lebo to stale nepouzivas." The receipt is keyed by the draft's CONTENT sha256, so
+    # running the skill and then editing the sentence it objected to invalidates it.
+    import subprocess as _sp
+    _r = _sp.run([sys.executable, os.path.join(ROOT, "tools", "humanizer_receipt.py"),
+                  "check", DRAFT], capture_output=True, text=True)
+    v["the_humanizer_SKILL_ran_on_THESE_bytes"] = _r.returncode == 0
+
     # ---- house style ----------------------------------------------------------------------------
     v["no_em_or_en_dash_survives_the_humanizer_rule"] = not (
         "—" in draft or "–" in draft or " -- " in draft)
