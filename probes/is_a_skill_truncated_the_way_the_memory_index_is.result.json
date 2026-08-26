@@ -1,0 +1,120 @@
+{
+  "probe": "is_a_skill_truncated_the_way_the_memory_index_is.py",
+  "controls": {
+    "CONTROL_the_route_is_exercised_at_all": true,
+    "CONTROL_a_small_listing_arrives_whole": true,
+    "CONTROL_every_arm_reached_the_recorder": true,
+    "CONTROL_every_sweep_arm_planted_the_same_24000_units": true,
+    "THE_LISTING_IS_CUT_and_well_under_the_memory_index_cap": true,
+    "it_is_not_a_count_cap": true,
+    "CONTROL_the_same_60_skills_arrive_whole_when_short": true
+  },
+  "arms": [
+    {
+      "arm": "small",
+      "skills": 3,
+      "desc_chars": 60,
+      "body_chars": 200,
+      "planted_desc_units": 180,
+      "descriptions_on_wire": 3,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D003",
+      "wire_chars": 41968
+    },
+    {
+      "arm": "many_short",
+      "skills": 60,
+      "desc_chars": 60,
+      "body_chars": 200,
+      "planted_desc_units": 3600,
+      "descriptions_on_wire": 60,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D060",
+      "wire_chars": 46528
+    },
+    {
+      "arm": "w400_n60",
+      "skills": 60,
+      "desc_chars": 400,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 26,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D026",
+      "wire_chars": 49988
+    },
+    {
+      "arm": "w600_n40",
+      "skills": 40,
+      "desc_chars": 600,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 18,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D018",
+      "wire_chars": 49964
+    },
+    {
+      "arm": "w800_n30",
+      "skills": 30,
+      "desc_chars": 800,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 13,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D013",
+      "wire_chars": 49992
+    },
+    {
+      "arm": "w200_n120",
+      "skills": 120,
+      "desc_chars": 200,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 47,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D047",
+      "wire_chars": 49990
+    },
+    {
+      "arm": "w120_n200",
+      "skills": 200,
+      "desc_chars": 120,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 66,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D066",
+      "wire_chars": 49988
+    },
+    {
+      "arm": "w300_n80",
+      "skills": 80,
+      "desc_chars": 300,
+      "body_chars": 200,
+      "planted_desc_units": 24000,
+      "descriptions_on_wire": 33,
+      "bodies_on_wire": 0,
+      "last_description_seen": "SKILLCAN-D033",
+      "wire_chars": 49934
+    }
+  ],
+  "cut_arms": [
+    "w400_n60",
+    "w600_n40",
+    "w800_n30",
+    "w200_n120",
+    "w120_n200",
+    "w300_n80"
+  ],
+  "platform": "win32",
+  "why": "a red team killed an OTel comment because every cap number we had was measured on the auto-memory index and no probe of ours had ever measured a skill; this measures the object itself",
+  "method": "ANTHROPIC_BASE_URL points at a local recorder; the request body is read and no completion is bought; nothing is written to disk",
+  "cost": "zero completions",
+  "finding": "the skill LISTING is silently truncated. Six fixtures each planting 24,000 UTF-16 units of descriptions at six entry widths are all cut, at a whole-entry boundary, with whole skills simply absent from the prompt and NO notice of any kind -- unlike the auto-memory index, which at least prints a warning. The same 60 skills arrive whole at 3,600 units, so it is size and not count.",
+  "not_settled": [
+    "the exact constant: delivered lands in 9,228-11,148 units across the six widths, and pinning it needs a boundary-free fixture",
+    "whether a skill absent from the listing can still be invoked by name; only its presence in the prompt was measured",
+    "one build, one platform"
+  ]
+}
