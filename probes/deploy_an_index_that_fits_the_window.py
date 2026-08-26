@@ -59,8 +59,19 @@ OUT = HERE / "deploy_an_index_that_fits_the_window.result.json"
 # UTF-16 code units (`trimmed.length` in the loader, against a constant NAMED
 # MAX_ENTRYPOINT_BYTES). This file measured UTF-8 bytes, which over-reports on every
 # non-ASCII character and would prune entries that actually load: 2.44x on a CJK index.
-# The 24,000 target stays: it is a margin under 25,000, not a unit claim.
-LINE_CAP, UNIT_CAP = 200, 24000
+# MARGIN REMOVED 2026-08-26. The 24,000 existed because "24.4KB" is ambiguous between KiB (24,986)
+# and KB (24,400), and a file between those two readings loads whole under one reading and loses
+# entries under the other. That ambiguity is now settled by measurement rather than by hedging:
+# probes/the_memory_cap_is_25000_utf16_units_not_bytes.py reads the request body off the wire and
+# counts the characters that arrive. A single line of markers, over the cap, with no line boundary
+# for whole-line truncation to keep, arrives as exactly 25,000 units at two different marker widths
+# (6,250x4 + 0, and 3,571x7 + 3, the second cutting inside marker 3572). A shorter store path
+# carries the same 25,000, so the harness header is not on the budget either.
+#
+# A margin under a cap you have not measured is prudence. A margin under a cap you HAVE measured is
+# just membership you decline to use: 1,000 units is about eight entries of this index, permanently
+# outside the window for a reason that no longer exists.
+LINE_CAP, UNIT_CAP = 200, 25000
 
 
 def units(s):
