@@ -325,7 +325,8 @@ def main() -> int:
                  "runs the other way"),
                 ("claim the unit point as new", "not news", "a new finding"),
                 ("drop the disclosure", "Written with AI assistance", "Written by hand"),
-                ("em dash", "before anything else.", "before anything else —.")]
+                ("em dash", "Correcting my own numbers first.",
+                 "Correcting my own numbers first —.")]
         caught = 0
         for label, x, y in muts:
             if x not in draft:

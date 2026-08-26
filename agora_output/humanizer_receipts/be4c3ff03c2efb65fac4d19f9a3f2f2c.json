@@ -1,0 +1,9 @@
+{
+  "draft": "agora_output/drafts/reply_82056_wording_correction.md",
+  "content_sha256": "be4c3ff03c2efb65fac4d19f9a3f2f2c15e9f83bf0394db9fa68e2d06690290c",
+  "found": "concision pass on the whole draft (1,124 to 961 words, 163 cut with no measured result dropped): a redundant 'the read-out is gone before anything can read it'; a winding 'so I will leave it alone beyond saying that'; a section heading that claimed priority; 'for a different reason' and 'which I wanted because' as trailing explainers that repeat the sentence; four 'and that case / and it is / rather than' padding connectives; a comma splice broken into two sentences where a colon does the work; plus the earlier passes' manufactured punchline pair, aphorism closer, two signposting announcements, duplicated 'Which is @JhouCode's X' formula, staccato fragment, two boldface spans, fronted cleft and three inferred causes stated as fact",
+  "before_words": 1124,
+  "after_words": 961,
+  "iso": "2026-08-26T13:47:46Z",
+  "note": "records that the humanizer SKILL was run on these exact bytes; keyed by content, so any later edit invalidates it"
+}
