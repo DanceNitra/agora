@@ -1,0 +1,930 @@
+{
+  "probe": "edrn_the_orbit_floor_holds_across_the_symmetry_spectrum.py",
+  "verdicts": {
+    "CONTROL_the_sweep_actually_ran": true,
+    "CONTROL_there_are_informative_graphs_at_all": true,
+    "within_orbit_dispersion_vanishes_on_every_informative_graph": true,
+    "edge_transitive_graphs_carry_ONE_correlation_value": true,
+    "edge_transitive_graphs_give_E1_zero": true,
+    "multi_orbit_graphs_give_a_NONZERO_orbit_floor": true,
+    "CONTROL_random_blocks_do_NOT_vanish": true,
+    "CONTROL_breaking_the_symmetry_makes_within_orbit_NONZERO": true,
+    "CONTROL_trivial_Aut_rows_are_excluded_not_counted": true
+  },
+  "rows": [
+    {
+      "graph": "C8 cycle",
+      "n": 8,
+      "edges": 8,
+      "aut_order": 16,
+      "orbit_sizes": [
+        8
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 2.0029671421627253e-32,
+      "var_within": 2.0029671421627253e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 2.9274135154685985e-32,
+      "ctrl_random_blocks_within_share": 1.4615384615384615,
+      "ctrl_broken_symmetry_within": 0.02154521583379803,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "C10 cycle",
+      "n": 10,
+      "edges": 10,
+      "aut_order": 20,
+      "orbit_sizes": [
+        10
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.3065508742723008e-31,
+      "var_within": 1.3065508742723008e-31,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 1.1093356479670479e-31,
+      "ctrl_random_blocks_within_share": 0.8490566037735849,
+      "ctrl_broken_symmetry_within": 0.020566205045917996,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "C12 cycle",
+      "n": 12,
+      "edges": 12,
+      "aut_order": 24,
+      "orbit_sizes": [
+        12
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.5304723291397234e-31,
+      "var_within": 1.5304723291397234e-31,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 1.5304723291397234e-31,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.01946321593307977,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "K4 complete",
+      "n": 4,
+      "edges": 6,
+      "aut_order": 24,
+      "orbit_sizes": [
+        6
+      ],
+      "n_orbits": 1,
+      "degeneracy": 2,
+      "E1": 0.0,
+      "var_total": 3.0814879110195774e-33,
+      "var_within": 3.0814879110195774e-33,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 3.0814879110195774e-33,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.22222222222222202,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "K5 complete",
+      "n": 5,
+      "edges": 10,
+      "aut_order": 120,
+      "orbit_sizes": [
+        10
+      ],
+      "n_orbits": 1,
+      "degeneracy": 5,
+      "E1": 0.0,
+      "var_total": 4.468157470978387e-33,
+      "var_within": 4.468157470978387e-33,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 4.468157470978387e-33,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.041481481481481466,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "K6 complete",
+      "n": 6,
+      "edges": 15,
+      "aut_order": 720,
+      "orbit_sizes": [
+        15
+      ],
+      "n_orbits": 1,
+      "degeneracy": 5,
+      "E1": 0.0,
+      "var_total": 6.573840876841765e-33,
+      "var_within": 6.573840876841765e-33,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 8.16594296420188e-33,
+      "ctrl_random_blocks_within_share": 1.2421875,
+      "ctrl_broken_symmetry_within": 0.031604938271604946,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "K3,3 bipartite",
+      "n": 6,
+      "edges": 9,
+      "aut_order": 72,
+      "orbit_sizes": [
+        9
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.232595164407831e-32,
+      "var_within": 1.232595164407831e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 1.232595164407831e-32,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.0025094655639696073,
+      "ctrl_perturbed_edge": [
+        0,
+        3
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "K4,4 bipartite",
+      "n": 8,
+      "edges": 16,
+      "aut_order": 1152,
+      "orbit_sizes": [
+        16
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 2.5422275265911513e-32,
+      "var_within": 2.5422275265911513e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 2.5422275265911513e-32,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.0006676307982123395,
+      "ctrl_perturbed_edge": [
+        0,
+        4
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "Q3 cube",
+      "n": 8,
+      "edges": 12,
+      "aut_order": 48,
+      "orbit_sizes": [
+        12
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.4380276918091362e-32,
+      "var_within": 1.4380276918091362e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 2.2597578014143566e-32,
+      "ctrl_random_blocks_within_share": 1.5714285714285712,
+      "ctrl_broken_symmetry_within": 0.0025257313326304967,
+      "ctrl_perturbed_edge": [
+        0,
+        4
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "Petersen",
+      "n": 10,
+      "edges": 15,
+      "aut_order": 120,
+      "orbit_sizes": [
+        15
+      ],
+      "n_orbits": 1,
+      "degeneracy": 5,
+      "E1": 0.0,
+      "var_total": 3.348550196641274e-32,
+      "var_within": 3.348550196641274e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 3.348550196641274e-32,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.030398076120355264,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "octahedron",
+      "n": 6,
+      "edges": 12,
+      "aut_order": 48,
+      "orbit_sizes": [
+        12
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 6.265692085739807e-32,
+      "var_within": 6.265692085739807e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 6.060259558338503e-32,
+      "ctrl_random_blocks_within_share": 0.9672131147540984,
+      "ctrl_broken_symmetry_within": 0.02980162990740994,
+      "ctrl_perturbed_edge": [
+        0,
+        2
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "star K1,7",
+      "n": 8,
+      "edges": 7,
+      "aut_order": 5040,
+      "orbit_sizes": [
+        7
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.8709033745476004e-33,
+      "var_within": 1.8709033745476004e-33,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 1.8709033745476004e-33,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.0034013605442176948,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.2
+    },
+    {
+      "graph": "triangular prism",
+      "n": 6,
+      "edges": 9,
+      "aut_order": 12,
+      "orbit_sizes": [
+        6,
+        3
+      ],
+      "n_orbits": 2,
+      "degeneracy": 1,
+      "E1": 0.2473642793181152,
+      "var_total": 0.061189086682570504,
+      "var_within": 1.7119377283442096e-32,
+      "var_between": 0.06118908668257052,
+      "within_share": 2.7977827765679806e-31,
+      "ctrl_random_blocks_within": 0.04589181501192788,
+      "ctrl_random_blocks_within_share": 0.75,
+      "ctrl_broken_symmetry_within": 0.01653452945938876,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "ladder L4",
+      "n": 8,
+      "edges": 12,
+      "aut_order": 48,
+      "orbit_sizes": [
+        12
+      ],
+      "n_orbits": 1,
+      "degeneracy": 1,
+      "E1": 0.0,
+      "var_total": 1.4380276918091362e-32,
+      "var_within": 1.4380276918091362e-32,
+      "var_between": 0.0,
+      "within_share": 1.0,
+      "ctrl_random_blocks_within": 1.4380276918091362e-32,
+      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_broken_symmetry_within": 0.00252573133263051,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": true,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "wheel W7",
+      "n": 7,
+      "edges": 12,
+      "aut_order": 12,
+      "orbit_sizes": [
+        6,
+        6
+      ],
+      "n_orbits": 2,
+      "degeneracy": 1,
+      "E1": 0.1242259987499884,
+      "var_total": 0.015432098765432124,
+      "var_within": 2.930430805714805e-30,
+      "var_between": 0.015432098765432119,
+      "within_share": 1.8989191621031905e-28,
+      "ctrl_random_blocks_within": 0.015432098765432126,
+      "ctrl_random_blocks_within_share": 1.0000000000000002,
+      "ctrl_broken_symmetry_within": 0.04616652566663288,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "path P8",
+      "n": 8,
+      "edges": 7,
+      "aut_order": 2,
+      "orbit_sizes": [
+        2,
+        2,
+        2,
+        1
+      ],
+      "n_orbits": 4,
+      "degeneracy": 1,
+      "E1": 0.22225573128862525,
+      "var_total": 0.04939761009064158,
+      "var_within": 3.5217004697366597e-33,
+      "var_between": 0.049397610090641586,
+      "within_share": 7.12929322547094e-32,
+      "ctrl_random_blocks_within": 0.021489013873388505,
+      "ctrl_random_blocks_within_share": 0.43502132661797777,
+      "ctrl_broken_symmetry_within": 0.002883889825936265,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "path P10",
+      "n": 10,
+      "edges": 9,
+      "aut_order": 2,
+      "orbit_sizes": [
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "n_orbits": 5,
+      "degeneracy": 1,
+      "E1": 0.20512328812753877,
+      "var_total": 0.04207556333225329,
+      "var_within": 1.3010726735415994e-32,
+      "var_between": 0.04207556333225329,
+      "within_share": 3.0922287677233637e-31,
+      "ctrl_random_blocks_within": 0.02045187767131322,
+      "ctrl_random_blocks_within_share": 0.4860749578042061,
+      "ctrl_broken_symmetry_within": 0.003063041636268026,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "bull+",
+      "n": 10,
+      "edges": 15,
+      "aut_order": 72,
+      "orbit_sizes": [
+        6,
+        6,
+        2,
+        1
+      ],
+      "n_orbits": 4,
+      "degeneracy": 4,
+      "E1": 0.12400673377399062,
+      "var_total": 0.015377670021293383,
+      "var_within": 4.217529787548795e-31,
+      "var_between": 0.015377670021293383,
+      "within_share": 2.742632519561678e-29,
+      "ctrl_random_blocks_within": 0.013858624954096538,
+      "ctrl_random_blocks_within_share": 0.9012174753981955,
+      "ctrl_broken_symmetry_within": 0.07964484088185343,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "gasket L2 (the paper's)",
+      "n": 15,
+      "edges": 27,
+      "aut_order": 6,
+      "orbit_sizes": [
+        6,
+        6,
+        6,
+        6,
+        3
+      ],
+      "n_orbits": 5,
+      "degeneracy": 2,
+      "E1": 0.1102691371511255,
+      "var_total": 0.012159282608053726,
+      "var_within": 3.5872371144156655e-30,
+      "var_between": 0.012159282608053726,
+      "within_share": 2.950204572134586e-28,
+      "ctrl_random_blocks_within": 0.010337820853946316,
+      "ctrl_random_blocks_within_share": 0.8501998997127543,
+      "ctrl_broken_symmetry_within": 0.05451471673989921,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 2.2
+    },
+    {
+      "graph": "prism CL5",
+      "n": 10,
+      "edges": 15,
+      "aut_order": 20,
+      "orbit_sizes": [
+        10,
+        5
+      ],
+      "n_orbits": 2,
+      "degeneracy": 1,
+      "E1": 0.12165493514755513,
+      "var_total": 0.01479992324575584,
+      "var_within": 4.4373425918681915e-32,
+      "var_between": 0.014799923245755844,
+      "within_share": 2.998220003026491e-30,
+      "ctrl_random_blocks_within": 0.01465192401329828,
+      "ctrl_random_blocks_within_share": 0.9899999999999998,
+      "ctrl_broken_symmetry_within": 0.004885085780752039,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "wheel W5",
+      "n": 5,
+      "edges": 8,
+      "aut_order": 8,
+      "orbit_sizes": [
+        4,
+        4
+      ],
+      "n_orbits": 2,
+      "degeneracy": 2,
+      "E1": 0.1666666666666665,
+      "var_total": 0.027777777777777728,
+      "var_within": 9.822242716374903e-33,
+      "var_between": 0.02777777777777772,
+      "within_share": 3.5360073778949716e-31,
+      "ctrl_random_blocks_within": 0.020833333333333294,
+      "ctrl_random_blocks_within_share": 0.7499999999999999,
+      "ctrl_broken_symmetry_within": 0.09876543209876527,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "grid 2x4",
+      "n": 8,
+      "edges": 10,
+      "aut_order": 4,
+      "orbit_sizes": [
+        4,
+        2,
+        2,
+        2
+      ],
+      "n_orbits": 4,
+      "degeneracy": 1,
+      "E1": 0.09704616400817317,
+      "var_total": 0.009417957948701244,
+      "var_within": 1.4174844390690055e-32,
+      "var_between": 0.009417957948701245,
+      "within_share": 1.5050868211452139e-30,
+      "ctrl_random_blocks_within": 0.0070558545647672515,
+      "ctrl_random_blocks_within_share": 0.749191555451813,
+      "ctrl_broken_symmetry_within": 0.0024399202104388347,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "grid 2x5",
+      "n": 10,
+      "edges": 13,
+      "aut_order": 4,
+      "orbit_sizes": [
+        4,
+        4,
+        2,
+        2,
+        1
+      ],
+      "n_orbits": 5,
+      "degeneracy": 1,
+      "E1": 0.09353928554117968,
+      "var_total": 0.008749597939554347,
+      "var_within": 5.2148256955715924e-33,
+      "var_between": 0.008749597939554347,
+      "within_share": 5.960074658970221e-31,
+      "ctrl_random_blocks_within": 0.007839028210167413,
+      "ctrl_random_blocks_within_share": 0.8959301060828729,
+      "ctrl_broken_symmetry_within": 0.002666216646852135,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.1
+    },
+    {
+      "graph": "K1,2,3 tripartite",
+      "n": 6,
+      "edges": 11,
+      "aut_order": 12,
+      "orbit_sizes": [
+        6,
+        3,
+        2
+      ],
+      "n_orbits": 3,
+      "degeneracy": 1,
+      "E1": 0.3428396514843872,
+      "var_total": 0.11753902662993611,
+      "var_within": 3.7370044302728327e-31,
+      "var_between": 0.1175390266299361,
+      "within_share": 3.179373300443048e-30,
+      "ctrl_random_blocks_within": 0.09577254021698497,
+      "ctrl_random_blocks_within_share": 0.8148148148148148,
+      "ctrl_broken_symmetry_within": 0.004593815129317947,
+      "ctrl_perturbed_edge": [
+        1,
+        3
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "lollipop 5+4",
+      "n": 9,
+      "edges": 14,
+      "aut_order": 24,
+      "orbit_sizes": [
+        6,
+        4,
+        1,
+        1,
+        1,
+        1
+      ],
+      "n_orbits": 6,
+      "degeneracy": 2,
+      "E1": 0.2528472141770745,
+      "var_total": 0.06393171371710739,
+      "var_within": 2.662141384596177e-32,
+      "var_between": 0.06393171371710739,
+      "within_share": 4.164038831144016e-31,
+      "ctrl_random_blocks_within": 0.02400734441613148,
+      "ctrl_random_blocks_within_share": 0.3755154213816638,
+      "ctrl_broken_symmetry_within": 0.09523809523809565,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "tadpole C6+3",
+      "n": 9,
+      "edges": 9,
+      "aut_order": 2,
+      "orbit_sizes": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "n_orbits": 6,
+      "degeneracy": 1,
+      "E1": 0.0868425536301272,
+      "var_total": 0.007541629121001521,
+      "var_within": 1.0956401461402941e-32,
+      "var_between": 0.007541629121001521,
+      "within_share": 1.4527897468323054e-30,
+      "ctrl_random_blocks_within": 0.0016536349518871249,
+      "ctrl_random_blocks_within_share": 0.21926760456599115,
+      "ctrl_broken_symmetry_within": 0.005969738344284447,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "cycle C8 + chord",
+      "n": 8,
+      "edges": 9,
+      "aut_order": 4,
+      "orbit_sizes": [
+        4,
+        4,
+        1
+      ],
+      "n_orbits": 3,
+      "degeneracy": 1,
+      "E1": 0.20711313041792317,
+      "var_total": 0.042895848791511655,
+      "var_within": 1.3695501826753678e-32,
+      "var_between": 0.042895848791511655,
+      "within_share": 3.1927336123638565e-31,
+      "ctrl_random_blocks_within": 0.037233665406448846,
+      "ctrl_random_blocks_within_share": 0.8680016005142377,
+      "ctrl_broken_symmetry_within": 0.06620872398565482,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "two triangles bridged",
+      "n": 9,
+      "edges": 10,
+      "aut_order": 8,
+      "orbit_sizes": [
+        4,
+        2,
+        2,
+        2
+      ],
+      "n_orbits": 4,
+      "degeneracy": 1,
+      "E1": 0.4039221954159858,
+      "var_total": 0.1631531399496698,
+      "var_within": 7.921053305198889e-30,
+      "var_between": 0.16315313994966982,
+      "within_share": 4.8549806075705385e-29,
+      "ctrl_random_blocks_within": 0.10182104358294541,
+      "ctrl_random_blocks_within_share": 0.6240826478384396,
+      "ctrl_broken_symmetry_within": 0.019564165245730923,
+      "ctrl_perturbed_edge": [
+        0,
+        2
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.0
+    },
+    {
+      "graph": "random G(12,0.35) a",
+      "n": 12,
+      "edges": 26,
+      "aut_order": 1,
+      "orbit_sizes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "n_orbits": 26,
+      "degeneracy": 1,
+      "E1": 0.2980228936876302,
+      "var_total": 0.08881764516194855,
+      "var_within": 0.0,
+      "var_between": 0.08881764516194854,
+      "within_share": 0.0,
+      "ctrl_random_blocks_within": 0.0,
+      "ctrl_random_blocks_within_share": 0.0,
+      "ctrl_broken_symmetry_within": 0.0,
+      "ctrl_perturbed_edge": [
+        0,
+        1
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": true,
+      "seconds": 0.3
+    },
+    {
+      "graph": "random G(12,0.35) b",
+      "n": 12,
+      "edges": 24,
+      "aut_order": 1,
+      "orbit_sizes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "n_orbits": 24,
+      "degeneracy": 1,
+      "E1": 0.2143156832062893,
+      "var_total": 0.04593121206817855,
+      "var_within": 0.0,
+      "var_between": 0.04593121206817855,
+      "within_share": 0.0,
+      "ctrl_random_blocks_within": 0.0,
+      "ctrl_random_blocks_within_share": 0.0,
+      "ctrl_broken_symmetry_within": 0.0,
+      "ctrl_perturbed_edge": [
+        0,
+        7
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": true,
+      "seconds": 0.3
+    },
+    {
+      "graph": "random tree n=12",
+      "n": 12,
+      "edges": 11,
+      "aut_order": 2,
+      "orbit_sizes": [
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "n_orbits": 10,
+      "degeneracy": 1,
+      "E1": 0.21778381365632635,
+      "var_total": 0.04742978949069348,
+      "var_within": 4.538191287137923e-32,
+      "var_between": 0.04742978949069348,
+      "within_share": 9.568229873818842e-31,
+      "ctrl_random_blocks_within": 0.0006562083232178024,
+      "ctrl_random_blocks_within_share": 0.013835362337978782,
+      "ctrl_broken_symmetry_within": 0.010293117516132542,
+      "ctrl_perturbed_edge": [
+        3,
+        11
+      ],
+      "edge_transitive": false,
+      "vacuous_all_orbits_size_1": false,
+      "seconds": 0.2
+    }
+  ],
+  "skipped": [],
+  "claim": "with rho the ground-manifold projector over its degeneracy, edges in one Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit and E(1)=sqrt(Var_between); edge-transitive graphs give E(1)=0 exactly",
+  "why_the_manifold_average": "every automorphism commutes with H(s=1), so it permutes the ground eigenspace and commutes with its projector. rho is Aut-invariant even where no single eigenvector is, which is why a lone Lanczos vector does not show this and the multiplet average does.",
+  "informative": 29,
+  "edge_transitive": 13,
+  "multi_orbit": 16,
+  "excluded_vacuous": 2,
+  "elapsed_s": 4.0,
+  "platform": "win32"
+}
