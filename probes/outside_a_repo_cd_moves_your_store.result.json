@@ -1,0 +1,45 @@
+{
+  "probe": "outside_a_repo_cd_moves_your_store.py",
+  "verdicts": {
+    "CONTROL_inside_a_repo_cd_keeps_the_same_store": true,
+    "CONTROL_git_agrees_the_repo_arms_are_a_repo": true,
+    "CONTROL_git_agrees_the_plain_arms_are_NOT": true,
+    "CONTROL_the_two_trees_do_not_share_a_store": true,
+    "outside_a_repo_cd_MOVES_the_store": true
+  },
+  "arms": [
+    {
+      "arm": "repo root",
+      "dir": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cdstore_jntsww91\\arepo",
+      "is_repo": true,
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-cdstore-jntsww91-arepo\\memory\\"
+    },
+    {
+      "arm": "repo subdir",
+      "dir": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cdstore_jntsww91\\arepo\\sub\\deeper",
+      "is_repo": true,
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-cdstore-jntsww91-arepo\\memory\\"
+    },
+    {
+      "arm": "non-repo root",
+      "dir": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cdstore_jntsww91\\plain",
+      "is_repo": false,
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-cdstore-jntsww91-plain\\memory\\"
+    },
+    {
+      "arm": "non-repo subdir",
+      "dir": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cdstore_jntsww91\\plain\\sub\\deeper",
+      "is_repo": false,
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-cdstore-jntsww91-plain-sub-deeper\\memory\\"
+    }
+  ],
+  "replicates": "@JhouCode on anthropics/claude-code#82056, linux-x64, n=1",
+  "finding": "the asymmetry reproduces on win32: inside a git repo a subdirectory resolves to the same auto-memory store, outside one it resolves to a different store with no signal",
+  "cost": "zero completions: ANTHROPIC_BASE_URL points at a local recorder and the store path is read from the stream-json init event, which the CLI emits before the model answers",
+  "not_settled": [
+    "whether the nesting rule holds at other depths",
+    "whether an empty store is ever cleaned up",
+    "one machine, win32"
+  ],
+  "platform": "win32"
+}
