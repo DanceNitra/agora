@@ -1,0 +1,9 @@
+{
+  "draft": "agora_output/drafts/reply_82056_wording_correction.md",
+  "content_sha256": "1e9e52a542a027acbfd31958265c183cad461c115eda1353ceac6750e5a5dd02",
+  "found": "third pass, on the sections rewritten after the re-run and after @yacb2's comment landed: a redundant 'the read-out is gone before anything can read it', a winding 'so I will leave it alone beyond saying that' clause, a section heading that claimed priority, plus the earlier pass's manufactured punchline pair, aphorism closer, two signposting announcements, duplicated 'Which is @JhouCode's X' formula, staccato fragment, two boldface spans, fronted cleft and three inferred causes stated as fact",
+  "before_words": 1133,
+  "after_words": 1128,
+  "iso": "2026-08-26T13:42:56Z",
+  "note": "records that the humanizer SKILL was run on these exact bytes; keyed by content, so any later edit invalidates it"
+}
