@@ -137,7 +137,21 @@ def run_arm(label: str, n: int, wide: int, narrow: int, mode: str) -> dict:
     # Was the seed actually read back off disk, and was it the isolated one?
     seed_survived = json.load(io.open(os.path.join(cfg, ".claude.json"),
                                       encoding="utf-8")).get("skillUsage") == usage
+    # THE ORDER THE FILL RUNS IN. With no history that is listing order; with a history it is the
+    # usage ranking. A skip has to be counted in THIS order. Counting it in listing order, which an
+    # earlier version did, made the number vacuous: in the inverted arm the kept set is a contiguous
+    # prefix of the usage ranking with zero skips, and the metric still reported 21.
+    if mode == "none":
+        fill_order = [x["skill"] for x in skills]
+    else:
+        fill_order = [k for k, _ in sorted(usage.items(),
+                                           key=lambda kv: -kv[1]["usageCount"])]
+    rank = {name: i for i, name in enumerate(fill_order)}
+    kept_ranks = sorted(rank[x["skill"]] for x in kept if x["skill"] in rank)
+    skips_in_fill_order = (kept_ranks[-1] - kept_ranks[0] + 1 - len(kept_ranks)) if kept_ranks else 0
+
     row = {"arm": label, "skills": n, "history_mode": mode,
+           "skips_in_fill_order": skips_in_fill_order,
            "seeded_entries": len(usage), "seed_survived": seed_survived,
            "isolated": os.path.abspath(cfg) != os.path.abspath(
                os.path.join(os.path.expanduser("~"), ".claude")),
@@ -197,11 +211,11 @@ def main() -> int:
     dropped_wide = [x for x in range(1, N + 1, 2) if x not in ih["kept_positions"]]
     kept_narrow_after = [p for p in ih["kept_positions"]
                          if p % 2 == 0 and dropped_wide and p > min(dropped_wide)]
-    # Greedy fill, measured in BOTH arms rather than asserted: a skipped entry inside the kept span.
-    nh_span_gaps = (max(nh["kept_positions"]) - min(nh["kept_positions"]) + 1
-                    - len(nh["kept_positions"])) if nh["kept_positions"] else 0
-    v["GREEDY_FILL_an_oversized_entry_is_SKIPPED_not_a_cut"] = (
-        nh_span_gaps > 0 or len(kept_narrow_after) > 0)
+    # Greedy fill, counted in each arm's OWN fill order. An entry skipped inside the kept span of
+    # that order is an entry the budget passed over because it no longer fit.
+    nh_span_gaps = nh["skips_in_fill_order"]
+    v["GREEDY_FILL_an_oversized_entry_is_SKIPPED_not_a_cut"] = any(
+        r["skips_in_fill_order"] > 0 for r in rows)
 
     # THE THIRD ARM. Count and recency disagree by construction: the early half is heavily used but
     # a year stale, the late half barely used but seconds old. Whichever half keeps its descriptions
