@@ -21,6 +21,8 @@ WHAT THIS CHECKS, and the split matters because only the first half is mechanica
         of events from the one that happened.
     L3  every commit that CHANGED the file is named by some ledger entry. A revision the ledger
         does not mention is an unlogged change, which is the failure a ledger exists to prevent.
+    L5  an entry that names a file but records NO hash. L1 to L4 examine hashes that are present,
+        so an absent one is invisible to all of them -- and this ledger has one.
 
   HEURISTIC, reported separately and never as a failure on its own:
     L4  the version label on an entry against the commit message of the state it points at. Commit
@@ -99,18 +101,49 @@ def paths_in(scope: str, known: list) -> list:
     return hit or (known if "both" in scope.lower() else [])
 
 
+def superseded(ledger_lines: list) -> set:
+    """Versions retired by a later correcting entry.
+
+    WHY THIS EXISTS, and it is a defect this file had rather than one it found. A ledger that is
+    append-only AND signed -- as this one is, `CHANGELOG.jsonl.asc` sits beside it -- cannot be
+    corrected by editing a row. The only correction it permits is an APPENDED entry. But an
+    appended correction necessarily points at an OLDER commit, so the first version of L2 ("the
+    ledger's order must agree with the commit order") forbade the only repair mechanism the format
+    allows. Measured: appending one correcting entry cleared L3 and then raised L2.
+
+    So corrections are first-class here. An entry naming `corrects: <version>` retires that
+    version: it stops being compared for order, and its label stops being reported.
+    """
+    return {e.get("corrects") for e in ledger_lines if e.get("corrects")}
+
+
 def audit(repo: str, ledger_lines: list, hist: dict, known: list) -> tuple[list, list]:
-    """Returns (findings, checked) -- findings are L1/L2/L3/L4 hits, checked are the entries seen."""
+    """Returns (findings, checked) -- findings are L1..L5 hits, checked are the entries seen."""
     findings, checked = [], []
+    retired = superseded(ledger_lines)
     by_hash = {}
     for path, rows in hist.items():
         for r in rows:
             if r["sha256"]:
                 by_hash.setdefault(r["sha256"], []).append((path, r))
 
+    # Versions whose missing hash a later correcting entry supplies.
+    supplied = {e.get("corrects") for e in ledger_lines
+                if e.get("corrects") and any(e.get(k) for k in HASH_KEYS)}
     order_seen = []
     for n, entry in enumerate(ledger_lines, 1):
         scope_paths = paths_in(entry.get("scope", ""), known)
+        is_correction = bool(entry.get("corrects")) or entry.get("action") == "correct"
+        # L5: an entry that names a file and records no post-state hash cannot be checked at all.
+        # The `v1.1-r2` row here is exactly that, and L1..L4 are all blind to it: they only ever
+        # examine hashes that ARE present, so a missing one is invisible to every one of them.
+        if (scope_paths and not any(entry.get(k) for k in HASH_KEYS)
+                and entry.get("version") not in supplied):
+            findings.append({"rule": "L5", "line": n, "version": entry.get("version"),
+                             "detail": "entry %s (%s) names %s and records no hash, so nothing "
+                                       "about it can be verified"
+                                       % (entry.get("version"), entry.get("action"),
+                                          ", ".join(os.path.basename(p) for p in scope_paths))})
         for key in HASH_KEYS:
             h = entry.get(key)
             if not h:
@@ -126,12 +159,17 @@ def audit(repo: str, ledger_lines: list, hist: dict, known: list) -> tuple[list,
                                                                 for p in want or scope_paths))})
                 continue
             path, row = hits[0]
-            order_seen.append((n, row["when"], entry.get("version"), row["short"]))
+            # A correcting entry is retrospective by construction, and a retired one no longer
+            # describes the current sequence, so neither takes part in the order comparison.
+            if not is_correction and entry.get("version") not in retired:
+                order_seen.append((n, row["when"], entry.get("version"), row["short"]))
             if want and path not in want:
                 findings.append({"rule": "L1", "line": n, "version": entry.get("version"),
                                  "detail": "hash belongs to %s, entry is about %s"
                                            % (os.path.basename(path), KEY_PATH.get(key, "?"))})
             # L4, heuristic: does the commit that produced this state agree with the label?
+            if entry.get("version") in retired:
+                continue          # a later entry has already corrected this label
             label = (entry.get("version") or "").lower()
             subj = row["subject"].lower()
             for tag in ("r1", "r2", "r3"):
@@ -256,14 +294,19 @@ def main() -> int:
                               "description matches the actual revisions.'",
            "gap": "integrity/calibration_dataset_check.py runs C01-C10 and none of them opens "
                   "CHANGELOG.jsonl or reads git history",
-           "exit_code": "non-zero when any control fails OR any finding is raised"}
+           "exit_code": "non-zero when any control fails OR any NON-HEURISTIC finding is raised; "
+                        "L4 reads a commit message and is reported without deciding"}
     json.dump(out, io.open(os.path.join(HERE, "does_the_ledger_match_the_history.result.json"),
                            "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     # FINDINGS MUST SET THE EXIT CODE. The first version returned `all(v.values())`, which is the
     # CONTROLS only -- so a run that printed the defect it was built to find exited 0, and as a CI
     # gate it could never go red on its own subject. Caught by an adversarial pass before this was
     # offered to anyone.
-    return 0 if (all(v.values()) and not findings) else 1
+    # L4 reads a commit MESSAGE, which is prose, and this file's own docstring says it can "only
+    # ever raise a question". Counting it into the exit code contradicted that: an L4-only ledger
+    # turned CI red on a heuristic. It is still reported, and it no longer decides.
+    blocking = [f for f in findings if f["rule"] != "L4"]
+    return 0 if (all(v.values()) and not blocking) else 1
 
 
 if __name__ == "__main__":
