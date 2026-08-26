@@ -1,0 +1,824 @@
+{
+  "probe": "which_capabilities_of_ours_is_anyone_outside_asking_for.py",
+  "controls": {
+    "CONTROL_the_corpus_is_real": true,
+    "CONTROL_the_tool_list_came_from_source_and_is_large": true,
+    "POSITIVE_CONTROL_known_needs_are_voiced": true,
+    "NEGATIVE_CONTROL_an_invented_capability_is_silent": true,
+    "CONTROL_every_tool_was_scored": true
+  },
+  "corpus_items": 392,
+  "corpus_projects": 205,
+  "tools": 73,
+  "voiced": 49,
+  "silent": 18,
+  "rows": [
+    {
+      "tool": "memory_index",
+      "tokens": [
+        "memory"
+      ],
+      "projects": 76,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "27b-io/anthropic-lb",
+        "AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state",
+        "AdguardTeam/AdguardFilters"
+      ]
+    },
+    {
+      "tool": "memory_report",
+      "tokens": [
+        "memory"
+      ],
+      "projects": 76,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "27b-io/anthropic-lb",
+        "AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state",
+        "AdguardTeam/AdguardFilters"
+      ]
+    },
+    {
+      "tool": "can_read",
+      "tokens": [
+        "can",
+        "read"
+      ],
+      "projects": 49,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "BaiGanio/aperio",
+        "BlackJack-Cao/agents-radar",
+        "CopilotKit/CopilotKit"
+      ]
+    },
+    {
+      "tool": "where_am_i",
+      "tokens": [
+        "where"
+      ],
+      "projects": 43,
+      "examples": [
+        "Aureliolo/synthorg",
+        "CopilotKit/CopilotKit",
+        "Dark-Basic-Software-Limited/GameGuruRepo",
+        "FRIKKern/barkpark"
+      ]
+    },
+    {
+      "tool": "symbol_status",
+      "tokens": [
+        "status"
+      ],
+      "projects": 34,
+      "examples": [
+        "Brescou/langgraph-agent-stack",
+        "Chicken3veryDay/Drop-finder",
+        "DavidRoyBlue/Autodidact",
+        "GoogleCloudPlatform/BigQuery-Agent-Analytics-SDK"
+      ]
+    },
+    {
+      "tool": "token_report",
+      "tokens": [
+        "token"
+      ],
+      "projects": 30,
+      "examples": [
+        "CodeHalwell/AgentGuides",
+        "DavidRoyBlue/Autodidact",
+        "Keith-CY/melix",
+        "MichaelSp/hermes-agent-helm-chart"
+      ]
+    },
+    {
+      "tool": "route",
+      "tokens": [
+        "route"
+      ],
+      "projects": 23,
+      "examples": [
+        "AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state",
+        "Brescou/langgraph-agent-stack",
+        "FRIKKern/barkpark",
+        "Jaal-Yantra-Textiles/v2"
+      ]
+    },
+    {
+      "tool": "history",
+      "tokens": [
+        "history"
+      ],
+      "projects": 20,
+      "examples": [
+        "AetherCore-Dev/ag402",
+        "CodeHalwell/AgentGuides",
+        "CopilotKit/CopilotKit",
+        "GoogleCloudPlatform/BigQuery-Agent-Analytics-SDK"
+      ]
+    },
+    {
+      "tool": "projects",
+      "tokens": [
+        "projects"
+      ],
+      "projects": 20,
+      "examples": [
+        "Augustrains/agents-radar",
+        "BlackJack-Cao/agents-radar",
+        "Chestnuts-0/os-feed",
+        "OpenAgentsInc/openagents"
+      ]
+    },
+    {
+      "tool": "check_sources",
+      "tokens": [
+        "sources"
+      ],
+      "projects": 19,
+      "examples": [
+        "Augustrains/agents-radar",
+        "BlackJack-Cao/agents-radar",
+        "DavidRoyBlue/Autodidact",
+        "GenvidTechnologies/claude-code-plugin-gvt-dev"
+      ]
+    },
+    {
+      "tool": "provenance",
+      "tokens": [
+        "provenance"
+      ],
+      "projects": 14,
+      "examples": [
+        "Brad-Edwards/aptl",
+        "GoogleCloudPlatform/BigQuery-Agent-Analytics-SDK",
+        "achieveai/LmDotnetTools",
+        "advatar/EUWallet"
+      ]
+    },
+    {
+      "tool": "governance_report",
+      "tokens": [
+        "governance"
+      ],
+      "projects": 12,
+      "examples": [
+        "Maximvonshaft/nexus_helpdesk",
+        "Mumega-com/mupot",
+        "aa-os/aaos-public",
+        "agentguard-ai/tealtiger"
+      ]
+    },
+    {
+      "tool": "recall",
+      "tokens": [
+        "recall"
+      ],
+      "projects": 12,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "OpenAgentsInc/openagents",
+        "StevSant/HireSense",
+        "camel-ai/camel"
+      ]
+    },
+    {
+      "tool": "recall_as",
+      "tokens": [
+        "recall"
+      ],
+      "projects": 12,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "OpenAgentsInc/openagents",
+        "StevSant/HireSense",
+        "camel-ai/camel"
+      ]
+    },
+    {
+      "tool": "check_conflict",
+      "tokens": [
+        "conflict"
+      ],
+      "projects": 10,
+      "examples": [
+        "Augustrains/agents-radar",
+        "Brescou/langgraph-agent-stack",
+        "FRIKKern/barkpark",
+        "astrid-runtime/astrid"
+      ]
+    },
+    {
+      "tool": "forget",
+      "tokens": [
+        "forget"
+      ],
+      "projects": 10,
+      "examples": [
+        "GenvidTechnologies/claude-code-plugin-gvt-dev",
+        "OpenAgentsInc/openagents",
+        "avidrucker/pycats",
+        "camel-ai/camel"
+      ]
+    },
+    {
+      "tool": "observe",
+      "tokens": [
+        "observe"
+      ],
+      "projects": 10,
+      "examples": [
+        "AetherCore-Dev/ag402",
+        "Brad-Edwards/aptl",
+        "Dark-Basic-Software-Limited/GameGuruRepo",
+        "Mumega-com/mupot"
+      ]
+    },
+    {
+      "tool": "consolidate",
+      "tokens": [
+        "consolidate"
+      ],
+      "projects": 8,
+      "examples": [
+        "100yenadmin/hermes-lcm",
+        "mblauberg/provenant",
+        "melodic-software/claude-code-plugins",
+        "nikships/gemdex"
+      ]
+    },
+    {
+      "tool": "remember",
+      "tokens": [
+        "remember"
+      ],
+      "projects": 8,
+      "examples": [
+        "OpenAgentsInc/openagents",
+        "avidrucker/pycats",
+        "frdteknikelektro/felix-agent",
+        "r/AI_Agents"
+      ]
+    },
+    {
+      "tool": "revert",
+      "tokens": [
+        "revert"
+      ],
+      "projects": 8,
+      "examples": [
+        "27b-io/anthropic-lb",
+        "anadon/JLS",
+        "avidrucker/pycats",
+        "hyunseo-and-children/jarvis-ai"
+      ]
+    },
+    {
+      "tool": "compliance_check",
+      "tokens": [
+        "compliance"
+      ],
+      "projects": 7,
+      "examples": [
+        "a2aproject/A2A",
+        "crewAIInc/crewAI",
+        "gHashTag/trios",
+        "microsoft/autogen"
+      ]
+    },
+    {
+      "tool": "compliance_report",
+      "tokens": [
+        "compliance"
+      ],
+      "projects": 7,
+      "examples": [
+        "a2aproject/A2A",
+        "crewAIInc/crewAI",
+        "gHashTag/trios",
+        "microsoft/autogen"
+      ]
+    },
+    {
+      "tool": "retention",
+      "tokens": [
+        "retention"
+      ],
+      "projects": 5,
+      "examples": [
+        "Brad-Edwards/aptl",
+        "GanTechProject/VinayakFortune",
+        "StoneCypher/fsl",
+        "mergeos-bounties/mergeos"
+      ]
+    },
+    {
+      "tool": "anchor",
+      "tokens": [
+        "anchor"
+      ],
+      "projects": 4,
+      "examples": [
+        "gHashTag/trios",
+        "greeves89/AI-Employee",
+        "spxrogers/agentsync",
+        "tylerdurrett/sketch-labs"
+      ]
+    },
+    {
+      "tool": "audit_the_audits",
+      "tokens": [
+        "audit",
+        "audits"
+      ],
+      "projects": 4,
+      "examples": [
+        "melodic-software/claude-code-plugins",
+        "r/AI_Agents",
+        "r/RAG",
+        "wildcard/caro"
+      ]
+    },
+    {
+      "tool": "contradictions",
+      "tokens": [
+        "contradictions"
+      ],
+      "projects": 4,
+      "examples": [
+        "moorcheh-ai/memanto",
+        "mthotaml/EchoSense-Platform-Specification",
+        "r/LangChain",
+        "r/RAG"
+      ]
+    },
+    {
+      "tool": "grant",
+      "tokens": [
+        "grant"
+      ],
+      "projects": 4,
+      "examples": [
+        "aa-os/aaos-public",
+        "danabaxia/agent_mesh",
+        "r/ClaudeAI",
+        "trycua/cua"
+      ]
+    },
+    {
+      "tool": "grant_log",
+      "tokens": [
+        "grant"
+      ],
+      "projects": 4,
+      "examples": [
+        "aa-os/aaos-public",
+        "danabaxia/agent_mesh",
+        "r/ClaudeAI",
+        "trycua/cua"
+      ]
+    },
+    {
+      "tool": "remember_decision",
+      "tokens": [
+        "remember",
+        "decision"
+      ],
+      "projects": 4,
+      "examples": [
+        "OpenAgentsInc/openagents",
+        "r/AI_Agents",
+        "r/ClaudeAI",
+        "r/LangChain"
+      ]
+    },
+    {
+      "tool": "supersession_report",
+      "tokens": [
+        "supersession"
+      ],
+      "projects": 4,
+      "examples": [
+        "Maximvonshaft/nexus_helpdesk",
+        "bmvv1995/PMORG-Platform",
+        "nathansso/agentic_resume_tailoring",
+        "r/RAG"
+      ]
+    },
+    {
+      "tool": "verify_claim",
+      "tokens": [
+        "verify",
+        "claim"
+      ],
+      "projects": 4,
+      "examples": [
+        "Scottcjn/rustchain-bounties",
+        "a2aproject/A2A",
+        "como-technologies/portfolio",
+        "samchon/ttsc"
+      ]
+    },
+    {
+      "tool": "credit",
+      "tokens": [
+        "credit"
+      ],
+      "projects": 3,
+      "examples": [
+        "jasonh80/selah",
+        "mergeos-bounties/mergeos",
+        "r/LocalLLaMA"
+      ]
+    },
+    {
+      "tool": "pii_report",
+      "tokens": [
+        "pii"
+      ],
+      "projects": 3,
+      "examples": [
+        "GanTechProject/VinayakFortune",
+        "OpenAgentsInc/openagents",
+        "agentguard-ai/tealtiger"
+      ]
+    },
+    {
+      "tool": "audit_bundle",
+      "tokens": [
+        "audit",
+        "bundle"
+      ],
+      "projects": 2,
+      "examples": [
+        "GenvidTechnologies/claude-code-plugin-gvt-dev",
+        "kyzodb/kyzo"
+      ]
+    },
+    {
+      "tool": "deprecate_symbol",
+      "tokens": [
+        "deprecate"
+      ],
+      "projects": 2,
+      "examples": [
+        "r/LocalLLaMA",
+        "vectorize-io/hindsight"
+      ]
+    },
+    {
+      "tool": "erasure_report",
+      "tokens": [
+        "erasure"
+      ],
+      "projects": 2,
+      "examples": [
+        "kyzodb/kyzo",
+        "r/RAG"
+      ]
+    },
+    {
+      "tool": "neighbors",
+      "tokens": [
+        "neighbors"
+      ],
+      "projects": 2,
+      "examples": [
+        "kyzodb/kyzo",
+        "r/RAG"
+      ]
+    },
+    {
+      "tool": "sleep",
+      "tokens": [
+        "sleep"
+      ],
+      "projects": 2,
+      "examples": [
+        "AdguardTeam/AdguardFilters",
+        "digitalis-io/pulsusdb"
+      ]
+    },
+    {
+      "tool": "check_self_narration",
+      "tokens": [
+        "self",
+        "narration"
+      ],
+      "projects": 1,
+      "examples": [
+        "r/LangChain"
+      ]
+    },
+    {
+      "tool": "detect_split_view",
+      "tokens": [
+        "detect",
+        "split",
+        "view"
+      ],
+      "projects": 1,
+      "examples": [
+        "erniesg/erniesg"
+      ]
+    },
+    {
+      "tool": "erasure_audit",
+      "tokens": [
+        "erasure",
+        "audit"
+      ],
+      "projects": 1,
+      "examples": [
+        "r/RAG"
+      ]
+    },
+    {
+      "tool": "forget_pii",
+      "tokens": [
+        "forget",
+        "pii"
+      ],
+      "projects": 1,
+      "examples": [
+        "OpenAgentsInc/openagents"
+      ]
+    },
+    {
+      "tool": "forget_subject",
+      "tokens": [
+        "forget",
+        "subject"
+      ],
+      "projects": 1,
+      "examples": [
+        "kyzodb/kyzo"
+      ]
+    },
+    {
+      "tool": "grants",
+      "tokens": [
+        "grants"
+      ],
+      "projects": 1,
+      "examples": [
+        "trycua/cua"
+      ]
+    },
+    {
+      "tool": "identifier_contract",
+      "tokens": [
+        "identifier",
+        "contract"
+      ],
+      "projects": 1,
+      "examples": [
+        "silentspike/project-sentinel"
+      ]
+    },
+    {
+      "tool": "index_coherence",
+      "tokens": [
+        "coherence"
+      ],
+      "projects": 1,
+      "examples": [
+        "r/LangChain"
+      ]
+    },
+    {
+      "tool": "revoke",
+      "tokens": [
+        "revoke"
+      ],
+      "projects": 1,
+      "examples": [
+        "advatar/EUWallet"
+      ]
+    },
+    {
+      "tool": "verify_writes",
+      "tokens": [
+        "verify",
+        "writes"
+      ],
+      "projects": 1,
+      "examples": [
+        "xiehd77-del/agents-radar"
+      ]
+    },
+    {
+      "tool": "why_recalled",
+      "tokens": [
+        "why",
+        "recalled"
+      ],
+      "projects": 1,
+      "examples": [
+        "nikships/gemdex"
+      ]
+    },
+    {
+      "tool": "admissibility_preconditions",
+      "tokens": [
+        "admissibility",
+        "preconditions"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "as_of",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "check_code",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "consolidate_clusters",
+      "tokens": [
+        "consolidate",
+        "clusters"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "erasure_certificate",
+      "tokens": [
+        "erasure",
+        "certificate"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "erasure_residue",
+      "tokens": [
+        "erasure",
+        "residue"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "get",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "get_as",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "influence_gate_report",
+      "tokens": [
+        "influence",
+        "gate"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "irreversible_budget_report",
+      "tokens": [
+        "irreversible",
+        "budget"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "recall_followup",
+      "tokens": [
+        "recall",
+        "followup"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "recall_iterative",
+      "tokens": [
+        "recall",
+        "iterative"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "reopened",
+      "tokens": [
+        "reopened"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "resolve_reopened",
+      "tokens": [
+        "resolve",
+        "reopened"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "selection_integrity",
+      "tokens": [
+        "selection",
+        "integrity"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "set_index_line",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "state_digest",
+      "tokens": [],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "value_by_cohort",
+      "tokens": [
+        "value",
+        "cohort"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "verify_attribution",
+      "tokens": [
+        "verify",
+        "attribution"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "verify_audit_bundle",
+      "tokens": [
+        "verify",
+        "audit",
+        "bundle"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "verify_consistency",
+      "tokens": [
+        "verify",
+        "consistency"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "verify_cosigned_anchor",
+      "tokens": [
+        "verify",
+        "cosigned",
+        "anchor"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "verify_witness",
+      "tokens": [
+        "verify",
+        "witness"
+      ],
+      "projects": 0,
+      "examples": []
+    },
+    {
+      "tool": "witness",
+      "tokens": [
+        "witness"
+      ],
+      "projects": 0,
+      "examples": []
+    }
+  ],
+  "question": "inbox 89eece: where do external demand and what we built meet, and where are we building for a need nobody voices",
+  "why_the_brains_own_map_cannot_answer_half_of_it": "/brain/library/external/map scores an 8-item hand-written AXIS, and all eight were chosen because we build them; 65 of our 73 tools are absent from it, so 'is anyone asking for this' was never askable about them",
+  "limit": "token containment is crude: a project asking for 'take it back' does not match `revert`, so a zero means nobody used OUR WORD, not that the need is absent"
+}
