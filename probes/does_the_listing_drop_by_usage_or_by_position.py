@@ -50,6 +50,8 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 NL = chr(10)
+REAL_PROFILE = os.path.join(os.path.expanduser("~"), ".claude.json")
+START = time.time()
 sys.path.insert(0, HERE)
 import is_a_skill_truncated_the_way_the_memory_index_is as S  # recorder, units, claude_bin
 
@@ -79,7 +81,9 @@ def seed_config(cfgdir: str, skills: list, mode: str) -> dict:
 
       none      no history at all.
       inverted  the LAST skills are both the most-used and the most-recent. That decides usage
-                against position, and leaves COUNT and RECENCY moving together.
+                against position, and leaves COUNT and RECENCY moving together. Note that position
+                1 gets usageCount 1 rather than zero: it is the LEAST used, not unused, and an
+                earlier comment here claimed the opposite.
       split     they disagree: the EARLY half is heavily used but a year stale, the LATE half
                 barely used but seconds old. Whichever half keeps its descriptions names the key.
 
@@ -153,8 +157,13 @@ def run_arm(label: str, n: int, wide: int, narrow: int, mode: str) -> dict:
     row = {"arm": label, "skills": n, "history_mode": mode,
            "skips_in_fill_order": skips_in_fill_order,
            "seeded_entries": len(usage), "seed_survived": seed_survived,
-           "isolated": os.path.abspath(cfg) != os.path.abspath(
-               os.path.join(os.path.expanduser("~"), ".claude")),
+           # The real profile is a FILE, ~/.claude.json. An earlier version compared the temp dir
+           # against the ~/.claude DIRECTORY, which is a different path by construction and so
+           # could never fail. This reads the real file's mtime and its content instead.
+           "isolated": (os.path.abspath(cfg) != os.path.abspath(REAL_PROFILE)
+                        and os.path.getmtime(REAL_PROFILE) <= START
+                        and "usage-skill-" not in io.open(REAL_PROFILE, encoding="utf-8",
+                                                          errors="replace").read()),
            "names_on_wire": len(names), "descriptions_on_wire": len(kept),
            "kept_positions": [s["pos"] for s in kept],
            "kept_kinds": {"wide": sum(1 for s in kept if s["kind"] == "wide"),
