@@ -203,6 +203,24 @@ def wire_text() -> str:
     return NL.join(parts)
 
 
+def _kept_lengths(text: str, cans: list, desc_chars: int) -> tuple:
+    """(kept at full planted length, kept but shortened) among entries that carry a description."""
+    full = short = 0
+    for c in cans:
+        i = text.find("- " + c["skill"])
+        if i < 0:
+            continue
+        line = text[i:text.find(NL, i)]
+        if c["desc_canary"] not in line:
+            continue                                   # a name-only entry, counted elsewhere
+        d = line.split(": ", 1)[1] if ": " in line else ""
+        if len(d) >= desc_chars - 2:
+            full += 1
+        else:
+            short += 1
+    return full, short
+
+
 def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
     root = tempfile.mkdtemp(prefix="skillcap_")
     cfg = tempfile.mkdtemp(prefix="skillcfg_")     # see run(): unisolated, our own 39 skills eat the budget
@@ -246,7 +264,13 @@ def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
            "wire_chars": len(text),
            # Named skills of OURS that reached the wire. Must be empty: if any arrive, the config
            # was not isolated and this arm is measuring our own installation, not the fixture.
-           "OUR_OWN_SKILLS_ON_THE_WIRE": [m for m in FOREIGN_SKILLS if m in text]}
+           "OUR_OWN_SKILLS_ON_THE_WIRE": [m for m in FOREIGN_SKILLS if m in text],
+           # FULL or NONE? The canary is a 12-char PREFIX, so a SHORTENED description still matches
+           # it and would be counted as present. The vendor documents both shortening and dropping,
+           # so "an entry carries its full description or none of it" cannot be asserted from the
+           # canary alone -- measure the delivered length of each kept entry instead.
+           "kept_at_full_length": _kept_lengths(text, cans, desc_chars)[0],
+           "kept_but_SHORTENED": _kept_lengths(text, cans, desc_chars)[1]}
     shutil.rmtree(root, ignore_errors=True)
     return row
 
@@ -322,6 +346,10 @@ def main() -> int:
     v["AND_IT_IS_THE_SAME_ORDER_AS_THE_MEMORY_INDEX_CAP_25000"] = (
         bool(delivered) and 22000 <= sum(delivered) / len(delivered) <= 28000)
     # If it were a COUNT cap the kept number would not move with entry width. It moves from 13 to 66.
+    # The claim the send gate flagged as a negative existence claim, now measured instead of asserted.
+    v["A_KEPT_ENTRY_ARRIVES_AT_FULL_LENGTH_no_shortening_at_these_widths"] = (
+        all(r["kept_but_SHORTENED"] == 0 for r in rows)
+        and sum(r["kept_at_full_length"] for r in rows) > 100)
     v["it_is_not_a_count_cap"] = len({r["descriptions_on_wire"] for r in sweep}) > 3
     # And a 3,600-unit listing of the same 60 skills arrives whole, so it is the SIZE that binds.
     v["CONTROL_the_same_60_skills_arrive_whole_when_short"] = (

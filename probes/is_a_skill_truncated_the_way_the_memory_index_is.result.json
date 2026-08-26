@@ -13,6 +13,7 @@
     "THE_LISTING_IS_CUT_in_the_arms_that_exceed_the_bound": true,
     "THE_BOUND_IS_ONE_SIZE_across_every_shape": true,
     "AND_IT_IS_THE_SAME_ORDER_AS_THE_MEMORY_INDEX_CAP_25000": true,
+    "A_KEPT_ENTRY_ARRIVES_AT_FULL_LENGTH_no_shortening_at_these_widths": true,
     "it_is_not_a_count_cap": true,
     "CONTROL_the_same_60_skills_arrive_whole_when_short": true
   },
@@ -39,7 +40,9 @@
       },
       "last_description_seen": "SKILLCAN-D003",
       "wire_chars": 16840,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 3,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "many_short",
@@ -63,7 +66,9 @@
       },
       "last_description_seen": "SKILLCAN-D060",
       "wire_chars": 21400,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 60,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w400_n60",
@@ -87,7 +92,9 @@
       },
       "last_description_seen": "SKILLCAN-D060",
       "wire_chars": 41666,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 60,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w600_n40",
@@ -111,7 +118,9 @@
       },
       "last_description_seen": "SKILLCAN-D040",
       "wire_chars": 41400,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 40,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w800_n30",
@@ -135,7 +144,9 @@
       },
       "last_description_seen": "SKILLCAN-D030",
       "wire_chars": 41200,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 30,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w200_n120",
@@ -159,7 +170,9 @@
       },
       "last_description_seen": "SKILLCAN-D114",
       "wire_chars": 41654,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 114,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w120_n200",
@@ -183,7 +196,9 @@
       },
       "last_description_seen": "SKILLCAN-D177",
       "wire_chars": 41660,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 177,
+      "kept_but_SHORTENED": 0
     },
     {
       "arm": "w300_n80",
@@ -207,7 +222,9 @@
       },
       "last_description_seen": "SKILLCAN-D078",
       "wire_chars": 41596,
-      "OUR_OWN_SKILLS_ON_THE_WIRE": []
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 78,
+      "kept_but_SHORTENED": 0
     }
   ],
   "cut_arms": [
