@@ -376,6 +376,39 @@ def main() -> int:
                          "complex and translation-invariant, so a SINGLE STATE reaches E(1)=0. "
                          "Real combinations are standing waves, mutual translates, all sharing "
                          "one variance. Real arithmetic cannot reach the doublet eigenstate.")
+    # SAMPLING A SMALL SPACE IS THE DEFECT WE ALREADY SHIPPED ONCE (2026-08-18, to this same
+    # correspondent). 200 random complex draws bottomed out at 0.0105 and we nearly published that
+    # as the range floor. The doublet is TWO parameters. COMPUTE the extrema.
+    _bt, _wt = 1e9, -1.0
+    for _t in np.linspace(0.0, np.pi / 2, 401):
+        for _ph in np.linspace(0.0, 2 * np.pi, 401):
+            _v = np.cos(_t) * Vr[:, 0] + np.exp(1j * _ph) * np.sin(_t) * Vr[:, 1]
+            _q = float(np.sqrt(np.var(spr @ (np.abs(_v) ** 2))))
+            _bt = min(_bt, _q); _wt = max(_wt, _q)
+    ring["exact_min_over_doublet"] = _bt
+    ring["exact_max_over_doublet"] = _wt
+    ring["sampled_complex_min_is_an_ARTIFACT"] = ring["complex_vectors_min"]
+    # the full-space degeneracy is NOT the in-sector one: the level also sits at n_up = 8
+    _H8, _b8 = build_H(15, Er, [1.0] * len(Er), 8)
+    _d8, _V8, _e8 = ground_manifold(_H8)
+    ring["degeneracy_in_sector"] = dr
+    ring["degeneracy_full_space"] = dr + (_d8 if abs(_e8 - float(np.min(np.linalg.eigvalsh(
+        (Vr.T @ (Hr @ Vr)))))) < 1e-8 else 0)
+    ring["sector_dependence"] = {}
+    for _nu in (7, 6, 5):
+        _Hs, _bs = build_H(15, Er, [1.0] * len(Er), _nu)
+        _ds, _Vs, _es = ground_manifold(_Hs)
+        ring["sector_dependence"]["Sz=%+.1f" % ((_nu - (15 - _nu)) / 2.0)] = float(
+            np.sqrt(np.var(sp_table(_bs, Er) @ (np.abs(_Vs[:, 0]) ** 2))))
+    v["RING_exact_minimum_is_ZERO_not_the_sampled_floor"] = _bt < 1e-10
+    v["CONTROL_sampling_MISSED_it"] = ring["complex_vectors_min"] > 100 * _bt
+    v["RING_full_space_degeneracy_is_FOUR"] = ring["degeneracy_full_space"] == 4
+    v["RING_other_Sz_sectors_DISAGREE"] = (max(ring["sector_dependence"].values()) -
+                                           min(ring["sector_dependence"].values())) > 0.02
+    print("  ring C15: EXACT min over doublet %.2e (sampling said %.4f) | deg sector %d, full %d"
+          % (_bt, ring["complex_vectors_min"], dr, ring["degeneracy_full_space"]))
+    print("  ring C15: E(1) by sector %s" % {k: round(q, 6) for k, q in
+                                             ring["sector_dependence"].items()})
     v["RING_is_a_momentum_doublet"] = all(abs(a - 1.0) < 1e-9 for a in
                                           ring["translation_eigenvalues_abs"])
     v["RING_a_SINGLE_STATE_reaches_zero"] = max(_mom) < 1e-10
@@ -390,7 +423,9 @@ def main() -> int:
              ring["real_vectors_spread"], ring["complex_vectors_min"]))
     for _k in ("RING_multiplet_average_is_zero", "RING_real_vectors_do_NOT_spread",
                "RING_complex_vectors_DO_spread", "RING_is_a_momentum_doublet",
-               "RING_a_SINGLE_STATE_reaches_zero", "CONTROL_the_standing_waves_do_NOT"):
+               "RING_a_SINGLE_STATE_reaches_zero", "CONTROL_the_standing_waves_do_NOT",
+               "RING_exact_minimum_is_ZERO_not_the_sampled_floor", "CONTROL_sampling_MISSED_it",
+               "RING_full_space_degeneracy_is_FOUR", "RING_other_Sz_sectors_DISAGREE"):
         print("  %s  %s" % ("YES" if v[_k] else "no ", _k))
 
     _dups = distinct_pairs()

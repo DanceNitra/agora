@@ -21,6 +21,10 @@
     "CONTROL_random_blocks_do_NOT_vanish": true,
     "CONTROL_breaking_the_symmetry_makes_within_orbit_NONZERO": true,
     "CONTROL_trivial_Aut_rows_are_excluded_not_counted": true,
+    "RING_exact_minimum_is_ZERO_not_the_sampled_floor": true,
+    "CONTROL_sampling_MISSED_it": true,
+    "RING_full_space_degeneracy_is_FOUR": true,
+    "RING_other_Sz_sectors_DISAGREE": true,
     "RING_is_a_momentum_doublet": true,
     "RING_a_SINGLE_STATE_reaches_zero": true,
     "CONTROL_the_standing_waves_do_NOT": true,
@@ -183,7 +187,7 @@
       ],
       "edge_transitive": true,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.0
+      "seconds": 0.1
     },
     {
       "graph": "K3,3 bipartite",
@@ -537,7 +541,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 2.3
+      "seconds": 2.4
     },
     {
       "graph": "prism CL5",
@@ -960,7 +964,17 @@
       1.762424413785662e-15,
       1.762424413785662e-15
     ],
-    "mechanism": "the ground manifold is a momentum doublet +/-k; its eigenstates are complex and translation-invariant, so a SINGLE STATE reaches E(1)=0. Real combinations are standing waves, mutual translates, all sharing one variance. Real arithmetic cannot reach the doublet eigenstate."
+    "mechanism": "the ground manifold is a momentum doublet +/-k; its eigenstates are complex and translation-invariant, so a SINGLE STATE reaches E(1)=0. Real combinations are standing waves, mutual translates, all sharing one variance. Real arithmetic cannot reach the doublet eigenstate.",
+    "exact_min_over_doublet": 1.7528402322556155e-15,
+    "exact_max_over_doublet": 0.13097935486622556,
+    "sampled_complex_min_is_an_ARTIFACT": 0.010529241990766278,
+    "degeneracy_in_sector": 2,
+    "degeneracy_full_space": 4,
+    "sector_dependence": {
+      "Sz=-0.5": 0.13097935486622597,
+      "Sz=-1.5": 0.16219927091092376,
+      "Sz=-2.5": 0.1814471317472116
+    }
   },
   "skipped": [],
   "claim": "with rho the ground-manifold projector over its degeneracy, edges in one Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit and E(1)=sqrt(Var_between); edge-transitive graphs give E(1)=0 exactly",
@@ -969,6 +983,6 @@
   "edge_transitive": 13,
   "multi_orbit": 16,
   "excluded_vacuous": 2,
-  "elapsed_s": 5.1,
+  "elapsed_s": 21.3,
   "platform": "win32"
 }
