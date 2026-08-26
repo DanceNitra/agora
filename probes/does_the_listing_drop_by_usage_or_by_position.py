@@ -23,7 +23,10 @@ observable and separates greedy-fill from a plain cut.
 
 COST: zero completions. `ANTHROPIC_BASE_URL` points at a local recorder answering canned SSE, and the
 usage history is seeded by writing `skillUsage` into an ISOLATED `CLAUDE_CONFIG_DIR` rather than by
-invoking anything. The owner's real `~/.claude.json` is never opened; that isolation was measured on
+invoking anything. The owner's real `~/.claude.json` is never WRITTEN. It is read, once per arm, precisely to
+assert that: the isolation control checks its mtime and its content and fails if either moved.
+An earlier version of this line said it was never opened, which was false of this file's own
+code. The isolation itself was measured on
 2026-08-26 (`does_a_nested_session_ignore_the_isolation_variables.py`, 5/5 honoured, zero leaks) and
 is asserted again here rather than assumed.
 
