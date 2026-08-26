@@ -119,16 +119,27 @@ def main() -> int:
         new = rows(chosen, lang)
         before = len(re.findall(r'class="wrow"', m.group(2)))
         after = len(chosen)
-        if m.group(2) == new:
-            print(f"  {lang}: current ({after} rows, newest {chosen[0]['date']})")
+        word = "esejí" if lang == "sk" else "essays"
+        counter_ok = f"<b>{len(posts)}</b> {word}" in doc or word not in doc
+        if m.group(2) == new and counter_ok:
+            print(f"  {lang}: current ({after} rows, newest {chosen[0]['date']}, "
+                  f"counter {len(posts)})")
             continue
         stale.append(path)
         if check:
             print(f"  {lang}: STALE -- {before} rows now, {after} after a rebuild; "
                   f"newest listed would be {chosen[0]['date']}")
             continue
-        io.open(path, "w", encoding="utf-8").write(doc[:m.start(2)] + new + doc[m.end(2):])
-        print(f"  {lang}: rewrote {before} -> {after} rows, newest {chosen[0]['date']}")
+        doc = doc[:m.start(2)] + new + doc[m.end(2):]
+        # The page also states how many essays exist, and that number is derived from the same
+        # manifest -- so the generator owns it too. Left by hand it drifts the moment a post is
+        # added: the deploy's own ledger gate caught exactly that within the hour, page saying 63
+        # against a manifest of 64.
+        n, word = len(posts), ("esejí" if lang == "sk" else "essays")
+        doc, hits = re.subn(r"<b>\d+</b> " + word, f"<b>{n}</b> {word}", doc)
+        io.open(path, "w", encoding="utf-8").write(doc)
+        print(f"  {lang}: rewrote {before} -> {after} rows, newest {chosen[0]['date']}; "
+              f"essay counter set to {n} in {hits} place(s)")
 
     if check and stale:
         print(f"\n  STALE: {len(stale)} file(s). Run: python tools/render_writing_index.py")
