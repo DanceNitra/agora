@@ -164,15 +164,42 @@ def main() -> int:
     print(f"  this process inherits CLAUDECODE={os.environ.get('CLAUDECODE')!r} "
           f"CLAUDE_CODE_CHILD_SESSION={os.environ.get('CLAUDE_CODE_CHILD_SESSION')!r}\n")
 
-    rows = [run_arm("nested", 8841, True), run_arm("clean", 8842, False)]
+    # TRIALS, not one shot. The first version ran a single call per arm and reported "does not
+    # reproduce". A hazard of this kind can be intermittent -- our own disk-read trap fired 4/9 and
+    # then 0/9 on identical inputs -- so one clean run is not evidence of absence, it is one run.
+    # @yacb2 used three trials per fixture; this uses five per arm.
+    TRIALS = 5
+    rows = []
+    for i in range(TRIALS):
+        rows.append(run_arm(f"nested{i + 1}", 8841 + 2 * i, True))
+        rows.append(run_arm(f"clean{i + 1}", 8842 + 2 * i, False))
+        print(f"    trial {i + 1}/{TRIALS} done", flush=True)
     for r in rows:
         print(f"  {r['arm']:7s} recorder_hits={r['requests_reached_our_recorder']} "
               f"base_url_honoured={r['base_url_honoured']} "
               f"config_dir_used={r['config_dir_got_a_projects_tree']} "
               f"leaked={r['LEAKED_into_the_real_store'] or 'none'} [{r['seconds']}s]")
 
-    nested = rows[0]
-    clean = rows[1]
+    N = [r for r in rows if r["nested"]]
+    C = [r for r in rows if not r["nested"]]
+    nested = {"base_url_honoured": all(r["base_url_honoured"] for r in N),
+              "config_dir_got_a_projects_tree": all(r["config_dir_got_a_projects_tree"] for r in N),
+              "LEAKED_into_the_real_store": sorted({d for r in N
+                                                    for d in r["LEAKED_into_the_real_store"]}),
+              "inherited_CLAUDECODE": all(r["inherited_CLAUDECODE"] for r in N),
+              "inherited_CHILD_SESSION": all(r["inherited_CHILD_SESSION"] for r in N),
+              "trials": len(N),
+              "base_url_hits": sum(r["base_url_honoured"] for r in N)}
+    clean = {"base_url_honoured": all(r["base_url_honoured"] for r in C),
+             "LEAKED_into_the_real_store": sorted({d for r in C
+                                                   for d in r["LEAKED_into_the_real_store"]}),
+             "trials": len(C),
+             "base_url_hits": sum(r["base_url_honoured"] for r in C)}
+    print()
+    print("  nested: base_url honoured %d/%d, config_dir %d/%d"
+          % (nested["base_url_hits"], nested["trials"],
+             sum(r["config_dir_got_a_projects_tree"] for r in N), nested["trials"]))
+    print(f"  clean : base_url honoured {clean['base_url_hits']}/{clean['trials']}")
     v: dict = {}
     # THE POSITIVE CONTROL. If the clean arm fails, nothing about the nested arm can be concluded.
     v["CONTROL_the_clean_arm_reached_our_recorder"] = clean["base_url_honoured"]
@@ -194,7 +221,7 @@ def main() -> int:
         for d in leaked:
             print("   ", d)
 
-    json.dump({"probe": os.path.basename(__file__), "verdicts": v, "arms": rows,
+    json.dump({"probe": os.path.basename(__file__), "verdicts": v, "arms": rows, "nested_summary": nested, "clean_summary": clean,
                "question": "@yacb2 on anthropics/claude-code#82056: a nested claude -p ignored "
                            "CLAUDE_CONFIG_DIR and ANTHROPIC_BASE_URL on darwin-arm64, and he had "
                            "not bisected which inherited variable causes it",

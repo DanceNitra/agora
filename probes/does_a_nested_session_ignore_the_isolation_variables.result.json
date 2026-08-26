@@ -11,7 +11,63 @@
   },
   "arms": [
     {
-      "arm": "nested",
+      "arm": "nested1",
+      "nested": true,
+      "inherited_CLAUDECODE": true,
+      "inherited_CHILD_SESSION": true,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.5,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested1_crahi9y8",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested1_tsutx7dj"
+    },
+    {
+      "arm": "clean1",
+      "nested": false,
+      "inherited_CLAUDECODE": false,
+      "inherited_CHILD_SESSION": false,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.6,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean1_uyox6fr3",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean1_fk6wgrwi"
+    },
+    {
+      "arm": "nested2",
+      "nested": true,
+      "inherited_CLAUDECODE": true,
+      "inherited_CHILD_SESSION": true,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.4,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested2_33z09gxr",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested2_avry6bbz"
+    },
+    {
+      "arm": "clean2",
+      "nested": false,
+      "inherited_CLAUDECODE": false,
+      "inherited_CHILD_SESSION": false,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 6.0,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean2_z3oysqc7",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean2_eqrz0tv2"
+    },
+    {
+      "arm": "nested3",
       "nested": true,
       "inherited_CLAUDECODE": true,
       "inherited_CHILD_SESSION": true,
@@ -21,11 +77,39 @@
       "config_dir_entries": 1,
       "LEAKED_into_the_real_store": [],
       "seconds": 5.6,
-      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested_i2u5gr9h",
-      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested_wy9iwbwf"
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested3_cr91w5k4",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested3_clk2sh61"
     },
     {
-      "arm": "clean",
+      "arm": "clean3",
+      "nested": false,
+      "inherited_CLAUDECODE": false,
+      "inherited_CHILD_SESSION": false,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 6.0,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean3_w6y2l81a",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean3_ssl7619c"
+    },
+    {
+      "arm": "nested4",
+      "nested": true,
+      "inherited_CLAUDECODE": true,
+      "inherited_CHILD_SESSION": true,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.6,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested4_tt08em70",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested4_qyuij1ck"
+    },
+    {
+      "arm": "clean4",
       "nested": false,
       "inherited_CLAUDECODE": false,
       "inherited_CHILD_SESSION": false,
@@ -35,10 +119,53 @@
       "config_dir_entries": 1,
       "LEAKED_into_the_real_store": [],
       "seconds": 5.5,
-      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean_8kt_0oxh",
-      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean_zp8q2oep"
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean4_zrrd0_p6",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean4_mg9994zw"
+    },
+    {
+      "arm": "nested5",
+      "nested": true,
+      "inherited_CLAUDECODE": true,
+      "inherited_CHILD_SESSION": true,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 6.0,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested5__hpl0h1t",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested5_xy_djh2h"
+    },
+    {
+      "arm": "clean5",
+      "nested": false,
+      "inherited_CLAUDECODE": false,
+      "inherited_CHILD_SESSION": false,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.5,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean5_4mmci9bo",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean5_k4v97pq4"
     }
   ],
+  "nested_summary": {
+    "base_url_honoured": true,
+    "config_dir_got_a_projects_tree": true,
+    "LEAKED_into_the_real_store": [],
+    "inherited_CLAUDECODE": true,
+    "inherited_CHILD_SESSION": true,
+    "trials": 5,
+    "base_url_hits": 5
+  },
+  "clean_summary": {
+    "base_url_honoured": true,
+    "LEAKED_into_the_real_store": [],
+    "trials": 5,
+    "base_url_hits": 5
+  },
   "question": "@yacb2 on anthropics/claude-code#82056: a nested claude -p ignored CLAUDE_CONFIG_DIR and ANTHROPIC_BASE_URL on darwin-arm64, and he had not bisected which inherited variable causes it",
   "scope": "one machine, win32, one build. This says what happens HERE; it cannot tell him why his box differs, only that the difference is real.",
   "platform": "win32"
