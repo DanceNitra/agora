@@ -1,0 +1,33 @@
+{
+  "probe": "the_cap_is_exactly_25000_units_and_cuts_mid_line.py",
+  "verdicts": {
+    "both_captures_cut_at_the_same_unit": true,
+    "that_unit_is_exactly_25000": true,
+    "CONTROL_at_least_one_run_cuts_INSIDE_a_marker": true,
+    "and_that_refutes_whole_line_truncation": true,
+    "no_tool_was_offered_in_either_capture": true,
+    "CONTROL_the_two_fixtures_have_different_geometry": true,
+    "CONTROL_both_fixtures_exceeded_the_cap": true
+  },
+  "rows": [
+    {
+      "marker_width": 4,
+      "units_on_wire": 25000,
+      "whole_markers": 6250,
+      "leftover_chars": 0,
+      "tools_on_wire": 0
+    },
+    {
+      "marker_width": 7,
+      "units_on_wire": 25000,
+      "whole_markers": 3571,
+      "leftover_chars": 3,
+      "tools_on_wire": 0
+    }
+  ],
+  "cap_units": 25000,
+  "truncation": "mid-line, to the unit -- not whole-line",
+  "instrument_credit": "wire capture from @pjt222, anthropics/claude-code#82056 comment 5412833938",
+  "scope": "one machine, win32, 2.1.245.1ab, ASCII single-line fixtures. The 200-line cap is untouched by this and still binds first on ordinary indexes.",
+  "platform": "win32"
+}
