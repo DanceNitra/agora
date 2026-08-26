@@ -1,5 +1,16 @@
 {
   "probe": "edrn_the_orbit_floor_holds_across_the_symmetry_spectrum.py",
+  "rows_are_not_graphs": {
+    "rows": 31,
+    "distinct_graphs": 30,
+    "isomorphic_pairs": [
+      [
+        "Q3 cube",
+        "ladder L4"
+      ]
+    ],
+    "note": "report distinct graphs, never the row count"
+  },
   "verdicts": {
     "CONTROL_the_sweep_actually_ran": true,
     "CONTROL_there_are_informative_graphs_at_all": true,
@@ -309,12 +320,12 @@
       "n_orbits": 1,
       "degeneracy": 1,
       "E1": 0.0,
-      "var_total": 1.8709033745476004e-33,
-      "var_within": 1.8709033745476004e-33,
+      "var_total": 7.043400939473319e-33,
+      "var_within": 7.043400939473319e-33,
       "var_between": 0.0,
       "within_share": 1.0,
-      "ctrl_random_blocks_within": 1.8709033745476004e-33,
-      "ctrl_random_blocks_within_share": 1.0,
+      "ctrl_random_blocks_within": 6.933347799794049e-33,
+      "ctrl_random_blocks_within_share": 0.984375,
       "ctrl_broken_symmetry_within": 0.0034013605442176948,
       "ctrl_perturbed_edge": [
         0,
@@ -520,7 +531,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 2.2
+      "seconds": 2.0
     },
     {
       "graph": "prism CL5",
@@ -547,7 +558,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.1
+      "seconds": 0.0
     },
     {
       "graph": "wheel W5",
@@ -633,7 +644,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.1
+      "seconds": 0.0
     },
     {
       "graph": "K1,2,3 tripartite",
@@ -915,7 +926,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.2
+      "seconds": 0.1
     }
   ],
   "skipped": [],
@@ -925,6 +936,6 @@
   "edge_transitive": 13,
   "multi_orbit": 16,
   "excluded_vacuous": 2,
-  "elapsed_s": 4.0,
+  "elapsed_s": 3.7,
   "platform": "win32"
 }

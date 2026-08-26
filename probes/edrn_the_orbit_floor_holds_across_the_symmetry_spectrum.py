@@ -212,6 +212,24 @@ GRAPHS = {
 }
 
 
+def distinct_pairs() -> list:
+    """Isomorphic duplicates among the fixtures, so a row count is never reported as a graph count.
+
+    `ladder L4` is `circular_ladder_graph(4)`, which is the cube Q3, already in the set under its
+    own name. Saying "31 graphs" when two rows are the same graph inflates the sweep, and it is the
+    kind of number a referee checks first.
+    """
+    import itertools
+    out = []
+    for a, b in itertools.combinations(list(GRAPHS), 2):
+        ga, gb = GRAPHS[a], GRAPHS[b]
+        if (ga.number_of_nodes() == gb.number_of_nodes()
+                and ga.number_of_edges() == gb.number_of_edges()
+                and nx.is_isomorphic(ga, gb)):
+            out.append([a, b])
+    return out
+
+
 def main() -> int:
     rows, skipped = [], []
     print(f"  {len(GRAPHS)} graphs, exact diagonalisation in the Sz=0 sector\n")
@@ -306,7 +324,12 @@ def main() -> int:
               f"{min(r['ctrl_random_blocks_within_share'] for r in multi):.2e}")
     print(f"  elapsed: {time.time() - T0:.0f}s")
 
-    json.dump({"probe": os.path.basename(__file__), "verdicts": v, "rows": rows,
+    _dups = distinct_pairs()
+    json.dump({"probe": os.path.basename(__file__),
+               "rows_are_not_graphs": {
+                   "rows": len(GRAPHS), "distinct_graphs": len(GRAPHS) - len(_dups),
+                   "isomorphic_pairs": _dups,
+                   "note": "report distinct graphs, never the row count"}, "verdicts": v, "rows": rows,
                "skipped": skipped,
                "claim": "with rho the ground-manifold projector over its degeneracy, edges in one "
                         "Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit "
