@@ -20,7 +20,10 @@
     "multi_orbit_graphs_give_a_NONZERO_orbit_floor": true,
     "CONTROL_random_blocks_do_NOT_vanish": true,
     "CONTROL_breaking_the_symmetry_makes_within_orbit_NONZERO": true,
-    "CONTROL_trivial_Aut_rows_are_excluded_not_counted": true
+    "CONTROL_trivial_Aut_rows_are_excluded_not_counted": true,
+    "RING_multiplet_average_is_zero": true,
+    "RING_real_vectors_do_NOT_spread": true,
+    "RING_complex_vectors_DO_spread": true
   },
   "rows": [
     {
@@ -531,7 +534,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 2.0
+      "seconds": 2.2
     },
     {
       "graph": "prism CL5",
@@ -558,7 +561,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.0
+      "seconds": 0.1
     },
     {
       "graph": "wheel W5",
@@ -644,7 +647,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.0
+      "seconds": 0.1
     },
     {
       "graph": "K1,2,3 tripartite",
@@ -842,7 +845,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": true,
-      "seconds": 0.3
+      "seconds": 0.4
     },
     {
       "graph": "random G(12,0.35) b",
@@ -926,9 +929,23 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 0.1
+      "seconds": 0.2
     }
   ],
+  "ring": {
+    "graph": "C15 (the correspondent's ring)",
+    "n": 15,
+    "sz_sector": "-1/2",
+    "degeneracy": 2,
+    "E1_at_rho": 1.8215779375546577e-15,
+    "real_vectors_min": 0.13097935486622236,
+    "real_vectors_max": 0.13097935486622558,
+    "real_vectors_spread": 3.219646771412954e-15,
+    "complex_vectors_min": 0.010529241990766278,
+    "complex_vectors_max": 0.13097907749354426,
+    "n_trials_each": 200,
+    "note": "every REAL vector gives ONE value, so a real-arithmetic solver has no spread to give; only complex superpositions move. Do NOT explain a reported error bar with solver scatter on this evidence -- that mechanism was retracted for the gasket on 2026-08-22 and it fails here for the same reason."
+  },
   "skipped": [],
   "claim": "with rho the ground-manifold projector over its degeneracy, edges in one Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit and E(1)=sqrt(Var_between); edge-transitive graphs give E(1)=0 exactly",
   "why_the_manifold_average": "every automorphism commutes with H(s=1), so it permutes the ground eigenspace and commutes with its projector. rho is Aut-invariant even where no single eigenvector is, which is why a lone Lanczos vector does not show this and the multiplet average does.",
@@ -936,6 +953,6 @@
   "edge_transitive": 13,
   "multi_orbit": 16,
   "excluded_vacuous": 2,
-  "elapsed_s": 3.7,
+  "elapsed_s": 5.0,
   "platform": "win32"
 }

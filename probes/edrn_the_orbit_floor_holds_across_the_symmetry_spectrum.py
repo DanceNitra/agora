@@ -56,7 +56,9 @@ over an edge-transitive graph is 0/0 -- both parts are machine zero -- and came 
 a correct result; the thresholds are absolute now. And control 3 is the tree case above.
 
 Requires numpy, scipy, networkx. No network, no model, no credits. Exact diagonalisation in the
-S^z = 0 sector; per-graph timings are printed.
+HALF-FILLED sector, n_up = n // 2. That is S^z = 0 only for EVEN n; the seven odd-n graphs here --
+the paper's own 15-site gasket among them -- sit at S^z = -1/2. This file said "S^z = 0 sector" in
+two places and it was false for 7 of 31 rows, including the one graph the correspondent cares about.
 """
 from __future__ import annotations
 
@@ -232,7 +234,7 @@ def distinct_pairs() -> list:
 
 def main() -> int:
     rows, skipped = [], []
-    print(f"  {len(GRAPHS)} graphs, exact diagonalisation in the Sz=0 sector\n")
+    print(f"  {len(GRAPHS)} graphs, exact diagonalisation in the half-filled sector (Sz=0 even n, -1/2 odd)\n")
     for name, G0 in GRAPHS.items():
         G = nx.convert_node_labels_to_integers(nx.Graph(G0))
         n = G.number_of_nodes()
@@ -324,12 +326,49 @@ def main() -> int:
               f"{min(r['ctrl_random_blocks_within_share'] for r in multi):.2e}")
     print(f"  elapsed: {time.time() - T0:.0f}s")
 
+    # ---- the correspondent's own ring, measured rather than covered by proxy -----------------
+    # C8/C10/C12 are in the sweep and edge-transitive, but their ground states are NON-DEGENERATE,
+    # so they cannot speak to the question that actually matters: does a single solver vector
+    # differ from the multiplet average? Only a degenerate ring can answer that, so measure his.
+    Gr = nx.cycle_graph(15)
+    Er = [tuple(sorted(e)) for e in Gr.edges()]
+    Hr, br = build_H(15, Er, [1.0] * len(Er), 15 // 2)
+    dr, Vr, _ = ground_manifold(Hr)
+    spr = sp_table(br, Er)
+    rng = np.random.default_rng(7)
+    real_vals, cplx_vals = [], []
+    for _ in range(200):
+        x = rng.standard_normal(dr); x /= np.linalg.norm(x)
+        real_vals.append(float(np.sqrt(np.var(spr @ (np.abs(Vr @ x) ** 2)))))
+        z = rng.standard_normal(dr) + 1j * rng.standard_normal(dr); z /= np.linalg.norm(z)
+        cplx_vals.append(float(np.sqrt(np.var(spr @ (np.abs(Vr @ z) ** 2)))))
+    ring = {"graph": "C15 (the correspondent's ring)", "n": 15, "sz_sector": "-1/2",
+            "degeneracy": dr,
+            "E1_at_rho": float(np.sqrt(np.var(manifold_corr(Vr, spr)))),
+            "real_vectors_min": min(real_vals), "real_vectors_max": max(real_vals),
+            "real_vectors_spread": max(real_vals) - min(real_vals),
+            "complex_vectors_min": min(cplx_vals), "complex_vectors_max": max(cplx_vals),
+            "n_trials_each": 200,
+            "note": "every REAL vector gives ONE value, so a real-arithmetic solver has no spread "
+                    "to give; only complex superpositions move. Do NOT explain a reported error "
+                    "bar with solver scatter on this evidence -- that mechanism was retracted "
+                    "for the gasket on 2026-08-22 and it fails here for the same reason."}
+    v["RING_multiplet_average_is_zero"] = ring["E1_at_rho"] < 1e-10
+    v["RING_real_vectors_do_NOT_spread"] = ring["real_vectors_spread"] < 1e-12
+    v["RING_complex_vectors_DO_spread"] = ring["complex_vectors_min"] < 0.5 * ring["real_vectors_max"]
+    print("\n  ring C15: deg=%d E(1)@rho=%.2e real=[%.6f,%.6f] spread=%.1e complex_min=%.4f"
+          % (dr, ring["E1_at_rho"], ring["real_vectors_min"], ring["real_vectors_max"],
+             ring["real_vectors_spread"], ring["complex_vectors_min"]))
+    for _k in ("RING_multiplet_average_is_zero", "RING_real_vectors_do_NOT_spread",
+               "RING_complex_vectors_DO_spread"):
+        print("  %s  %s" % ("YES" if v[_k] else "no ", _k))
+
     _dups = distinct_pairs()
     json.dump({"probe": os.path.basename(__file__),
                "rows_are_not_graphs": {
                    "rows": len(GRAPHS), "distinct_graphs": len(GRAPHS) - len(_dups),
                    "isomorphic_pairs": _dups,
-                   "note": "report distinct graphs, never the row count"}, "verdicts": v, "rows": rows,
+                   "note": "report distinct graphs, never the row count"}, "verdicts": v, "rows": rows, "ring": ring,
                "skipped": skipped,
                "claim": "with rho the ground-manifold projector over its degeneracy, edges in one "
                         "Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit "
