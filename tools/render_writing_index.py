@@ -72,9 +72,35 @@ def selected(posts: list, lang: str) -> list:
     return live[:SHOW]
 
 
+# A page on disk that no manifest entry knows about is invisible to everything derived FROM the
+# manifest: this index, the archive listing, and the sitemap. Measured 2026-08-26, the hour after
+# the first version of this tool shipped: deep-dive-hot-hand was a real, live, bilingual essay that
+# the old hand-written list linked and posts.json had never heard of, so generating the list from
+# the manifest silently dropped it. The generator was right and its input was short.
+KNOWN_ORPHANS = {
+    # A stale render of pre-trends-test-weak-evidence under a truncated slug. Live, in no sitemap,
+    # linked from nowhere. Adding it to the manifest would publish the same essay twice.
+    "passing-a-pre-trends-test-is-weak-evidence-which-difference-",
+}
+
+
+def orphans(posts: list) -> list:
+    have = {p["slug"] for p in posts}
+    on_disk = {f[:-5] for f in os.listdir(os.path.join(ROOT, "public", "posts"))
+               if f.endswith(".html") and f != "index.html"}
+    return sorted(on_disk - have - KNOWN_ORPHANS)
+
+
 def main() -> int:
     check = "--check" in sys.argv
     posts = json.load(io.open(POSTS, encoding="utf-8"))
+    missing = orphans(posts)
+    if missing:
+        print(f"  {len(missing)} post page(s) exist with no posts.json entry, so nothing derived "
+              f"from the manifest can reach them:")
+        for m in missing:
+            print("   ", m)
+        return 1
     stale = []
     for lang, path in (("en", os.path.join(ROOT, "index.html")),
                        ("sk", os.path.join(ROOT, "sk", "index.html"))):

@@ -83,11 +83,50 @@ počtom.** Dve celé čísla.
 Nie percento pokrytia a nie pomer odlišnosti. Mám oboje a nepovedali mi nič. To, ktoré mi niečo
 povedalo, bolo to, čo vyšlo ako nula.
 
+*Dve sa ukázali byť málo. Pozri doplnok nižšie, tam prosba stojí teraz.*
+
 Sonda je jeden súbor bez závislostí a vypisuje obe kontroly vrátane tej resolverovej, ktorá musí
 prejsť skôr, než čokoľvek nahlási:
 [`a_provenance_field_at_100_percent_with_one_distinct_value.py`](https://github.com/DanceNitra/agora/blob/main/probes/a_provenance_field_at_100_percent_with_one_distinct_value.py).
 Ak máte iný formát skladu, celá kontrola je `sum(1 for r in records if resolves(r.source))` a môj kód
 na ňu nepotrebujete.
+
+
+## Doplnok, 26. augusta: dvaja čitatelia posunuli meranie
+
+Na r/RAG odpovedali traja ľudia a dvaja z nich zmenili to, čo považujem za správne číslo.
+
+**Terrible_Front_583 rozdelil „pokrytie zdrojom" na tri veci, ktoré som považoval za jednu:**
+prítomnosť poľa, sémantickú provenance a stiahnuteľnosť, pričom brána má vyžadovať dosiahnuteľný
+zdrojový objekt plus snímku alebo verziu, vlastníka a kontrolu prístupu. Je to lepšie než moje dve
+celé čísla a moje vlastné dáta mu dajú za pravdu v rámci jedného dotazu: prítomnosť je sama o sebe
+dvojica čísel. V mojom coding sklade je kľúč `source` prítomný na každom z 20 162 záznamov v
+opečiatkovanom receipte a hodnotu nesie na 145 z nich, teda 0,72 %. Kontrola schémy vidí prvé číslo.
+Pokrytie, počítané tak, ako som ho počítal, vidí druhé. Ani jedno z nich nie je to, čo som publikoval.
+
+Zvyšok tej vrstvy neviem oskórovať vôbec. Ani jedna z mojich schém nemá snímku, verziu, vlastníka
+ani pole prístupu, takže tá vrstva u mňa nie je nula, je **nemerateľná**. To je horšia pozícia než
+zlé skóre a žiadne percento pokrytia ju neukáže.
+
+**arupbuildsai upozornil, že tu nie je jeden audit, ale dva:** či sa zdroj dá dosiahnuť a či
+podporuje tvrdenie. Ten druhý spustil na produkčnom RAG asistentovi, ktorého citácie tiež vyzerali
+zdravo, a našiel odpovede nesprávne asi v 35 % prípadov, pričom zneli isto a citácia často zdobila
+tvrdenie, ktoré jej zdroj nikdy nespravil; presun chunkovania z veľkostného na hlavičkové a potom
+sémantické to stiahol zhruba na 8 %. Moja sonda vie testovať vždy len prvú polovicu. Sťahuje, nikdy
+nečíta, takže zdroj, ktorý vedie na stránku protirečiacu tvrdeniu, jej prejde čistý. Druhá polovica
+už benchmarky má: ALCE meria presnosť a úplnosť citácií priamo (Gao a kol.,
+[arXiv:2305.14627](https://arxiv.org/abs/2305.14627)) a AIS je staršie rámovanie (Rashkin a kol.,
+[arXiv:2112.12870](https://arxiv.org/abs/2112.12870)).
+
+**A číslo sa zase pohlo, čo je jediná vec, ktorú tento článok o sebe predpovedal.** Nový beh dnes:
+240 715 záznamov v tých istých jedenástich skladoch, `source` vyplnené na 91,15 %, dohľadateľných 0.
+To je o 5 660 záznamov viac než v tabuľke vyššie a každý jej súčet je teraz zastaraný. Dohľadateľných
+bolo 0 pri každom meraní od vydania tohto článku; počet, ktorý stále neviem vysvetliť, je tých 24 z
+10. augusta.
+
+Takže prosba znie na tri počty, nie na dva. Koľko záznamov máte, koľko z nich vôbec nesie hodnotu v
+zdroji a koľko z tých vedie k niečomu, čo si čitateľ vie stiahnuť. To tretie je to, ktoré môže
+zlyhať.
 
 ---
 

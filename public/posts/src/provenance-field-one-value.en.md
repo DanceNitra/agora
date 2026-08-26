@@ -82,11 +82,51 @@ integers.
 Not the coverage percentage, and not the distinctness ratio. I have both of those and they told me
 nothing. The one that told me something was the one that came back zero.
 
+*Two turned out to be too few. See the update below, which is where the ask now stands.*
+
 The probe is one file with no dependencies and it prints both controls, including the resolver check
 that has to pass before it will report anything:
 [`a_provenance_field_at_100_percent_with_one_distinct_value.py`](https://github.com/DanceNitra/agora/blob/main/probes/a_provenance_field_at_100_percent_with_one_distinct_value.py).
 If your store format differs, the check is `sum(1 for r in records if resolves(r.source))` and you
 don't need my code for it.
+
+
+## Update, 26 August: two readers moved the measurement
+
+Three people replied on r/RAG and two of them changed what I think the right number is.
+
+**Terrible_Front_583 split "source coverage" into three things I had been treating as one:** field
+presence, semantic provenance, and fetchability, with the gate requiring a resolvable source object
+plus snapshot or version, owner, and an access check. That is better than my two integers, and my own
+data agrees with him inside one query: presence is itself two numbers. In my coding store the
+`source` key is present on every one of the 20,162 records in the stamped receipt and carries a
+value on 145 of them, 0.72%. A
+schema check sees the first number. Coverage, computed the way I was computing it, sees the second.
+Neither of them is what I published.
+
+The rest of that tier I cannot score at all. Neither of my schemas has a snapshot, a version, an
+owner, or an access field, so for me that layer is not zero, it is unmeasurable. That is a worse
+place to be than a bad score, and no coverage percentage will ever show it to you.
+
+**arupbuildsai pointed out that there are two audits here rather than one:** does the source resolve,
+and does it support the claim. He ran the second on a production RAG assistant whose citations also
+looked healthy, and found the answers wrong around 35% of the time while sounding certain, the
+citation often decorating a claim its source never made; moving chunking from size-based to
+header-based to semantic brought that to roughly 8%. My probe can only ever test the first half. It
+fetches, it never reads, so a source that resolves to a page contradicting the claim passes it clean.
+The second half already has benchmarks: ALCE scores citation precision and recall directly (Gao et
+al., [arXiv:2305.14627](https://arxiv.org/abs/2305.14627)), and AIS is the earlier framing (Rashkin
+et al., [arXiv:2112.12870](https://arxiv.org/abs/2112.12870)).
+
+**And the number moved again, which is the one thing this post predicted about itself.** Re-run
+today: 240,715 records across the same eleven stores, `source` populated on 91.15%, re-checkable 0.
+That is 5,660 records more than the table above, and every total in it is now stale. Re-checkable has
+been 0 at every measurement since this post went up; the count I still cannot explain is the 24 from
+10 August.
+
+So the ask is three counts rather than two. How many records you have, how many carry a source value
+at all, and how many of those resolve to something a reader can fetch. The third is the one that can
+fail.
 
 ---
 

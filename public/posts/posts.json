@@ -24,7 +24,7 @@
   "tags_sk": "Agentská pamäť · Provenance · Kvalita dát · Meranie · RAG",
   "kicker": "Measurement · self-audit",
   "kicker_sk": "Meranie · sebaaudit",
-  "read": 4,
+  "read": 6,
   "bilingual": true
  },
  {
@@ -851,6 +851,20 @@
   "kicker": "Research",
   "kicker_sk": "Výskum",
   "read": 3,
+  "bilingual": true
+ },
+ {
+  "slug": "deep-dive-hot-hand",
+  "title": "The hot hand, in code · deep dive",
+  "title_sk": "Horúca ruka, prestavaná v kóde",
+  "desc": "A runnable deep dive into the hot-hand fallacy: the canonical estimator is biased on a fair coin, the bias grows toward the operating point, and a measured zero hides a real +8-point streak effect.",
+  "desc_sk": "Gilovich, Vallone a Tversky (1985) položili čistú otázku: po sérii trafených košov, je ďalší kôš pravdepodobnejší než po sérii minutí? Nenašli žiadny…",
+  "date": "2026-06-12",
+  "tags": "Statistics · Measurement · Estimator bias · Reproducibility",
+  "tags_sk": "Štatistika · Meranie · Vychýlenie odhadu · Reprodukovateľnosť",
+  "kicker": "Deep dive · runnable",
+  "kicker_sk": "Hlboký ponor · spustiteľný",
+  "read": 6,
   "bilingual": true
  },
  {
