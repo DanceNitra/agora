@@ -28,23 +28,33 @@ The read-out is the presence of the notice, which is a string the harness emits 
 does not depend on trailing whitespace surviving anything. This is his question with the geometry
 changed; the credit for the question is his.
 
-AND THE ANSWER TO HIS ARM IS THAT IT CANNOT BE READ, for a reason that generalises past this
-fixture. Two halves:
+AND HIS ARM CANNOT BE READ, BUT THE QUESTION CAN BE ANSWERED. Two halves.
 
-  MEASURED (`disp_none` / `disp_nl5` / `disp_sp`): three indexes differing only in their trailing
-  run -- none, five newlines, spaces and newlines -- produce BYTE-IDENTICAL prompt text, all ending
+  WHY HIS ARM CANNOT (`disp_none` / `disp_nl5` / `disp_sp`): three indexes differing only in their
+  trailing run, none / five newlines / spaces and newlines, produce the SAME wire text, all ending
   at the last content character. The embedding trims the tail, so no trailing run is ever visible
-  on the wire whether or not anything was cut.
+  whether or not anything was cut, and his read-out is gone before the request is built.
 
-  ARGUED, and it is two lines: a cut happens only when the TRIMMED length exceeds the cap, and in
-  that case the trailing run lies beyond position 25,000, so slicing the raw text and slicing the
-  trimmed text keep the same prefix. When the two would differ, the trimmed length is under the cap
-  and trim-first does not cut at all -- leaving a difference of pure trailing whitespace, which the
-  first half says is invisible. So for EVERY input the two models produce identical prompts.
+  WHY THE QUESTION STILL HAS AN ANSWER (`lead_size` / `lead_lines` and their partners): a trailing
+  run sits PAST the cap window, which is exactly why both operands keep the same prefix and the arm
+  says nothing. A LEADING run sits INSIDE it, so the two operands differ by CONTENT rather than by
+  whitespace, and the difference survives any amount of trimming for display.
 
-That is the same shape as his own commutativity argument for the order of the two cuts: not
-unmeasured, unobservable from the output. What the wire does settle is the THRESHOLD, and
-`blank2000` settles it about 2KB clear of the boundary rather than 3 units clear.
+      2,000 newlines then 100 lines of 300 characters. Raw 32,100, trimmed 30,099.
+        cut the trimmed string -> 83 whole lines, 24,982 units, last label L082
+        cut the raw text       -> 2,000 blanks + 76 lines, 22,876 units of content, last label L075
+      and the same question through the line cap, which needs no unit arithmetic at all:
+      2,000 newlines then 300 five-character lines.
+        cut the trimmed string -> N000..N199, notice "300 lines (limit: 200)"
+        cut the raw text       -> 200 blank lines, no content, notice "2300 lines (limit: 200)"
+
+  Each leading-run arm has a partner with no leading run, so the read-out is a byte comparison
+  between two wires rather than a description of one.
+
+An earlier version of this file argued that the operand was unobservable from the wire for every
+input. That argument assumed the trim removed only a SUFFIX. It is two-sided, a leading run is
+inside the cap window, and the claim was wrong; an adversarial pass found it before it was sent.
+The trailing half of the argument survives untouched and is the half that kills his arm.
 
 CONTROLS, and two of them can fail:
   * `ctl_exact`  5,000 markers, exactly 25,000 units, no trailing run -> must arrive WHOLE and
@@ -75,11 +85,12 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+NL = chr(10)          # spelled this way so no fixture depends on an escape surviving an editor
 PORT = 8893
 CAP = 25000
 # The index sits between these two in the system-reminder. Both are the harness's own strings.
 HEAD = "(user's auto-memory, persists across conversations):\n\n"
-NOTICE = re.compile(r"> WARNING: MEMORY\.md is ([0-9.]+)KB[^\n]*")
+NOTICE = re.compile(r"> WARNING: MEMORY\.md is ([^\n]*)")
 
 SSE = "".join([
     'event: message_start\ndata: {"type":"message_start","message":{"id":"m","type":"message",'
@@ -158,6 +169,16 @@ def markers(n: int) -> str:
     return "".join("M%04d" % i for i in range(1, n + 1))
 
 
+def wide(lines: int, width: int) -> str:
+    """`lines` newline-terminated lines of `width` characters, each labelled Lnnn."""
+    return "".join("L%03d" % i + "c" * (width - 4) + NL for i in range(lines))
+
+
+def narrow(lines: int) -> str:
+    """`lines` newline-terminated five-character labelled lines."""
+    return "".join("N%03d" % i + NL for i in range(lines))
+
+
 # label -> (fixture text, what it is for)
 ARMS = {
     "ctl_small":     (("A" * 100) + "\n" * 5,
@@ -181,6 +202,17 @@ ARMS = {
                       "display-trim arm: five trailing newlines"),
     "disp_sp":       (("A" * 100) + "   \n  \n",
                       "display-trim arm: trailing spaces and newlines"),
+    # A LEADING run is the arm that DOES discriminate, because it sits INSIDE the cap
+    # window. The trailing-run arms above cannot separate the two operands; these can.
+    # Each has a no-leading-run partner so the two wires are compared, not described.
+    "lead_size":      ((NL * 2000) + wide(100, 300),
+                       "leading 2,000-newline run then 100 lines of 300: which operand is cut"),
+    "lead_size_ctl":  (wide(100, 300),
+                       "the same file with no leading run: the byte-comparison partner"),
+    "lead_lines":     ((NL * 2000) + narrow(300),
+                       "leading run then 300 short lines: the LINE cap asks the same question"),
+    "lead_lines_ctl": (narrow(300),
+                       "the same file with no leading run"),
 }
 
 
@@ -233,17 +265,20 @@ def main() -> int:
             raise SystemExit("REFUSED: %s captured nothing; the recorder was not reached" % label)
         seg, kb = segment(BODIES[-1])
         raw = len(text.encode("utf-16-le")) // 2
-        trimmed = len(text.rstrip().encode("utf-16-le")) // 2
+        trimmed = len(text.strip().encode("utf-16-le")) // 2
         # Read straight out of the prompt, not out of segment(), so the display-trim comparison
         # below cannot be an artefact of this file's own parsing.
         whole = json.loads(BODIES[-1])["messages"][0]["content"][0]["text"]
-        tail4 = text.rstrip()[-4:]
-        # Absent whenever the arm was cut, which is fine: only the display arms use this field,
-        # and they are all far under the cap. A missing anchor must read as absent, not as equal.
-        anchor = (whole.rindex(tail4) + 4) if tail4 in whole else None
+        tail4 = text.strip()[-4:]
+        # Search INSIDE the index region, never the whole prompt. An earlier version searched
+        # the entire body, which can land on an unrelated match in CLAUDE.md and let three arms
+        # agree by pointing at the same irrelevant place.
+        after = whole.split(HEAD, 1)[1] if HEAD in whole else ""
+        idx = after.rfind(tail4)
+        anchor = None if idx < 0 else idx + 4
         rows.append({"arm": label, "why": why, "raw_units": raw, "trimmed_units": trimmed,
                      "wire_units": len(seg), "notice_kb": kb,
-                     "wire_tail": seg[-14:], "after_last_content_char": (whole[anchor:anchor + 20] if anchor else None),
+                     "wire_head": seg[:14], "wire_tail": seg[-14:], "after_last_content_char": (after[anchor:anchor + 20] if anchor else None),
                      "trailing_newlines_on_wire": len(seg) - len(seg.rstrip("\n"))})
         r = rows[-1]
         print("[%6.1fs] %-14s raw=%6d trimmed=%6d wire=%6d notice=%6s tail=%r"
@@ -289,9 +324,9 @@ def main() -> int:
     v["CONTROL_a_raw_threshold_would_have_been_visible"] = (
         b2k["raw_units"] > CAP + 1900 and by["ctl_over1"]["notice_kb"] is not None)
 
-    # --- why his read-out cannot work, measured rather than argued ---------------------------
+    # --- why the TRAILING read-out cannot work, measured rather than argued -----------------
     disp = [by["disp_none"], by["disp_nl5"], by["disp_sp"]]
-    v["THE_EMBEDDING_TRIMS_the_tail_before_the_prompt"] = (
+    v["the_embedding_trims_the_TAIL_before_the_prompt"] = (
         all(d["after_last_content_char"] for d in disp)
         and len({d["after_last_content_char"] for d in disp}) == 1
         and len({d["wire_units"] for d in disp}) == 1)
@@ -299,6 +334,34 @@ def main() -> int:
         len({d["raw_units"] for d in disp}) == 3)
     v["CONTROL_none_of_the_display_arms_was_cut"] = all(
         d["notice_kb"] is None and d["wire_units"] == 100 for d in disp)
+
+    # --- and the LEADING run, which does discriminate ---------------------------------------
+    # A trailing run is past the cap window, so both operands keep the same prefix and the arm
+    # answers nothing. A leading run is INSIDE it, so the two operands differ by CONTENT.
+    ls, lsc = by["lead_size"], by["lead_size_ctl"]
+    ll, llc = by["lead_lines"], by["lead_lines_ctl"]
+    v["the_leading_size_arm_ran_at_the_geometry_designed"] = (
+        ls["raw_units"] == 32100 and ls["trimmed_units"] == 30099
+        and lsc["raw_units"] == 30100)
+    # THE READ-OUT: identical to its no-leading-run partner means the CUT saw the trimmed string.
+    v["THE_CUT_SLICES_THE_TRIMMED_STRING"] = (
+        ls["wire_units"] == lsc["wire_units"] and ls["wire_tail"] == lsc["wire_tail"])
+    v["and_the_notice_reports_the_trimmed_size_too"] = (
+        ls["notice_kb"] is not None and ls["notice_kb"] == lsc["notice_kb"])
+    # It could have said the opposite, and here is what that would have looked like: cutting the
+    # raw text keeps 2,000 blank lines plus 22,876 units of content, so the wire would be 2,106
+    # units shorter and would end seven labels earlier.
+    v["CONTROL_the_two_operands_predict_different_wires"] = (
+        (25000 - 2000) // 301 * 301 != 25000 // 301 * 301)
+    v["CONTROL_a_cut_actually_happened_in_that_arm"] = ls["wire_units"] < ls["trimmed_units"]
+
+    # The line cap asks the same question and answers it independently of any unit arithmetic.
+    v["the_leading_line_arm_says_the_same"] = (
+        ll["wire_units"] == llc["wire_units"] and ll["notice_kb"] == llc["notice_kb"])
+    v["CONTROL_the_line_arm_kept_real_content_not_blank_lines"] = (
+        ll["wire_tail"].startswith("N") or "N0" in ll["wire_tail"])
+    v["CONTROL_the_line_notice_names_the_trimmed_line_count"] = (
+        ll["notice_kb"] is not None and "300 lines" in ll["notice_kb"])
 
     # --- an open cell in his notice taxonomy, closed from a capture we already hold -----------
     old = os.path.join(HERE, "_wire_capture_windows.json")
@@ -308,7 +371,7 @@ def main() -> int:
         om = NOTICE.search(ot)
         v["the_multiline_size_over_cell_carries_the_limit_clause"] = bool(
             om and "index entries are too long" in om.group(0) and "(limit: 24.4KB)" in om.group(0)
-            and "lines" not in om.group(0))
+            and "lines (limit:" not in om.group(0))
         v["CONTROL_that_capture_really_is_multiline_and_under_200_lines"] = (
             100 < ot.count("CANARY-L") < 200)
 

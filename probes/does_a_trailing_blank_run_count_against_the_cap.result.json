@@ -12,9 +12,17 @@
     "THE_ANSWER_the_threshold_uses_the_TRIMMED_count": true,
     "and_the_index_arrived_whole": true,
     "CONTROL_a_raw_threshold_would_have_been_visible": true,
-    "THE_EMBEDDING_TRIMS_the_tail_before_the_prompt": true,
+    "the_embedding_trims_the_TAIL_before_the_prompt": true,
     "CONTROL_the_three_display_arms_really_differ_on_disk": true,
     "CONTROL_none_of_the_display_arms_was_cut": true,
+    "the_leading_size_arm_ran_at_the_geometry_designed": true,
+    "THE_CUT_SLICES_THE_TRIMMED_STRING": true,
+    "and_the_notice_reports_the_trimmed_size_too": true,
+    "CONTROL_the_two_operands_predict_different_wires": true,
+    "CONTROL_a_cut_actually_happened_in_that_arm": true,
+    "the_leading_line_arm_says_the_same": true,
+    "CONTROL_the_line_arm_kept_real_content_not_blank_lines": true,
+    "CONTROL_the_line_notice_names_the_trimmed_line_count": true,
     "the_multiline_size_over_cell_carries_the_limit_clause": true,
     "CONTROL_that_capture_really_is_multiline_and_under_200_lines": true,
     "every_fixture_store_was_removed": true
@@ -27,6 +35,7 @@
       "trimmed_units": 100,
       "wire_units": 100,
       "notice_kb": null,
+      "wire_head": "AAAAAAAAAAAAAA",
       "wire_tail": "AAAAAAAAAAAAAA",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -38,6 +47,7 @@
       "trimmed_units": 25000,
       "wire_units": 25000,
       "notice_kb": null,
+      "wire_head": "M0001M0002M000",
       "wire_tail": "4998M4999M5000",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -48,7 +58,8 @@
       "raw_units": 25001,
       "trimmed_units": 25001,
       "wire_units": 25000,
-      "notice_kb": "24.4",
+      "notice_kb": "24.4KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "wire_head": "M0001M0002M000",
       "wire_tail": "4998M4999M5000",
       "after_last_content_char": null,
       "trailing_newlines_on_wire": 0
@@ -60,6 +71,7 @@
       "trimmed_units": 25000,
       "wire_units": 25000,
       "notice_kb": null,
+      "wire_head": "M0001M0002M000",
       "wire_tail": "4998M4999M5000",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -71,6 +83,7 @@
       "trimmed_units": 24998,
       "wire_units": 24998,
       "notice_kb": null,
+      "wire_head": "M0001M0002M000",
       "wire_tail": "7M4998M4999zzz",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -82,6 +95,7 @@
       "trimmed_units": 24998,
       "wire_units": 24998,
       "notice_kb": null,
+      "wire_head": "M0001M0002M000",
       "wire_tail": "7M4998M4999zzz",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -93,6 +107,7 @@
       "trimmed_units": 100,
       "wire_units": 100,
       "notice_kb": null,
+      "wire_head": "AAAAAAAAAAAAAA",
       "wire_tail": "AAAAAAAAAAAAAA",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -104,6 +119,7 @@
       "trimmed_units": 100,
       "wire_units": 100,
       "notice_kb": null,
+      "wire_head": "AAAAAAAAAAAAAA",
       "wire_tail": "AAAAAAAAAAAAAA",
       "after_last_content_char": "\n# currentDate\nToday",
       "trailing_newlines_on_wire": 0
@@ -115,8 +131,57 @@
       "trimmed_units": 100,
       "wire_units": 100,
       "notice_kb": null,
+      "wire_head": "AAAAAAAAAAAAAA",
       "wire_tail": "AAAAAAAAAAAAAA",
       "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "lead_size",
+      "why": "leading 2,000-newline run then 100 lines of 300: which operand is cut",
+      "raw_units": 32100,
+      "trimmed_units": 30099,
+      "wire_units": 24982,
+      "notice_kb": "29.4KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "wire_head": "L000cccccccccc",
+      "wire_tail": "cccccccccccccc",
+      "after_last_content_char": "\n\n> WARNING: MEMORY.",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "lead_size_ctl",
+      "why": "the same file with no leading run: the byte-comparison partner",
+      "raw_units": 30100,
+      "trimmed_units": 30099,
+      "wire_units": 24982,
+      "notice_kb": "29.4KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "wire_head": "L000cccccccccc",
+      "wire_tail": "cccccccccccccc",
+      "after_last_content_char": "\n\n> WARNING: MEMORY.",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "lead_lines",
+      "why": "leading run then 300 short lines: the LINE cap asks the same question",
+      "raw_units": 3500,
+      "trimmed_units": 1499,
+      "wire_units": 999,
+      "notice_kb": "300 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "wire_head": "N000\nN001\nN002",
+      "wire_tail": "N197\nN198\nN199",
+      "after_last_content_char": null,
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "lead_lines_ctl",
+      "why": "the same file with no leading run",
+      "raw_units": 1500,
+      "trimmed_units": 1499,
+      "wire_units": 999,
+      "notice_kb": "300 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "wire_head": "N000\nN001\nN002",
+      "wire_tail": "N197\nN198\nN199",
+      "after_last_content_char": null,
       "trailing_newlines_on_wire": 0
     }
   ],
