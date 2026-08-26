@@ -99,13 +99,21 @@ def seed_config(cfgdir: str, skills: list, mode: str) -> dict:
         for s in skills:
             usage[s["skill"]] = {"usageCount": s["pos"],
                                  "lastUsedAt": now - (n - s["pos"]) * 1000}
-    elif mode == "split":
+    elif mode.startswith("split"):
+        # split      the early half is heavily used (500x) but a year stale.
+        # split:R    the same shape at a count ratio of R, to find where the two swap.
+        #
+        # WHY THE SWEEP EXISTS. The 500x arm answered "count or recency" with a ratio so large that
+        # it could not have come out any other way, which is a claim adjacent to what was measured
+        # rather than the measurement itself. Sweeping R finds the boundary, and the boundary is
+        # the number worth reporting.
         year = 365 * 24 * 3600 * 1000
+        ratio = int(mode.split(":", 1)[1]) if ":" in mode else 500
         for s in skills:
             if s["pos"] <= n / 2:
-                usage[s["skill"]] = {"usageCount": 500 + s["pos"], "lastUsedAt": now - year}
+                usage[s["skill"]] = {"usageCount": ratio, "lastUsedAt": now - year}
             else:
-                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - (n - s["pos"]) * 1000}
+                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - 1000}
     elif mode != "none":
         raise SystemExit("REFUSED: unknown seed mode %r" % mode)
     cfg = {"skillUsage": usage}
@@ -185,6 +193,9 @@ def main() -> int:
     rows = [run_arm("no_history", N, WIDE, NARROW, "none"),
             run_arm("inverted_history", N, WIDE, NARROW, "inverted"),
             run_arm("count_vs_recency", N, WIDE, NARROW, "split")]
+    # THE CROSSOVER. A stale skill and a fresh one, swept over the count ratio between them.
+    for r in (1, 2, 5, 10, 20):
+        rows.append(run_arm("split_x%d" % r, N, WIDE, NARROW, "split:%d" % r))
     srv.shutdown()
     by = {r["arm"]: r for r in rows}
     nh, ih, cr = by["no_history"], by["inverted_history"], by["count_vs_recency"]
@@ -233,9 +244,34 @@ def main() -> int:
     cr_early = sum(1 for x in cr["kept_positions"] if x <= N / 2)
     v["CONTROL_the_split_arm_also_dropped_something"] = (
         0 < cr["descriptions_on_wire"] < cr["skills"])
-    v["the_key_is_COUNT_not_recency"] = cr_early > cr_late
-    v["or_the_key_is_RECENCY_not_count"] = cr_late > cr_early
+    # Both of these are about the 500x arm ALONE and neither is the general rule. The sweep below
+    # shows recency winning at every ratio up to 5x, so "count decides" is true only above the
+    # crossover, and stating it unqualified was a claim adjacent to the measurement.
+    v["at_500x_count_beats_recency"] = cr_early > cr_late
+    v["or_at_500x_recency_beats_count"] = cr_late > cr_early
 
+    # Where the winner flips, read off the sweep rather than asserted.
+    sweep = [(int(r["arm"].split("x")[1]), r) for r in rows if r["arm"].startswith("split_x")]
+    sweep.sort()
+    flips = [(lo, hi) for (lo, a), (hi, b) in zip(sweep, sweep[1:])
+             if (sum(1 for x in a["kept_positions"] if x <= N / 2) >
+                 sum(1 for x in a["kept_positions"] if x > N / 2))
+             != (sum(1 for x in b["kept_positions"] if x <= N / 2) >
+                 sum(1 for x in b["kept_positions"] if x > N / 2))]
+    v["THE_CROSSOVER_IS_BRACKETED"] = len(flips) == 1
+    v["CONTROL_recency_wins_at_the_bottom_of_the_sweep"] = (
+        sum(1 for x in sweep[0][1]["kept_positions"] if x > N / 2)
+        > sum(1 for x in sweep[0][1]["kept_positions"] if x <= N / 2))
+    v["CONTROL_count_wins_at_the_top_of_the_sweep"] = (
+        sum(1 for x in sweep[-1][1]["kept_positions"] if x <= N / 2)
+        > sum(1 for x in sweep[-1][1]["kept_positions"] if x > N / 2))
+
+    print()
+    print("  crossover bracket: %s" % (flips or "none found"))
+    for r, row in sweep:
+        e = sum(1 for x in row["kept_positions"] if x <= N / 2)
+        print("    ratio %3dx  early(stale,used) %3d   late(fresh,once) %3d" % (
+            r, e, len(row["kept_positions"]) - e))
     print()
     for k, ok in v.items():
         print("  %s  %s" % ("YES" if ok else "no ", k))
@@ -245,6 +281,7 @@ def main() -> int:
     json.dump({"probe": os.path.basename(__file__), "controls": v, "arms": rows,
                "fixture": {"skills": N, "wide": WIDE, "narrow": NARROW},
                "late_half_kept": late, "early_half_kept": early,
+               "crossover_bracket": flips,
                "split_arm_late_kept": cr_late, "split_arm_early_kept": cr_early,
                "narrow_kept_after_a_wide_drop": len(kept_narrow_after),
                "no_history_span_gaps": nh_span_gaps,
