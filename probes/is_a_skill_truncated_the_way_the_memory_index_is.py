@@ -1,5 +1,30 @@
 """Does a SKILL reach the model whole, or is it cut like the auto-memory index?
 
+THIS REPLICATES DOCUMENTED BEHAVIOUR. IT DOES NOT DISCOVER IT. Found after the fact, and the
+correction belongs at the top rather than in a footnote: @ralucaoda reported this on
+anthropics/claude-code#81081 on 2026-07-25, and on 2026-08-16 @bcherny answered that it is intended
+and documented at code.claude.com/docs/en/skills#skill-descriptions-are-cut-short. The listing gets
+1% of the model context window by default; on overflow every NAME is kept and DESCRIPTIONS are
+dropped starting with the least-used skills, which in a fresh session with no usage history
+degenerates to listing order. `skillListingBudgetFraction` and `SLASH_COMMAND_TOOL_CHAR_BUDGET`
+tune it, `skillOverrides` can mark a skill name-only, `/doctor` estimates the cost and `--debug`
+warns on overflow.
+
+Two consequences for what this file may claim:
+
+  * "nothing announces it" is TRUE ONLY OF THE REQUEST BODY, which is the only channel measured
+    here. The runtime does announce it, on `--debug` and in `/doctor`, neither of which this probe
+    reads. bcherny himself grants the narrower point ("the model gets no signal"), and the issue
+    stays open as a usability improvement.
+  * the clean prefix cut this sees is a FIXTURE ARTEFACT. Every fixture here is uniform-width and
+    runs with no usage history, which is exactly the case the vendor says degenerates to listing
+    order. A mixed-width fixture with a usage history would test the least-used rule, and this does
+    not.
+
+What the file still contributes is the instrument, not the finding: it reads the request body and
+buys no completions, where both existing reports ask the model what it can see.
+
+
 WHY. A red-team pass killed a comment I had drafted for open-telemetry/semantic-conventions-genai#86.
 Two reasons, and the second is the one that matters here: every number I had was measured on Claude
 Code's auto-memory index, and NOT ONE of our probes had ever measured a skill. Arguing about a skill
@@ -269,7 +294,18 @@ def main() -> int:
                "method": "ANTHROPIC_BASE_URL points at a local recorder; the request body is read "
                          "and no completion is bought; nothing is written to disk",
                "cost": "zero completions",
-               "finding": "the skill listing DEGRADES rather than truncates. Every skill NAME "
+               "documented_by_the_vendor": {
+                   "issue": "anthropics/claude-code#81081 (@ralucaoda, 2026-07-25)",
+                   "confirmed": "@bcherny 2026-08-16: intended and documented",
+                   "docs": "code.claude.com/docs/en/skills#skill-descriptions-are-cut-short",
+                   "budget": "1% of the model context window, skillListingBudgetFraction / "
+                             "SLASH_COMMAND_TOOL_CHAR_BUDGET",
+                   "drop_order": "least-used first; degenerates to listing order with no usage "
+                                 "history, which is the case every fixture here runs in",
+                   "announced_on": "--debug logs a warning; /doctor estimates the listing cost. "
+                                   "Neither is read by this probe."},
+               "finding": "REPLICATION of documented behaviour: the skill listing degrades rather "
+                          "than truncates. Every skill NAME "
                           "reaches the prompt; past a size limit the entry stops carrying its "
                           "description, so the listing changes from '- name: description' to "
                           "'- name' partway down with nothing marking the transition. Six fixtures "
@@ -287,7 +323,16 @@ def main() -> int:
                                     "omitted occur in unrelated prompt text and their counts "
                                     "differ between cut and uncut arms, so they are reported per "
                                     "arm and never as one constant",
-               "not_settled": ["the exact constant: pinning it needs a boundary-free fixture; the "
+               "not_settled": ["the drop RULE. Uniform-width fixtures with no usage history cannot "
+                               "distinguish a prefix cut from the vendor's stated least-used-first "
+                               "rule, because with no history the two coincide. A mixed-width "
+                               "fixture with a seeded usage history would separate them and is not "
+                               "run here",
+                               "WHERE the listing sits in the request. wire_text() flattens the "
+                               "system parameter and messages into one string, so this probe cannot "
+                               "locate it, and any claim about which block carries it is not "
+                               "supported by anything measured here",
+                               "the exact constant: pinning it needs a boundary-free fixture; the "
                                "measured spread is delivered_range above",
                                "whether a name-only skill can still be invoked usefully; its name "
                                "is present and no skill name appears in the tools array at all, so "
