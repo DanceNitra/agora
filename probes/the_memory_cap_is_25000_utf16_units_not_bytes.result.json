@@ -1,0 +1,104 @@
+{
+  "probe": "the_memory_cap_is_25000_utf16_units_not_bytes.py",
+  "verdicts": {
+    "ARM1_the_multiline_wire_stops_on_a_line_boundary": true,
+    "ARM1_and_a_raw_cut_would_have_had_room_to_continue": true,
+    "ARM1_alone_only_brackets_the_cap": true,
+    "ARM2_both_widths_cut_at_the_same_unit": true,
+    "ARM2_that_unit_is_exactly_25000": true,
+    "CONTROL_at_least_one_run_cuts_INSIDE_a_marker": true,
+    "CONTROL_the_two_fixtures_have_different_geometry": true,
+    "CONTROL_both_fixtures_exceeded_the_cap": true,
+    "CONTROL_the_two_headers_really_differ_in_length": true,
+    "CONTROL_a_shorter_header_carries_the_SAME_content": true,
+    "CONTROL_ARM_A_under_both_caps_is_NOT_truncated": true,
+    "CONTROL_ARM_A_proves_the_notice_can_be_absent_meaningfully": true,
+    "CONTROL_ARM_B_really_is_over_25000_BYTES": true,
+    "CONTROL_ARM_B_really_is_under_25000_UNITS": true,
+    "ARM_B_over_25000_bytes_is_NOT_truncated": true,
+    "ARM_C_cuts_at_25000_CHARACTERS": true,
+    "ARM_C_does_NOT_cut_at_25000_bytes": true,
+    "so_the_cap_is_counted_in_UTF16_units_not_bytes": true,
+    "the_notice_size_matches_UNITS_over_1024": true,
+    "the_notice_size_does_NOT_match_the_file_on_disk": true,
+    "the_stated_limit_is_25000_over_1024": true
+  },
+  "cap_units": 25000,
+  "unit": "UTF-16 code units",
+  "slice_arm": [
+    {
+      "marker_width": 4,
+      "units_on_wire": 25000,
+      "whole_markers": 6250,
+      "leftover_chars": 0
+    },
+    {
+      "marker_width": 7,
+      "units_on_wire": 25000,
+      "whole_markers": 3571,
+      "leftover_chars": 3
+    }
+  ],
+  "unit_arms": {
+    "A": {
+      "fixture_chars": 20000,
+      "fixture_bytes": 20000,
+      "chars_on_wire": 20000,
+      "bytes_on_wire": 20000,
+      "truncated": false,
+      "notice": false,
+      "notice_size_kb": null,
+      "notice_limit_kb": null
+    },
+    "B": {
+      "fixture_chars": 10500,
+      "fixture_bytes": 31500,
+      "chars_on_wire": 10500,
+      "bytes_on_wire": 31500,
+      "truncated": false,
+      "notice": false,
+      "notice_size_kb": null,
+      "notice_limit_kb": null
+    },
+    "C": {
+      "fixture_chars": 35000,
+      "fixture_bytes": 105000,
+      "chars_on_wire": 25000,
+      "bytes_on_wire": 75000,
+      "truncated": true,
+      "notice": true,
+      "notice_size_kb": 34.2,
+      "notice_limit_kb": 24.4
+    }
+  },
+  "multiline_arm": {
+    "last_kept_line": 124,
+    "units": 24922,
+    "partial_next_line_on_wire": false,
+    "bracket_from_this_arm_alone": [
+      24922,
+      25125
+    ]
+  },
+  "header_control": {
+    "long": 246,
+    "short": 240,
+    "content_units": 25000
+  },
+  "display_defect": {
+    "notice_kb": 34.2,
+    "units_kb": 34.18,
+    "real_kb_on_disk": 102.5,
+    "factor": 3.0,
+    "what": "size and limit are both UTF-16 unit counts divided by 1024 and printed as KB; invisible on ASCII, 3x off on CJK, in both numbers at once"
+  },
+  "truncation": "whole-line while a line boundary is available; a raw 25,000-unit cut when line 1 alone exceeds the budget",
+  "not_settled": [
+    "whether the trigger threshold equals the cut length",
+    "any platform but win32; builds 2.1.245.1ab and 2.1.246",
+    "the 200-line cap, which binds first on ordinary indexes"
+  ],
+  "instrument_credit": "wire-capture method from @pjt222, anthropics/claude-code#82056 comment 5412833938",
+  "corrects": "an earlier version claimed truncation is NOT whole-line, citing the single-line arm. Arm 1, our own capture from the day before, shows the whole-line path directly. The single-line cut is the fallback.",
+  "platform": "win32"
+}
