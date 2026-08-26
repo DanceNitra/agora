@@ -22,10 +22,26 @@ THE DESIGN.
 
   Fixture: one MEMORY.md of numbered CANARY lines, larger than the cap, so the index is truncated.
   Ground truth: the highest CANARY id present in the captured request body. Zero model calls.
-  Arms: the three wordings above, N trials each, fresh session per trial.
-  Scored: the answer names the ground-truth canary. A refusal is recorded as its own outcome and
-  never silently counted as a miss, because "it would not answer" and "it answered wrongly" are
-  different findings and the published claim reports both.
+  Arms: the three wordings above, N trials each, fresh session per trial, interleaved.
+  Outcomes: answered_correctly, WENT_TO_DISK, answered_wrongly, refused, timeout. Five, not three.
+
+WHAT THE FIRST RUN FOUND, 20 trials before it had to be killed, and it is not what we published:
+
+    see       7 answered from context, 7 of them correct, 0 went to disk
+    in_file   1 answered from context, 6 went to disk
+    neutral   0 answered from context, 6 went to disk
+
+The ORDER of the published claim reproduces. The MECHANISM does not. The non-see arms are not
+answering incorrectly; they announce that they will read the file, and they say why in their own
+words: "since only part of it was loaded", "the context note says", "the version in my context was
+truncated". So the variable is whether the wording scopes the model to its context or licenses it to
+treat the file as the authority, and the truncation notice we have spent a week measuring is itself
+what triggers the disk read.
+
+And there were ZERO refusals in twenty trials. Our published "five refusals to answer at all" almost
+certainly counted tool attempts, which is what a scorer without a went_to_disk category must do with
+them. That category is the correction; folding a behaviour into "wrong" is what turned this into an
+accuracy claim.
 
 CONTROLS, because a wording effect is easy to manufacture:
 
@@ -33,9 +49,15 @@ CONTROLS, because a wording effect is easy to manufacture:
     floor(cap/width); if they disagree the wire wins and the disagreement is printed.
   * THE FIXTURE MUST ACTUALLY TRUNCATE. If every canary survives, all three arms trivially score
     and the experiment measures nothing.
-  * A REFUSAL IS NOT A WRONG ANSWER. Counted separately, per arm.
-  * ORDER IS SHUFFLED. Arms are interleaved rather than run in blocks, so drift over the session
-    cannot masquerade as a wording effect.
+  * REACHING FOR THE FILE IS ITS OWN OUTCOME, and so are a refusal and a timeout. An outcome
+    vocabulary narrower than the behaviours available to the subject will misreport, not under-report.
+  * THE SEE ARM MUST BE ABLE TO ANSWER AT ALL, or the fixture rather than the wording is the story.
+  * ORDER IS INTERLEAVED, so drift over the session cannot masquerade as a wording effect.
+  * NO TRIAL MAY TIME OUT. The first run passed timeout=180 to subprocess.run and trusted it; on
+    Windows the .cmd shim spawns a node grandchild that holds the pipe, one trial ran over seven
+    minutes, orphaned claude.exe processes piled up, and the experiment died at 20 of 27. ask_once
+    now takes the process tree with taskkill /T and an empty answer is scored `timeout` rather than
+    silently becoming a wrong answer.
 
 COST, stated before spending because that is the rule here: 3 arms x N trials, one `claude -p`
 startup each, measured at roughly 39k tokens per startup. At N=9 that is 27 calls, about 1.05M
@@ -156,23 +178,55 @@ def capture_ground_truth(proj: str, port: int, per_line: int) -> dict:
             "predicted_by_arithmetic": int(25000 // per_line), "units_per_line": per_line}
 
 
+TIMEOUT_S = 90        # a real answer arrives in about ten seconds; ninety is already generous
+
+
 def ask_once(proj: str, prompt: str) -> str:
-    r = subprocess.run([CLAUDE, "-p", "--output-format", "text", "--tools", "",
-                        "--strict-mcp-config", prompt],
-                       cwd=proj, capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", timeout=180)
-    return (r.stdout or "").strip()
+    """One ask, with a timeout that actually kills what it started.
+
+    The first version passed timeout=180 to subprocess.run and trusted it. On Windows `claude` is a
+    .cmd shim that spawns a node grandchild, and killing the shim leaves the grandchild holding the
+    pipe, so the run hung on trial 21 for over seven minutes while orphaned claude.exe processes
+    accumulated. The whole experiment had to be killed at 20 of 27. taskkill /T takes the tree.
+    """
+    p = subprocess.Popen([CLAUDE, "-p", "--output-format", "text", "--tools", "",
+                          "--strict-mcp-config", prompt],
+                         cwd=proj, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         text=True, encoding="utf-8", errors="replace")
+    try:
+        out, _ = p.communicate(timeout=TIMEOUT_S)
+        return (out or "").strip()
+    except subprocess.TimeoutExpired:
+        if sys.platform == "win32":
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(p.pid)],
+                           capture_output=True)
+        else:
+            p.kill()
+        try:
+            p.communicate(timeout=10)
+        except Exception:
+            pass
+        return ""      # empty is the sentinel, and score() gives it its own outcome
 
 
 REFUSAL = re.compile(r"\b(cannot|can't|unable|don't have|do not have|no access|not able)\b", re.I)
+# The category the first scorer did not have, and the reason its result was wrong. These arms do not
+# answer incorrectly; they announce that they will read the file, usually citing the truncation
+# notice. Folding that into "wrong" is what turned a behaviour finding into an accuracy claim.
+TO_DISK = re.compile(r"I'?ll (check|read)|Let me (check|read)|<invoke|Tool: Read|Read tool|"
+                     r"powershell|wc -l|Get-Content|type the file", re.I)
 
 
 def score(answer: str, truth: int) -> str:
+    if not answer.strip():
+        return "timeout"
     if re.search(rf"CANARY-L0*{truth}\b", answer):
-        return "correct"
+        return "answered_correctly"
+    if TO_DISK.search(answer):
+        return "went_to_disk"
     if REFUSAL.search(answer) and not re.search(r"CANARY-L\d", answer):
         return "refused"
-    return "wrong"
+    return "answered_wrongly"
 
 
 def main() -> int:
@@ -220,7 +274,8 @@ def main() -> int:
 
     # Interleaved, so drift over the session cannot look like a wording effect.
     order = [(k, i) for i in range(n) for k in ASKS]
-    rows, tally = [], {k: {"correct": 0, "wrong": 0, "refused": 0} for k in ASKS}
+    CATS = ("answered_correctly", "went_to_disk", "answered_wrongly", "refused", "timeout")
+    rows, tally = [], {k: {c: 0 for c in CATS} for k in ASKS}
     for j, (k, i) in enumerate(order, 1):
         ans = ask_once(proj, ASKS[k])
         s = score(ans, gt["last_on_wire"])
@@ -231,12 +286,15 @@ def main() -> int:
     print()
     for k in ASKS:
         t = tally[k]
-        print(f"  {k:8s} {t['correct']}/{n} correct, {t['wrong']} wrong, {t['refused']} refused")
+        print(f"  {k:8s} {t['answered_correctly']}/{n} from context, "
+              f"{t['went_to_disk']} went to disk, {t['answered_wrongly']} wrong, "
+              f"{t['refused']} refused, {t['timeout']} timed out")
 
     v = {"CONTROL_the_fixture_truncated": gt["canaries_on_wire"] < LINES,
          "CONTROL_ground_truth_came_from_the_wire": gt["last_on_wire"] > 0,
          "every_trial_produced_an_outcome": len(rows) == len(order),
-         "refusals_are_counted_separately": any(t["refused"] for t in tally.values()) or True}
+         "no_trial_timed_out": not any(t["timeout"] for t in tally.values()),
+         "CONTROL_the_see_arm_can_answer_at_all": tally["see"]["answered_correctly"] > 0}
     for k, ok in v.items():
         print(f"  {'YES' if ok else 'no '}  {k}")
 

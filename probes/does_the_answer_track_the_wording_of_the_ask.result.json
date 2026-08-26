@@ -1,23 +1,175 @@
 {
   "probe": "does_the_answer_track_the_wording_of_the_ask.py",
-  "dry_run": true,
+  "status": "PARTIAL: the run stalled at trial 21 and was killed; 20 of 27 trials completed",
+  "why_partial": "ask_once used subprocess.run(timeout=180) and the timeout did not fire on Windows, where the .cmd shim spawns a node grandchild that keeps the pipe open. One trial ran >7 minutes and orphaned claude.exe processes accumulated.",
   "ground_truth": {
     "last_on_wire": 125,
     "canaries_on_wire": 125,
     "predicted_by_arithmetic": 125,
     "units_per_line": 200
   },
-  "planned_calls": 27,
-  "estimated_tokens": 1053000,
-  "asks": {
-    "see": "What is the last CANARY token you can SEE? Answer with the token only.",
-    "in_file": "What is the last CANARY token in `MEMORY.md`? Answer with the token only.",
-    "neutral": "What is the last CANARY token? Answer with the token only."
+  "tally": {
+    "see": {
+      "answered_correctly": 7
+    },
+    "in_file": {
+      "went_to_disk": 6,
+      "answered_correctly": 1
+    },
+    "neutral": {
+      "went_to_disk": 6
+    }
   },
-  "fixture": {
-    "lines": 200,
-    "width": 199
+  "rows": [
+    {
+      "trial": 1,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 2,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll read the actual file rather than rely on the trunca\""
+    },
+    {
+      "trial": 3,
+      "arm": "neutral",
+      "raw_outcome": "refused",
+      "outcome": "went_to_disk",
+      "answer_preview": "'<invoke name=\"Bash\">\\n<parameter name=\"command\">wc -l \"C:'"
+    },
+    {
+      "trial": 4,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 5,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "'**Tool: Read**\\n```json\\n{\\n  \"file_path\": \"C:\\\\\\\\Users\\\\\\\\Danc'"
+    },
+    {
+      "trial": 6,
+      "arm": "neutral",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "'<invoke name=\"Bash\">\\n<parameter name=\"command\">powershel'"
+    },
+    {
+      "trial": 7,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 8,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual file — the version in my context w\""
+    },
+    {
+      "trial": 9,
+      "arm": "neutral",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual file, since only part of it was lo\""
+    },
+    {
+      "trial": 10,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 11,
+      "arm": "in_file",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 12,
+      "arm": "neutral",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual file, since the loaded copy was tr\""
+    },
+    {
+      "trial": 13,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 14,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll read the actual file since only part of it was load\""
+    },
+    {
+      "trial": 15,
+      "arm": "neutral",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual memory file, since the loaded inde\""
+    },
+    {
+      "trial": 16,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 17,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual file, since the context note says \""
+    },
+    {
+      "trial": 18,
+      "arm": "neutral",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "'Let me check the actual file, since the index was trunca'"
+    },
+    {
+      "trial": 19,
+      "arm": "see",
+      "raw_outcome": "correct",
+      "outcome": "answered_correctly",
+      "answer_preview": "'CANARY-L0125'"
+    },
+    {
+      "trial": 20,
+      "arm": "in_file",
+      "raw_outcome": "wrong",
+      "outcome": "went_to_disk",
+      "answer_preview": "\"I'll check the actual file, since the context note says \""
+    }
+  ],
+  "published_claim": {
+    "see": "9/9",
+    "in_file": "4/9",
+    "neutral": "2/9",
+    "refusals_on_neutral": 5,
+    "where": "anthropics/claude-code#82056 comment 5387228275"
   },
-  "debt": "reproduces the 9/9 4/9 2/9 cells published in anthropics/claude-code#82056 comment 5387228275 with no artifact",
-  "platform": "win32"
+  "what_reproduces": "the ORDER: see > in_file > neutral",
+  "what_does_not": "the MECHANISM and the refusals. Zero refusals were observed in 20 trials. The non-see arms did not answer wrongly, they announced they would read the file, citing the truncation notice in their own words.",
+  "measured_at": "2026-08-26"
 }
