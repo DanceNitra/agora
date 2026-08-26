@@ -1,6 +1,6 @@
 {
   "probe": "does_the_ledger_match_the_history.py",
-  "repo": "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/d58cd2cd-56c1-4dbb-973e-94c1b0a34285/scratchpad/lh-patched",
+  "repo": "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/d58cd2cd-56c1-4dbb-973e-94c1b0a34285/scratchpad/lh",
   "controls": {
     "NEGATIVE_CONTROL_an_invented_hash_fails_L1": true,
     "POSITIVE_CONTROL_some_real_entry_passes_L1": true,
@@ -9,7 +9,7 @@
     "CONTROL_the_history_is_deeper_than_the_ledger": true
   },
   "ledger_entries": 4,
-  "hashes_recorded": 5,
+  "hashes_recorded": 4,
   "history": {
     "longhun-shared-audit-dataset-v1.0.jsonl": [
       {
@@ -46,8 +46,27 @@
       }
     ]
   },
-  "findings": [],
+  "findings": [
+    {
+      "rule": "L4",
+      "line": 2,
+      "version": "v1.1-r1",
+      "detail": "labelled v1.1-r1, but the state it names was produced by 6aa23b9f whose own message reads: fix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)"
+    },
+    {
+      "rule": "L5",
+      "line": 3,
+      "version": "v1.1-r2",
+      "detail": "entry v1.1-r2 (curate) names longhun-shared-audit-dataset-v1.1-negative.jsonl and records no hash, so nothing about it can be verified"
+    },
+    {
+      "rule": "L3",
+      "line": null,
+      "version": null,
+      "detail": "fb267b62 changed longhun-shared-audit-dataset-v1.1-negative.jsonl to b78c9509b708... and no ledger entry records that state (feat(shared-audit): add v1.1-negative dataset (19 real rejec)"
+    }
+  ],
   "question_credit": "@qingkong66, deepseek-ai/DeepSeek-V3#1591 comment 5426973801: 'CI can pin the files, but it cannot catch whether the ledger description matches the actual revisions.'",
   "gap": "integrity/calibration_dataset_check.py runs C01-C10 and none of them opens CHANGELOG.jsonl or reads git history",
-  "exit_code": "non-zero when any control fails OR any finding is raised"
+  "exit_code": "non-zero when any control fails OR any NON-HEURISTIC finding is raised; L4 reads a commit message and is reported without deciding"
 }
