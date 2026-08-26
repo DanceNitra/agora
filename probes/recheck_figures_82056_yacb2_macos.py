@@ -1,4 +1,4 @@
-"""Gate the reply to @yacb2: recompute every figure, and fetch every attributed claim live.
+"""RECHECK THE FIGURES in reply to @yacb2: recompute every figure, and fetch every attributed claim live.
 
 The rule this enforces is the one that keeps catching us: a gate that reads the DRAFT and checks the
 draft says what the draft says has measured nothing. Every number below is recomputed from a probe
@@ -8,6 +8,13 @@ to a local constant.
 
 Run:  python -X utf8 probes/gate_82056_yacb2_macos.py
       python -X utf8 probes/gate_82056_yacb2_macos.py --mutate
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 

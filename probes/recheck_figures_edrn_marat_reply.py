@@ -11,6 +11,13 @@ near-zero end is the symmetry-carrying state, not what a solver returns. We had 
 2026-08-18 and corrected the same class of error twice on 2026-08-22 (commits bc4f5fe, 7106658).
 
 CONTROL. `--self-test` requires each assertion to fail when the thing it checks is broken.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 import argparse
 import json

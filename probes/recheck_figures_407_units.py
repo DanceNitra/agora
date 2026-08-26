@@ -1,4 +1,4 @@
-"""Gate the reply to @pjt222 on pjt222/agent-almanac#407.
+"""RECHECK THE FIGURES in reply to @pjt222 on pjt222/agent-almanac#407.
 
 Same design as the #82056 gate, for the same reasons: nothing asserts that the draft SAYS
 something -- every check reads a value OUT of the draft and compares it against a source
@@ -8,6 +8,13 @@ number in the draft be consumed by a check or named as a reference.
 The extra risk here is that the draft quotes ANOTHER PERSON'S issue and code back at him.
 Those quotations are checked against the live issue body with whitespace normalised, and a
 paraphrase that drifts is a failure, not a rounding.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import hashlib, json, os, re, shutil, subprocess, sys

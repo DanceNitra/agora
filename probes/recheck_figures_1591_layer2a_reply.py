@@ -19,6 +19,13 @@ Each assertion below binds ONE claim in the draft to the dataset, and each one c
 CONTROL. `--self-test` mutates the dataset and requires each assertion to fail on its own row. An
 assertion that cannot fail is not validating anything, which is the thesis of the thread this reply
 belongs to.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 import argparse
 import hashlib

@@ -1,8 +1,15 @@
-"""Gate the CRLF correction on pjt222/agent-almanac#407.
+"""RECHECK THE FIGURES in CRLF correction on pjt222/agent-almanac#407.
 
 Every figure is read OUT of the draft and compared against the raw file, and the sentence
 being retracted is compared against the comment as GitHub actually serves it -- a
 correction that misquotes what it corrects is worse than the original error.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import re, subprocess, sys, os

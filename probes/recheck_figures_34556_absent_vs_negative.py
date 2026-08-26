@@ -1,4 +1,4 @@
-"""Gate the follow-up about an absent key reading as a negative answer.
+"""RECHECK THE FIGURES in follow-up about an absent key reading as a negative answer.
 
 Every claim here is about a THIRD PARTY's API, so every one is re-fetched live rather than quoted
 from the session that produced it. The message's whole point is that a wrong endpoint gives a
@@ -6,6 +6,13 @@ confident wrong answer -- publishing it on an unverified reading of a different 
 the joke landing on us for the second time in one thread.
 
 Run:  python probes/gate_34556_absent_vs_negative.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json

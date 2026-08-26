@@ -1,4 +1,4 @@
-"""Gate the reply to @bobnolley on anthropics/claude-code#81710.
+"""RECHECK THE FIGURES in reply to @bobnolley on anthropics/claude-code#81710.
 
 Almost nothing in this draft is our own measurement -- it is other people's changelog
 entries, issue states, docs sentences and man pages. That inverts the usual risk: the
@@ -8,6 +8,13 @@ the issue author (or we) believed it to be.
 
 Coverage plus mutation control, as always. A number nobody checked is the one that will
 be wrong.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json

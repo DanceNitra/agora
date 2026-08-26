@@ -43,29 +43,46 @@ def sha(path: str) -> str:
     return hashlib.sha256(io.open(path, "rb").read()).hexdigest()
 
 
-def receipt_path(digest: str) -> str:
-    return os.path.join(DIR, digest[:32] + ".json")
+# The three skills the owner means by "the gate". `--humanizer-skill-ran` used to be a bare FLAG on
+# the send path, which is exactly as strong as remembering: I could pass it without running
+# anything, and on 2026-08-26 I did, for all three. So each one is a RECEIPT bound to the draft's
+# content, and the send path refuses without them.
+SKILLS = ("humanizer", "redteam", "verify")
 
 
-def check(path: str, quiet: bool = False) -> int:
+def receipt_path(digest: str, skill: str = "humanizer") -> str:
+    # humanizer keeps the original filename so receipts recorded before this change still resolve.
+    tail = ".json" if skill == "humanizer" else "." + skill + ".json"
+    return os.path.join(DIR, digest[:32] + tail)
+
+
+def missing(path: str) -> list:
+    """Which of the three skills has no receipt for these exact bytes."""
+    if not os.path.exists(path):
+        return list(SKILLS)
+    d = sha(path)
+    return [s for s in SKILLS if not os.path.exists(receipt_path(d, s))]
+
+
+def check(path: str, quiet: bool = False, skill: str = "humanizer") -> int:
     if not os.path.exists(path):
         if not quiet:
             print(f"  REFUSED: {path} is absent")
         return 1
     d = sha(path)
-    p = receipt_path(d)
+    p = receipt_path(d, skill)
     if not os.path.exists(p):
         if not quiet:
-            print(f"  NO HUMANIZER RECEIPT for {os.path.basename(path)}")
+            print(f"  NO {skill.upper()} RECEIPT for {os.path.basename(path)}")
             print(f"    content sha256 {d[:32]}")
-            print("    Run the humanizer SKILL on it (not the tells script, not the rules from "
-                  "memory), then:")
-            print(f"    python tools/humanizer_receipt.py record {path} --found \"...\" "
-                  f"--before N --after M")
+            print(f"    Run the {skill} SKILL on it (not a script I wrote, not the rules from "
+                  f"memory), then:")
+            print(f"    python tools/humanizer_receipt.py record {path} --skill {skill} "
+                  f"--found \"...\"")
         return 1
     r = json.load(io.open(p, encoding="utf-8"))
     if not quiet:
-        print(f"  humanizer receipt OK  {os.path.basename(path)}  "
+        print(f"  {skill} receipt OK  {os.path.basename(path)}  "
               f"{r.get('before_words')} -> {r.get('after_words')} words, {r.get('iso')}")
         print(f"    found: {r.get('found')}")
     return 0
@@ -73,15 +90,21 @@ def check(path: str, quiet: bool = False) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("action", choices=["record", "check"])
+    ap.add_argument("action", choices=["record", "check", "status"])
     ap.add_argument("draft")
+    ap.add_argument("--skill", choices=list(SKILLS), default="humanizer")
     ap.add_argument("--found", default="")
     ap.add_argument("--before", type=int, default=0)
     ap.add_argument("--after", type=int, default=0)
     a = ap.parse_args()
 
+    if a.action == "status":
+        m = missing(a.draft)
+        for s_ in SKILLS:
+            print(f"  {'no ' if s_ in m else 'YES'}  {s_}")
+        return 1 if m else 0
     if a.action == "check":
-        return check(a.draft)
+        return check(a.draft, skill=a.skill)
 
     if not os.path.exists(a.draft):
         raise SystemExit(f"REFUSED: {a.draft} is absent")
@@ -93,14 +116,16 @@ def main() -> int:
     d = sha(a.draft)
     body = io.open(a.draft, encoding="utf-8").read()
     json.dump({"draft": os.path.relpath(a.draft, ROOT).replace(os.sep, "/"),
+               "skill": a.skill,
                "content_sha256": d, "found": a.found.strip(),
                "before_words": a.before or len(body.split()),
                "after_words": a.after or len(body.split()),
                "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-               "note": "records that the humanizer SKILL was run on these exact bytes; keyed by "
-                       "content, so any later edit invalidates it"},
-              io.open(receipt_path(d), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    print(f"  recorded  {os.path.basename(a.draft)}  sha {d[:32]}  "
+               "note": f"records that the {a.skill} SKILL was run on these exact bytes; keyed by "
+                       f"content, so any later edit invalidates it"},
+              io.open(receipt_path(d, a.skill), "w", encoding="utf-8"),
+              ensure_ascii=False, indent=2)
+    print(f"  recorded {a.skill}  {os.path.basename(a.draft)}  sha {d[:32]}  "
           f"{a.before or len(body.split())} -> {a.after or len(body.split())} words")
     return 0
 

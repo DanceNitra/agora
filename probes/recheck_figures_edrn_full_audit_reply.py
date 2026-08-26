@@ -1,10 +1,17 @@
-"""Gate the full-audit letter to Guanghao Li.
+"""RECHECK THE FIGURES in full-audit letter to Guanghao Li.
 
 This letter tells a co-author that one subsection of a paper published three hours ago does not
 reproduce. Every figure in it therefore comes from a receipt written this cycle, and the counts are
 recomputed from the receipts rather than copied from the prose that reported them.
 
 Run:  python probes/gate_edrn_full_audit_reply.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json

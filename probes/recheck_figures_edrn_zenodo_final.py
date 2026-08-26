@@ -1,4 +1,4 @@
-"""Gate the pre-Zenodo letter to Guanghao Li.
+"""RECHECK THE FIGURES in pre-Zenodo letter to Guanghao Li.
 
 This letter corrects a number WE published, so the bar is the one that caught the error in the
 first place: every figure is compared against an artifact re-run this cycle, never against the
@@ -13,6 +13,13 @@ Controls
   M4  the letter must not restate the three unreceipted figures it exists to retract
 
 Run:  python probes/gate_edrn_zenodo_final.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json

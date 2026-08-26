@@ -1,4 +1,4 @@
-"""Gate for the final-sign-off reply on luoxuejian000/edrn-dmrg-verification#2.
+"""RECHECK THE FIGURES for for the final-sign-off reply on luoxuejian000/edrn-dmrg-verification#2.
 
 Every figure re-derived from a receipt in this repo, every quotation checked against the manuscript
 file itself, and the room checked before the send. This reply corrects a number WE published and
@@ -6,6 +6,13 @@ that the manuscript credits to us, so the bar is higher than usual: if we hand a
 correction, the correction must itself be receipted.
 
 Run:  python probes/gate_edrn_final_signoff.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 
 import base64

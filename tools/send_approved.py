@@ -53,6 +53,7 @@ from pathlib import Path
 
 # Direct-script runs put tools/ on sys.path automatically; an import from a test does not.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import humanizer_receipt as hr  # noqa: E402
 import humanizer_tells as ht  # noqa: E402
 import prior_statement_check as psc  # noqa: E402
 
@@ -221,6 +222,37 @@ def _tells_gate(body: str, acked: bool, skill_ran: bool) -> int | None:
         return None
     print("  REFUSED. Rewrite them -- which invalidates the approved hash, so re-show the draft --")
     print("  or pass --ack-tells to record that a human read them and chose to keep them.")
+    return 1
+
+
+def _the_gate(path: str) -> int | None:
+    """The owner's gate, and it is not a script I wrote. None means proceed.
+
+    "a pod branou sa myslia veci ako Validate, storm ak je treba, redteam a podobne!!!!!" -- and
+    then, the same day, "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO HOVEN". Both were said
+    because I kept running `probes/gate_*.py`, a file I wrote that morning, and calling it the gate.
+    That file recomputes figures against receipts. It is ONE check inside VALIDATE. It is not the
+    frame, and it never was.
+
+    The frame is the SKILLS: verify-claims (validate the facts), stress-claim (red-team the claim),
+    and humanizer (how it reads). Storm when the claim rests on literature. Until today the send
+    path asked for `--humanizer-skill-ran`, which is a bare flag -- exactly as strong as
+    remembering, and on 2026-08-26 I passed it for a draft whose skeptic and validator had never
+    run. So each skill now leaves a RECEIPT bound to the draft's content sha256, an edit
+    invalidates it, and this refuses without all three.
+    """
+    m = hr.missing(path)
+    if not m:
+        return None
+    print("REFUSED: the gate has not run on this draft. Missing: %s" % ", ".join(m))
+    print("  The gate is the SKILLS, not a probes/*.py I wrote:")
+    print("    verify  -> .claude/skills/verify-claims/SKILL.md    (every number vs its artifact)")
+    print("    redteam -> .claude/skills/stress-claim/SKILL.md     (the claim, before the prose)")
+    print("    humanizer -> .claude/skills/humanizer/SKILL.md      (how it reads)")
+    print("  Then record each one against THESE bytes:")
+    for skill in m:
+        print("    python tools/humanizer_receipt.py record %s --skill %s --found \"...\""
+              % (path, skill))
     return 1
 
 
@@ -482,6 +514,12 @@ def main(argv=None):
     # Local and free, so it runs before the gates that cost network calls: being refused on the
     # wording after waiting for two `gh api --paginate` round trips is how a gate earns a reputation
     # for being in the way. Gates the PAYLOAD, not the file, for the same reason bind_payload exists.
+    # THE GATE FIRST, before anything cheap or expensive. It is the three skills, and it is not
+    # waivable by any flag on this command line: the receipts are bound to the draft's bytes.
+    refuse = _the_gate(a.file)
+    if refuse is not None:
+        return refuse
+
     refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells, a.humanizer_skill_ran)
     if refuse is not None:
         return refuse

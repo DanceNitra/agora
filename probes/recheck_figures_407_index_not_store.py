@@ -1,4 +1,4 @@
-"""Gate the #407 reply: recount our own store live, and fetch every attributed figure from the thread.
+"""RECHECK THE FIGURES in #407 reply: recount our own store live, and fetch every attributed figure from the thread.
 
 Nothing here checks that the draft says what the draft says. The store numbers are recounted from
 the actual files at gate time, and every figure attributed to @JhouCode or @pjt222 is read out of
@@ -8,6 +8,13 @@ level misleads.
 The caveat is gated too. Our index is clean partly because our own writing rules ban emoji, which
 makes it a weak sample rather than an independent one. A draft that presents it as independent
 evidence must fail, so there is a check for the caveat's presence and a mutation that removes it.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 

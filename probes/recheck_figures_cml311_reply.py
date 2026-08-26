@@ -1,4 +1,4 @@
-"""Gate the CML#311 reply to @Stratogain.
+"""RECHECK THE FIGURES in CML#311 reply to @Stratogain.
 
 Every figure in the draft is bound here to a receipt produced this cycle, not to prose:
 
@@ -15,6 +15,13 @@ checked against a corrupted variant of the draft, and the gate must go red on ev
 that passes on both the true and the false text is measuring nothing.
 
 Run:  python probes/gate_cml311_reply.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json

@@ -1,4 +1,4 @@
-"""Gate the #82056 comment: every figure re-read from its receipt, every quotation from its source.
+"""RECHECK THE FIGURES in #82056 comment: every figure re-read from its receipt, every quotation from its source.
 
 The comment does four things and each fails differently, so the checks are grouped that way.
 
@@ -27,6 +27,13 @@ THE ROOM MOVED WHILE THIS WAS BEING MEASURED. @yacb2 ran the same arm on darwin 
 same conclusion 34 minutes before the draft existed, with a control this box did not have. The
 checks below require the draft to credit him FIRST and to frame ours as a second route; two
 mutations put the priority claim back.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 
@@ -216,14 +223,24 @@ def check(draft: str, w: dict, cd: dict, un: dict, bl: dict, cs: list, readme: s
     v["the_cjk_ratio_is_recomputed"] = (
         abs(cjk["bytes"] / cjk["utf16_units"] - 2.44) < 0.01 and "2.44x" in draft)
     v["the_emoji_figures_are_the_receipts"] = (
-        f"{emo['bytes']:,}" in draft and f"{emo['utf16_units']:,}" in draft
-        and emo["last_line_loaded"] == 115 and "line 115" in draft)
-    # The emoji case does NOT run the other way on bytes; both overcount. What differs is that
-    # emoji move the CUT. An earlier draft said "run the other way" and that was wrong.
-    v["the_emoji_claim_is_about_the_CUT_not_the_direction"] = (
-        emo["bytes"] > emo["utf16_units"]
-        and "moves the cut rather than only the label" in draft
-        and "run the other way" not in draft)
+        f"{emo['bytes']:,}" in draft and f"{emo['utf16_units']:,}" in draft)
+    # WE RETRACTED THAT CELL IN THIS THREAD. `emoji 200x125 -> 115` is floor(25000/u), which the
+    # model can read back off the cap stated in its own prompt, so it never measured where the cut
+    # fell. Comment 5411236356, 25 August. The draft carried it again anyway and the prior-statement
+    # gate caught it on the send. Three checks, because the first two alone would pass a draft that
+    # simply never mentioned emoji at all.
+    ours = by("DanceNitra")
+    v["OUR_OWN_RETRACTION_IS_REAL"] = (
+        "`emoji 200x125 -> 115`" in ours and "**Retracted.**" in ours)
+    v["THE_RETRACTED_CELL_IS_NOT_REPUBLISHED"] = (
+        "line 115" not in draft and "cut at line 115" not in draft)
+    v["and_the_draft_says_so_rather_than_going_quiet"] = (
+        "I have no measured cut position for that arm" in draft
+        and "I retracted it here on the 25th" in draft)
+    # The emoji case does NOT run the other way on bytes; both overcount. An earlier draft said
+    # "run the other way" and that was wrong.
+    v["the_emoji_direction_claim_is_gone"] = (
+        emo["bytes"] > emo["utf16_units"] and "run the other way" not in draft)
     v["his_README_really_says_25KB"] = "200 lines / 25KB" in readme
     v["and_he_said_it_again_in_the_thread_today"] = "200 lines / 25KB" in by("tonydzi")
     v["we_do_not_present_the_unit_point_as_new"] = "not news" in draft
@@ -321,8 +338,11 @@ def main() -> int:
                  "A conclusion nobody else has reached"),
                 ("cd slug", "cdstore-jntsww91-plain-sub-deeper", "cdstore-jntsww91-plain-sub"),
                 ("cjk ratio", "2.44x", "3.44x"),
-                ("emoji direction", "moves the cut rather than only the label",
-                 "runs the other way"),
+                ("republish the retracted cell", "on the same geometry",
+                 "and cut at line 115"),
+                ("go quiet about the retraction",
+                 "I have no measured cut position for that arm",
+                 "The cut position for that arm"),
                 ("claim the unit point as new", "not news", "a new finding"),
                 ("drop the disclosure", "Written with AI assistance", "Written by hand"),
                 ("em dash", "Correcting my own numbers first.",

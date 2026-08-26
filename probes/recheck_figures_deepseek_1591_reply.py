@@ -1,4 +1,4 @@
-"""Gate for the reply on deepseek-ai/DeepSeek-V3#1591.
+"""RECHECK THE FIGURES for for the reply on deepseek-ai/DeepSeek-V3#1591.
 
 Every figure re-derived from the dataset itself, every claim about his rules checked against the
 issue text fetched live, the receipt link verified to resolve, and the room checked.
@@ -11,6 +11,13 @@ gate asserts that both corrections are visible in the outgoing text, not merely 
 up.
 
 Run:  python probes/gate_deepseek_1591_reply.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 
 import json

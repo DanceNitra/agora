@@ -1,4 +1,4 @@
-"""Gate the #1591 ledger-history reply: every claim recomputed against a fresh clone, live.
+"""RECHECK THE FIGURES in #1591 ledger-history reply: every claim recomputed against a fresh clone, live.
 
 WHAT CAN GO WRONG HERE, in the order it has gone wrong before in this thread:
 
@@ -23,6 +23,13 @@ WHAT CAN GO WRONG HERE, in the order it has gone wrong before in this thread:
 House rules for this thread specifically, both set by the owner: sign as DanceNitra only, no
 personal name, and NO "written with AI assistance" line, which belongs in other threads but not
 this one.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 

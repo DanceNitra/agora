@@ -1,4 +1,4 @@
-"""Gate for the reply to anthropics/claude-code#82056. Refuses to pass unless every number in the
+"""RECHECK THE FIGURES for for the reply to anthropics/claude-code#82056. Refuses to pass unless every number in the
 draft is re-derived HERE, this cycle, and every citation is checked against its PRIMARY source.
 
 Standing rule: nothing goes outward until VALIDATE -> AUDIT -> VERIFY has passed to 100%. A number in
@@ -16,6 +16,13 @@ contradicts our own previous comment in the same thread, is still a defect. That
 before -- 18/18 verified, posted into an issue closed 4h38m earlier.
 
 Run:  python probes/gate_82056_reply_numbers.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 
 import json

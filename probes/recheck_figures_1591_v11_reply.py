@@ -1,9 +1,16 @@
-"""Gate the v1.1-negative reply on deepseek-ai/DeepSeek-V3#1591.
+"""RECHECK THE FIGURES in v1.1-negative reply on deepseek-ai/DeepSeek-V3#1591.
 
 Every figure is read OUT of the draft and compared against the audit artifact or the live
 data files, never against the draft's own assertion. Claims about other people's records
 are checked against the published dataset. Coverage requires every number be consumed by
 a check; the mutation control requires the gate to fail on single-value corruptions.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import hashlib

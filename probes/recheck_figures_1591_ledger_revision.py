@@ -1,4 +1,4 @@
-"""Gate the #1591 ledger reply. Every figure recomputed live; every quotation fetched from its source.
+"""RECHECK THE FIGURES in #1591 ledger reply. Every figure recomputed live; every quotation fetched from its source.
 
 This replaces a gate that guarded a DIFFERENT claim and passed it 28/29 while it was false. That
 draft said the thread's file hashes had gone stale and nobody had posted current ones. The red team
@@ -10,6 +10,13 @@ author's announcement and never opened the repository. The other tested two file
 the sentence it guarded spoke of "a current hash" in general, so the check was narrower than the
 claim. Both failure modes are written against below: the killed headline must stay dead, and the
 citations are fetched from RFC and spec text rather than from a summary.
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 

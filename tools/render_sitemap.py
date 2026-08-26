@@ -61,6 +61,12 @@ def build():
               "aiaudit", "langgraph-gdpr-erasure"):
         if (ROOT / "public" / d / "index.html").exists():
             urls.append((f"{SITE}/public/{d}/", None))
+    # deep-dive-hot-hand used to be special-cased here, because the site linked and served it while
+    # posts.json did not list it. It is in the manifest as of 2026-08-26, so the special case is gone
+    # -- and leaving it in emitted the page TWICE, which is how this was noticed. A hardcoded patch
+    # for a missing manifest entry becomes a duplicate the moment the entry arrives, and nothing
+    # about the patch says so. tools/render_writing_index.py now fails when a page has no entry,
+    # which is the check that makes patches like this unnecessary.
     try:
         posts = json.loads((ROOT / "public" / "posts" / "posts.json").read_text(encoding="utf-8"))
     except Exception:
@@ -86,6 +92,20 @@ def build():
             cand = sk_root / (rel if rel.endswith(".html") else rel + "index.html")
             if cand.exists():
                 urls.append((f"{SITE}/sk/{rel}", lastmod))
+
+    # A duplicate <loc> is a generator defect wearing a harmless costume: crawlers dedupe it, so it
+    # never shows as breakage, and it means two code paths both claim the same page. Keep the first
+    # occurrence that carries a lastmod, else the first.
+    _seen, _uniq = {}, []
+    for loc, lastmod in urls:
+        if loc in _seen:
+            i = _seen[loc]
+            if lastmod and not _uniq[i][1]:
+                _uniq[i] = (loc, lastmod)
+            continue
+        _seen[loc] = len(_uniq)
+        _uniq.append((loc, lastmod))
+    urls = _uniq
 
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

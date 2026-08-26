@@ -1,4 +1,4 @@
-"""Gate the reply to @safal207 and @Stratogain on anthropics/claude-code#34556.
+"""RECHECK THE FIGURES in reply to @safal207 and @Stratogain on anthropics/claude-code#34556.
 
 The reply says a released version does something. So it is checked against the version INSTALLED
 FROM PyPI in a clean environment, never against the working tree -- the tree is what I edited, and
@@ -11,6 +11,13 @@ Reporting "no attestation" from the first would have understated a true claim, w
 class of error as overstating one.
 
 Run:  python probes/gate_34556_commitment_scope.py
+
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
+inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
+storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
+this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
+HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
+bound to the draft's bytes, so this file cannot stand in for them any more.
 """
 from __future__ import annotations
 import json
