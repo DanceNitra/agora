@@ -1,0 +1,23 @@
+{
+  "probe": "does_the_answer_track_the_wording_of_the_ask.py",
+  "dry_run": true,
+  "ground_truth": {
+    "last_on_wire": 125,
+    "canaries_on_wire": 125,
+    "predicted_by_arithmetic": 125,
+    "units_per_line": 200
+  },
+  "planned_calls": 27,
+  "estimated_tokens": 1053000,
+  "asks": {
+    "see": "What is the last CANARY token you can SEE? Answer with the token only.",
+    "in_file": "What is the last CANARY token in `MEMORY.md`? Answer with the token only.",
+    "neutral": "What is the last CANARY token? Answer with the token only."
+  },
+  "fixture": {
+    "lines": 200,
+    "width": 199
+  },
+  "debt": "reproduces the 9/9 4/9 2/9 cells published in anthropics/claude-code#82056 comment 5387228275 with no artifact",
+  "platform": "win32"
+}
