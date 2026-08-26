@@ -1,0 +1,135 @@
+{
+  "probe": "does_a_trailing_blank_run_count_against_the_cap.py",
+  "verdicts": {
+    "CONTROL_exactly_25000_arrives_whole_and_silent": true,
+    "CONTROL_one_character_over_is_cut_and_warns": true,
+    "CONTROL_the_small_arm_is_not_cut": true,
+    "his_trim_finding_reproduces_here": true,
+    "his_named_arm_ran_at_the_geometry_he_specified": true,
+    "his_named_arm_is_silent_as_both_models_predict": true,
+    "his_arm_CANNOT_be_read_this_way_and_we_say_so": true,
+    "the_notice_arm_ran_at_the_geometry_designed": true,
+    "THE_ANSWER_the_threshold_uses_the_TRIMMED_count": true,
+    "and_the_index_arrived_whole": true,
+    "CONTROL_a_raw_threshold_would_have_been_visible": true,
+    "THE_EMBEDDING_TRIMS_the_tail_before_the_prompt": true,
+    "CONTROL_the_three_display_arms_really_differ_on_disk": true,
+    "CONTROL_none_of_the_display_arms_was_cut": true,
+    "the_multiline_size_over_cell_carries_the_limit_clause": true,
+    "CONTROL_that_capture_really_is_multiline_and_under_200_lines": true,
+    "every_fixture_store_was_removed": true
+  },
+  "arms": [
+    {
+      "arm": "ctl_small",
+      "why": "far under the cap: does a trailing newline run survive onto the wire at all",
+      "raw_units": 105,
+      "trimmed_units": 100,
+      "wire_units": 100,
+      "notice_kb": null,
+      "wire_tail": "AAAAAAAAAAAAAA",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "ctl_exact",
+      "why": "exactly 25,000 units, no trailing run: must arrive whole and silent",
+      "raw_units": 25000,
+      "trimmed_units": 25000,
+      "wire_units": 25000,
+      "notice_kb": null,
+      "wire_tail": "4998M4999M5000",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "ctl_over1",
+      "why": "25,001 units: must be cut to 25,000 and must warn",
+      "raw_units": 25001,
+      "trimmed_units": 25001,
+      "wire_units": 25000,
+      "notice_kb": "24.4",
+      "wire_tail": "4998M4999M5000",
+      "after_last_content_char": null,
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "trim3",
+      "why": "@pjt222's trim arm verbatim: raw 25,003, trimmed 25,000",
+      "raw_units": 25003,
+      "trimmed_units": 25000,
+      "wire_units": 25000,
+      "notice_kb": null,
+      "wire_tail": "4998M4999M5000",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "his_separator",
+      "why": "@pjt222's named unrun arm: raw 25,003, trimmed 24,998",
+      "raw_units": 25003,
+      "trimmed_units": 24998,
+      "wire_units": 24998,
+      "notice_kb": null,
+      "wire_tail": "7M4998M4999zzz",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "blank2000",
+      "why": "same question, notice-presence read-out: raw 26,998, trimmed 24,998",
+      "raw_units": 26998,
+      "trimmed_units": 24998,
+      "wire_units": 24998,
+      "notice_kb": null,
+      "wire_tail": "7M4998M4999zzz",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "disp_none",
+      "why": "display-trim arm: no trailing run",
+      "raw_units": 100,
+      "trimmed_units": 100,
+      "wire_units": 100,
+      "notice_kb": null,
+      "wire_tail": "AAAAAAAAAAAAAA",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "disp_nl5",
+      "why": "display-trim arm: five trailing newlines",
+      "raw_units": 105,
+      "trimmed_units": 100,
+      "wire_units": 100,
+      "notice_kb": null,
+      "wire_tail": "AAAAAAAAAAAAAA",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    },
+    {
+      "arm": "disp_sp",
+      "why": "display-trim arm: trailing spaces and newlines",
+      "raw_units": 107,
+      "trimmed_units": 100,
+      "wire_units": 100,
+      "notice_kb": null,
+      "wire_tail": "AAAAAAAAAAAAAA",
+      "after_last_content_char": "\n# currentDate\nToday",
+      "trailing_newlines_on_wire": 0
+    }
+  ],
+  "cap_units": 25000,
+  "trailing_newlines_visible_on_wire": false,
+  "question_credit": "@pjt222, anthropics/claude-code#82056 comment 5425660561: 'Both silent, so the count is the read-out. I have not run it.'",
+  "finding": "the threshold reads the TRIMMED length: 26,998 raw units of which 2,000 are a trailing newline run arrive whole and silent, where 25,001 raw units with no trailing run are cut and warn; and the operand the CUT slices is unobservable from the wire, because the embedding trims the tail (measured: three fixtures differing only in their trailing run produce byte-identical prompt text) and because a cut only happens when the trimmed length is already over the cap, at which point both models keep the same prefix",
+  "cost": "zero completions; a local recorder answers canned SSE and request bodies are never written to disk",
+  "not_settled": [
+    "the operand the cut slices, if trailing newlines do not reach the wire",
+    "one machine, win32",
+    "one trial per arm"
+  ],
+  "platform": "win32",
+  "claude_version": "2.1.246 (Claude Code)"
+}
