@@ -1,0 +1,64 @@
+{
+  "probe": "does_the_ledger_match_the_history.py",
+  "repo": "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/d58cd2cd-56c1-4dbb-973e-94c1b0a34285/scratchpad/lh",
+  "controls": {
+    "NEGATIVE_CONTROL_an_invented_hash_fails_L1": true,
+    "POSITIVE_CONTROL_some_real_entry_passes_L1": true,
+    "CONTROL_the_ledger_and_history_were_both_read": true,
+    "CONTROL_the_checker_looked_at_more_than_one_file": true
+  },
+  "ledger_entries": 4,
+  "hashes_recorded": 4,
+  "history": {
+    "longhun-shared-audit-dataset-v1.0.jsonl": [
+      {
+        "short": "2df5ae7d",
+        "when": "2026-08-19T14:47:43+08:00",
+        "subject": "📊 Add shared audit dataset (19 real red-team records) for cross-framework validation (#1466)",
+        "sha256": "b1a8a650b8038b21505396ea869911008781b26a3adf39ad730edc3d99a2e7f3"
+      },
+      {
+        "short": "dafdd03c",
+        "when": "2026-08-26T14:57:23+08:00",
+        "subject": "feat(shared-audit): v1.1 完整性升级 — 逐条 record_hash + Merkle 根 + 独立探针 + CI 守门",
+        "sha256": "a6f9cbe8e3a96e8b0ba9bd0cd124dc86898358395848d64e562022fa489258ca"
+      }
+    ],
+    "longhun-shared-audit-dataset-v1.1-negative.jsonl": [
+      {
+        "short": "fb267b62",
+        "when": "2026-08-21T12:24:31+08:00",
+        "subject": "feat(shared-audit): add v1.1-negative dataset (19 real rejection records)",
+        "sha256": "b78c9509b70831504860f1b32e3f25e2fcb56fc59162e64628658a24c30e6e9f"
+      },
+      {
+        "short": "6aa23b9f",
+        "when": "2026-08-21T12:42:41+08:00",
+        "subject": "fix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)",
+        "sha256": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378"
+      },
+      {
+        "short": "dafdd03c",
+        "when": "2026-08-26T14:57:23+08:00",
+        "subject": "feat(shared-audit): v1.1 完整性升级 — 逐条 record_hash + Merkle 根 + 独立探针 + CI 守门",
+        "sha256": "5af2f320310f01535d2bbfb9b0ef9f5ae7af8c4583bcaadc173d17ea361b281e"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "rule": "L4",
+      "line": 2,
+      "version": "v1.1-r1",
+      "detail": "labelled v1.1-r1, but the state it names was produced by 6aa23b9f whose own message reads: fix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)"
+    },
+    {
+      "rule": "L3",
+      "line": null,
+      "version": null,
+      "detail": "fb267b62 changed longhun-shared-audit-dataset-v1.1-negative.jsonl to b78c9509b708... and no ledger entry records that state (feat(shared-audit): add v1.1-negative dataset (19 real rejec)"
+    }
+  ],
+  "question_credit": "@qingkong66, deepseek-ai/DeepSeek-V3#1591 comment 5426973801: 'CI can pin the files, but it cannot catch whether the ledger description matches the actual revisions.'",
+  "gap": "integrity/calibration_dataset_check.py runs C01-C10 and none of them opens CHANGELOG.jsonl or reads git history"
+}
