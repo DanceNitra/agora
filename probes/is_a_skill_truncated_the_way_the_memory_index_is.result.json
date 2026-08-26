@@ -42,7 +42,8 @@
       "wire_chars": 16840,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 3,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "many_short",
@@ -68,7 +69,8 @@
       "wire_chars": 21400,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 60,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w400_n60",
@@ -94,7 +96,8 @@
       "wire_chars": 41666,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 60,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w600_n40",
@@ -120,7 +123,8 @@
       "wire_chars": 41400,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 40,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w800_n30",
@@ -146,7 +150,8 @@
       "wire_chars": 41200,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 30,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w200_n120",
@@ -172,7 +177,8 @@
       "wire_chars": 41654,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 114,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w120_n200",
@@ -198,7 +204,8 @@
       "wire_chars": 41660,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 177,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w300_n80",
@@ -224,7 +231,8 @@
       "wire_chars": 41596,
       "OUR_OWN_SKILLS_ON_THE_WIRE": [],
       "kept_at_full_length": 78,
-      "kept_but_SHORTENED": 0
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     }
   ],
   "cut_arms": [

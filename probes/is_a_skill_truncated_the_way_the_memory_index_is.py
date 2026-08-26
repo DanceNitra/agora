@@ -203,6 +203,15 @@ def wire_text() -> str:
     return NL.join(parts)
 
 
+def _wire_model() -> str:
+    """The model name the CLI put in the request body. The listing budget is a fraction of THAT
+    model's context window, so a delivered size is meaningless without it."""
+    try:
+        return json.loads(BODIES[-1]).get("model") or ""
+    except Exception:
+        return ""
+
+
 def _kept_lengths(text: str, cans: list, desc_chars: int) -> tuple:
     """(kept at full planted length, kept but shortened) among entries that carry a description."""
     full = short = 0
@@ -270,7 +279,11 @@ def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
            # so "an entry carries its full description or none of it" cannot be asserted from the
            # canary alone -- measure the delivered length of each kept entry instead.
            "kept_at_full_length": _kept_lengths(text, cans, desc_chars)[0],
-           "kept_but_SHORTENED": _kept_lengths(text, cans, desc_chars)[1]}
+           "kept_but_SHORTENED": _kept_lengths(text, cans, desc_chars)[1],
+           # The budget is 1% of the MODEL's context window (vendor docs), so every size here is an
+           # operating point tied to whatever model the CLI declares. Record it: without this the
+           # bound reads as a constant, and it is not one.
+           "model_declared_on_the_wire": _wire_model()}
     shutil.rmtree(root, ignore_errors=True)
     return row
 
