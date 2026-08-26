@@ -1,0 +1,107 @@
+{
+  "probe": "the_dataset_hash_the_whole_thread_quotes_is_stale.py",
+  "verdicts": {
+    "every_file_sha256_matches_the_manifest": true,
+    "every_record_hash_recomputes": true,
+    "both_file_merkle_roots_match": true,
+    "the_total_38_record_root_matches": true,
+    "CONTROL_the_other_leaf_reading_does_NOT_reproduce": true,
+    "CONTROL_one_changed_character_breaks_the_total_root": true,
+    "the_stale_hashes_really_are_quoted_in_the_thread": true,
+    "MOST_of_the_stale_citations_are_OURS": true,
+    "and_NOBODY_has_posted_the_current_ones": true,
+    "CONTROL_the_thread_was_actually_read": true
+  },
+  "files": [
+    {
+      "file": "longhun-shared-audit-dataset-v1.0.jsonl",
+      "records": 19,
+      "sha256": "a6f9cbe8e3a96e8b0ba9bd0cd124dc86898358395848d64e562022fa489258ca",
+      "sha256_matches_manifest": true,
+      "record_hash_agree": "19/19",
+      "merkle": "4d7f8669b0c626839146e23e4a5b539bc472585936d9f4c3b19399678b4bd604",
+      "merkle_matches_manifest": true
+    },
+    {
+      "file": "longhun-shared-audit-dataset-v1.1-negative.jsonl",
+      "records": 19,
+      "sha256": "5af2f320310f01535d2bbfb9b0ef9f5ae7af8c4583bcaadc173d17ea361b281e",
+      "sha256_matches_manifest": true,
+      "record_hash_agree": "19/19",
+      "merkle": "c64fa70c85ee7332632765908088eccd411bf5baa3823d7513496a2ba93fa33b",
+      "merkle_matches_manifest": true
+    }
+  ],
+  "total_merkle": "27aa9ec0c8468fbbec9e8fed62c466e5a70762990b2b219153debcc7e1f3e952",
+  "manifest_meta": {
+    "manifest_version": "1.1",
+    "files": {
+      "longhun-shared-audit-dataset-v1.0.jsonl": {
+        "count": 19,
+        "file_sha256": "a6f9cbe8e3a96e8b0ba9bd0cd124dc86898358395848d64e562022fa489258ca",
+        "merkle_root": "4d7f8669b0c626839146e23e4a5b539bc472585936d9f4c3b19399678b4bd604"
+      },
+      "longhun-shared-audit-dataset-v1.1-negative.jsonl": {
+        "count": 19,
+        "file_sha256": "5af2f320310f01535d2bbfb9b0ef9f5ae7af8c4583bcaadc173d17ea361b281e",
+        "merkle_root": "c64fa70c85ee7332632765908088eccd411bf5baa3823d7513496a2ba93fa33b"
+      }
+    },
+    "total_count": 38,
+    "total_merkle_root": "27aa9ec0c8468fbbec9e8fed62c466e5a70762990b2b219153debcc7e1f3e952",
+    "hash_scheme": {
+      "record_hash": "SHA-256 of canonical JSON (sort_keys=True, ensure_ascii=False, separators=(',',':')) excluding the record_hash field itself",
+      "leaf": "SHA-256(record_hash_bytes)",
+      "internal": "SHA-256(left||right); odd level duplicates last"
+    }
+  },
+  "stale_citations": {
+    "b1a8a650": [
+      {
+        "user": "DanceNitra",
+        "id": 5358016110
+      },
+      {
+        "user": "DanceNitra",
+        "id": 5379826055
+      },
+      {
+        "user": "DanceNitra",
+        "id": 5382219588
+      },
+      {
+        "user": "DanceNitra",
+        "id": 5385217316
+      },
+      {
+        "user": "DanceNitra",
+        "id": 5399255963
+      },
+      {
+        "user": "UID9622",
+        "id": 5421596918
+      }
+    ],
+    "156d3ebb": [
+      {
+        "user": "UID9622",
+        "id": 5365297051
+      },
+      {
+        "user": "icophy",
+        "id": 5404089663
+      },
+      {
+        "user": "DanceNitra",
+        "id": 5407385432
+      },
+      {
+        "user": "UID9622",
+        "id": 5421596918
+      }
+    ]
+  },
+  "leaf_encoding": "SHA-256 over the 64-character hex STRING; the raw-digest reading does not reproduce the published roots",
+  "his_checker": "integrity/calibration_dataset_check.py exits 0 on CLEAN and 1 on a one-character mutation, so the CI gate goes red; three separate checks catch it and one names the offending request_id",
+  "platform": "win32"
+}
