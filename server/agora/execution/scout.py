@@ -387,6 +387,42 @@ def box_take(kind: str = "contribute") -> dict | None:
     return best
 
 
+def thread_is_open(lead: dict) -> bool | None:
+    """Is this lead's thread still open RIGHT NOW? True / False / None when we could not tell.
+
+    Discovery already searches `is:issue is:open` (see the query in find_opportunity), so every lead
+    was open WHEN FOUND. It is then parked in the box, and the box's oldest entry has run to 8 days.
+    Nothing re-checked the state in between, and the moment that matters is not discovery, it is the
+    moment a human is handed the work.
+
+    Measured 2026-08-26 across the 22 leads then reachable by a human -- 11 sitting in the box and 11
+    already promoted into two inbox tasks -- 5 were on threads that had since been closed, four of
+    them closed within the previous 48 hours. That is 23% of everything offered, and it repeats a
+    defect we already recorded once: voku/agent-loop#18 sat in the inbox for 7.6 days, growing a
+    duplicate every 36 hours, on a thread closed before the task ever existed.
+
+    None, never False, on any failure. A network blip must not delete real work: dropping a lead we
+    could not check is indistinguishable to the reader from never finding it, and that error runs in
+    the EXCLUDING direction, which is the expensive one.
+    """
+    repo, num = (lead or {}).get("repo"), (lead or {}).get("issue_number")
+    if not repo or not num:
+        return None
+    try:
+        import os as _os
+        import urllib.request
+        req = urllib.request.Request(
+            "https://api.github.com/repos/%s/issues/%s" % (repo, num),
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "agora-scout"})
+        tok = _os.environ.get("GITHUB_TOKEN") or _os.environ.get("GH_TOKEN")
+        if tok:
+            req.add_header("Authorization", "Bearer %s" % tok)
+        with urllib.request.urlopen(req, timeout=12) as r:
+            return json.loads(r.read().decode("utf-8")).get("state") == "open"
+    except Exception:
+        return None
+
+
 def box_mark(url: str, status: str = "done") -> bool:
     items = box_load()
     hit = False

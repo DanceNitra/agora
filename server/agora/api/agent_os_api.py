@@ -2418,10 +2418,31 @@ async def brain_scout_box_take(kind: str = "contribute", n: int = 1):
     pointless; promoting them as separate inbox tasks would flood the inbox instead. One task carrying
     several leads is the shape that matches the work.
     """
-    from agora.execution.scout import box_stats, box_take
-    leads = [x for x in (box_take(kind) for _ in range(max(1, min(int(n), 10)))) if x]
+    from agora.execution.scout import box_stats, box_mark, box_take, thread_is_open
+    want = max(1, min(int(n), 10))
+    leads: list = []
+    dropped: list = []
+    # RE-CHECK THE STATE HERE, not only at discovery. `is:issue is:open` in the search query was true
+    # when the lead was FOUND; the box then holds it for up to 8 days, and this endpoint is the moment
+    # a human is handed the work. Measured 2026-08-26: of the 22 leads then reachable by a human (11
+    # sitting in the box, 11 already promoted into two inbox tasks) 5 were on threads that had since
+    # closed, four of them within 48 hours. `thread_is_open` returns None when it cannot tell, and
+    # None is KEPT -- a network blip must never silently delete real work, because a lead dropped is
+    # indistinguishable to the reader from a lead never found.
+    for _ in range(want * 3):                      # top up, so a closed lead does not shrink the batch
+        if len(leads) >= want:
+            break
+        x = box_take(kind)
+        if not x:
+            break
+        if thread_is_open(x) is False:
+            box_mark(x.get("url") or "", "closed_upstream")
+            dropped.append({"url": x.get("url"), "repo": x.get("repo"),
+                            "issue_number": x.get("issue_number")})
+            continue
+        leads.append(x)
     return {"status": "ok", "leads": leads, "lead": leads[0] if leads else None,
-            "stats": box_stats()}
+            "dropped_closed_upstream": dropped, "stats": box_stats()}
 
 
 @router.get("/brain/scout")
