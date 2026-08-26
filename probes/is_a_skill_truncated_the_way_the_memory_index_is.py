@@ -277,8 +277,18 @@ def main() -> int:
                           "all degrade this way; the same 60 skills keep every description at "
                           "3,600 units, so it is size and not count. The model still knows the "
                           "skill exists and no longer knows what it does.",
-               "not_settled": ["the exact constant: delivered lands in 9,228-11,148 units across "
-                               "the six widths, and pinning it needs a boundary-free fixture",
+               # COMPUTED, not typed. This line used to carry "9,228-11,148", a literal that
+               # disagreed with this file's own arm data (9,239-11,159) by 11 at both ends. A
+               # reader checking the receipt against the numbers beside it would have found the
+               # mismatch, in the one artifact offered as the evidence.
+               "delivered_range": [min(r["delivered_listing_units"] for r in sweep_rows(rows)),
+                                   max(r["delivered_listing_units"] for r in sweep_rows(rows))],
+               "notice_words_note": "counted over the WHOLE request body per arm; truncat and "
+                                    "omitted occur in unrelated prompt text and their counts "
+                                    "differ between cut and uncut arms, so they are reported per "
+                                    "arm and never as one constant",
+               "not_settled": ["the exact constant: pinning it needs a boundary-free fixture; the "
+                               "measured spread is delivered_range above",
                                "whether a name-only skill can still be invoked usefully; its name "
                                "is present and no skill name appears in the tools array at all, so "
                                "invocation goes through some other path this probe did not test",
