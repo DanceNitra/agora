@@ -1,0 +1,49 @@
+{
+  "probe": "the_provenance_ledger_labels_r2_as_r1.py",
+  "verdicts": {
+    "CONTROL_the_history_has_three_distinct_byte_states": true,
+    "CONTROL_the_changelog_was_read": true,
+    "the_r1_hash_in_the_ledger_resolves_to_a_real_commit": true,
+    "but_that_commit_calls_itself_r2": true,
+    "and_it_is_NOT_the_oldest_byte_state": true,
+    "the_true_r1_hash_appears_nowhere_in_the_ledger": true,
+    "the_r2_entry_records_no_hash_at_all": true,
+    "todays_rewrite_kept_the_record_count": true,
+    "it_kept_the_request_id_sequence": true,
+    "it_changed_no_existing_value": true,
+    "the_only_difference_is_the_added_field": true
+  },
+  "history": [
+    {
+      "sha": "dafdd03c",
+      "date": "2026-08-26T06:57:23Z",
+      "msg": "feat(shared-audit): v1.1 完整性升级 — 逐条 record_hash + Merkle 根 + 独立探针 + CI 守门",
+      "sha256": "5af2f320310f01535d2bbfb9b0ef9f5ae7af8c4583bcaadc173d17ea361b281e",
+      "records": 19
+    },
+    {
+      "sha": "6aa23b9f",
+      "date": "2026-08-21T04:42:41Z",
+      "msg": "fix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)",
+      "sha256": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378",
+      "records": 19
+    },
+    {
+      "sha": "fb267b62",
+      "date": "2026-08-21T04:24:31Z",
+      "msg": "feat(shared-audit): add v1.1-negative dataset (19 real rejection records)",
+      "sha256": "b78c9509b70831504860f1b32e3f25e2fcb56fc59162e64628658a24c30e6e9f",
+      "records": 19
+    }
+  ],
+  "changelog_v1_1_r1_claims": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378",
+  "changelog_v1_1_r2_has_sha": false,
+  "true_r1_sha256": "b78c9509b70831504860f1b32e3f25e2fcb56fc59162e64628658a24c30e6e9f",
+  "true_r1_commit": "fb267b62",
+  "finding": "CHANGELOG.jsonl labels 156d3ebb as v1.1-r1, but that is the blob at the commit whose own message says r2 (purge 4 leak-type records). The true r1 is published nowhere and the r2 entry carries no hash.",
+  "why_it_matters": "r1 still contained the four refuse-then-leak boundary records and r2 exists because they were purged, so the ledger inverts the one distinction the negative half is for",
+  "why_CI_cannot_see_it": "the shipped checker compares the current files against the current MANIFEST-META, a self-consistent pair; no check binds a historical label to the bytes it names",
+  "reassuring": "today's rewrite is purely additive: same 19 records, same request_id sequence, no existing value changed, record_hash the only new key",
+  "killed_first": "our original draft reported the stale file hashes as a finding; his MANIFEST, archive/README and CHANGELOG all document that in the same commit, and his 07:02 comment carries the current Merkle roots",
+  "platform": "win32"
+}

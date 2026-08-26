@@ -1,0 +1,1156 @@
+{
+ "controls": {
+  "portable": "OK",
+  "unportable": "FAILS LOUD"
+ },
+ "counts": {
+  "FAILS LOUD": 43,
+  "OK": 139,
+  "TOO-SLOW": 29,
+  "SILENT": 1,
+  "WOULD-USE-GPU (not run)": 77
+ },
+ "gpu_excluded": [
+  "_gm_v3_sweep.py",
+  "adversarial_conflict.py",
+  "agentpoison_coherence_attack.py",
+  "agentpoison_coherence_diag.py",
+  "agentpoison_defense_check.py",
+  "agentpoison_dilution_check.py",
+  "agentpoison_hotflip_probe.py",
+  "agentpoison_influence_gate.py",
+  "agentpoison_influence_gate_validation.py",
+  "agentpoison_multirandom_check.py",
+  "agentpoison_multiretriever_check.py",
+  "agentpoison_setcoherence_proto.py",
+  "agentpoison_softcoherence_check.py",
+  "agentpoison_trigger_probe.py",
+  "atomic_decomposition_law_crossfamily.py",
+  "audit_claim_semantic_dedup.py",
+  "audit_mem0_reader.py",
+  "behavior_integrity_probe.py",
+  "bseries_b001_crossover.py",
+  "bseries_b001_preference_recall.py",
+  "build_realnoise_stress_v1.py",
+  "competitor_cells.py",
+  "correction_decay_probe.py",
+  "decomposition_subtle_errors.py",
+  "determinism_jaccard.py",
+  "determinism_verify.py",
+  "echo_attack_probe.py",
+  "echo_live_xsystem.py",
+  "embedding_inversion_probe.py",
+  "erasure_auditor_probe.py",
+  "erasure_completeness_xsystem.py",
+  "erasure_fanout_probe.py",
+  "eval_v3_three_methods.py",
+  "forget_verification_xsystem.py",
+  "governance_sufficiency_xsystem.py",
+  "graphiti_fidelity.py",
+  "grounding_firewall_hardened.py",
+  "hindsight_credit_bias_probe.py",
+  "hindsight_diffuse_decision_probe.py",
+  "hindsight_hedge_intensity_probe.py",
+  "hindsight_question_ending_probe.py",
+  "ifc_frontier_empirical_locomo.py",
+  "inspeximus_hybrid_recall_test.py",
+  "integrity_bench_ollama.py",
+  "locomo_alias_strength_weight.py",
+  "locomo_composed_soft_filters.py",
+  "locomo_confweighted_prefilter.py",
+  "locomo_correlated_cue_composition.py",
+  "locomo_metadata_prefilter.py",
+  "locomo_orthogonal_trust_weight.py",
+  "locomo_qa.py",
+  "locomo_soft_prefer_filter.py",
+  "locomo_temporal_parser_weight.py",
+  "mab_conflict_resolution.py",
+  "mab_cr_competitors.py",
+  "mab_cr_controls.py",
+  "membench_noisy_query_distill_probe.py",
+  "membench_recall_probe.py",
+  "membench_recall_probe_v2.py",
+  "membench_recency_tiebreak_probe.py",
+  "negative_control_precision_probe.py",
+  "norm_specificity_reranker.py",
+  "operating_point_memory.py",
+  "oracle_separation_density.py",
+  "passenger_credit.py",
+  "poison_identifiability_isolation.py",
+  "poison_realistic.py",
+  "recovery_halflife_pilot.py",
+  "reversibility_gate_frontier.py",
+  "reversibility_oracle_dependence.py",
+  "reversion_classifier_probe.py",
+  "sleep_time_compute_probe.py",
+  "soft_freshness_backdated.py",
+  "supersession_deepdive.py",
+  "supersession_replication.py",
+  "v4nat_audit_probe.py",
+  "v4nat_decomposition_probe.py"
+ ],
+ "rows": [
+  {
+   "name": "_diag_blob.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'competitor_cells'"
+  },
+  {
+   "name": "advance_audit.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2440 chars"
+  },
+  {
+   "name": "argument_surface_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'reversibility_predictability_pro"
+  },
+  {
+   "name": "arxiv_and_join.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "as_of_pointintime_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "atomic_decomposition_calibration_law.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "attestation_coverage_before_flipping_strict.py",
+   "verdict": "SILENT",
+   "detail": "exit 1 with no explanation"
+  },
+  {
+   "name": "attribution_floor.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "attribution_verified_key.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "audit_canon_source_collisions.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2236 chars"
+  },
+  {
+   "name": "audit_code_guard_disarm.py",
+   "verdict": "OK",
+   "detail": "exit 0, 891 chars"
+  },
+  {
+   "name": "audit_code_guard_recall.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1232 chars"
+  },
+  {
+   "name": "audit_consolidate.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1059 chars"
+  },
+  {
+   "name": "audit_consolidate2.py",
+   "verdict": "OK",
+   "detail": "exit 0, 659 chars"
+  },
+  {
+   "name": "audit_contradictions.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1131 chars"
+  },
+  {
+   "name": "audit_coverage_confirmed.py",
+   "verdict": "OK",
+   "detail": "exit 0, 957 chars"
+  },
+  {
+   "name": "audit_did_it_look.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1563 chars"
+  },
+  {
+   "name": "audit_did_our_audit_catch_it.py",
+   "verdict": "OK",
+   "detail": "exit 0, 875 chars"
+  },
+  {
+   "name": "audit_echo_guard_default.py",
+   "verdict": "OK",
+   "detail": "exit 0, 548 chars"
+  },
+  {
+   "name": "audit_echo_guard_rest.py",
+   "verdict": "OK",
+   "detail": "exit 0, 6554 chars"
+  },
+  {
+   "name": "audit_echo_guard_silent.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1203 chars"
+  },
+  {
+   "name": "audit_erasure_coverage_claim.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1460 chars"
+  },
+  {
+   "name": "audit_erasure_reach_all_paths.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1668 chars"
+  },
+  {
+   "name": "audit_erasure_residue.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3056 chars"
+  },
+  {
+   "name": "audit_erasure_rest.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2460 chars"
+  },
+  {
+   "name": "audit_erasure_third_party_protection.py",
+   "verdict": "OK",
+   "detail": "exit 0, 879 chars"
+  },
+  {
+   "name": "audit_erasure_wrong_subject.py",
+   "verdict": "OK",
+   "detail": "exit 0, 793 chars"
+  },
+  {
+   "name": "audit_ghost_via_taint.py",
+   "verdict": "OK",
+   "detail": "exit 0, 882 chars"
+  },
+  {
+   "name": "audit_lab_import_resolution.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1670 chars"
+  },
+  {
+   "name": "audit_manifest_shape.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2042 chars"
+  },
+  {
+   "name": "audit_mcp_erasure_attribution.py",
+   "verdict": "OK",
+   "detail": "exit 0, 915 chars"
+  },
+  {
+   "name": "audit_mcp_param_gaps.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1373 chars"
+  },
+  {
+   "name": "audit_mcp_params.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3368 chars"
+  },
+  {
+   "name": "audit_mcp_provenance_reach.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1253 chars"
+  },
+  {
+   "name": "audit_mcp_verify_writes_key.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1062 chars"
+  },
+  {
+   "name": "audit_pass2.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2359 chars"
+  },
+  {
+   "name": "audit_pass3.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1173 chars"
+  },
+  {
+   "name": "audit_pass4.py",
+   "verdict": "OK",
+   "detail": "exit 0, 4463 chars"
+  },
+  {
+   "name": "audit_pass5.py",
+   "verdict": "OK",
+   "detail": "exit 0, 954 chars"
+  },
+  {
+   "name": "audit_pass6.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2519 chars"
+  },
+  {
+   "name": "audit_recheck.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1946 chars"
+  },
+  {
+   "name": "audit_replication_guard_replay.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'agora'"
+  },
+  {
+   "name": "audit_replication_queue_dedup.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "audit_sibling_census.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1988 chars"
+  },
+  {
+   "name": "audit_slash_collision.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1185 chars"
+  },
+  {
+   "name": "audit_surfaces.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1415 chars"
+  },
+  {
+   "name": "audit_today_coverage_paths.py",
+   "verdict": "OK",
+   "detail": "exit 0, 984 chars"
+  },
+  {
+   "name": "audit_verdict_surfaces.py",
+   "verdict": "OK",
+   "detail": "exit 0, 4177 chars"
+  },
+  {
+   "name": "audit_verify_fix.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1028 chars"
+  },
+  {
+   "name": "authorized_revert_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 573 chars"
+  },
+  {
+   "name": "autostamp_lineage.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1237 chars"
+  },
+  {
+   "name": "behavior_integrity_cycles_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "bestofn_exploitability.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2237 chars"
+  },
+  {
+   "name": "bounded_eviction_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "browser_and_cli_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2537 chars"
+  },
+  {
+   "name": "bseries_b002_identity_injection.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1843 chars"
+  },
+  {
+   "name": "bseries_b003_belief_update.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ValueError: remember(source=...) needs a 'doc' key \ufffd it is the identif"
+  },
+  {
+   "name": "bseries_b003_influence_timeline.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3514 chars"
+  },
+  {
+   "name": "bseries_blast_radius_soft_authority.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2003 chars"
+  },
+  {
+   "name": "bseries_forged_provenance_stateful_monitor.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1828 chars"
+  },
+  {
+   "name": "bseries_ifc_frontier_declassify.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: UnicodeEncodeError: 'charmap' codec can't encode character '\\u2212' in"
+  },
+  {
+   "name": "bseries_low_water_mark_ifc.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1890 chars"
+  },
+  {
+   "name": "bseries_matrix_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 694 chars"
+  },
+  {
+   "name": "build_v3_obscuring_reversion.py",
+   "verdict": "OK",
+   "detail": "exit 0, 660 chars"
+  },
+  {
+   "name": "build_v4_coreference_reversion.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1077 chars"
+  },
+  {
+   "name": "build_v4_naturalized.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1723 chars"
+  },
+  {
+   "name": "can_we_reconcile_our_own_index.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1149 chars"
+  },
+  {
+   "name": "challenge_gate_falsifier.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: urllib.error.URLError: <urlopen error [WinError 10061] No connection c"
+  },
+  {
+   "name": "check_conflict_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 592 chars"
+  },
+  {
+   "name": "coherence_gate_demo.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1008 chars"
+  },
+  {
+   "name": "composite_bench.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'run_inspeximus_official'"
+  },
+  {
+   "name": "conformance_claim_census.py",
+   "verdict": "OK",
+   "detail": "exit 0, 637 chars"
+  },
+  {
+   "name": "consistency_class_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: inspeximus.core.StoreChangedOnDisk: C:\\Users\\Danculus\\AppData\\Local\\Te"
+  },
+  {
+   "name": "consolidation_scope_law.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "continuous_chunk_recall_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 867 chars"
+  },
+  {
+   "name": "convergence_adjudication.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1573 chars"
+  },
+  {
+   "name": "correlated_sources_calibration.py",
+   "verdict": "OK",
+   "detail": "exit 0, 377 chars"
+  },
+  {
+   "name": "corroboration_poison.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "credit_burst_offpath_regression.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "credit_burst_window_falsifier.py",
+   "verdict": "OK",
+   "detail": "exit 0, 451 chars"
+  },
+  {
+   "name": "credit_demotion.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1207 chars"
+  },
+  {
+   "name": "credit_demotion_defenses.py",
+   "verdict": "OK",
+   "detail": "exit 0, 987 chars"
+  },
+  {
+   "name": "ct_anchor_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ImportError: cannot import name '_sha256_hex' from 'inspeximus' (C:\\Us"
+  },
+  {
+   "name": "determinism_gap.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'run_inspeximus_official'"
+  },
+  {
+   "name": "distill_and_remember_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 702 chars"
+  },
+  {
+   "name": "echo_attack_gen_paraphrases.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'echo_attack_probe'"
+  },
+  {
+   "name": "echo_attack_probe_v1.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: SyntaxError: unterminated triple-quoted string literal (detected at li"
+  },
+  {
+   "name": "echo_attack_probe_v2.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'echo_attack_probe'"
+  },
+  {
+   "name": "echo_guard_e2e_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'echo_attack_probe'"
+  },
+  {
+   "name": "elina_adapter.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1363 chars"
+  },
+  {
+   "name": "embed_recipe_migration_guard_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1451 chars"
+  },
+  {
+   "name": "erasure_cell_v2.py",
+   "verdict": "OK",
+   "detail": "exit 0, 679 chars"
+  },
+  {
+   "name": "erasure_certificate_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 644 chars"
+  },
+  {
+   "name": "erasure_manifest_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "erasure_manifest_wired_cell.py",
+   "verdict": "OK",
+   "detail": "exit 0, 512 chars"
+  },
+  {
+   "name": "erasure_raw_store_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "erasure_runtime_cell.py",
+   "verdict": "OK",
+   "detail": "exit 0, 380 chars"
+  },
+  {
+   "name": "eviction_twotier.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "execution_receipt_gate_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1694 chars"
+  },
+  {
+   "name": "extractor_adapter_wireup_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 398 chars"
+  },
+  {
+   "name": "extractor_hook_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "extractor_nonreferring_subject_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "fair_conflict.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'run_inspeximus_official'"
+  },
+  {
+   "name": "fair_conflict_claude.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'run_inspeximus_official'"
+  },
+  {
+   "name": "fault_to_fabrication_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "font_fallback_metrics.py",
+   "verdict": "OK",
+   "detail": "exit 0, 828 chars"
+  },
+  {
+   "name": "forget_emits_tombstone_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1105 chars"
+  },
+  {
+   "name": "forget_subject_tombstone_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "forgeteval_inspeximus_adapter.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "gate_ensemble_coherence.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1655 chars"
+  },
+  {
+   "name": "gate_ensemble_recovery.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1823 chars"
+  },
+  {
+   "name": "gate_observability.py",
+   "verdict": "OK",
+   "detail": "exit 0, 681 chars"
+  },
+  {
+   "name": "generality_generativity_field_contrast_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "governance_hysteresis_ising.py",
+   "verdict": "OK",
+   "detail": "exit 0, 917 chars"
+  },
+  {
+   "name": "governance_sufficiency_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1596 chars"
+  },
+  {
+   "name": "graph_layer_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 402 chars"
+  },
+  {
+   "name": "graph_shift_orthogonal_gate_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 903 chars"
+  },
+  {
+   "name": "graphiti_echo_real_rate_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'echo_attack_probe'"
+  },
+  {
+   "name": "grounding_firewall_cloud_poison.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'server/.env'"
+  },
+  {
+   "name": "grounding_meter_strong_models.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'server/.env'"
+  },
+  {
+   "name": "grounding_meter_v3_analyze.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "hydration_witness_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 609 chars"
+  },
+  {
+   "name": "idea_generativity_generality_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 841 chars"
+  },
+  {
+   "name": "identity_gate_supersession_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ValueError: cannot parse the store at C:\\Users\\Danculus\\AppData\\Local\\"
+  },
+  {
+   "name": "inspeximus_adk_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 436 chars"
+  },
+  {
+   "name": "inspeximus_autogen_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 567 chars"
+  },
+  {
+   "name": "inspeximus_cli_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "inspeximus_crewai_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 564 chars"
+  },
+  {
+   "name": "inspeximus_langgraph_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 591 chars"
+  },
+  {
+   "name": "inspeximus_llamaindex_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 453 chars"
+  },
+  {
+   "name": "inspeximus_pydantic_ai_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 458 chars"
+  },
+  {
+   "name": "inspeximus_rerank_hook_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "inspeximus_session_adapter_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 652 chars"
+  },
+  {
+   "name": "integrity_bench_echo.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "integrity_bench_inject.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "integrity_bench_revert.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "intent_tagger_router_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2196 chars"
+  },
+  {
+   "name": "langgraph_saver_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 282 chars"
+  },
+  {
+   "name": "legible_warrant_scoped_budget_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1006 chars"
+  },
+  {
+   "name": "lifetime_budget_bound.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "live_gate_test.py",
+   "verdict": "OK",
+   "detail": "exit 0, 753 chars"
+  },
+  {
+   "name": "live_gate_test2.py",
+   "verdict": "OK",
+   "detail": "exit 0, 369 chars"
+  },
+  {
+   "name": "marat_fair_vs_circular_gt_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 421 chars"
+  },
+  {
+   "name": "membership_cost_frontier.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "memory_corroboration_cost_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2059 chars"
+  },
+  {
+   "name": "memory_defense_layer_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 72 chars"
+  },
+  {
+   "name": "memory_gate_defense_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 71 chars"
+  },
+  {
+   "name": "memory_hierarchy_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 243 chars"
+  },
+  {
+   "name": "mmr_result_dedup_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 580 chars"
+  },
+  {
+   "name": "moving_target_retrieval_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1130 chars"
+  },
+  {
+   "name": "new_frontier_questions.py",
+   "verdict": "OK",
+   "detail": "exit 0, 62 chars"
+  },
+  {
+   "name": "oracle_separation_density_stability.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "outcome_propagation_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "poisoning_corroboration_gate.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "promote_privilege_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 420 chars"
+  },
+  {
+   "name": "reach_disagreement_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'reversibility_predictability_pro"
+  },
+  {
+   "name": "reach_networked_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'reversibility_predictability_pro"
+  },
+  {
+   "name": "read_conflict_resolver_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "reality_check.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: UnicodeEncodeError: 'charmap' codec can't encode character '\\u2212' in"
+  },
+  {
+   "name": "recall_reinforce_flag_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FAILED: 1 default recall bumps a hit's value"
+  },
+  {
+   "name": "recall_where_test.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1060 chars"
+  },
+  {
+   "name": "recency_recipe_poison_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "recency_vs_random_is_it_separated.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'ragfresh'"
+  },
+  {
+   "name": "refusal_gate_recall.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1054 chars"
+  },
+  {
+   "name": "rerank_menu_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 385 chars"
+  },
+  {
+   "name": "retention_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "retraction_propagation.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3100 chars"
+  },
+  {
+   "name": "retrieval_exposure_coverage_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'research/prob"
+  },
+  {
+   "name": "retrieval_recall_locomo.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'locomo_qa'"
+  },
+  {
+   "name": "reversibility_predictability_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "revert_aba_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 800 chars"
+  },
+  {
+   "name": "revert_by_reference_probe.py",
+   "verdict": "TOO-SLOW",
+   "detail": "still running after 60s"
+  },
+  {
+   "name": "revert_chain_starvation_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1268 chars"
+  },
+  {
+   "name": "revert_concurrency_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FAIL: "
+  },
+  {
+   "name": "revert_instream_real_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1107 chars"
+  },
+  {
+   "name": "revert_instream_sim_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1131 chars"
+  },
+  {
+   "name": "revert_liveness_floor_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 975 chars"
+  },
+  {
+   "name": "revert_slot_binding_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 688 chars"
+  },
+  {
+   "name": "revert_staleness_window_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 597 chars"
+  },
+  {
+   "name": "rich_mcp_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'inspeximus.mcp'"
+  },
+  {
+   "name": "robustness_filter_independence.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1311 chars"
+  },
+  {
+   "name": "route_add_update_delete_noop_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 389 chars"
+  },
+  {
+   "name": "route_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da"
+  },
+  {
+   "name": "schema_v0_emit.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ValueError: remember(source=...) needs a 'doc' key \ufffd it is the identif"
+  },
+  {
+   "name": "seed_anchored_trust_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1541 chars"
+  },
+  {
+   "name": "sleeper_bond_reversibility_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1311 chars"
+  },
+  {
+   "name": "soc_rashba_valley_audit.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1374 chars"
+  },
+  {
+   "name": "soft_influence_taint_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1451 chars"
+  },
+  {
+   "name": "spend_irreversible_require_earned_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 630 chars"
+  },
+  {
+   "name": "supersession_policy_stamp_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 597 chars"
+  },
+  {
+   "name": "tat_chunk_interop_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1239 chars"
+  },
+  {
+   "name": "tat_monitor_runner.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 2: tat_monitor_runner.py: error: the following arguments are required: --"
+  },
+  {
+   "name": "tat_odd_chain_design.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2663 chars"
+  },
+  {
+   "name": "tat_odd_chain_redteam.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2386 chars"
+  },
+  {
+   "name": "tat_odd_chain_test.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2611 chars"
+  },
+  {
+   "name": "tat_retrieval_experiment.py",
+   "verdict": "OK",
+   "detail": "exit 0, 615 chars"
+  },
+  {
+   "name": "tat_sp500_audit.py",
+   "verdict": "OK",
+   "detail": "exit 0, 557 chars"
+  },
+  {
+   "name": "temporal_gate_demo.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1122 chars"
+  },
+  {
+   "name": "toki_concurrency_probe.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'probes'"
+  },
+  {
+   "name": "triad_attacker_split.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3468 chars"
+  },
+  {
+   "name": "triad_diffcap.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2895 chars"
+  },
+  {
+   "name": "trusted_only_poison_defense_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 315 chars"
+  },
+  {
+   "name": "two_detector_trap_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 3604 chars"
+  },
+  {
+   "name": "two_sided_manipulation_check.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: ModuleNotFoundError: No module named 'probe_gate'"
+  },
+  {
+   "name": "validate_surface_blindness_claim.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1884 chars"
+  },
+  {
+   "name": "veracity_outcome_grounding_probe.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1818 chars"
+  },
+  {
+   "name": "verify_instore_residue.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1052 chars"
+  },
+  {
+   "name": "verify_redteam_findings.py",
+   "verdict": "OK",
+   "detail": "exit 0, 2304 chars"
+  },
+  {
+   "name": "warrant_tier_adversarial.py",
+   "verdict": "OK",
+   "detail": "exit 0, 1084 chars"
+  },
+  {
+   "name": "warrant_tier_semantics.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1:   only adds the 'warrant' key for 'port 8443': got ['warrant', 'warran"
+  },
+  {
+   "name": "why_the_old_guard_missed.py",
+   "verdict": "OK",
+   "detail": "exit 0, 832 chars"
+  },
+  {
+   "name": "wxyj_dialogue_substrate.py",
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: UnicodeEncodeError: 'charmap' codec can't encode characters in positio"
+  }
+ ],
+ "timeout_s": 60,
+ "elapsed_s": 276.7562646865845
+}

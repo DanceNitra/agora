@@ -1,0 +1,216 @@
+{
+ "controls": {
+  "positive": {
+   "name": "_pos.py",
+   "base": [
+    [
+     "PASS"
+    ],
+    0
+   ],
+   "n": 11,
+   "guarded": 7,
+   "crashed": 0,
+   "caught": 7,
+   "unnoticed": [
+    "line 8: 0 -> 1.0"
+   ],
+   "inert": 3,
+   "kind": "GATE"
+  },
+  "negative": {
+   "name": "_neg.py",
+   "base": [
+    [
+     "PASS"
+    ],
+    0
+   ],
+   "n": 6,
+   "guarded": 0,
+   "crashed": 0,
+   "caught": 0,
+   "unnoticed": [
+    "line 3: 1.0 -> 2.0",
+    "line 3: 2.0 -> 4.0",
+    "line 3: 3.0 -> 6.0",
+    "line 3: 4.0 -> 8.0",
+    "line 5: 0.0 -> 1.0",
+    "line 8: 0 -> 1.0"
+   ],
+   "inert": 0,
+   "kind": "REPORT-ONLY"
+  }
+ },
+ "rows": [
+  {
+   "name": "adaptive_defenses.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 0,
+   "crashed": 8,
+   "caught": 0,
+   "unnoticed": [
+    "line 65: 1 -> 2.0"
+   ],
+   "inert": 3,
+   "kind": "REPORT-ONLY"
+  },
+  {
+   "name": "arena_style_only.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 0,
+   "crashed": 6,
+   "caught": 0,
+   "unnoticed": [
+    "line 40: 0 -> 1.0",
+    "line 57: or -> and",
+    "line 100: == -> !=",
+    "line 103: 1 -> 2.0",
+    "line 108: 0 -> 1.0",
+    "line 116: 1 -> 2.0"
+   ],
+   "inert": 0,
+   "kind": "REPORT-ONLY"
+  },
+  {
+   "name": "founder_survivorship_null.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 3,
+   "crashed": 2,
+   "caught": 3,
+   "unnoticed": [
+    "line 35: 0.15 -> 0.3",
+    "line 56: == -> !=",
+    "line 84: 0.11 -> 0.22",
+    "line 99: 100 -> 200.0",
+    "line 103: 2.1 -> 4.2"
+   ],
+   "inert": 2,
+   "kind": "WEAK-GATE"
+  },
+  {
+   "name": "good_to_great_null.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 1,
+   "crashed": 7,
+   "caught": 1,
+   "unnoticed": [
+    "line 57: >= -> <=",
+    "line 58: >= -> <=",
+    "line 62: < -> >",
+    "line 90: 100.0 -> 200.0"
+   ],
+   "inert": 0,
+   "kind": "WEAK-GATE"
+  },
+  {
+   "name": "llm_judge_length_null.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 1,
+   "crashed": 3,
+   "caught": 1,
+   "unnoticed": [
+    "line 76: == -> !=",
+    "line 126: 0.5 -> 1.0",
+    "line 134: or -> and",
+    "line 140: < -> >",
+    "line 152: <= -> >=",
+    "line 163: 0.05 -> 0.1",
+    "line 164: 0.30 -> 0.6"
+   ],
+   "inert": 1,
+   "kind": "WEAK-GATE"
+  },
+  {
+   "name": "meta_audit_auditor_roc.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 0,
+   "crashed": 0,
+   "caught": 0,
+   "unnoticed": [
+    "line 32: True -> False",
+    "line 34: False -> True",
+    "line 36: True -> False",
+    "line 38: False -> True",
+    "line 40: False -> True",
+    "line 42: True -> False",
+    "line 44: False -> True",
+    "line 46: True -> False",
+    "line 48: False -> True",
+    "line 50: False -> True",
+    "line 72: == -> !=",
+    "line 75: == -> !="
+   ],
+   "inert": 0,
+   "kind": "REPORT-ONLY"
+  },
+  {
+   "name": "meta_audit_scoring.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 6,
+   "crashed": 0,
+   "caught": 6,
+   "unnoticed": [
+    "line 67: 17 -> 34.0",
+    "line 73: 20 -> 40.0",
+    "line 79: 23 -> 46.0",
+    "line 85: 26 -> 52.0",
+    "line 91: 29 -> 58.0",
+    "line 97: 36 -> 72.0"
+   ],
+   "inert": 0,
+   "kind": "GATE"
+  },
+  {
+   "name": "nudge_pubbias_artifact.py",
+   "base": [
+    [],
+    0
+   ],
+   "n": 12,
+   "guarded": 0,
+   "crashed": 4,
+   "caught": 0,
+   "unnoticed": [
+    "line 33: 0.20 -> 0.4",
+    "line 41: 1.0 -> 2.0",
+    "line 48: and -> or",
+    "line 50: 2.0 -> 4.0",
+    "line 54: or -> and",
+    "line 54: and -> or"
+   ],
+   "inert": 2,
+   "kind": "REPORT-ONLY"
+  }
+ ],
+ "limit": 12,
+ "elapsed_s": 228.84766840934753
+}

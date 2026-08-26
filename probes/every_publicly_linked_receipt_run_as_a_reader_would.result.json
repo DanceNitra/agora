@@ -1,0 +1,146 @@
+{
+ "controls": {
+  "portable": "OK",
+  "unportable": "FAILS LOUD"
+ },
+ "rows": [
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/probes/a_provenance_field_at_100_percent_with_one_distinct_value.py",
+   "http": 200,
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FAIL -- no stores read; nothing was measured",
+   "needs": [
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/adaptive_defenses.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 2511 chars",
+   "needs": [
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/arena_style_only.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1258 chars",
+   "needs": [
+    "a dataset file"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/evidence_grade_ratchet.py",
+   "http": 200,
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da",
+   "needs": [
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/founder_survivorship_null.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1460 chars",
+   "needs": []
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/generality_generativity_metric_dependence_probe.py",
+   "http": 200,
+   "verdict": "FAILS LOUD",
+   "detail": "exit 1: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Da",
+   "needs": [
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/good_to_great_null.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1375 chars",
+   "needs": []
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/llm_judge_length_null.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1385 chars",
+   "needs": [
+    "a dataset file"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/locomo_retrieval_map.py",
+   "http": 200,
+   "verdict": "NEEDS-KEY",
+   "detail": "not executed: would spend the owner's quota",
+   "needs": [
+    "api key",
+    "network model call",
+    "a dataset file"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1546 chars",
+   "needs": []
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 1394 chars",
+   "needs": []
+  },
+  {
+   "url": "https://github.com/DanceNitra/agora/blob/main/research/probes/nudge_pubbias_artifact.py",
+   "http": 200,
+   "verdict": "OK",
+   "detail": "exit 0, 872 chars",
+   "needs": [
+    "a dataset file"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/inspeximus/blob/main/probes/does_the_headline_number_depend_on_who_judges_it.py",
+   "http": 200,
+   "verdict": "NEEDS-KEY",
+   "detail": "not executed: would spend the owner's quota",
+   "needs": [
+    "api key",
+    "network model call",
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/inspeximus/blob/main/probes/the_judge_is_not_deterministic_at_temperature_zero.py",
+   "http": 200,
+   "verdict": "NEEDS-KEY",
+   "detail": "not executed: would spend the owner's quota",
+   "needs": [
+    "api key",
+    "repo-relative data dir"
+   ]
+  },
+  {
+   "url": "https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py",
+   "http": 200,
+   "verdict": "NEEDS-KEY",
+   "detail": "not executed: would spend the owner's quota",
+   "needs": [
+    "api key"
+   ]
+  }
+ ],
+ "counts": {
+  "FAILS LOUD": 3,
+  "OK": 8,
+  "NEEDS-KEY": 4
+ },
+ "elapsed_s": 63.13622856140137
+}

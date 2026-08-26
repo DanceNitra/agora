@@ -1,46 +1,39 @@
-"""@UID9622's integrity chain verifies independently. The hash six comments quote does not match it.
+"""A claim of ours that the gate killed, kept because the verification inside it is still good.
 
-WHY. On 2026-08-26 @UID9622 shipped two commits to UID9622/longhun-financial-deep-seek: per-file
-SHA-256 in the §6 template (our correction), a rev4 fix to a SCHEMA id suffix (our correction), and
-then a full tamper-evidence chain -- per-record SHA-256, a three-level Merkle root, a stdlib probe,
-and a CI gate. He closed with an invitation rather than an assertion:
+WHAT WE WERE GOING TO SAY. That the file hashes quoted in six comments of deepseek-ai/DeepSeek-V3#1591
+had gone stale when @UID9622's integrity commit rewrote both files, and that nobody in the thread had
+posted the current ones.
 
-    "任何人（不依赖作者）可独立复算" -- anyone, not relying on the author, can recompute this.
+WHY IT IS DEAD, three independent counts, each re-verified by hand before the verdict was accepted:
 
-That is the right way to publish a baseline and it deserves someone actually doing it. So this
-recomputes the whole chain from his stated algorithm with our own implementation, rather than
-running his script and reporting what it says about itself.
+  1. HIS 07:02 COMMENT ALREADY CARRIES CURRENT HASHES -- the full 38-record Merkle root and both
+     file-level roots. Our "zero of 34 comments carry a current hash" was only true if "hash" is
+     narrowed to the file-level SHA-256 and excludes the Merkle roots he had just promoted as the
+     stronger anchor. The check underneath it tested exactly those two SHA-256 prefixes, so the
+     claim was wider than the measurement.
+  2. HE PUBLISHED THE FINDING HIMSELF, in the same commit, in three files: MANIFEST.md strikes both
+     old hashes through as 作废, archive/README.md carries a section explaining why, and
+     CHANGELOG.jsonl records sha256_after_v10 / sha256_after_v11n. Our gate had a check for exactly
+     this and it searched only COMMENT BODIES; it never opened the repository. A check that never
+     sees its target reports safe.
+  3. "NINETEEN MINUTES" WAS 14m36s. The integrity commit is dafdd03c at 06:57:23 against his 06:42:47
+     comment; nineteen minutes is the gap between his two COMMENTS. A wrong number inside a comment
+     about hash accuracy.
 
-WHAT VERIFIES, all of it:
+The gate script for that draft passed 28 of 29 checks while the claim was false, which is the whole
+lesson: a per-draft script is one check inside validate/storm/audit/verify, never the frame.
 
-    38/38 record_hash values recompute            canonical JSON, sort_keys, no record_hash field
-    both file-level Merkle roots match            4d7f8669... and c64fa70c...
-    the total 38-record root matches              27aa9ec0...
-    both file SHA-256 match the MANIFEST block    a6f9cbe8... and 5af2f320...
+WHAT SURVIVES AND IS STILL RUN. The recomputation itself: 38/38 record_hash values reproduce from
+his canonical-JSON spec, both file-level Merkle roots and the total root match MANIFEST-META, only
+the hex-string leaf reading reproduces them, and one changed character breaks the total root. That
+is a third-party reproduction the thread does not otherwise have, and it is the half that went into
+the comment we did send.
 
-One spec ambiguity worth writing down for anyone else reimplementing: `leaf = SHA-256(record_hash_bytes)`
-does not say whether those bytes are the 64-character hex string or the 32-byte digest it encodes.
-Only the hex-string reading reproduces his roots. Both were tried; that is why this file knows.
+The finding that replaced this one is in probes/the_provenance_ledger_labels_r2_as_r1.py.
 
-AND HIS CONTROL WORKS, which matters more than the roots. Change `REQ-` to `REQ_` in one record and
-three independent checks catch it: the file SHA, the record_hash for that exact id (named in the
-output), and the total Merkle root. The script exits 1, so the CI gate goes red. Read the exit code
-DIRECTLY: the first run of this measurement read it through a pipe, got `tail`'s status, and briefly
-concluded that a tampered dataset passed his gate.
-
-THE ONE FINDING, and it lands on us harder than on him. His comment of 08:43 published
-`b1a8a650...` and `156d3ebb...` as the current release hashes. Nineteen minutes later the integrity
-commit added a record_hash field to all 38 records, which rewrote both files, and both hashes moved.
-The MANIFEST was updated and is correct. The COMMENTS were not, and cannot be: they are published
-text.
-
-Measured against the live thread: `b1a8a650` appears in six comments, five of them OURS, and
-`156d3ebb` in three including ours. The current hashes appear in none. So every reader who follows
-the thread's own instruction to verify gets a mismatch and has to work out for themselves whether
-the dataset was tampered with or the citation aged. That is the exact failure this dataset exists to
-prevent, and we supplied most of the instances.
-
-Network: fetches the four published files and the live comment bodies. No model, no credits.
+The file was also renamed. Its old name was the_dataset_hash_the_whole_thread_quotes_is_stale.py,
+which is a public filename that states the accusation as a fact, on a claim that turned out to be
+wrong. A tone review flagged it; a probe name is published text too.
 """
 from __future__ import annotations
 
