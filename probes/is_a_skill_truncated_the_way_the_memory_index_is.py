@@ -159,10 +159,18 @@ def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
     text = wire_text()
     d_seen = [c["desc_canary"] for c in cans if c["desc_canary"] in text]
     b_seen = [c["body_canary"] for c in cans if c["body_canary"] in text]
+    # THE NAMES, counted separately from the descriptions. The first version of this probe counted
+    # only descriptions and I wrote "whole skills are absent from the prompt". They are not: every
+    # NAME arrives. Past the limit the listing degrades from "- name: description" to "- name", so
+    # the model still knows the skill exists and no longer knows what it does. Counting one field
+    # and reporting it as the object is the same error this probe exists to study.
+    n_seen = [c["skill"] for c in cans if c["skill"] in text]
     total_desc = sum(c["desc_units"] for c in cans)
     row = {"arm": label, "skills": n, "desc_chars": desc_chars, "body_chars": body_chars,
            "planted_desc_units": total_desc,
-           "descriptions_on_wire": len(d_seen), "bodies_on_wire": len(b_seen),
+           "descriptions_on_wire": len(d_seen), "names_on_wire": len(n_seen),
+           "bodies_on_wire": len(b_seen),
+           "name_only_entries": len(n_seen) - len(d_seen),
            "last_description_seen": d_seen[-1] if d_seen else None,
            "wire_chars": len(text)}
     shutil.rmtree(root, ignore_errors=True)
@@ -196,6 +204,10 @@ def main() -> int:
     by = {r["arm"]: r for r in rows}
     v = {}
     v["CONTROL_the_route_is_exercised_at_all"] = by["small"]["descriptions_on_wire"] > 0
+    v["EVERY_NAME_ARRIVES_it_is_the_DESCRIPTION_that_is_dropped"] = all(
+        r["names_on_wire"] == r["skills"] for r in rows)
+    v["CONTROL_and_the_uncut_arms_have_no_name_only_entries"] = (
+        by["small"]["name_only_entries"] == 0 and by["many_short"]["name_only_entries"] == 0)
     v["CONTROL_a_small_listing_arrives_whole"] = (
         by["small"]["descriptions_on_wire"] == by["small"]["skills"])
     v["CONTROL_every_arm_reached_the_recorder"] = all(r["wire_chars"] > 500 for r in rows)
@@ -227,16 +239,19 @@ def main() -> int:
                "method": "ANTHROPIC_BASE_URL points at a local recorder; the request body is read "
                          "and no completion is bought; nothing is written to disk",
                "cost": "zero completions",
-               "finding": "the skill LISTING is silently truncated. Six fixtures each planting "
-                          "24,000 UTF-16 units of descriptions at six entry widths are all cut, at "
-                          "a whole-entry boundary, with whole skills simply absent from the prompt "
-                          "and NO notice of any kind -- unlike the auto-memory index, which at "
-                          "least prints a warning. The same 60 skills arrive whole at 3,600 units, "
-                          "so it is size and not count.",
+               "finding": "the skill listing DEGRADES rather than truncates. Every skill NAME "
+                          "reaches the prompt; past a size limit the entry stops carrying its "
+                          "description, so the listing changes from '- name: description' to "
+                          "'- name' partway down with nothing marking the transition. Six fixtures "
+                          "each planting 24,000 UTF-16 units of descriptions at six entry widths "
+                          "all degrade this way; the same 60 skills keep every description at "
+                          "3,600 units, so it is size and not count. The model still knows the "
+                          "skill exists and no longer knows what it does.",
                "not_settled": ["the exact constant: delivered lands in 9,228-11,148 units across "
                                "the six widths, and pinning it needs a boundary-free fixture",
-                               "whether a skill absent from the listing can still be invoked by "
-                               "name; only its presence in the prompt was measured",
+                               "whether a name-only skill can still be invoked usefully; its name "
+                               "is present and no skill name appears in the tools array at all, so "
+                               "invocation goes through some other path this probe did not test",
                                "one build, one platform"]},
               io.open(os.path.join(HERE, os.path.basename(__file__).replace(".py", ".result.json")),
                       "w", encoding="utf-8"), ensure_ascii=False, indent=2)
