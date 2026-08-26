@@ -72,29 +72,49 @@ def plant_mixed(root: str, n: int, wide: int, narrow: int) -> list:
     return out
 
 
-def seed_config(cfgdir: str, skills: list, inverted: bool) -> dict:
-    """Write skillUsage into an isolated config. Inverted = later skills are the most used."""
+def seed_config(cfgdir: str, skills: list, mode: str) -> dict:
+    """Write skillUsage into an isolated config.
+
+    THREE MODES, and the third exists because the second confounds two explanations.
+
+      none      no history at all.
+      inverted  the LAST skills are both the most-used and the most-recent. That decides usage
+                against position, and leaves COUNT and RECENCY moving together.
+      split     they disagree: the EARLY half is heavily used but a year stale, the LATE half
+                barely used but seconds old. Whichever half keeps its descriptions names the key.
+
+    `mode` is a string rather than a bool because it was a bool, and passing "none" to a bool
+    parameter is truthy: all three arms seeded themselves identically and returned the same
+    numbers. The no-history control caught it.
+    """
     os.makedirs(cfgdir, exist_ok=True)
-    usage = {}
-    if inverted:
-        n = len(skills)
-        now = int(time.time() * 1000)
+    usage: dict = {}
+    n = len(skills)
+    now = int(time.time() * 1000)
+    if mode == "inverted":
         for s in skills:
-            # position n -> highest count; position 1 -> zero, so it is never written at all
-            count = s["pos"]
-            if count > 0:
-                usage[s["skill"]] = {"usageCount": count, "lastUsedAt": now - (n - s["pos"]) * 1000}
+            usage[s["skill"]] = {"usageCount": s["pos"],
+                                 "lastUsedAt": now - (n - s["pos"]) * 1000}
+    elif mode == "split":
+        year = 365 * 24 * 3600 * 1000
+        for s in skills:
+            if s["pos"] <= n / 2:
+                usage[s["skill"]] = {"usageCount": 500 + s["pos"], "lastUsedAt": now - year}
+            else:
+                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - (n - s["pos"]) * 1000}
+    elif mode != "none":
+        raise SystemExit("REFUSED: unknown seed mode %r" % mode)
     cfg = {"skillUsage": usage}
     io.open(os.path.join(cfgdir, ".claude.json"), "w", encoding="utf-8",
             newline=NL).write(json.dumps(cfg, ensure_ascii=False, indent=1))
     return usage
 
 
-def run_arm(label: str, n: int, wide: int, narrow: int, inverted: bool) -> dict:
+def run_arm(label: str, n: int, wide: int, narrow: int, mode: str) -> dict:
     root = tempfile.mkdtemp(prefix="usagecut_")
     cfg = os.path.join(root, "cfg")
     skills = plant_mixed(root, n, wide, narrow)
-    usage = seed_config(cfg, skills, inverted)
+    usage = seed_config(cfg, skills, mode)
 
     env = dict(os.environ, ANTHROPIC_BASE_URL="http://127.0.0.1:%d" % S.PORT,
                ANTHROPIC_API_KEY="x", CLAUDE_CONFIG_DIR=cfg)
@@ -117,7 +137,7 @@ def run_arm(label: str, n: int, wide: int, narrow: int, inverted: bool) -> dict:
     # Was the seed actually read back off disk, and was it the isolated one?
     seed_survived = json.load(io.open(os.path.join(cfg, ".claude.json"),
                                       encoding="utf-8")).get("skillUsage") == usage
-    row = {"arm": label, "skills": n, "inverted_history": inverted,
+    row = {"arm": label, "skills": n, "history_mode": mode,
            "seeded_entries": len(usage), "seed_survived": seed_survived,
            "isolated": os.path.abspath(cfg) != os.path.abspath(
                os.path.join(os.path.expanduser("~"), ".claude")),
@@ -139,11 +159,12 @@ def main() -> int:
     # the ambient install did. The control caught it and refused to report a rule from an arm where
     # nothing was dropped, which is the only reason this is not a false finding.
     N, WIDE, NARROW = 220, 900, 150
-    rows = [run_arm("no_history", N, WIDE, NARROW, False),
-            run_arm("inverted_history", N, WIDE, NARROW, True)]
+    rows = [run_arm("no_history", N, WIDE, NARROW, "none"),
+            run_arm("inverted_history", N, WIDE, NARROW, "inverted"),
+            run_arm("count_vs_recency", N, WIDE, NARROW, "split")]
     srv.shutdown()
     by = {r["arm"]: r for r in rows}
-    nh, ih = by["no_history"], by["inverted_history"]
+    nh, ih, cr = by["no_history"], by["inverted_history"], by["count_vs_recency"]
 
     for r in rows:
         pos = r["kept_positions"]
@@ -182,6 +203,16 @@ def main() -> int:
     v["GREEDY_FILL_an_oversized_entry_is_SKIPPED_not_a_cut"] = (
         nh_span_gaps > 0 or len(kept_narrow_after) > 0)
 
+    # THE THIRD ARM. Count and recency disagree by construction: the early half is heavily used but
+    # a year stale, the late half barely used but seconds old. Whichever half keeps its descriptions
+    # names the key, and neither reading can masquerade as the other.
+    cr_late = sum(1 for x in cr["kept_positions"] if x > N / 2)
+    cr_early = sum(1 for x in cr["kept_positions"] if x <= N / 2)
+    v["CONTROL_the_split_arm_also_dropped_something"] = (
+        0 < cr["descriptions_on_wire"] < cr["skills"])
+    v["the_key_is_COUNT_not_recency"] = cr_early > cr_late
+    v["or_the_key_is_RECENCY_not_count"] = cr_late > cr_early
+
     print()
     for k, ok in v.items():
         print("  %s  %s" % ("YES" if ok else "no ", k))
@@ -191,6 +222,7 @@ def main() -> int:
     json.dump({"probe": os.path.basename(__file__), "controls": v, "arms": rows,
                "fixture": {"skills": N, "wide": WIDE, "narrow": NARROW},
                "late_half_kept": late, "early_half_kept": early,
+               "split_arm_late_kept": cr_late, "split_arm_early_kept": cr_early,
                "narrow_kept_after_a_wide_drop": len(kept_narrow_after),
                "no_history_span_gaps": nh_span_gaps,
                "finding": "USAGE BEATS POSITION, and it is not close. With the usage history "
