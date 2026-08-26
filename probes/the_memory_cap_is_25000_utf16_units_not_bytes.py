@@ -276,6 +276,7 @@ def main() -> int:
                "slice_arm": rows, "unit_arms": unit_rows,
                "multiline_arm": {"last_kept_line": last, "units": kept,
                                  "partial_next_line_on_wire": partial_next,
+                                 "slice_would_have_carried": would_carry,
                                  "bracket_from_this_arm_alone": [kept, (last + 1) * per]},
                "header_control": {"long": long_h, "short": short_h, "content_units": sp_units},
                "display_defect": {"notice_kb": C["notice_size_kb"], "units_kb": round(units_kb, 2),

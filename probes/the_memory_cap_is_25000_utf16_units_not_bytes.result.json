@@ -75,6 +75,7 @@
     "last_kept_line": 124,
     "units": 24922,
     "partial_next_line_on_wire": false,
+    "slice_would_have_carried": 78,
     "bracket_from_this_arm_alone": [
       24922,
       25125
