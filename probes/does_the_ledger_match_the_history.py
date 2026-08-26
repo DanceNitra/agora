@@ -182,6 +182,17 @@ def main() -> int:
     if not any(any(e.get(k) for k in HASH_KEYS) for e in ledger):
         raise SystemExit("REFUSED: no ledger entry records a hash, so L1 could never fail")
 
+    # A SHALLOW CLONE IS THE "LOOKING AT NOTHING" CASE, and this file claimed controls against it
+    # while having none. `actions/checkout@v4` defaults to fetch-depth 1, which is how this would
+    # be run in CI. Measured on a depth-1 clone before this guard existed: TWO false L1 findings on
+    # genuine hashes, the real L3 defect not reported, exit 0, and all four controls saying YES.
+    # A checker that turns someone's CI red for the wrong reason is worse than no checker.
+    if git(repo, "rev-parse", "--is-shallow-repository").strip() == "true":
+        raise SystemExit("REFUSED: this is a SHALLOW clone, so most historical states are invisible "
+                         "and every rule below would be answered from a fraction of the history. "
+                         "In CI use actions/checkout with fetch-depth: 0; locally, git fetch "
+                         "--unshallow.")
+
     known = [l.strip() for l in git(repo, "ls-files", "data/shared-audit").splitlines()
              if l.strip().endswith(".jsonl") and "CHANGELOG" not in l]
     if not known:
@@ -214,6 +225,22 @@ def main() -> int:
         1 for f in findings if f["rule"] == "L1")
     v["CONTROL_the_ledger_and_history_were_both_read"] = bool(ledger) and all(hist.values())
     v["CONTROL_the_checker_looked_at_more_than_one_file"] = len(known) >= 2
+    # And the history must be deep enough to hold more states than the ledger names, or "no entry
+    # records that state" is a statement about the clone rather than about the ledger.
+    v["CONTROL_the_history_is_deeper_than_the_ledger"] = (
+        sum(len(rows) for rows in hist.values()) >= len(checked))
+    # THE CONTROLS MUST EXIST, not merely pass. An adversarial pass deleted the negative control
+    # and the probe stayed green at exit 0: nothing asserted the check was still in the suite.
+    REQUIRED = {"NEGATIVE_CONTROL_an_invented_hash_fails_L1",
+                "POSITIVE_CONTROL_some_real_entry_passes_L1",
+                "CONTROL_the_ledger_and_history_were_both_read",
+                "CONTROL_the_checker_looked_at_more_than_one_file",
+                "CONTROL_the_history_is_deeper_than_the_ledger"}
+    absent = sorted(REQUIRED - set(v))
+    if absent:
+        raise SystemExit("REFUSED: %d control(s) are missing from this suite, so a green result "
+                         "would mean nothing: %s" % (len(absent), absent))
+
     print()
     for k, ok in v.items():
         print("  %s  %s" % ("YES" if ok else "no ", k))
@@ -228,10 +255,15 @@ def main() -> int:
                               "'CI can pin the files, but it cannot catch whether the ledger "
                               "description matches the actual revisions.'",
            "gap": "integrity/calibration_dataset_check.py runs C01-C10 and none of them opens "
-                  "CHANGELOG.jsonl or reads git history"}
+                  "CHANGELOG.jsonl or reads git history",
+           "exit_code": "non-zero when any control fails OR any finding is raised"}
     json.dump(out, io.open(os.path.join(HERE, "does_the_ledger_match_the_history.result.json"),
                            "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    return 0 if all(v.values()) else 1
+    # FINDINGS MUST SET THE EXIT CODE. The first version returned `all(v.values())`, which is the
+    # CONTROLS only -- so a run that printed the defect it was built to find exited 0, and as a CI
+    # gate it could never go red on its own subject. Caught by an adversarial pass before this was
+    # offered to anyone.
+    return 0 if (all(v.values()) and not findings) else 1
 
 
 if __name__ == "__main__":

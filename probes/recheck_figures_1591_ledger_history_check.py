@@ -1,38 +1,29 @@
-"""RECHECK THE FIGURES in #1591 ledger-history reply: every claim recomputed against a fresh clone, live.
+"""RECHECK THE FIGURES in the #1591 ledger reply, against live sources at run time.
 
-WHAT CAN GO WRONG HERE, in the order it has gone wrong before in this thread:
+THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check inside
+VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and storm when the claim
+rests on literature. Owner, 2026-08-26, after I called a file like this one "the gate" three times
+in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO HOVEN." tools/send_approved.py now refuses
+to publish without a receipt from each skill, bound to the draft's bytes, so this file cannot stand
+in for them any more.
 
-  1. THE DEFECT IS ALREADY FIXED. Twice this thread has handed us a finding its author had already
-     corrected. So the gate re-clones the repository and re-runs the checker at gate time, and fails
-     if the unlogged state is no longer unlogged. It is not enough that the probe found it earlier.
+WHAT IT RECOMPUTES, and every one of these is fetched or re-derived rather than trusted:
 
-  2. WE CLAIM THE GAP WHERE THE SUITE ALREADY COVERS IT. Fetched live: his checker's own source must
-     contain no reference to CHANGELOG or git, or "C01 to C10 never open it" is false.
-
-  3. WE OVERSTATE WHAT FIRED. Three of the four rules do NOT fire, and the draft says so. A version
-     that reports only the hit is a version that implies the ledger is fabricated. There is a check
-     that the non-firing rules are named and a mutation that removes them.
-
-  4. THE REMEDY IS ASSERTED RATHER THAN TESTED. The draft says two lines fix it; the gate applies
-     exactly those two lines to the real ledger and requires the checker to come back clean.
-
-  5. WE CLAIM NOVELTY. The prior art sentence must be present.
-
-  6. WE MISQUOTE @qingkong66. His line is fetched from the live comment and must be byte-present.
-
-House rules for this thread specifically, both set by the owner: sign as DanceNitra only, no
-personal name, and NO "written with AI assistance" line, which belongs in other threads but not
-this one.
-
-THIS FILE IS NOT THE GATE. It recomputes figures against receipts, which is ONE check
-inside VALIDATE. The gate is the SKILLS: verify-claims, stress-claim, humanizer, and
-storm when the claim rests on literature. Owner, 2026-08-26, after I called a file like
-this one "the gate" three times in a day: "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO
-HOVEN." tools/send_approved.py now refuses to publish without a receipt from each skill,
-bound to the draft's bytes, so this file cannot stand in for them any more.
+  * the two announcement comments, their ids, authors, hashes, the 作废 string and the eighteen
+    minutes between them, from the live GitHub API;
+  * the ledger's current state, from a FRESH clone at run time, because the whole comment is about
+    a defect its author may fix at any moment and has fixed everything else within hours;
+  * the two Chinese sentences quoted from his README and MANIFEST, byte-present in the live files;
+  * the remedy, APPLIED to a copy and re-run, never asserted;
+  * the shallow-clone refusal, by actually cloning at depth 1 and reading the exit code directly,
+    not through a pipe;
+  * that the probe the comment points at RESOLVES on our public default branch. An earlier comment
+    of ours cited a probe that 404'd for every reader who followed it.
 """
 from __future__ import annotations
 
+import base64
+import datetime as dt
 import io
 import json
 import os
@@ -45,182 +36,181 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DRAFT = os.path.join(ROOT, "agora_output", "drafts", "reply_1591_ledger_history_check.md")
 REPO = "https://github.com/UID9622/longhun-financial-deep-seek.git"
-QK_COMMENT = "5426973801"
+API = "repos/UID9622/longhun-financial-deep-seek"
+OURS = "probes/does_the_ledger_match_the_history.py"
+R1_ANNOUNCE, R2_ANNOUNCE = "5365183869", "5365297051"
 
 sys.path.insert(0, HERE)
 import does_the_ledger_match_the_history as C  # noqa: E402
 
 
-def gh_body(cid: str) -> str:
-    r = subprocess.run(["gh", "api", "repos/deepseek-ai/DeepSeek-V3/issues/comments/" + cid,
-                        "--jq", ".body"], capture_output=True, text=True,
+def gh(*args: str) -> str:
+    r = subprocess.run(["gh", "api", *args], capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
     return r.stdout if r.returncode == 0 else ""
 
 
-def fetch_checker() -> str:
-    r = subprocess.run(["gh", "api",
-                        "repos/UID9622/longhun-financial-deep-seek/contents/"
-                        "integrity/calibration_dataset_check.py", "--jq", ".content"],
-                       capture_output=True, text=True)
-    if r.returncode != 0:
-        return ""
-    import base64
-    return base64.b64decode(r.stdout).decode("utf-8", "replace")
+def comment(cid: str) -> dict:
+    out = gh("repos/deepseek-ai/DeepSeek-V3/issues/comments/" + cid)
+    return json.loads(out) if out else {}
 
 
-def check(draft: str, findings: list, fixed_findings: list, hist: dict, checker: str,
-          qk: str, checked_n: int, fixed_n: int) -> dict:
+def repo_file(path: str) -> str:
+    out = gh(f"{API}/contents/{path}", "--jq", ".content")
+    return base64.b64decode(out).decode("utf-8", "replace") if out.strip() else ""
+
+
+def check(draft: str, a1: dict, a2: dict, ledger: list, hist: dict, neg: str,
+          readme: str, manifest: str, workflow: str, remedy: tuple, shallow_rc: int,
+          ours_size: int) -> dict:
     v: dict = {}
-    rules = {f["rule"] for f in findings}
+    b1, b2 = a1.get("body", ""), a2.get("body", "")
+    R1 = [r for r in hist[neg] if r["short"] == "fb267b62"]
+    R2 = [r for r in hist[neg] if r["short"] == "6aa23b9f"]
 
-    # ---- the defect is still live, re-measured at gate time --------------------------------------
-    v["THE_UNLOGGED_STATE_IS_STILL_UNLOGGED"] = any(
-        f["rule"] == "L3" and "fb267b62" in f["detail"] for f in findings)
-    # EVERY occurrence, not the first. `b78c9509` appears twice, so a presence check passed a
-    # draft whose first copy had been corrupted -- the same occurrence-vs-presence defect that got
-    # through this morning's gate on "27 trials".
-    def all_agree(prefix: str, correct: str) -> bool:
-        hits = re.findall(prefix + r"[0-9a-f]*", draft)
-        return bool(hits) and all(h == correct for h in hits)
+    # ---- the two announcements, live -----------------------------------------------------------
+    v["CONTROL_both_announcements_were_fetched"] = bool(b1) and bool(b2)
+    v["both_are_his"] = a1.get("user", {}).get("login") == "UID9622" == a2.get("user", {}).get(
+        "login")
+    v["he_announced_b78c9509_first"] = "b78c9509b708" in b1 and "156d3ebb" not in b1
+    v["he_announced_156d3ebb_second_and_voided_the_first"] = (
+        "156d3ebb59ec" in b2 and "b78c9509" in b2 and "作废" in b2)
+    gap = (dt.datetime.fromisoformat(a2["created_at"].replace("Z", "+00:00"))
+           - dt.datetime.fromisoformat(a1["created_at"].replace("Z", "+00:00")))
+    v["the_gap_really_is_eighteen_minutes"] = (
+        abs(gap.total_seconds() - 18 * 60) < 90 and "eighteen minutes later" in draft)
+    v["the_draft_cites_both_comment_ids"] = R1_ANNOUNCE in draft and R2_ANNOUNCE in draft
+    v["the_draft_quotes_the_void_string"] = "原 b78c9509... 作废" in draft and "作废" in b2
 
-    v["and_the_draft_names_that_commit_and_hash"] = (
-        all_agree("fb267b", "fb267b62") and all_agree("b78c95", "b78c9509"))
-    neg = [p for p in hist if "negative" in p][0]
-    v["CONTROL_that_state_really_is_in_git"] = any(
-        r["short"] == "fb267b62" and r["sha256"].startswith("b78c9509") for r in hist[neg])
-    v["the_label_finding_is_labelled_heuristic"] = (
-        "L4" in rules and "commit messages are prose" in draft
-        and "should not rest on that" in draft)
-    v["the_draft_puts_the_mechanical_rule_first"] = (
-        draft.index("must be named by some ledger entry") < draft.index("label mismatch"))
+    # ---- the ledger as it stands right now -------------------------------------------------------
+    by_ver = {e.get("version"): e for e in ledger}
+    v["THE_DEFECT_IS_STILL_LIVE_r1_carries_r2s_hash"] = (
+        by_ver.get("v1.1-r1", {}).get("sha256_after", "").startswith("156d3ebb"))
+    v["AND_r2_still_carries_no_hash"] = not any(
+        k.startswith("sha256_after") for k in by_ver.get("v1.1-r2", {}))
+    v["the_draft_says_both"] = (
+        "puts `156d3ebb…` under `v1.1-r1`" in draft and "gives `v1.1-r2` no hash at all" in draft)
 
-    # ---- what did NOT fire, said out loud ----------------------------------------------------------
-    v["THE_NON_FIRING_RULES_ARE_REPORTED"] = (
-        "L1" not in rules and "L2" not in rules
-        and "not fabricated and not shuffled" in draft
-        and "neither fires here" in draft)
+    # ---- the history, re-derived ------------------------------------------------------------------
+    v["fb267b62_really_produced_b78c9509"] = bool(R1) and R1[0]["sha256"].startswith("b78c9509")
+    v["6aa23b9f_really_produced_156d3ebb"] = bool(R2) and R2[0]["sha256"].startswith("156d3ebb")
+    v["no_entry_carries_the_r1_state"] = not any(
+        R1[0]["sha256"] in json.dumps(e) for e in ledger)
+    v["the_draft_names_both_commits"] = "fb267b62" in draft and "6aa23b9f" in draft
 
-    # ---- the gap claim, against his live source -----------------------------------------------------
-    v["CONTROL_his_checker_was_actually_fetched"] = "C01" in checker and len(checker) > 4000
-    v["his_suite_really_does_not_read_the_ledger_or_git"] = not (
-        "CHANGELOG" in checker or re.search(r"\bgit\b", checker))
-    v["the_draft_states_that_narrowly"] = "never open `CHANGELOG.jsonl` and never touch git" in draft
+    # ---- his own words, byte-present ---------------------------------------------------------------
+    v["CONTROL_his_readme_and_manifest_were_fetched"] = len(readme) > 400 and len(manifest) > 400
+    v["the_readme_quote_is_byte_present"] = (
+        "修订链（append-only）" in readme and "每次发布/剔除/升级有据可查" in readme
+        and "修订链（append-only）" in draft and "每次发布/剔除/升级有据可查" in draft
+        and "data/shared-audit/README.md" in draft)
+    v["the_manifest_quote_is_byte_present"] = (
+        "变更全程记录于 `CHANGELOG.jsonl`（append-only）" in manifest
+        and "变更全程记录于 `CHANGELOG.jsonl`（append-only）" in draft
+        and "data/shared-audit/MANIFEST.md" in draft)
 
-    # ---- the remedy was applied, not asserted ---------------------------------------------------------
-    v["THE_REMEDY_WAS_TESTED_AND_IT_CLEARS"] = not fixed_findings
-    v["the_remedy_adds_exactly_one_hash"] = fixed_n == checked_n + 1
-    v["the_draft_reports_that_count"] = (
-        "five hashes checked instead of four" in draft and checked_n == 4)
-    v["the_draft_says_it_was_tested_not_assumed"] = "I tested it rather than assuming" in draft
+    # ---- the remedy, applied not asserted ----------------------------------------------------------
+    findings_after, checked_after, labels = remedy
+    v["THE_REMEDY_WAS_APPLIED_AND_IT_CLEARS"] = not findings_after
+    v["the_remedy_checks_five_hashes"] = checked_after == 5 and "five hashes checked" in draft
+    v["the_remedy_makes_no_duplicate_label"] = (
+        len(labels) == len(set(labels)) and "no duplicate labels" in draft)
+    v["the_remedy_adds_no_entry"] = len(labels) == len(ledger) and "no new entry" in draft
+    v["the_draft_says_it_was_applied_to_a_copy"] = "applied it to a copy rather than assuming" in draft
 
-    # ---- controls, novelty, caveat ---------------------------------------------------------------------
-    v["the_checkers_own_controls_are_described"] = (
-        "invented hash must fail" in draft and "at least one real entry must pass" in draft)
-    v["the_refusal_conditions_are_described"] = "absent, empty, or records no hashes" in draft
-    v["NO_NOVELTY_CLAIM"] = (
-        "None of this is a new idea" in draft and "in-toto" in draft and "SLSA" in draft)
-    v["the_assumption_behind_the_rule_is_stated"] = (
-        "convention rather than a fact" in draft and "every revision" in draft)
+    # ---- the caveats the draft states against itself -------------------------------------------------
+    v["THE_SHALLOW_CLONE_NOW_REFUSES"] = shallow_rc != 0
+    v["the_draft_reports_what_it_did_before"] = (
+        "two false findings on genuine hashes" in draft and "every one of its controls reported "
+        "green" in draft)
+    v["their_workflow_really_sets_no_fetch_depth"] = (
+        "actions/checkout" in workflow and "fetch-depth" not in workflow
+        and "fetch-depth: 0" in draft)
+    v["the_rewritable_history_caveat_is_stated"] = (
+        "lint over a mutable substrate, not an attestation" in draft)
 
-    # ---- attribution ---------------------------------------------------------------------------------------
-    v["CONTROL_his_comment_was_actually_fetched"] = len(qk) > 200
-    v["qingkong66_really_said_CI_cannot_do_this"] = (
-        "cannot catch whether the ledger description matches the actual revisions" in qk)
-    v["we_credit_him_rather_than_correcting_him_flatly"] = (
-        "you are right about the suite as it stands" in draft)
+    # ---- prior art, named correctly -------------------------------------------------------------------
+    v["the_property_is_named_completeness"] = (
+        "completeness, or omission detection" in draft
+        and not re.search(r"(?<!and )consistency proof(?!s and neither)", draft))
+    v["CT_is_described_correctly"] = (
+        "inclusion and consistency proofs and neither is this one" in draft
+        and "leaves it to monitors" in draft)
+    v["the_paper_is_cited_in_full"] = all(
+        s in draft for s in ("Torres-Arias", "Ammula", "Curtmola", "Cappos",
+                             "On Omitting Commits and Committing Omissions",
+                             "USENIX Security 2016", "Reference State Log"))
+    v["and_where_it_stops_short_is_stated"] = "only from adoption onward" in draft
 
-    # ---- house style for THIS thread -------------------------------------------------------------------------
+    # ---- the pointer must resolve ----------------------------------------------------------------------
+    v["THE_PROBE_WE_POINT_AT_IS_PUBLIC"] = ours_size > 0
+    v["the_draft_names_that_path"] = OURS in draft
+
+    # ---- house style for THIS thread ---------------------------------------------------------------------
     v["NO_AI_DISCLOSURE_LINE_IN_THIS_THREAD"] = "AI assistance" not in draft
     v["no_personal_name"] = not re.search(r"[Rr]astislav|Draho[sš]", draft)
     v["no_em_or_en_dash"] = not ("—" in draft or "–" in draft or " -- " in draft)
     v["length_is_reasonable"] = 350 < len(draft.split()) < 650
 
     r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "humanizer_receipt.py"),
-                        "check", DRAFT], capture_output=True, text=True)
-    v["the_humanizer_SKILL_ran_on_THESE_bytes"] = r.returncode == 0
+                        "status", DRAFT], capture_output=True, text=True)
+    v["ALL_THREE_SKILL_RECEIPTS_EXIST"] = r.returncode == 0
     return v
 
 
 def main() -> int:
     draft = io.open(DRAFT, encoding="utf-8").read()
+    tmp = tempfile.mkdtemp(prefix="lh1591_")
+    full = os.path.join(tmp, "full")
+    if subprocess.run(["git", "clone", "-q", REPO, full], capture_output=True).returncode:
+        raise SystemExit("REFUSED: could not clone the repository")
 
-    # A FRESH clone at gate time. A stale one would let a fix land upstream without this noticing.
-    tmp = tempfile.mkdtemp(prefix="lhgate_")
-    repo = os.path.join(tmp, "lh")
-    r = subprocess.run(["git", "clone", "-q", REPO, repo], capture_output=True, text=True)
-    if r.returncode != 0:
-        raise SystemExit("REFUSED: could not clone %s: %s" % (REPO, (r.stderr or "").strip()))
-
-    lp = os.path.join(repo, C.LEDGER)
-    ledger = [json.loads(l) for l in io.open(lp, encoding="utf-8") if l.strip()]
-    known = [l.strip() for l in C.git(repo, "ls-files", "data/shared-audit").splitlines()
+    ledger = [json.loads(l) for l in io.open(os.path.join(full, C.LEDGER), encoding="utf-8")
+              if l.strip()]
+    known = [l.strip() for l in C.git(full, "ls-files", "data/shared-audit").splitlines()
              if l.strip().endswith(".jsonl") and "CHANGELOG" not in l]
-    hist = {p: C.history(repo, p) for p in known}
-    findings, checked = C.audit(repo, ledger, hist, known)
-
-    # THE REMEDY, applied to the real ledger exactly as the draft describes it.
+    hist = {p: C.history(full, p) for p in known}
     neg = [p for p in known if "negative" in p][0]
-    r1 = [x for x in hist[neg] if x["short"] == "fb267b62"]
-    if not r1:
-        raise SystemExit("REFUSED: fb267b62 is not in the history of %s any more" % neg)
-    fixed = [dict(e) for e in ledger]
-    fixed.insert(1, {"ts": "2026-08-21T00:00:00+08:00", "version": "v1.1-r1", "action": "publish",
-                     "scope": os.path.basename(neg), "detail": "19 negative records, pre-review",
-                     "sha256_after": r1[0]["sha256"], "author": "UID9622"})
-    for e in fixed:
-        if e.get("version") == "v1.1-r1" and e.get("sha256_after", "").startswith("156d3ebb"):
-            e["version"] = "v1.1-r2"
-    fixed_findings, fixed_checked = C.audit(repo, fixed, hist, known)
 
-    checker = fetch_checker()
-    qk = gh_body(QK_COMMENT)
-    if not checker or not qk:
-        raise SystemExit("REFUSED: could not fetch his checker or @qingkong66's comment; both "
-                         "claims would be unverified")
+    # THE REMEDY, applied to a copy exactly as the draft describes it.
+    r1 = [r for r in hist[neg] if r["short"] == "fb267b62"][0]["sha256"]
+    r2 = [r for r in hist[neg] if r["short"] == "6aa23b9f"][0]["sha256"]
+    patched = [dict(e) for e in ledger]
+    for e in patched:
+        if e.get("version") == "v1.1-r1":
+            e["sha256_after"] = r1
+        if e.get("version") == "v1.1-r2":
+            e["sha256_after"] = r2
+    f_after, c_after = C.audit(full, patched, hist, known)
+    remedy = (f_after, len(c_after), [e.get("version") for e in patched])
 
-    v = check(draft, findings, fixed_findings, hist, checker, qk, len(checked), len(fixed_checked))
+    # THE SHALLOW REFUSAL, measured. Exit code read directly, never through a pipe.
+    shallow = os.path.join(tmp, "shallow")
+    subprocess.run(["git", "clone", "-q", "--depth", "1", REPO, shallow], capture_output=True)
+    shallow_rc = subprocess.run(
+        [sys.executable, os.path.join(HERE, "does_the_ledger_match_the_history.py"), shallow],
+        capture_output=True).returncode
+
+    a1, a2 = comment(R1_ANNOUNCE), comment(R2_ANNOUNCE)
+    # THE RIGHT FILES. The first version fetched the ROOT README, where neither sentence lives;
+    # both are under data/shared-audit/. It would have quoted his own words from a file that
+    # does not contain them.
+    readme = repo_file("data/shared-audit/README.md")
+    manifest = repo_file("data/shared-audit/MANIFEST.md")
+    wf = repo_file(".github/workflows/integrity.yml")
+    size = gh(f"repos/DanceNitra/agora/contents/{OURS}?ref=main", "--jq", ".size").strip()
+    ours_size = int(size) if size.isdigit() else 0
+
+    if not (a1 and a2 and readme and manifest and wf):
+        raise SystemExit("REFUSED: a live source could not be fetched; claims resting on it would "
+                         "be unverified")
+
+    v = check(draft, a1, a2, ledger, hist, neg, readme, manifest, wf, remedy, shallow_rc, ours_size)
     for k, ok in v.items():
         print("  %s  %s" % ("YES" if ok else "no ", k))
     passed = sum(1 for x in v.values() if x)
-    print("\n  %d/%d checks, %d words, %d findings live, %d after the remedy"
-          % (passed, len(v), len(draft.split()), len(findings), len(fixed_findings)))
-
-    if "--mutate" in sys.argv:
-        print("\n  MUTATION SELF-TEST")
-        muts = [("wrong commit", "fb267b62", "fb267b63"),
-                ("wrong hash", "b78c9509", "b78c9510"),
-                ("drop the heuristic label", "commit messages are prose",
-                 "commit messages are reliable"),
-                ("hide what did not fire", "not fabricated and not shuffled",
-                 "unreliable throughout"),
-                ("overstate the gap", "never open `CHANGELOG.jsonl` and never touch git",
-                 "check nothing at all"),
-                ("assert the remedy", "I tested it rather than assuming",
-                 "it is obvious"),
-                ("wrong remedy count", "five hashes checked instead of four",
-                 "six hashes checked instead of four"),
-                ("drop the controls", "invented hash must fail", "checker is reliable"),
-                ("claim novelty", "None of this is a new idea", "This is a new idea"),
-                ("drop the caveat", "convention rather than a fact", "fact about ledgers"),
-                ("flatten the credit", "you are right about the suite as it stands",
-                 "you were wrong"),
-                ("add the AI line", "Point it at a clone.",
-                 "Point it at a clone. Written with AI assistance."),
-                ("em dash", "Point it at a clone.", "Point it at a clone —.")]
-        caught = 0
-        for label, a, b in muts:
-            if a not in draft:
-                print("    SKIP   %s: anchor absent, mutation vacuous" % label)
-                continue
-            mv = check(draft.replace(a, b, 1), findings, fixed_findings, hist, checker, qk,
-                       len(checked), len(fixed_checked))
-            broke = [k for k in v if v[k] and not mv.get(k)]
-            caught += bool(broke)
-            print("    %s  %s%s" % ("CAUGHT" if broke else "MISSED", label,
-                                    (" -> " + broke[0]) if broke else ""))
-        print("    %d/%d mutations caught" % (caught, len(muts)))
-        return 0 if (passed == len(v) and caught == len(muts)) else 1
+    print("\n  %d/%d recomputed, %d words, remedy leaves %d findings, shallow rc=%d, our probe %d B"
+          % (passed, len(v), len(draft.split()), len(f_after), shallow_rc, ours_size))
     return 0 if passed == len(v) else 1
 
 
