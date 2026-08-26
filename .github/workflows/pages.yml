@@ -64,6 +64,15 @@ jobs:
         # ledger held 241 resolved and a Brier of 0.304. A guard nothing invokes is not a guard.
         run: python3 tools/check_public_counts.py
 
+      - name: The front page must link what we have actually published
+        # Measured 2026-08-26: 63 essays published, 14 reachable from the front page, newest one
+        # linked 2026-07-11. Six weeks of work -- including both posts a live Reddit thread was
+        # sending 4,200 readers at -- sat on the site and could not be found from its front door,
+        # and one of the 14 links pointed at a slug absent from posts.json. Nothing was red: a
+        # hand-written list cannot know that something new was published, so it decays while every
+        # check that reads the page itself still passes.
+        run: python3 tools/render_writing_index.py --check
+
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |
           python3 - <<'PY'
