@@ -21,6 +21,9 @@
     "CONTROL_random_blocks_do_NOT_vanish": true,
     "CONTROL_breaking_the_symmetry_makes_within_orbit_NONZERO": true,
     "CONTROL_trivial_Aut_rows_are_excluded_not_counted": true,
+    "RING_is_a_momentum_doublet": true,
+    "RING_a_SINGLE_STATE_reaches_zero": true,
+    "CONTROL_the_standing_waves_do_NOT": true,
     "RING_multiplet_average_is_zero": true,
     "RING_real_vectors_do_NOT_spread": true,
     "RING_complex_vectors_DO_spread": true
@@ -534,7 +537,7 @@
       ],
       "edge_transitive": false,
       "vacuous_all_orbits_size_1": false,
-      "seconds": 2.2
+      "seconds": 2.3
     },
     {
       "graph": "prism CL5",
@@ -944,7 +947,20 @@
     "complex_vectors_min": 0.010529241990766278,
     "complex_vectors_max": 0.13097907749354426,
     "n_trials_each": 200,
-    "note": "every REAL vector gives ONE value, so a real-arithmetic solver has no spread to give; only complex superpositions move. Do NOT explain a reported error bar with solver scatter on this evidence -- that mechanism was retracted for the gasket on 2026-08-22 and it fails here for the same reason."
+    "note": "every REAL vector gives ONE value, so a real-arithmetic solver has no spread to give; only complex superpositions move. Do NOT explain a reported error bar with solver scatter on this evidence -- that mechanism was retracted for the gasket on 2026-08-22 and it fails here for the same reason.",
+    "translation_eigenvalues_abs": [
+      0.9999999999999982,
+      0.9999999999999982
+    ],
+    "momenta_over_2pi": [
+      0.26666666666666666,
+      -0.26666666666666666
+    ],
+    "momentum_eigenstate_E1": [
+      1.762424413785662e-15,
+      1.762424413785662e-15
+    ],
+    "mechanism": "the ground manifold is a momentum doublet +/-k; its eigenstates are complex and translation-invariant, so a SINGLE STATE reaches E(1)=0. Real combinations are standing waves, mutual translates, all sharing one variance. Real arithmetic cannot reach the doublet eigenstate."
   },
   "skipped": [],
   "claim": "with rho the ground-manifold projector over its degeneracy, edges in one Aut(G)-orbit carry equal Tr(rho SzSz), so Var(c) is entirely between-orbit and E(1)=sqrt(Var_between); edge-transitive graphs give E(1)=0 exactly",
@@ -953,6 +969,6 @@
   "edge_transitive": 13,
   "multi_orbit": 16,
   "excluded_vacuous": 2,
-  "elapsed_s": 5.0,
+  "elapsed_s": 5.1,
   "platform": "win32"
 }

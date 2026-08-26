@@ -353,6 +353,35 @@ def main() -> int:
                     "to give; only complex superpositions move. Do NOT explain a reported error "
                     "bar with solver scatter on this evidence -- that mechanism was retracted "
                     "for the gasket on 2026-08-22 and it fails here for the same reason."}
+    # WHY the real/complex split exists, which is the part that matters to the correspondent.
+    # The 2-fold manifold is a MOMENTUM DOUBLET +/-k. Restrict the translation operator to it and
+    # diagonalise: its eigenvectors are complex, translation-invariant in |psi|^2, so every edge
+    # carries the same correlation and E(1) = 0 for a SINGLE STATE, not merely for rho. Real
+    # combinations are standing waves, and every standing wave is a translate of every other, so
+    # they all share one variance. A real-arithmetic solver cannot reach the momentum eigenstate.
+    _idx = {t: i for i, t in enumerate(br)}
+    _perm = np.array([_idx[tuple(sorted(((x + 1) % 15) for x in t))] for t in br])
+    _T = np.zeros((len(br), len(br)))
+    _T[_perm, np.arange(len(br))] = 1.0
+    _w, _u = np.linalg.eig(Vr.T @ (_T @ Vr))
+    _mom = []
+    for _i in range(dr):
+        _v = Vr @ _u[:, _i]
+        _v = _v / np.linalg.norm(_v)
+        _mom.append(float(np.sqrt(np.var(spr @ (np.abs(_v) ** 2)))))
+    ring["translation_eigenvalues_abs"] = [float(abs(z)) for z in _w]
+    ring["momenta_over_2pi"] = [float(np.angle(z) / (2 * np.pi)) for z in _w]
+    ring["momentum_eigenstate_E1"] = _mom
+    ring["mechanism"] = ("the ground manifold is a momentum doublet +/-k; its eigenstates are "
+                         "complex and translation-invariant, so a SINGLE STATE reaches E(1)=0. "
+                         "Real combinations are standing waves, mutual translates, all sharing "
+                         "one variance. Real arithmetic cannot reach the doublet eigenstate.")
+    v["RING_is_a_momentum_doublet"] = all(abs(a - 1.0) < 1e-9 for a in
+                                          ring["translation_eigenvalues_abs"])
+    v["RING_a_SINGLE_STATE_reaches_zero"] = max(_mom) < 1e-10
+    v["CONTROL_the_standing_waves_do_NOT"] = ring["real_vectors_min"] > 1e-3
+    print("  ring C15: momenta k/2pi=%s  momentum-eigenstate E(1)=%.2e  standing wave=%.6f"
+          % (["%.4f" % q for q in ring["momenta_over_2pi"]], max(_mom), ring["real_vectors_min"]))
     v["RING_multiplet_average_is_zero"] = ring["E1_at_rho"] < 1e-10
     v["RING_real_vectors_do_NOT_spread"] = ring["real_vectors_spread"] < 1e-12
     v["RING_complex_vectors_DO_spread"] = ring["complex_vectors_min"] < 0.5 * ring["real_vectors_max"]
@@ -360,7 +389,8 @@ def main() -> int:
           % (dr, ring["E1_at_rho"], ring["real_vectors_min"], ring["real_vectors_max"],
              ring["real_vectors_spread"], ring["complex_vectors_min"]))
     for _k in ("RING_multiplet_average_is_zero", "RING_real_vectors_do_NOT_spread",
-               "RING_complex_vectors_DO_spread"):
+               "RING_complex_vectors_DO_spread", "RING_is_a_momentum_doublet",
+               "RING_a_SINGLE_STATE_reaches_zero", "CONTROL_the_standing_waves_do_NOT"):
         print("  %s  %s" % ("YES" if v[_k] else "no ", _k))
 
     _dups = distinct_pairs()
