@@ -1,0 +1,45 @@
+{
+  "probe": "does_a_nested_session_ignore_the_isolation_variables.py",
+  "verdicts": {
+    "CONTROL_the_clean_arm_reached_our_recorder": true,
+    "CONTROL_we_really_were_nested": true,
+    "CONTROL_the_real_store_was_readable": true,
+    "nested_ALSO_honoured_ANTHROPIC_BASE_URL": true,
+    "nested_ALSO_honoured_CLAUDE_CONFIG_DIR": true,
+    "nested_did_NOT_leak_a_slug_into_the_real_store": true,
+    "clean_did_NOT_leak_a_slug_into_the_real_store": true
+  },
+  "arms": [
+    {
+      "arm": "nested",
+      "nested": true,
+      "inherited_CLAUDECODE": true,
+      "inherited_CHILD_SESSION": true,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.6,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_nested_i2u5gr9h",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_nested_wy9iwbwf"
+    },
+    {
+      "arm": "clean",
+      "nested": false,
+      "inherited_CLAUDECODE": false,
+      "inherited_CHILD_SESSION": false,
+      "requests_reached_our_recorder": 1,
+      "base_url_honoured": true,
+      "config_dir_got_a_projects_tree": true,
+      "config_dir_entries": 1,
+      "LEAKED_into_the_real_store": [],
+      "seconds": 5.5,
+      "_cfg": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\ccfg_clean_8kt_0oxh",
+      "_proj": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cproj_clean_zp8q2oep"
+    }
+  ],
+  "question": "@yacb2 on anthropics/claude-code#82056: a nested claude -p ignored CLAUDE_CONFIG_DIR and ANTHROPIC_BASE_URL on darwin-arm64, and he had not bisected which inherited variable causes it",
+  "scope": "one machine, win32, one build. This says what happens HERE; it cannot tell him why his box differs, only that the difference is real.",
+  "platform": "win32"
+}
