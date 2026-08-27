@@ -162,8 +162,11 @@ control, and left the scan calling the old function, so the retriever passed its
 ever seeing a record of the corpus.
 
 **Then a hostile re-run of my own numbers killed the headline.** The audit was scoped to the field
-named `source`, and I had read a zero over that field as a zero over the records. In the coding store
-168 of 174 sourced records carry a locator that retrieves. The `meta.sha` and `meta.files` pairs
+named `source`, and I had read a zero over that field as a zero over the records. Every figure in
+this paragraph is from the receipt stamped `2026-08-27T22:03:30Z`, and they move: by the time the
+reply to him was written, twenty minutes later, the first pair read 170 of 176 and the second 441 of
+447. A provenance count without a time on it is the same class of mistake as the one this post is
+about. In the coding store 168 of 174 sourced records carry a locator that retrieves. The `meta.sha` and `meta.files` pairs
 resolve inside the tree of their own commit 426 times out of 432, and all 171 distinct shas are real
 commits. The provenance was there the whole time, one key away from the field I was auditing.
 
