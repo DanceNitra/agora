@@ -1,0 +1,40 @@
+{
+  "platform": "win32",
+  "cli_version": "2.1.247",
+  "arms": {
+    "repo_sub": {
+      "cwd": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tx_idx_x7lcq3g6\\arepo\\sub",
+      "version": "2.1.247",
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-arepo\\memory\\",
+      "session_id": "85c8d6b4-f35a-4fa0-acf7-276a4b08c4b5",
+      "store_slug": "C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-arepo"
+    },
+    "repo_root": {
+      "cwd": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tx_idx_x7lcq3g6\\arepo",
+      "version": "2.1.247",
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-arepo\\memory\\",
+      "session_id": "f94e8ca7-c9b0-49df-9e71-fe52fd9200a3",
+      "store_slug": "C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-arepo"
+    },
+    "nonrepo_sub": {
+      "cwd": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tx_idx_x7lcq3g6\\plain\\sub",
+      "version": "2.1.247",
+      "store": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-plain-sub\\memory\\",
+      "session_id": "2101928c-ef9c-450c-a2ae-8e506a56f997",
+      "store_slug": "C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-plain-sub"
+    }
+  },
+  "cwd_slug": "C--Users-Danculus-AppData-Local-Temp-tx-idx-x7lcq3g6-arepo-sub",
+  "jsonl_in_cwd_slug": 1,
+  "jsonl_in_repo_root_slug": 1,
+  "verdicts": {
+    "CONTROL_init_carries_the_store_path": true,
+    "CONTROL_repo_root_and_subdir_agree": true,
+    "CONTROL_a_non_repo_subdir_gets_its_own_store": true,
+    "the_index_keys_to_the_repo_root": true,
+    "a_separate_cwd_directory_exists": true,
+    "the_transcript_lands_in_the_cwd_directory": true,
+    "the_subdir_sessions_transcript_is_not_where_it_read": true,
+    "that_transcript_is_in_the_cwd_directory": true
+  }
+}
