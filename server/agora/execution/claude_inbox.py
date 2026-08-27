@@ -44,10 +44,31 @@ def _signature(text: str) -> frozenset:
 
 
 def _is_duplicate(sig: frozenset, items: list, now: float) -> str:
+    """The window applies to DONE tasks only. A PENDING twin is a duplicate at any age.
+
+    THE WINDOW AND THE ORGAN RELEASE VALVE WERE SET TO THE SAME 36 HOURS, and the valve always won.
+    Every organ opens with the dungeon's `_task_already_pending`, which deliberately RELEASES the organ
+    once its task has sat unprocessed for `_PENDING_GUARD_MAX_H = 36.0` -- an expiry added because one
+    stuck task had kept the Replication Unit shut for four days. The organ then calls add_task again,
+    and by that moment the original had just fallen out of this window, so the copy was appended.
+    Deterministic, once every 36 hours, for as long as nobody drains the task.
+
+    Measured 2026-08-17 on the live inbox: 86 pending items, 7 exact-duplicate groups, 24 surplus
+    copies. The intervals between copies were 36, 36, 36, 37 h ("Chart the external map"), 40, 40, 40,
+    40 h ("Replicate claim") and 73, 36, 36, 37, 37 h ("Challenge belief") -- the release deadline,
+    beating verbatim.
+
+    So the age test now only guards re-picking something already FINISHED, which is what the comment
+    above it always described. A pending twin is refused regardless of age, which is what
+    `_task_already_pending` says in its own words: "a second copy adds nothing, Claude would just
+    editorial-skip it". The valve keeps working -- the organ is released, calls here, receives the
+    existing id and carries on -- so nothing that was fixed in July is undone.
+    """
     if not sig:
         return ""
     for t in items:
-        if now - t.get("ts", 0) > _DEDUP_WINDOW_S:
+        _done = str(t.get("status", "")).lower() == "done"
+        if _done and now - t.get("ts", 0) > _DEDUP_WINDOW_S:
             continue
         other = _signature(t.get("text", ""))
         if not other:
@@ -90,7 +111,41 @@ def _save(items: list) -> None:
     INBOX.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def add_task(text: str) -> str:
+def add_task(text: str, untrusted: str = "", source: str = "") -> str:
+    """Queue a task for Claude Code.
+
+    `text` is OUR instruction. `untrusted` is third-party content — a stranger's GitHub issue body,
+    a harvested reply, a web-search snippet, a paper abstract — and it is sanitized and enveloped
+    HERE rather than by the caller.
+
+    WHY THE SIGNATURE CHANGED. `input_shield.wrap_as_data` exists precisely for this flow; its own
+    docstring says "The Correspondent harvests replies from strangers on the public web straight
+    toward Claude's task inbox." A repo-wide grep on 2026-08-14 found it called at exactly ONE site,
+    while three others fed the same class of text in raw:
+
+      * server/agora/main.py — the envoy loop, which is the one that actually fires (registered in
+        lifespan, every 30 min), while the guarded copy was the on-demand endpoint. Same data, two
+        doors, one guard, and the guard was on the door used less.
+      * agora-game-server/mcp_server.py — Scout triage, interpolating a stranger's issue title and
+        body[:320] into a task whose next instruction is "draft a gated reply".
+      * server/agora/execution/web_search.py — third-party title and snippet.
+
+    Sanitizing the WHOLE string here would be wrong: a task mixes our operational instructions with
+    the third-party span, and defanging our own text would corrupt legitimate tasks. So the split is
+    the fix — the caller cannot concatenate untrusted content into `text` without going out of its
+    way, and every caller added later inherits the envelope for free. That is the difference between
+    closing a class and patching three instances; the sibling gate `_inbox_theme_allowed` records
+    the same drift in its own docstring (31 queueing functions, 5 gate calls).
+
+    This does NOT make injection impossible. The mechanical half of the shield (zero-width and bidi
+    stripping, control chars, collapsing code fences that could re-open an instruction block) is a
+    real and deterministic win; the prose envelope is weaker and a determined injection walks past
+    it. The point is that the mechanical half now runs on every path.
+    """
+    if untrusted:
+        from agora.execution.input_shield import wrap_as_data
+        text = (text or "").rstrip() + "\n\n" + wrap_as_data(source or "an external source",
+                                                             untrusted)
     items = _load()
     now = time.time()
     dup = _is_duplicate(_signature(text), items, now)
@@ -115,10 +170,49 @@ def recent_texts(window_s: float = _DEDUP_WINDOW_S) -> list[str]:
 
 
 def mark_done(task_id: str, result: str) -> None:
+    """Record that a task was WORKED. A result is what makes that checkable.
+
+    `done` used to be the only exit from this queue, so the doctrine's own triage step -- "off-board
+    -> POST /brain/gatekeeper/skip + mark done" -- wrote a task nobody worked into the ledger as
+    completed. Measured 2026-08-27 over the 100 tasks the store holds: 48 done, and 13 of them carry
+    NO result at all, so 27% of our record of completed work is indistinguishable from a discard.
+    `skipped` was never a reachable status: the only two this module could set were `pending` and
+    `done`, and `gatekeeper/skip` records a THEME so upstream generators stop offering it, never
+    touching the task.
+
+    An empty result is still accepted, because refusing it would drop work rather than record it,
+    but it is now flagged in the row so the two populations can be counted apart afterwards.
+    """
     items = _load()
     for t in items:
         if t.get("id") == task_id:
             t["status"] = "done"
             t["result"] = (result or "")[:800]
             t["done_ts"] = time.time()
+            t["result_empty"] = not (result or "").strip()
     _save(items)
+
+
+def mark_skipped(task_id: str, reason: str) -> bool:
+    """Record that a task was READ and judged not to be work. The reason is not optional.
+
+    This is the exit the triage doctrine has always prescribed and the queue never had. Without it
+    the only way to clear an off-board task, a refusal or a stale duplicate was to call it done, and
+    a ledger that cannot tell "completed" from "discarded" is the exact failure our own product
+    exists to prevent.
+    """
+    reason = (reason or "").strip()
+    if len(reason) < 8:
+        return False                     # a blank reason turns this into `done` under another name
+    items = _load()
+    hit = False
+    for t in items:
+        if t.get("id") == task_id and t.get("status") == "pending":
+            t["status"] = "skipped"
+            t["result"] = ""
+            t["skip_reason"] = reason[:400]
+            t["done_ts"] = time.time()
+            hit = True
+    if hit:
+        _save(items)
+    return hit

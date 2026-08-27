@@ -1,0 +1,43 @@
+{
+ "verdict": "SPLIT",
+ "binds_observed": false,
+ "binds_write_time": true,
+ "reports_fresh": true,
+ "api_accepts_observed": false,
+ "source_dict_route_binds": true,
+ "honest_capture_fresh": true,
+ "real_drift_caught": true,
+ "vacuous_check_refuses_ok": true,
+ "states": {
+  "no observed, unchanged": [
+   {
+    "FRESH": 1
+   },
+   true,
+   0.0
+  ],
+  "no observed, moved first": [
+   {
+    "FRESH": 1
+   },
+   true,
+   0.0
+  ],
+  "observed, unchanged": [
+   {
+    "FRESH": 1
+   },
+   true,
+   1.0
+  ],
+  "observed, MOVED before write": [
+   {
+    "UNBOUND_CAPTURE": 1
+   },
+   false,
+   1.0
+  ]
+ },
+ "moved_capture_caught": true,
+ "unclaimed_binding_reported_as_zero": true
+}

@@ -1,0 +1,107 @@
+{
+  "probe": "the_data_disagrees_with_its_own_published_generator.py",
+  "verdicts": {
+    "the_dataset_is_the_one_we_measured": true,
+    "every_upstream_doc_is_at_its_pinned_blob_sha": true,
+    "every_string_we_quote_is_present_in_the_doc": true,
+    "the_generator_declares_a_400_char_cut": true,
+    "the_generator_stamps_a_PER_RECORD_length": true,
+    "every_shipped_body_is_400_matching_the_generator": true,
+    "but_NO_shipped_marker_carries_its_own_raw_length": true,
+    "every_shipped_marker_carries_the_same_frozen_500": true,
+    "the_lower_bound_3_is_NOT_a_truncation_delta": true,
+    "SCHEMAs_own_table_spans_133_to_242": true,
+    "the_true_minimum_delta_is_ZERO": true,
+    "which_refutes_published_is_always_shorter": true,
+    "CONTROL_patching_the_prose_to_400_flips_the_quote_check": true,
+    "CONTROL_a_one_byte_edit_breaks_the_blob_pin": true,
+    "CONTROL_a_correct_marker_would_not_read_as_frozen": true
+  },
+  "truncated": [
+    {
+      "request_id": "REQ-55072cb7-001",
+      "body": 400,
+      "raw": 556,
+      "marker_says": 500
+    },
+    {
+      "request_id": "REQ-c9613162-002",
+      "body": 400,
+      "raw": 635,
+      "marker_says": 500
+    },
+    {
+      "request_id": "REQ-b59745a2-005",
+      "body": 400,
+      "raw": 665,
+      "marker_says": 500
+    }
+  ],
+  "deltas": [
+    {
+      "request_id": "REQ-55072cb7-001",
+      "raw": 556,
+      "published": 423,
+      "delta": 133
+    },
+    {
+      "request_id": "REQ-c9613162-002",
+      "raw": 635,
+      "published": 423,
+      "delta": 212
+    },
+    {
+      "request_id": "REQ-b59745a2-005",
+      "raw": 665,
+      "published": 423,
+      "delta": 242
+    },
+    {
+      "request_id": "REQ-812baf38-006",
+      "raw": 171,
+      "published": 162,
+      "delta": 9
+    },
+    {
+      "request_id": "REQ-0c20a02e-013",
+      "raw": 62,
+      "published": 59,
+      "delta": 3
+    },
+    {
+      "request_id": "REQ-4f5322c7-014",
+      "raw": 62,
+      "published": 59,
+      "delta": 3
+    },
+    {
+      "request_id": "REQ-91f8a1a5-015",
+      "raw": 65,
+      "published": 62,
+      "delta": 3
+    },
+    {
+      "request_id": "REQ-9bd5cb4a-016",
+      "raw": 67,
+      "published": 67,
+      "delta": 0
+    },
+    {
+      "request_id": "REQ-154cd575-017",
+      "raw": 70,
+      "published": 67,
+      "delta": 3
+    },
+    {
+      "request_id": "REQ-4755c59c-018",
+      "raw": 71,
+      "published": 68,
+      "delta": 3
+    }
+  ],
+  "upstream_blobs": {
+    "SCHEMA.md": "d33d98f1a78f0d98e470d882c8c117754cff4d40",
+    "CALIBRATION_DATASET_USAGE_GUIDE.md": "99e12538510ec0debd90d993b1ca2213f8e4f128",
+    "lh_shared_audit_extract.py": "e5b6401fc5857e3fb64d6de99acca41d1a2eba88"
+  }
+}

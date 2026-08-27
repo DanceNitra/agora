@@ -33,13 +33,25 @@ def _save(items: list) -> None:
         pass
 
 
-def record_challenge(verdict: str, target: str, by_agent: str = "Sergeant Voss") -> dict | None:
-    """Ledger one resolved belief challenge. verdict: survived | revised | retired."""
+def record_challenge(verdict: str, target: str, by_agent: str = "Sergeant Voss",
+                     evidence: str = "") -> dict | None:
+    """Ledger one resolved belief challenge. verdict: survived | revised | retired.
+
+    `evidence` CARRIES THE RECEIPT, and it is not optional in spirit. The record used to be
+    {verdict, kill, target, by, ts} and nothing else, so a "survived" said a belief was attacked
+    without a trace of WHAT it survived. Measured 2026-07-31: Voss ran a real falsifier
+    (lab c9dbc6 -- observed_delta=0.1900, n=100, p=0.0078, 20,000 trials), recorded "survived", and
+    the ledger kept none of it. An unevidenced survival is indistinguishable from a challenge that
+    was never capable of killing anything, which is the exact failure Voss's own academy lesson
+    names: "a challenge that could not kill is not a test". It also made the record unusable to the
+    acceptance gate, which asks for a lab id or a citation and correctly found neither.
+    """
     v = (verdict or "").strip().lower()
     if v not in ("survived", "revised", "retired"):
         return None
     rec = {"verdict": v, "kill": v in _KILL_VERDICTS, "target": (target or "")[:120],
-           "by": (by_agent or "Sergeant Voss")[:40], "ts": time.time()}
+           "by": (by_agent or "Sergeant Voss")[:40], "evidence": (evidence or "")[:300],
+           "ts": time.time()}
     items = _load()
     items.append(rec)
     _save(items[-200:])

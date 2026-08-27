@@ -345,7 +345,8 @@ def main() -> None:
                       if _AGENT_OUTPUT.search(str(nt["path"]))}
         print(f"[AutoLinker] {len(machinery)} notes are machine output (dated snapshot families or "
               f"agent-output folders) — excluded as link targets")
-        applied_notes = applied_links = 0
+        applied_notes = applied_links = skipped_undecodable = 0
+        write_failures: list[str] = []
         for stem, cands in suggestions:
             if applied_notes >= args.max_notes:
                 print(f"[AutoLinker] budget reached ({args.max_notes} notes) — the rest stays "
@@ -373,21 +374,49 @@ def main() -> None:
                 new.append(ot)
             if not new:
                 continue
+            # This is the only code in the repo that REWRITES the owner's pre-existing notes, and
+            # it runs unattended (the standing check above sets args.apply itself). Two defects were
+            # confirmed here on 2026-08-14 and both are fixed by the read/write below:
+            #
+            #  1. `errors="replace"` is a DECODE policy, and the decoded string was written back --
+            #     so any note that is not valid UTF-8 had every offending byte permanently replaced
+            #     by U+FFFD on disk. A file we cannot decode is a file we must not rewrite, so the
+            #     decode is now strict and a failure SKIPS the note.
+            #  2. No `newline=` on either side meant universal-newline translation in both
+            #     directions: read turned CRLF into \n, write turned \n into os.linesep. On this
+            #     Windows box every LF note was silently rewritten CRLF from top to bottom. That
+            #     needed no bad bytes and no attacker -- it happened to every note this tool
+            #     touched, and it makes the promise in MORNING_BRIEFING_2026-07-21 ("nothing else
+            #     was touched, so it is a mechanical strip") untrue. `newline=""` on both sides
+            #     hands the string through verbatim.
             try:
-                txt = note["path"].read_text(encoding="utf-8", errors="replace")
-            except Exception:
+                with open(note["path"], "r", encoding="utf-8", newline="") as fh:
+                    txt = fh.read()
+            except (OSError, UnicodeDecodeError):
+                skipped_undecodable += 1
                 continue
-            block = "\n".join(f"- [[{t}]]" for t in new)
+            eol = "\r\n" if "\r\n" in txt else "\n"      # append in the file's own line ending
+            block = eol.join(f"- [[{t}]]" for t in new)
             if MARK in txt:
-                txt = txt.rstrip() + "\n" + block + "\n"   # extend existing section
+                txt = txt.rstrip() + eol + block + eol    # extend existing section
             else:
-                txt = txt.rstrip() + f"\n\n{MARK}{provenance}\n" + block + "\n"
+                txt = txt.rstrip() + eol + eol + MARK + provenance + eol + block + eol
             try:
-                note["path"].write_text(txt, encoding="utf-8")
+                with open(note["path"], "w", encoding="utf-8", newline="") as fh:
+                    fh.write(txt)
                 applied_notes += 1
                 applied_links += len(new)
-            except Exception:
-                pass
+            except Exception as e:
+                # A failed write used to vanish. write_text truncates at open, so this is exactly
+                # where a note can be left empty -- it must be counted and printed, not swallowed.
+                write_failures.append("%s: %s" % (note["path"].name, str(e)[:80]))
+        # A silent skip and a silent write failure are both how "the tool ran fine" gets said about
+        # a run that touched nothing or emptied something. Print them beside the success count.
+        if skipped_undecodable:
+            print(f"[AutoLinker] SKIPPED {skipped_undecodable} note(s) that are not valid UTF-8 "
+                  f"-- they were left byte-for-byte alone, which is the point")
+        for f in write_failures:
+            print(f"[AutoLinker] WRITE FAILED (note may be truncated -- check it): {f}")
         print(f"[AutoLinker] APPLIED {applied_links} links into {applied_notes} notes "
               f"(threshold {args.apply_threshold})")
 

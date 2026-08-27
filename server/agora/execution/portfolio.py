@@ -97,14 +97,14 @@ def publish() -> dict:
     def _git(*a):
         return subprocess.run(["git", "-C", str(AGORA_REPO), *a],
                               capture_output=True, text=True, timeout=60)
-    _git("add", PUBLIC_REL)
-    c = _git("commit", "-m", f"Track Record: update {time.strftime('%Y-%m-%d')}")
-    if "nothing to commit" in (c.stdout + c.stderr):
-        return {"url": PUBLIC_URL, "note": "unchanged since last publish"}
-    p = _git("push", "origin", "main")
-    if p.returncode != 0:
-        return {"error": ("push failed: " + (p.stderr or p.stdout))[:200]}
-    return {"url": PUBLIC_URL}
+    from agora.execution.public_repo import commit_and_push
+    r = commit_and_push(AGORA_REPO, [PUBLIC_REL],
+                        f"Track Record: update {time.strftime('%Y-%m-%d')}")
+    if r.get("error"):
+        return {"error": r["error"]}
+    if r.get("note"):
+        return {"url": PUBLIC_URL, "note": r["note"]}
+    return {"url": PUBLIC_URL, "sha": r["sha"]}
 
 
 def format_portfolio() -> str:

@@ -1,0 +1,43 @@
+{
+  "spec_commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
+  "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
+  "arms": {
+    "clean": {
+      "checkpoint_coverage": "verified",
+      "triad": {
+        "negative": "pass",
+        "positive": "pass",
+        "preserve": "pass"
+      },
+      "stores": {
+        "inspeximus": "verified"
+      },
+      "aggregate": "verified",
+      "active_records": [
+        "prefers quiet restaurants",
+        "moderate budget",
+        "eats meat again"
+      ],
+      "duplicate_assertions": 0
+    },
+    "undeclared_derivative": {
+      "checkpoint_coverage": "unknown",
+      "triad": {
+        "negative": "pass",
+        "positive": "pass",
+        "preserve": "pass"
+      },
+      "stores": {
+        "inspeximus": "unknown"
+      },
+      "aggregate": "unknown",
+      "active_records": [
+        "prefers quiet restaurants",
+        "moderate budget",
+        "digest whose summariser dropped its lineage",
+        "eats meat again"
+      ],
+      "duplicate_assertions": 0
+    }
+  }
+}

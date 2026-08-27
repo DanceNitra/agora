@@ -1,0 +1,17 @@
+{
+  "probe": "claude_md_declares_exactly_one_current_llm_state.py",
+  "verdicts": {
+    "the_llm_section_exists": true,
+    "the_standing_rule_is_stated_first": true,
+    "the_rule_names_embeddings_as_the_only_local_thing": true,
+    "exactly_one_block_claims_to_be_current": true,
+    "no_block_still_uses_the_ambiguous_current_tag": true,
+    "the_local_block_is_labelled_a_fallback": true,
+    "the_current_block_points_at_the_cloud": true,
+    "the_current_block_does_not_point_at_localhost": true,
+    "CONTROL_a_second_current_label_would_be_caught": true
+  },
+  "current_blocks": 1,
+  "fallback_blocks": 1,
+  "ambiguous_tags": 0
+}

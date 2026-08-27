@@ -1,0 +1,272 @@
+"""THE definition of "is this grounded", in one place.
+
+WHY THIS FILE EXISTS. On 2026-07-31 the repo held SIX independent answers to "does this text carry a
+citation", and they disagreed on 8 of 9 citation forms. Measured, each cell = does that definition accept
+that form:
+
+    form                    quality_gate  seminar  find_div  api_grade  self_impr  funnel
+    (Smith, 2024)                Y           Y        .          Y          .        Y
+    Smith (2024)                 .           .        Y          .          Y        .
+    Breznau et al. (2022)        .           Y        Y          .          Y        .
+    doi:10.x                     Y           Y        .          Y          Y        Y
+    arXiv:2404.12967             Y           Y        .          Y          Y        Y
+    [[vault note]]               .           Y        .          .          .        .
+    bare "et al." (no year)      .           Y        .          .          Y        .
+    MEASURED:/VERDICT:           Y           .        .          .          .        Y
+    bare prose                   .           .        .          .          .        .
+
+The two author-year regexes were MIRROR IMAGES: `quality_gate._CITES` requires the name INSIDE the
+parentheses, `finding_diversity._CITE` requires it OUTSIDE. Both are standard styles and each rejected
+the other's. Consequence measured over the 4,000 most recent discoveries: 2,514 (62.9%) passed the vault
+door and **1,127 (28.2%) were rejected while carrying a real narrative citation** -- "Cameron et al.
+(2022)", "Lemos (2010)", "Dame (2011)". Those were not empty notes. They were grounded findings thrown
+away over the position of a bracket, silently, because a rejection leaves no trace.
+
+WHAT THIS FILE DOES NOT DO. It does not flatten the six into one predicate. The modules differ in PURPOSE
+and that is legitimate: the vault door wants EXTERNAL grounding (a paper or a measurement), the Seminar's
+verification tier wants A CHECKABLE SOURCE (a vault link counts -- a reader can follow it), and
+`finding_diversity` wants to EXTRACT the source string to measure source concentration. The defect was
+never that they differ in intent; it was that they differed ACCIDENTALLY, on the same form, by regex
+drift. So this module exposes the primitives separately and lets each caller compose the meaning it
+actually needs -- and pins them all to one table of forms in tests/test_grounding_is_unforked.py.
+
+A NOTE ON BARE "et al.": `seminar._SOURCE_RE` accepted "as Smith et al. showed" with no year at all.
+That is not a checkable source -- there is nothing to look up. It is excluded here, which TIGHTENS the
+Seminar's verified tier. That is a deliberate behaviour change, measured before it shipped.
+"""
+
+from __future__ import annotations
+
+import re
+
+# ── the primitives ───────────────────────────────────────────────────────────────────────────────
+
+#: A capitalised word that is a DATE, not a surname. Measured 2026-08-01: "(January 2026)" was
+#: accepted as a parenthetical author-year citation, so any claim that merely mentions a month and a
+#: year read as externally cited. Every caller of `citation()`/`is_cited()` inherits that -- the
+#: quality gate, the promotion pipeline, the canon receipt scan -- so a note with no source at all
+#: could clear a citation bar by naming the month it was written in.
+_NOT_A_SURNAME = re.compile(
+    r"^(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?"
+    r"|Sep(?:t|tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?"
+    r"|Q[1-4]|Spring|Summer|Autumn|Fall|Winter|Version|Release|Issue|Revision)$", re.I)
+
+#: Narrative author-year: `Smith (2024)`, `Smith & Jones (2024)`, `Breznau et al. (2022)`.
+_CITE_NARRATIVE = re.compile(
+    r"(?P<lead>[A-Z][A-Za-z\-]+)(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?\s*"
+    r"\((?:19|20)\d{2}[a-z]?\)")
+
+#: Parenthetical author-year: `(Smith, 2024)`, `(Breznau et al., 2022)`.
+_CITE_PAREN = re.compile(
+    r"\(\s*(?P<lead>[A-Z][A-Za-z\-]+)(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?,?\s*"
+    r"(?:19|20)\d{2}[a-z]?\s*\)")
+
+_DOI = re.compile(r"\b10\.\d{4,9}/\S+", re.I)
+_ARXIV = re.compile(r"\barxiv[:\s]*\d{4}\.\d{4,5}", re.I)
+_URL = re.compile(r"https?://\S+", re.I)
+
+#: An internal reference to one of the owner's own vault notes. Checkable by a reader, but NOT external
+#: evidence -- a note citing another note is not a paper.
+_VAULT_LINK = re.compile(r"\[\[.+?\]\]")
+
+#: A Lab receipt: the 6-hex id `lab.run` mints. Evidence of a measurement having happened.
+#:
+#: `=` is in both separator classes because `lab_id=2b7e05` is a form our own code writes and this
+#: detector missed it, while the LAB-FIRST gate's private copy caught it and missed `Lab: <id>` --
+#: the form the ORGAN DISPATCHER writes. Two regexes for one field, each blind to what the other saw.
+_LAB_ID = re.compile(r"\blab[:=_\s-]*(?:id\s*)?[:=#]?\s*([0-9a-f]{6})\b", re.I)
+
+#: A measured result. Grounding by our own computation rather than by somebody else's paper.
+_MEASURED = re.compile(
+    r"MEASURED:|VERDICT:|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|p\s*[<=]\s*0?\.\d{1,4}|effect size|"
+    r"\bCI\b|95%|bootstrap|risk@", re.I)
+
+
+# ── the composable answers ───────────────────────────────────────────────────────────────────────
+
+def citation(text: str) -> str | None:
+    """The first EXTERNAL citation in `text`, or None. Returns the match so callers that need the
+    source string (source-concentration metrics) use the same detector as callers that need a boolean."""
+    for rx in (_DOI, _ARXIV, _CITE_NARRATIVE, _CITE_PAREN, _URL):
+        for m in rx.finditer(text or ""):
+            # A month is not an author. Scan ON rather than returning at the first hit, so a note
+            # that says "(January 2026)" early and cites a real paper later is still credited.
+            try:
+                lead = m.group("lead")
+            except (IndexError, re.error):
+                lead = None
+            if lead and _NOT_A_SURNAME.match(lead):
+                continue
+            return m.group(0).strip()
+    return None
+
+
+def is_cited(text: str) -> bool:
+    """Does `text` carry an external citation (paper, DOI, arXiv, URL)?"""
+    return citation(text) is not None
+
+
+def is_internal_ref(text: str) -> bool:
+    """Does `text` point at one of the owner's own vault notes? Checkable, but not external evidence."""
+    return bool(_VAULT_LINK.search(text or ""))
+
+
+#: Vault-note index for `names_existing_note`. Rebuilt at most every _NOTE_INDEX_TTL_S; a bare glob over
+#: the vault measured 0.18s for 8,907 notes, so this is cheap per run and unaffordable per call.
+_NOTE_INDEX_TTL_S = 900.0
+_note_index: dict = {"stems": frozenset(), "prefixes": frozenset(), "built": 0.0, "n": 0}
+#: Below this length a slug is not distinctive enough to identify a note ("Consistency", "Exercise"),
+#: and a prefix match on it would credit almost anything.
+_MIN_SLUG = 12
+
+
+def _slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", str(s or "").strip().strip("[]").lower()).strip("-")
+
+
+def _note_stems() -> tuple:
+    """(stems, 40-char prefixes) of every note in the vault. FAILS CLOSED to empty sets.
+
+    An unreadable vault must not lift anything: this primitive exists to grant credit for a reference,
+    and granting it when the evidence cannot be examined is the failure mode this repo keeps recording.
+    Empty sets mean `names_existing_note` answers False for everything, which is the safe direction.
+    """
+    import glob
+    import os
+    import time as _t
+    if _note_index["stems"] and (_t.time() - _note_index["built"]) < _NOTE_INDEX_TTL_S:
+        return _note_index["stems"], _note_index["prefixes"]
+    try:
+        vault = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
+        stems = {os.path.splitext(os.path.basename(p))[0].lower()
+                 for p in glob.glob(os.path.join(vault, "**", "*.md"), recursive=True)}
+    except Exception:                                                  # noqa: BLE001
+        stems = set()
+    slugs = {_slug(s) for s in stems if s}
+    _note_index.update(stems=frozenset(slugs), prefixes=frozenset(s[:40] for s in slugs),
+                       built=_t.time(), n=len(slugs))
+    return _note_index["stems"], _note_index["prefixes"]
+
+
+def names_existing_note(s: str) -> bool:
+    """Does `s` name a note that ACTUALLY EXISTS in the vault, bracketed or not?
+
+    THE SEMINAR'S VERIFIED TIER WAS READING THE PROSE FOR A FACT THE RECORD ALREADY CARRIED.
+    `verify_contributions` requires a checkable source, and it looked only at the evidence and claim
+    text -- so a `[[bracketed]]` mention counted while the same reference sitting in the record's own
+    `links` field did not. Measured 2026-08-17 over the whole ledger: of the 174 post-2026-07-31
+    contributions the prose test rejected, ALL 174 carried at least one link, 171 of 502 link strings
+    resolved to a real file among 8,907 vault notes, and 102 of the 174 records (59%) had at least one
+    link that exists on disk. Counting those moves the verified rate for 2026-W32/W33 from 44% to 72%,
+    against 94% in W31 -- so roughly 13 points of a 35-point "collapse" were this blind spot, and the
+    remaining ~22 are a real drop in the model's citing-in-prose behaviour dated to the same day.
+
+    Deliberately checks the FILESYSTEM rather than the string's shape. A slug is not evidence that a
+    note exists; the note existing is. Short slugs are refused because a prefix match on "Consistency"
+    would credit half the vault, and a fabricated slug must not lift anything -- pinned by test.
+    """
+    n = _slug(s)
+    if len(n) < _MIN_SLUG:
+        return False
+    stems, prefixes = _note_stems()
+    return n in stems or n[:40] in prefixes
+
+
+def lab_id(text: str) -> str | None:
+    """The Lab receipt id in `text`, or None."""
+    m = _LAB_ID.search(text or "")
+    return m.group(1) if m else None
+
+
+def is_measured(text: str) -> bool:
+    """Does `text` carry a measured result or a Lab receipt, rather than a claim about one?"""
+    return bool(_MEASURED.search(text or "")) or lab_id(text) is not None
+
+
+#: Nouns that name a SOURCE. The refusal test anchors on these and nowhere else, because the
+#: distinction that matters is between a non-answer and a null result: "no sources were found" is an
+#: unanswered question, while "no significant difference was found (p=0.31)" is science, and a filter
+#: that cannot tell them apart deletes our best material.
+_SOURCE_NOUN = r"(?:papers?|sources?|stud(?:y|ies)|abstracts?|evidence|references?|citations?|literature)"
+
+#: "no <up to three modifiers> <source noun> ... <verb of support>", plus the "none of the ..." form.
+#: The gap for modifiers is the whole point: the previous pattern required the noun IMMEDIATELY after
+#: "no", so a single adjective defeated it. Measured on the live inbox 2026-07-31: ten pending tasks
+#: carried a refusal and the guard caught ONE -- every miss was of the form "No REAL sources were
+#: provided". A guard with 10% recall reports safe.
+_REFUSAL = re.compile(
+    r"\bno(?:ne of the)?\b(?:\s+[a-z-]+){0,3}?\s+" + _SOURCE_NOUN +
+    r"\b[^.\n]{0,70}?\b(?:support|provide|relate|address|mention|match|fit|confirm|ground|report|"
+    r"found|exist|available)\w*"
+    r"|\b(?:cannot|could not|can't) be (?:assessed|evaluated|determined|verified)\b[^.\n]{0,40}"
+    r"\b(?:available|provided|existing)\b"
+    r"|\bdoes not (?:support|fit|apply)\b|\b(?:are|is) unrelated\b"
+    r"|\bcould not find\b|\bunable to (?:find|locate)\b|\bthe closest (?:are|is)\b"
+    r"|\bnot supported by\b|\btotal mismatch\b|\bas an ai\b"
+    r"|\bi (?:cannot|can't|could not|am unable)\b", re.I)
+
+
+def is_refusal(text: str) -> bool:
+    """Is this a NON-ANSWER dressed as research -- "no sources were provided to support the claim"?
+
+    THE ONE DEFINITION, because the same question is asked at two doors and only one was asking it.
+    `_garbage_finding` kept a private copy and used it to keep refusals out of the discovery pool;
+    nothing checked the CORP -> Claude inbox path, so a refusal that could never become a finding
+    still became a task. Measured 2026-07-31: 10 of 33 pending inbox tasks (30%) were refusals, nine
+    of them invisible to the private copy as well.
+
+    A null RESULT is not a refusal. See `_SOURCE_NOUN`.
+    """
+    return bool(_REFUSAL.search(text or ""))
+
+
+#: A claim states its FALSIFIER when it names the observation that would overturn it. Matched on the
+#: CONCEPT, not on one spelling: the press arm asked for the literal substring "falsifier" while the
+#: Theory Engine writes "falsification control: ...", and "falsifier" is not a substring of
+#: "falsification". Measured 2026-07-31: of the last 40 discoveries, 40 carried a Lab id and 1 was
+#: seen to carry a falsifier, which read as a swarm-wide contract gap. Part of it was the detector.
+#:
+#: The bar is deliberately a NAMED TEST, not the word alone: a bare "falsifiable" adjective is a
+#: claim about the claim, and would let an empty gesture past a gate whose whole job is to demand the
+#: test. Same failure mode as a refusal guard keyed to one word order.
+_FALSIFIER = re.compile(
+    # The noun, then the statement it introduces, within the same sentence. The separator is not
+    # always a colon: the Theory Engine writes "falsification control: ...", the contradiction desk
+    # writes "Falsifier, fixed in the lab script before it computed anything: ...". Requiring ":"
+    # immediately after the word rejected the second one, which is a real falsifier in a live note.
+    # `falsifiABLE` cannot match here -- it contains neither "falsifier" nor "falsification" -- and
+    # that is deliberate: an adjective is a claim ABOUT the claim, not the test.
+    # Separator: a colon, a comma, or a SPACED dash. Spaced on purpose -- an unspaced hyphen lives
+    # inside words ("falsification-aware"), and accepting it would make the noun alone sufficient.
+    r"falsif(?:ier|ication)\b[^.\n]{0,80}?(?:[:,]|\s[-–—]+\s)"
+    r"|\bthis (?:claim|result|finding|model) is (?:wrong|false|refuted) if\b"
+    # Both tenses. The bounty ledger writes "WOULD HAVE KILLED IT: ..." -- a named killing condition,
+    # and the strongest falsifier in the swarm, since the test was actually run. A pattern that knew
+    # only "would kill it" missed it, which is the same one-surface-form failure this file records
+    # for "falsifier" vs "falsification".
+    r"|\bwould (?:have )?(?:kill(?:ed|s)?|refute[ds]?|falsif(?:y|ied|ies)|overturn(?:ed|s)?) "
+    r"(?:it|this|the claim|the result|the finding|the belief)\b"
+    r"|\b(?:refuted|falsified|overturned) if\b"
+    r"|\bfails? if\b[^.\n]{0,80}\b(?:below|above|exceeds|under|less than|greater than|\d)"
+    r"|\bpre-?registered\s+(?:a\s+|the\s+)?(?:falsifier|threshold|cutoff)\b", re.I)
+
+
+def has_falsifier(text: str) -> bool:
+    """Does `text` name the observation that would overturn its own claim?
+
+    THE ONE DEFINITION. A claim that cannot say what would kill it is an assertion, and the press
+    template refuses it for that reason -- correctly. What it must not do is refuse a claim that
+    DID say so in different words.
+    """
+    return bool(_FALSIFIER.search(text or ""))
+
+
+def is_grounded(text: str, allow_internal: bool = False) -> bool:
+    """The vault-door question: external citation OR our own measurement.
+
+    `allow_internal=True` widens it to "a reader can check this", which is what the Seminar's
+    verification tier means -- there, a [[vault note]] is a legitimate anchor.
+    """
+    if is_cited(text) or is_measured(text):
+        return True
+    return allow_internal and is_internal_ref(text)

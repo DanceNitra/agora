@@ -1,7 +1,7 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass); RETRACTED = a verdict we published and then withdrew, kept on the record with the reason.",
- "generated": "2026-08-06",
+ "generated": "2026-08-14",
  "counts": {
   "REPRODUCED": 21,
   "FAILED": 13,

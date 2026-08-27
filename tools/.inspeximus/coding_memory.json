@@ -1,40 +1,10 @@
 [
- {
-  "id": "fa15f1156e",
-  "text": "ran: cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.vbs 2>/dev/null | head -8; echo \"=== ps1 guard check ===\"; grep -n -i \"netstat\\|Get-NetTCP\\|Get-CimInstance\\|Get-Process\\|already\\|exit\" star…",
-  "tags": [
-   "bash"
-  ],
-  "value": 1.0,
-  "ts": 1784567547.9881582,
-  "iso": "2026-07-20T17:12:27Z",
-  "valid_from": 1784567547.9881582,
-  "source": null,
-  "mtype": "episodic",
-  "last_access": 1784567547.9881582,
-  "status": "active",
-  "links": [],
-  "meta": {},
-  "key": "cmd:ceee24620e",
-  "object": "cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.v"
- },
- {
-  "id": "4417401267",
-  "text": "ran: sed -n '1,30p' start_agora.ps1",
-  "tags": [
-   "bash"
-  ],
-  "value": 1.0,
-  "ts": 1784567551.9757571,
-  "iso": "2026-07-20T17:12:31Z",
-  "valid_from": 1784567551.9757571,
-  "source": null,
-  "mtype": "episodic",
-  "last_access": 1784567551.9757571,
-  "status": "active",
-  "links": [],
-  "meta": {},
-  "key": "cmd:23cbc55b63",
-  "object": "sed -n '1,30p' start_agora.ps1"
- }
+ {"id":"fa15f1156e","text":"ran: cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.vbs 2>/dev/null | head -8; echo \"=== ps1 guard check ===\"; grep -n -i \"netstat\\|Get-NetTCP\\|Get-CimInstance\\|Get-Process\\|already\\|exit\" star…","tags":["bash"],"value":1.0,"ts":1784567547.9881582,"iso":"2026-07-20T17:12:27Z","valid_from":1784567547.9881582,"source":null,"mtype":"episodic","last_access":1784567547.9881582,"status":"active","links":[],"meta":{},"key":"cmd:ceee24620e","object":"cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.v"},
+ {"id":"4417401267","text":"ran: sed -n '1,30p' start_agora.ps1","tags":["bash"],"value":1.0,"ts":1784567551.9757571,"iso":"2026-07-20T17:12:31Z","valid_from":1784567551.9757571,"source":null,"mtype":"episodic","last_access":1784567551.9757571,"status":"active","links":[],"meta":{},"key":"cmd:23cbc55b63","object":"sed -n '1,30p' start_agora.ps1"},
+ {"id":"0051aa9e1f","text":"ran: cd /c/Users/Danculus/agora/tools grep -n -i -B3 -A8 \"mcp_server\" start_agora.ps1 | head -40","tags":["bash"],"value":1.0,"ts":1785853053.2657132,"iso":"2026-08-04T14:17:33Z","valid_from":1785853053.2657132,"source":null,"mtype":"episodic","last_access":1785853053.2657132,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:5d7e1abe04","object":"cd /c/Users/Danculus/agora/tools grep -n -i -B3 -A8 \"mcp_ser"},
+ {"id":"7bb16a0d9f","text":"ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== CLAUDE INBOX (key is .pending) ===\" curl -s \"$B/claude-inbox\" | python -c \" import sys,json,collections d=json.load(sys.stdin) p=d.get('pending'…","tags":["bash"],"value":1.0,"ts":1785853259.4820786,"iso":"2026-08-04T14:20:59Z","valid_from":1785853259.4820786,"source":null,"mtype":"episodic","last_access":1785853259.4820786,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:36ef064770","object":"B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== CLAU"},
+ {"id":"7fa041ad12","text":"ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain curl -s \"$B/claude-inbox\" | python -c \" import sys,json,collections d=json.load(sys.stdin); p=d['pending'] print('  item keys:', list(p[0].keys())) print(…","tags":["bash"],"value":1.0,"ts":1785853266.262795,"iso":"2026-08-04T14:21:06Z","valid_from":1785853266.262795,"source":null,"mtype":"episodic","last_access":1785853266.262795,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:e9a932c7e7","object":"B=http://127.0.0.1:8000/api/v1/agent-os/brain curl -s \"$B/cl"},
+ {"id":"40573afba3","text":"ran: S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/df92a49c-7e54-4db8-936b-195e7a1f09cb/scratchpad\" curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" -o \"$S/inbox.…","tags":["bash"],"value":1.0,"ts":1785853288.7543583,"iso":"2026-08-04T14:21:28Z","valid_from":1785853288.7543583,"source":null,"mtype":"episodic","last_access":1785853288.7543583,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:54e19cefd3","object":"S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danc"},
+ {"id":"a7c6fe5f00","text":"ran: S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/df92a49c-7e54-4db8-936b-195e7a1f09cb/scratchpad\" python - <<PY import json, io, re, textwrap p = json.load(io.open(r\"$S/inbox.jso…","tags":["bash"],"value":1.0,"ts":1785853305.886693,"iso":"2026-08-04T14:21:45Z","valid_from":1785853305.886693,"source":null,"mtype":"episodic","last_access":1785853305.886693,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:2aac2b2584","object":"S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danc"},
+ {"id":"8d177d3220","text":"ran: S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/df92a49c-7e54-4db8-936b-195e7a1f09cb/scratchpad\" python - <<PY import json, io, re, collections p = json.load(io.open(r\"$S/inbox.…","tags":["bash"],"value":1.0,"ts":1785853326.4160316,"iso":"2026-08-04T14:22:06Z","valid_from":1785853326.4160316,"source":null,"mtype":"episodic","last_access":1785853326.4160316,"status":"active","links":[],"meta":{"sid":"df92a49c-7e54-4db8-936b-195e7a1f09cb"},"key":"cmd:cb5f1369ab","object":"S=\"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danc"}
 ]

@@ -1,0 +1,26 @@
+SG(2): 15 vertices, 27 edges | defect (0, 1)
+testing s=0.5, which the manuscript calls strictly zero
+
+  Sz=+0.5  dim= 6435  gap(s=0.5)=0.522571  E(0)=0.246731  (0s)
+  Sz=+1.5  dim= 5005  gap(s=0.5)=0.363353  E(0)=0.229169  (0s)
+  Sz=+2.5  dim= 3003  gap(s=0.5)=0.056861  E(0)=0.381249  (0s)
+  Sz=+3.5  dim= 1365  gap(s=0.5)=0.320784  E(0)=0.461886  (1s)
+  Sz=+4.5  dim=  455  gap(s=0.5)=0.482009  E(0)=0.379868  (1s)
+  Sz=+5.5  dim=  105  gap(s=0.5)=0.100862  E(0)=0.269184  (1s)
+  Sz=+6.5  dim=   15  gap(s=0.5)=0.000000  E(0)=0.256105  (1s)
+  Sz=+7.5  dim=    1  fully polarised: no second level in this sector
+
+C1 COVERAGE     8 distinct sectors visited (n_up 8..15); every dim = C(15,n_up)  OK
+C2 CALIBRATION  sectors reproducing E(0)=0.246731: [0.5]  OK -- E(0) identifies the sector
+Traceback (most recent call last):
+  File "C:\Users\Danculus\agora\probes\edrn_every_sector_not_just_three.py", line 144, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\Danculus\agora\probes\edrn_every_sector_not_just_three.py", line 105, in main
+    vf = np.sort(spla.eigsh(Hflat, k=2, which="SA", tol=1e-11)[0])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Danculus\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\scipy\sparse\linalg\_eigen\arpack\arpack.py", line 1778, in eigsh
+    params.iterate()
+  File "C:\Users\Danculus\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\scipy\sparse\linalg\_eigen\arpack\arpack.py", line 626, in iterate
+    raise ArpackError(self.arpack_dict['info'],
+scipy.sparse.linalg._eigen.arpack.arpack.ArpackError: ARPACK error -9: Starting vector is zero.

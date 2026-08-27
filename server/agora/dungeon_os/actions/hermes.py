@@ -18,9 +18,17 @@ TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
 
 
 async def _send_telegram(config: dict, chat_id: str, message: str) -> bool:
-    """Send a message via Telegram Bot API using curl subprocess.
+    """Send a message via the Telegram Bot API.
 
-    Using subprocess to avoid asyncio event-loop conflicts.
+    urllib in a worker thread, NOT a curl subprocess. The old version put the bot token into the
+    curl argv, where `ps` -- or Get-CimInstance Win32_Process on Windows, no elevation needed --
+    hands it to any local process. Whoever holds that token can read the owner's entire
+    control-plane chat via getUpdates, consume updates before our poller sees them, and send
+    messages that appear to come from us.
+
+    The docstring this replaces said subprocess was used "to avoid asyncio event-loop conflicts".
+    That was wrong twice over: `subprocess.run` inside an `async def` blocks the loop exactly as a
+    blocking socket would. `asyncio.to_thread` is the answer to both problems.
     """
     bot_token = (
         config.get("telegram_bot_token")
@@ -35,30 +43,26 @@ async def _send_telegram(config: dict, chat_id: str, message: str) -> bool:
         "text": message,
         "parse_mode": "Markdown",
         "disable_web_page_preview": True,
-    })
+    }).encode()
     url = TELEGRAM_API.format(token=bot_token)
 
-    try:
-        result = subprocess.run(
-            ["curl", "-s", "--max-time", "8", "-X", "POST", url,
-             "-H", "Content-Type: application/json", "-d", payload],
-            capture_output=True, text=True, timeout=10,
-        )
-        if result.returncode == 0:
-            resp = json.loads(result.stdout)
+    def _post() -> bool:
+        try:
+            req = urllib.request.Request(
+                url, data=payload, headers={"Content-Type": "application/json"})
+            resp = json.loads(urllib.request.urlopen(req, timeout=8).read().decode(
+                "utf-8", "replace"))
             if resp.get("ok"):
                 msg_id = resp.get("result", {}).get("message_id", "?")
                 print(f"[Hermes] Telegram sent to {chat_id} (msg #{msg_id})")
                 return True
-            else:
-                print(f"[Hermes] Telegram API error: {resp}")
-                return False
-        else:
-            print(f"[Hermes] curl failed (rc={result.returncode}): {result.stderr[:200]}")
+            print(f"[Hermes] Telegram API error: {resp}")
             return False
-    except Exception as e:
-        print(f"[Hermes] Telegram send exception: {e}")
-        return False
+        except Exception as e:
+            print(f"[Hermes] Telegram send exception: {e}")
+            return False
+
+    return await asyncio.to_thread(_post)
 
 
 async def _build_report_message(title: str, quest: dict, message: str) -> str:

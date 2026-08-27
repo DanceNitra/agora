@@ -16,7 +16,7 @@ expected shape from prior work: inspeximus defends, Graphiti also defends (~0% r
 mem0 ~0.53. We do NOT sweep this cell — that is the point.
 
 RUN (free):  python research/probes/integrity_bench_echo.py --systems inspeximus
-RUN (paid):  python research/probes/integrity_bench_echo.py --systems inspeximus,mem0,graphiti --n 20
+RUN (paid):  python research/probes/integrity_bench_echo.py --systems inspeximus,mem0,graphiti,hindsight --n 20
 """
 import os, sys, json, argparse
 
@@ -101,6 +101,68 @@ def run_graphiti_echo(cases):
     return asyncio.run(_run())
 
 
+def run_hindsight_echo(cases):
+    """Hindsight 0.9.2 (vectorize-io), embedded server, native config.
+
+    ADDED 2026-08-25 and it is not a courtesy cell. Their own issue #2696 states this exact failure:
+    "incorrect or deprecated memories continue surfacing in recall, compounding over time because
+    every mention (including corrections) reinforces the vector representation." Their maintainer
+    closed it `not_planned` with "we already have it", pointing at Reversible Memory Curation in
+    0.8.2. This measures the claim on the task their issue describes.
+
+    NATIVE CONFIG, which for them means an LLM extractor on every retain -- gpt-5-mini, the model
+    their own README documents. That is the sanctioned OpenAI spend: measuring a competitor in the
+    configuration they publish, never for our own arms.
+
+    ONE server for the whole run (startup is ~90s and it brings up an embedded Postgres); cases are
+    isolated by bank_id the way mem0's are by user_id.
+    """
+    try:
+        from hindsight import HindsightClient, HindsightServer
+    except ImportError:
+        print("    [hindsight not importable -- pip install hindsight-all in this venv]", flush=True)
+        return ["error"] * len(cases)
+    key = os.environ.get("OPENAI_API_KEY") or rev.env.get("OPENAI_API_KEY", "")
+    if not key:
+        print("    [hindsight: no OPENAI_API_KEY; refusing rather than scoring an unconfigured store]",
+              flush=True)
+        return ["error"] * len(cases)
+    out, srv = [], None
+    try:
+        srv = HindsightServer(llm_provider="openai", llm_model="gpt-5-mini", llm_api_key=key)
+        srv.__enter__()
+        c = HindsightClient(base_url=srv.url)
+        for i, (e, A, B) in enumerate(cases):
+            try:
+                bank = f"echo{i}"
+                try:
+                    c.create_bank(bank_id=bank)
+                except Exception:
+                    pass
+                c.retain(bank_id=bank, content=f"the {e} is {A}")
+                c.retain(bank_id=bank, content=f"correction: the {e} is now {B}")
+                c.retain(bank_id=bank, content=f"the {e} is {A}")      # the echo
+                r = c.recall(bank_id=bank, query=f"what is the current {e}?")
+                items = getattr(r, "results", None) or []
+                ctx = chr(10).join(getattr(x, "text", str(x)) for x in items)
+                out.append(judge_current(e, ctx or "(none)", A, B))
+            except Exception as ex:                                    # noqa: BLE001
+                print(f"    [hindsight echo {i} error: {str(ex)[:90]}]", flush=True)
+                out.append("error")
+            if (i + 1) % 5 == 0:
+                print(f"    hindsight {i+1}/{len(cases)}", flush=True)
+    except Exception as ex:                                            # noqa: BLE001
+        print(f"    [hindsight init FAILED: {str(ex)[:140]}]", flush=True)
+        out += ["error"] * (len(cases) - len(out))
+    finally:
+        if srv is not None:
+            try:
+                srv.__exit__(None, None, None)
+            except Exception:                                          # noqa: BLE001
+                pass
+    return out
+
+
 def score(name, verdicts, n_cases):
     B = sum(1 for v in verdicts if v == "B")      # clean current-truth (returns the corrected value)
     A = sum(1 for v in verdicts if v == "A")      # RESURRECTED the stale value (the actual attack success)
@@ -129,6 +191,10 @@ def main():
         out["inspeximus"] = score("inspeximus", run_inspeximus_echo(cases), len(cases)); print(json.dumps(out["inspeximus"]))
     if "mem0" in want:
         print("\nmem0 (native, OpenAI)..."); out["mem0"] = score("mem0", run_mem0_echo(cases), len(cases)); print(json.dumps(out["mem0"]))
+    if "hindsight" in want:
+        print(chr(10) + "hindsight (native, embedded server + OpenAI gpt-5-mini)...")
+        out["hindsight"] = score("hindsight", run_hindsight_echo(cases), len(cases))
+        print(json.dumps(out["hindsight"]))
     if "graphiti" in want:
         print("\ngraphiti (native, neo4j + OpenAI)..."); out["graphiti"] = score("graphiti", run_graphiti_echo(cases), len(cases)); print(json.dumps(out["graphiti"]))
     json.dump({"task": "echo resistance", "metric": "echo_resistance (current answer stays corrected B)",

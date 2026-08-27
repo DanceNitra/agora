@@ -1,0 +1,30 @@
+{
+  "probe": "can_the_guide_s_layer2_template_be_filled_on_all_38.py",
+  "verdicts": {
+    "the_two_halves_are_19_and_19": true,
+    "the_guide_s_n_38_is_their_sum": true,
+    "the_negative_half_is_ONE_family": true,
+    "the_three_declared_families_are_8_7_3": true,
+    "they_cover_exactly_the_18_penetration_rows": true,
+    "so_layer2_is_fillable_on_18_of_38_not_38": true,
+    "neither_display_name_occurs_in_either_file": true,
+    "every_literal_prefix_does_occur": true,
+    "every_long_response_row_is_flagged_penetration": true,
+    "none_of_them_is_a_rejection": true,
+    "CONTROL_any_SINGLE_row_flip_breaks_the_8_7_3_count": true,
+    "CONTROL_the_absence_check_flips_when_the_name_is_spiked": true
+  },
+  "positive_families": {
+    "长回复": 3,
+    "穿透信号": 8,
+    "未明确判定": 7,
+    "能力受限": 1
+  },
+  "negative_families": {
+    "模型明确拒绝": 19
+  },
+  "mutants_killed": 18,
+  "mutants_survived": 0,
+  "stratifiable": 18,
+  "total": 38
+}

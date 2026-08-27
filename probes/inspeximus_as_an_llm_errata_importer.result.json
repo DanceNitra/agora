@@ -1,0 +1,30 @@
+{
+  "clean store": {
+    "coverage_detail": {
+      "records": 2,
+      "reachable_from_root": 2,
+      "with_declared_lineage": 1,
+      "unresolved_derivation_claims": 0,
+      "lineage_complete": true,
+      "verdict": "verified",
+      "spec_commit": "a477fe4f5c86730031b6285d9505778fb8eec060"
+    },
+    "adapter_says": "verified",
+    "checkpoint_says": "verified",
+    "agree": true
+  },
+  "store with an undeclared derivative": {
+    "coverage_detail": {
+      "records": 3,
+      "reachable_from_root": 2,
+      "with_declared_lineage": 1,
+      "unresolved_derivation_claims": 1,
+      "lineage_complete": false,
+      "verdict": "unknown",
+      "spec_commit": "a477fe4f5c86730031b6285d9505778fb8eec060"
+    },
+    "adapter_says": "unknown",
+    "checkpoint_says": "unknown",
+    "agree": true
+  }
+}

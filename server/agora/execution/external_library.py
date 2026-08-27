@@ -113,7 +113,14 @@ def _store(m, *, key: str, text: str, meta: dict) -> bool:
     """One item. Returns True if it was new to the library."""
     if any((r.get("meta") or {}).get("url") == meta.get("url") for r in m.items):
         return False
-    m.remember(text[:4000], key=key, meta=meta, tags=[meta.get("source", "web"), meta.get("kind", "")])
+    # NAME THE DOCUMENT. This is the most literal use of `source` anywhere in the codebase -- the item
+    # IS an external document -- and it was going in unattributed, so `slash(scope='source')` could not
+    # forfeit a paper that turned out to be retracted, or a repo thread that turned out to be a plant.
+    # The url was already in `meta` and was never promoted to the field the retraction lever resolves on.
+    # Measured 2026-07-31 across every store we run: source coverage 0.000%.
+    doc = meta.get("url") or meta.get("source") or ""
+    m.remember(text[:4000], key=key, meta=meta, tags=[meta.get("source", "web"), meta.get("kind", "")],
+               source={"doc": doc} if doc else None)
     return True
 
 
@@ -222,10 +229,22 @@ def stats() -> dict:
 # recur across unrelated projects, and which of them nobody has built. A hole in that map is a market
 # gap; a hole in the vault map was just a gap in our reading.
 AXIS = {
-    "correction/update": ("correct", "update", "stale", "outdated", "supersede", "overwrite"),
-    "forget/erasure": ("forget", "delete", "erasure", "gdpr", "right to be forgotten", "purge", "wipe"),
+    # THE WORDS MUST CARRY THE CONCEPT, NOT MERELY CO-OCCUR WITH IT. Measured 2026-08-18 over the
+    # 392-record corpus: `provenance/trust` was the loudest need at 108 distinct projects and the
+    # bucket was held up by `source`, which admitted 94 records on its own -- "fyxer or like api
+    # sourceforge?" among them. Only 16 projects actually said provenance or attribution. The same
+    # shape ran through three more buckets: bare `update` admitted 67 alone ("Action for dynamic
+    # badges"), bare `correct` 21 ("Bun parity ... test-suite", the adjective), bare `delete` 16 (an
+    # mlflow tracing integration). Removing those six words re-ranks the map, and the map is what
+    # tells the organs which need is worth work -- so a generic word here becomes a quarter's
+    # research direction. Every word below was checked against the records it uniquely admits.
+    "correction/update": ("supersede", "superseded", "stale", "outdated", "overwrite",
+                          "correction", "contradict"),
+    "forget/erasure": ("forget", "erasure", "gdpr", "right to be forgotten", "purge", "wipe",
+                       "deletion request", "delete my data"),
     "revert/undo": ("revert", "undo", "rollback", "restore previous"),
-    "provenance/trust": ("provenance", "trust", "source", "attribution", "verify", "audit"),
+    "provenance/trust": ("provenance", "attribution", "audit trail", "chain of custody",
+                         "verifiable"),
     "poisoning/safety": ("poison", "injection", "malicious", "adversarial", "tamper"),
     "determinism/cost": ("deterministic", "non-deterministic", "llm cost", "expensive", "latency"),
     "dedup/conflict": ("duplicate", "dedupe", "conflict", "contradiction"),

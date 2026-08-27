@@ -65,6 +65,19 @@ def start_dungeon() -> bool:
         env = {k: v for k, v in os.environ.items() if k != "DUNGEON_AUTOPUSH"}
         env["PYTHONUNBUFFERED"] = "1"
         flags = 0x08000008          # DETACHED_PROCESS | CREATE_NO_WINDOW
+        # Roll BEFORE opening: the old process is gone and the new one has not opened yet, which is
+        # the only safe moment (a rename fails on an open handle, and these writers are positional
+        # so truncating in place corrupts rather than clears). start_brain.py has done this since
+        # 2026-08-06; this launcher did not, and _dungeon.err reached 1,021 MB while _brain.log
+        # stayed at 25.
+        try:
+            import sys as _s
+            _s.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools"))
+            from logroll import roll_if_big
+            roll_if_big(DUNGEON_DIR / "_dungeon.log")
+            roll_if_big(DUNGEON_DIR / "_dungeon.err")
+        except Exception:
+            pass                    # a rotation problem must never stop the dungeon from starting
         with open(DUNGEON_DIR / "_dungeon.log", "ab") as out, \
              open(DUNGEON_DIR / "_dungeon.err", "ab") as err:
             subprocess.Popen([sys.executable, "-u", "mcp_server.py"],

@@ -116,10 +116,31 @@ def format_agenda(a: dict) -> str:
 
 
 def format_board() -> str:
+    """The last meeting's agenda, with "Waiting on you" RE-DERIVED at read time.
+
+    MEASURED 2026-08-17. Three of the five decisions this endpoint listed had already been settled
+    -- two rejected, one approved and executed -- and it still showed all five, because the stored
+    agenda freezes `open_decisions` at the moment the meeting was prepared and this function
+    replayed that snapshot. The last meeting was 1.9 days old and they run weekly, so the owner's
+    steering surface can be a week behind the store it is supposed to describe, and he re-decides
+    what he already decided.
+
+    Vitals and the proposed focus stay frozen on purpose: those are honest claims ABOUT that
+    meeting. "What needs you" is a claim about NOW, so it is recomputed from the same two sources
+    `prepare_agenda` uses. A surface that reports a state it does not read is the defect this
+    repository keeps paying for.
+    """
     items = _load()
     if not items:
         return "🏛 _No board meetings yet._"
-    last = items[-1]
+    last = dict(items[-1])                     # copy: never mutate the stored meeting
+    from agora.execution.hands import pending_approvals
+    from agora.execution.interview import open_question
+    live = [f"approve/reject `{a['id']}`: {a['title'][:50]}" for a in pending_approvals()]
+    oq = open_question()
+    if oq:
+        live.append(f"answer the open interview question: {oq['question'][:60]}")
+    last["open_decisions"] = live
     txt = priorities_text()
     lines = [format_agenda(last)]
     if txt:

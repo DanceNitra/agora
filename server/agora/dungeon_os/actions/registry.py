@@ -101,8 +101,6 @@ def _register_builtins(registry: ActionRegistry):
         action_summarize,
     )
     from agora.dungeon_os.actions.forge import (
-        action_run_script,
-        action_build,
         action_request_resources,
     )
     from agora.dungeon_os.actions.warden import (
@@ -132,11 +130,12 @@ def _register_builtins(registry: ActionRegistry):
     registry.register("scribe", "summarize", action_summarize)
     registry.register("scribe", "query", action_query)
 
-    # Forge
-    registry.register("forge", "build_station", action_build)
-    registry.register("forge", "run_script", action_run_script)
+    # Forge — build_station / run_script / store_blueprint were unregistered 2026-08-14 along with
+    # their handlers. They pointed at a subprocess.run(..., shell=True) whose command fell back to
+    # the quest goal (paper- and GitHub-derived prose). Nothing issued npc_name="forge", so they
+    # were loaded and unreachable — a registration is a loaded gun even when nothing pulls it, and
+    # RealActionEngine._run_script already provides the capability with an allowlist and shell=False.
     registry.register("forge", "request_resources", action_request_resources)
-    registry.register("forge", "store_blueprint", action_run_script)
 
     # Warden
     registry.register("warden", "verify", action_verify_quest)

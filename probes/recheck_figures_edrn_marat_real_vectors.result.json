@@ -1,0 +1,29 @@
+{
+  "draft": "agora_output/drafts/reply_edrn_marat_real_vectors_are_forced.md",
+  "rederived_C": 0.13097935486622464,
+  "max_dev": 4.440892098500626e-16,
+  "momentum_E1": 7.091535990731451e-16,
+  "printed_decimals": [
+    "-26.134670289863",
+    "0.13097935486622",
+    "0.1310",
+    "0.1622",
+    "0.1814"
+  ],
+  "verdicts": {
+    "CONTROL_the_rederivation_ran": true,
+    "closed_form_constant_matches_draft": true,
+    "draft_deviation_figure_is_real": true,
+    "draft_momentum_zero_is_real": true,
+    "real_vector_attains_the_constant": true,
+    "CONTROL_a_wrong_constant_would_FAIL": true,
+    "CONTROL_the_law_can_be_broken": true,
+    "sector_numbers_match_draft": true,
+    "four_fold_level_is_real": true,
+    "draft_energy_matches": true,
+    "the_grid_really_is_401x401": true,
+    "the_grid_phi_zero_line_is_real": true,
+    "no_unsourced_decimals": true,
+    "the_unreproducible_range_is_gone": true
+  }
+}

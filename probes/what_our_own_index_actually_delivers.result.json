@@ -1,0 +1,28 @@
+{
+  "probe": "what_our_own_index_actually_delivers.py",
+  "verdicts": {
+    "the_window_is_not_empty": true,
+    "the_window_respects_the_line_cap": true,
+    "the_window_respects_the_unit_cap": true,
+    "CONTROL_a_text_mode_read_would_have_undercounted": true,
+    "and_the_carriage_returns_are_counted_here": true,
+    "every_pointer_in_the_index_resolves": true,
+    "the_archive_pointer_is_inside_the_window": true,
+    "CONTROL_the_archive_actually_exists": true
+  },
+  "lines": 195,
+  "units": 23066,
+  "units_a_text_mode_read_reports": 22872,
+  "crlf_terminators": 194,
+  "lines_seen": 195,
+  "units_seen": 23065,
+  "pointers_seen": 234,
+  "pointers_outside": 0,
+  "headroom_units": 1935,
+  "headroom_lines": 5,
+  "dead_pointers": [],
+  "outside": [],
+  "cap_source": "measured on the wire in the_memory_cap_is_25000_utf16_units_not_bytes.py: 25,000 UTF-16 units, whole-line, header not counted",
+  "layout_note": "one entry per line scores recall@3 0.343 against 0.216 for two or three, so more pointers inside the window is NOT automatically better -- see our-own-index-crowding-costs-6x-on-retrieval",
+  "platform": "win32"
+}

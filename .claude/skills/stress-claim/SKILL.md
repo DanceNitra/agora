@@ -24,6 +24,31 @@ Run it BEFORE: recording a Crucible REPRODUCED/FAILED verdict, shipping a flagsh
 gated outreach that asserts a finding, or committing to build on a result. Pairs with `verify-claims`
 (facts) — run both before any flagship publish; this one is the argument/credibility half.
 
+### PRE-DRAFT MODE — the default for a new article (owner, PERMANENT 2026-08-17)
+
+*"pred publikovanim noveho clanku pusti skeptika dopredu."* For anything NEW — an article, a post, a
+Crucible entry, a first-contact reply — run this **before the draft exists**, on the claim and its
+measurement rather than on prose. Skip Phase 2's full panel; run these three, in one message:
+
+- **SHOULD-THIS-EXIST** — `Is {CLAIM} textbook, already published, or already stated by the party we
+  are writing to? Search the literature AND, if there is a target repo/thread, ITS OWN issue tracker
+  and prior comments. Return: NEW / TEXTBOOK-CITE-IT / ALREADY-SAID-BY-THEM, with the source.`
+- **COUNTER-MEASUREMENT** — hand it the **probe and the target, never the draft**: `Re-run this
+  measurement hostilely and try to refute the number. Is the criterion narrower than the property?
+  Is any comparison a tautology? Did the harness create the state it reports?`
+- **ON-FRONTIER** — `Does {CLAIM} advance the owner's standing priorities, scored with the SAME
+  board_priority_terms the gates use — not by eye?`
+
+If any returns TEXTBOOK, ALREADY-SAID, REFUTED or OFF-FRONTIER, **there is no draft to write**. Say so
+and stop; that is the skill succeeding, not failing. Only what survives earns the prose, and only then
+does the full standing gate (validate → storm → audit → verify) run on it.
+
+Measured the day this became a rule: a comment reached 878 words and passed five storm lenses, four
+citation verifiers, a prior-art hunter and a framing critic — then lost two whole sections to framing, a
+third of its content to an issue the maintainer had filed three hours earlier, and its central claim to
+one `HGETALL`. Every one of those was knowable before the first sentence. A skeptic at the end grades
+prose; a skeptic first decides whether to spend the day.
+
 ## Process
 
 ### 1. State the claim in one sentence + its evidence

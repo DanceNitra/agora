@@ -1,0 +1,9 @@
+{
+  "draft": "agora_output/drafts/reply_82056_wording_correction.md",
+  "content_sha256": "d35de3e9c506d0c6dc602c31966b087eb4bd9d6f71c5248f4842122e24c0db63",
+  "found": "fix pass after the prior-statement gate refused the send: the emoji sentence republished a cell we retracted publicly on 25 August (emoji 200x125 to line 115 is floor(25000/u), an echo-channel reconstruction, never a measurement). Replaced with the file arithmetic plus an explicit statement that I have no measured cut position for that arm and why. Carries the earlier passes: concision cuts, two trailing explainers, four padding connectives, manufactured punchline pair, aphorism closer, two signposting announcements, duplicated formula, staccato fragment, two boldface spans, fronted cleft, three inferred causes stated as fact",
+  "before_words": 961,
+  "after_words": 976,
+  "iso": "2026-08-26T13:52:27Z",
+  "note": "records that the humanizer SKILL was run on these exact bytes; keyed by content, so any later edit invalidates it"
+}

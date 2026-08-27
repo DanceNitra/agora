@@ -106,6 +106,17 @@ _CONF_SHRINK = 0.4    # pull (confidence-0.5) toward 0 for directional calls
 _CONF_CAP = 0.62      # hard ceiling on a directional forecast's published confidence
 
 
+def _flat_band(baseline: float) -> str:
+    """The FLAT band as the RESOLVER computes it, rendered for the prompt.
+
+    Derived from the same rule resolution applies -- `max(1, base * 0.05)` -- and kept beside the
+    prompt that quotes it, so the question asked and the question scored cannot drift apart again.
+    They already had: the forecaster was never told the band existed at all.
+    """
+    t = max(1, round(baseline * 0.05))
+    return "%s to %s (+/-%s)" % (round(baseline - t), round(baseline + t), t)
+
+
 def _calibrate_conf(direction: str, confidence: float) -> float:
     """Regularize an over-confident directional forecast toward chance; FLAT is left unchanged."""
     if direction in ("UP", "DOWN"):
@@ -126,7 +137,18 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
         "You are a calibrated forecaster. A topic's RECENT ACTIVITY RATE is given. Predict whether the "
         f"NEXT {horizon_days} days will have MORE (UP = accelerating) or FEWER (DOWN = decelerating) "
         "than the last window — this is genuinely uncertain, so SPREAD your confidence (be near 50 when "
-        "unsure, high only when you have a real reason). Reply EXACTLY:\n"
+        "unsure, high only when you have a real reason).\n"
+        # THE BAND, STATED. It was not, and the forecaster was answering a different question from the
+        # one being scored. Resolution calls FLAT only inside +/-5% (or +/-1, whichever is larger) of
+        # the baseline, while this prompt offered "FLAT" undefined -- so a reasonable reader took it to
+        # mean "roughly the same". MEASURED 2026-08-18 over 241 resolved forecasts: the median window
+        # moves 29.5% and FLAT is true 34% of the time, yet we called FLAT on 68% of questions. For
+        # FLAT to be true as often as we called it, the band would have to be +/-52%. None of the
+        # model's judgement had to be wrong to produce that gap.
+        f"FLAT is a NARROW band: it means the next window lands within {_flat_band(baseline)}. "
+        "Anything outside it is UP or DOWN, however small the move feels. Most windows move far more "
+        "than that, so FLAT is not the safe answer.\n"
+        "Reply EXACTLY:\n"
         "DIRECTION: UP or DOWN or FLAT\nCONFIDENCE: <integer 0-100>\nWHY: <one sentence>",
         f"THEME: {theme}\nRATE: {base['metric_label']} = {baseline} in the last {horizon_days} days\n"
         f"(other rates: {base['all_baselines']})", "cheap", 0.3, 200) or ""
@@ -257,14 +279,30 @@ async def gather_prediction_baseline(theme: str, horizon_days: int = 14) -> dict
 
 
 def record_prediction(theme: str, metric: str, baseline: int, direction: str,
-                      confidence: float, why: str, horizon_days: int = 14) -> dict:
-    """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger."""
-    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric,
+                      confidence: float, why: str, horizon_days: int = 14,
+                      by: str = "claude") -> dict:
+    """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger.
+
+    `mode="rate"` IS NOT OPTIONAL HERE. The baseline this receives comes from
+    `gather_prediction_baseline`, which returns a TRAILING 14-DAY WINDOW count. `resolve_due`
+    branches on this field and, without it, falls to `_metric_value` -- the ALL-TIME CUMULATIVE
+    total. A window baseline scored against a cumulative total is not a forecast, it is a rigged
+    scoreboard: measured 2026-07-31 over the 32 resolved records with by="claude", the median
+    resolved/baseline ratio is **51.7x** against 1.0x for every rate-mode record. Any FLAT or DOWN
+    call is dead on arrival and any UP call is free.
+
+    King Aldric's organ found this before I did and REFUSES to record through this path for exactly
+    this reason (`organs/king.py`, rule 4). I then recorded two forecasts through it the same
+    evening without setting the field. Setting it here means the ledger arm cannot make that mistake
+    again, whoever is driving.
+    """
+    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric, "mode": "rate",
             "metric_label": _METRIC_LABEL.get(metric, metric), "baseline": int(baseline),
             "all_baselines": {metric: int(baseline)},
             "direction": str(direction).upper().strip()[:5] if str(direction).upper().strip()[:4] in
             ("UP", "DOWN", "FLAT") else "FLAT",
-            "confidence": max(0.0, min(1.0, float(confidence))), "why": why[:240], "by": "claude",
+            "confidence": max(0.0, min(1.0, float(confidence))), "why": why[:240],
+            "by": (by or "claude")[:40],
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
             "horizon_days": horizon_days, "status": "pending"}
     preds = _load()
@@ -304,7 +342,11 @@ async def resolve_due(force: bool = False) -> list:
         # brain-memories most relevant to this theme by whether the call was RIGHT.
         try:
             from agora.execution.inspeximus_bridge import credit_outcome
-            credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct)
+            # The warrant names the LEDGER ENTRY that carries resolved_value / actual / brier — an
+            # artifact a reader can re-open and re-check. The outcome came from a measured metric, not
+            # from the memories being credited, so this credit is exogenous and may say so.
+            credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct,
+                           warrant=(f"prediction:{p['id']}" if p.get("id") else None))
         except Exception:
             pass
         resolved.append(p)

@@ -24,6 +24,8 @@ from __future__ import annotations
 import json
 import re
 import time
+
+from agora.execution import grounding
 from pathlib import Path
 
 _SERVER = Path(__file__).resolve().parents[2]
@@ -582,8 +584,22 @@ def record_contribution(topic: dict, partners: list[str], claim: str, evidence: 
          # never once skipped by agent_can_contribute. The cap was truncating by NPC order, so it
          # always cut the same four, and two of them (Wren, Rooke) carry the lowest trust scores in
          # the roster. Contributor lists are bounded by the 8-agent seminar anyway.
-         "partners": list(partners), "claim": claim[:400], "evidence": evidence[:300],
-         "falsifier": falsifier[:300], "links": [str(x)[:80] for x in links][:5],
+         # AND THE OTHER THREE CAPS ON THIS LINE WERE LEFT IN PLACE WHEN `partners` WAS FIXED.
+         # The comment above learned that a truncating cap silently destroys what it cuts, applied it
+         # to one field, and left its three neighbours at 300/300/400. Measured 2026-08-17 over the
+         # whole ledger: evidence sat exactly at the cap in 3,326 of 3,344 records (99%), and in the
+         # last week 121 of 137 capped strings ended mid-WORD. falsifier 1,013/3,339 (30%), claim
+         # 571/3,414 (17%). The evidence field is the reasoning that grounds the claim, so a 300-char
+         # cap was deleting most of the justification for almost every contribution we have.
+         #
+         # Scoped deliberately: the same `[:300]` appears in bounty, canon, contradictions, forge,
+         # insight_engine and scientist, and in NONE of them does it fire -- their stores top out at
+         # 49-264 chars because those writers are terse. The class is in the source; the damage was in
+         # exactly one place, and a seven-file change would have been a no-op in six of them.
+         # Nothing downstream reads these lengths: the only length test anywhere is `len(claim) < 25`,
+         # a minimum.
+         "partners": list(partners), "claim": claim[:1200], "evidence": evidence[:2000],
+         "falsifier": falsifier[:2000], "links": [str(x)[:300] for x in links][:5],
          "basis": basis,
          "grounded": bool(evidence and not _REFUSAL.search(evidence)), "verified": False}
     contribs.append(c)
@@ -627,7 +643,32 @@ def verify_contributions(limit: int = 500) -> dict:
         if checked > limit:
             break
         has_fals = bool((c.get("falsifier") or "").strip())
-        has_src = bool(_SOURCE_RE.search((c.get("evidence") or "") + " " + (c.get("claim") or "")))
+        # DELEGATES to the one shared definition (2026-07-31), with `allow_internal=True` because THIS
+        # tier's question is "can a reader check it", and a [[vault note]] is checkable — unlike the
+        # vault door, which wants external evidence. The two differ on purpose; they used to differ by
+        # regex accident. The change is not purely a widening: `_SOURCE_RE` also matched a bare "et al."
+        # with NO YEAR, so "as Smith et al. showed" counted as a checkable source with nothing to look
+        # up. That now fails, which TIGHTENS this tier. Deliberate. See execution/grounding.py.
+        _txt = (c.get("evidence") or "") + " " + (c.get("claim") or "")
+        # DELIBERATELY NOT WIDENED TO `links`, AND THE REASON IS THE INTERESTING PART.
+        # The verified rate fell from 79% (2026-W31) to 44% (W32) and stayed there, and this tier's
+        # source test reads only the prose -- so the obvious repair was to also accept a `links` entry
+        # naming a note that exists on disk. `grounding.names_existing_note` was built for exactly that
+        # and it works. Wiring it in here promoted 497 records: the ledger went 79% -> 93% overall and
+        # W32/W33 went 44% -> 100%. That is the tell, not the win. A tier that passes essentially
+        # everything is not measuring anything.
+        #
+        # The reason it passes everything: `links` is populated by the MACHINERY, not earned by the
+        # work -- 0% of post-cliff records have zero links, mean 2.81. A source the system attaches for
+        # you is not the same evidence as a source the reasoning cites, and "verified" feeds the public
+        # track record. So the widening was measured, reverted, and left here as a comment instead.
+        #
+        # What the measurement DID settle: the cliff is not the 2026-07-31 grounding tightening (that
+        # accounts for 3% of the rejections -- the OLD regex drops from 78% to 38% at the same moment),
+        # it is a drop in the model's citing-in-prose behaviour dated to the same day, with `links`
+        # unchanged across it. The honest reading of the 44% is "the reasoning stopped naming its
+        # sources", which is a real thing to fix upstream rather than to reclassify here.
+        has_src = grounding.is_grounded(_txt, allow_internal=True)
         if has_fals and has_src:
             c["verified"] = True
             changed += 1
@@ -704,18 +745,40 @@ def run_group_seminar(npcs: list[dict], vault: str) -> dict:
         _running = False
 
 
+#: Agents already reported as role-less. A seminar round fires every 20 ticks, so a per-round
+#: warning is noise that gets filtered and a never-warning is a degradation nobody sees.
+_ROLE_WARNED: set = set()
+
+
 def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
     from agora.execution import inspeximus_bridge
 
     topic = pick_topic(vault)
     contributors, passed, brought = [], [], []
+    read_ids: list[str] = []          # every memory the round actually READ -- the contribution's lineage
+    role_missing: list[str] = []      # agents that queried memory by their NAME because no role arrived
     for n in npcs[:8]:
         name = n.get("npc_name") or n.get("npc_id", "agent")
-        role = n.get("role") or name
-        can, ctx = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        raw_role = str(n.get("role") or "").strip()
+        # A BLANK ROLE IS A MISSING ROLE. `n.get("role") or name` passed "  " straight through as a
+        # whitespace hint, so the degradation was invisible: the recall ran against nothing useful and
+        # the round still reported success. The fallback to the name is kept -- it is better than
+        # nothing -- but it is now RECORDED, because an eight-agent seminar where every agent queries
+        # by its own name is eight identical queries over one shared store, and that reads as a
+        # working seminar from every metric we have.
+        if not raw_role:
+            role_missing.append(name)
+        role = raw_role or name
+        _res = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        # Tolerant unpack: the bridge grew a third element (the recalled ids, the contribution's
+        # lineage) and a caller that hard-unpacks three cannot survive an older bridge or a test
+        # double written against the older shape. The ids are an enrichment, not a precondition.
+        can, ctx = _res[0], _res[1]
+        ids = _res[2] if len(_res) > 2 else []
         if can and ctx:
             contributors.append({"id": n.get("npc_id"), "name": name})
             brought.append(f"{name} brings: {ctx[:200]}")
+            read_ids.extend(ids)
         else:
             passed.append({"agent": name, "why": "no relevant memory"})
     contribution = None
@@ -724,12 +787,26 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
         transcript = "\n".join(brought)
         contribution = extract_contribution(topic, transcript, [c["name"] for c in contributors])
         if contribution:
-            inspeximus_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
-                                               tags=[topic.get("headline", "")[:40]])
+            # DECLARE WHAT IT WAS BUILT FROM. The Contribution is a synthesis of exactly the memories
+            # recalled above, and those ids were already in hand and discarded -- which is why
+            # `derived_from` measured 0.00% across the whole live store. Without the edge, retracting a
+            # memory leaves every conclusion drawn from it standing at full trust.
+            inspeximus_bridge.remember_contribution(
+                contribution["claim"], contribution.get("evidence", ""),
+                tags=[topic.get("headline", "")[:40]],
+                derived_from=sorted(set(read_ids)) or None,
+                source_doc="seminar:%s" % (topic.get("id") or topic.get("headline", "")[:40] or "round"))
+    # SAY IT OUT LOUD, ONCE PER AGENT. A round fires every 20 ticks, so warning per round would drown
+    # the log and get filtered; warning never is how a degraded seminar reports as a healthy one.
+    _fresh = [a for a in role_missing if a not in _ROLE_WARNED]
+    if _fresh:
+        _ROLE_WARNED.update(_fresh)
+        print("[seminar] DEGRADED: no role for %s -- recall falls back to the agent's own NAME, so "
+              "these agents query one shared store with near-identical hints" % ", ".join(_fresh))
     log_round(topic, [c["name"] for c in contributors], passed, contribution)
     _record_attempt(topic.get("id"))      # count the round so a saturated topic eventually retires
     return {"topic": topic.get("headline", ""), "contributors": contributors,
-            "passed": passed, "contribution": contribution}
+            "passed": passed, "contribution": contribution, "role_missing": role_missing}
 
 
 def research_report(hours: int = 3) -> str:

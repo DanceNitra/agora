@@ -1,0 +1,53 @@
+{
+  "probe": "does_a_147_unit_line_split_the_cap_bracket.py",
+  "claude_version": "2.1.241 (Claude Code)",
+  "width_chars": 147,
+  "units_per_line": 148,
+  "lines": 180,
+  "file_units": 26640,
+  "boundary_line": 169,
+  "split_at": 25012,
+  "bracket_before": [
+    24955,
+    25074
+  ],
+  "bracket_after": [
+    24955,
+    25012
+  ],
+  "last_line_loaded": 168,
+  "warned": true,
+  "verdicts": {
+    "file_size_matches_the_arithmetic": true,
+    "no_tools_were_offered": true,
+    "no_tool_was_called": true,
+    "every_trial_agrees": true,
+    "the_answer_is_one_of_the_two_the_design_allows": true,
+    "a_cut_actually_happened": true,
+    "the_bracket_is_strictly_narrower_than_before": true,
+    "every_fixture_store_was_removed": true
+  },
+  "rows": [
+    {
+      "trial": 1,
+      "last": 168,
+      "tools_offered": 0,
+      "tool_uses": [],
+      "answer": "LAST=CANARY-L0168 || WARNING=> WARNING: MEMORY.md is 26KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
+    },
+    {
+      "trial": 2,
+      "last": 168,
+      "tools_offered": 0,
+      "tool_uses": [],
+      "answer": "LAST=CANARY-L0168 || WARNING=> WARNING: MEMORY.md is 26KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
+    },
+    {
+      "trial": 3,
+      "last": 168,
+      "tools_offered": 0,
+      "tool_uses": [],
+      "answer": "LAST=CANARY-L0168 || WARNING=WARNING: MEMORY.md is 26KB (limit: 24.4KB) — index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
+    }
+  ]
+}

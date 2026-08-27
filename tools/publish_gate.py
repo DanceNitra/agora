@@ -45,6 +45,11 @@ WAIVERS = ROOT / "tools" / "construction_waivers.json"
 KNOWN_REPOS = {
     "DanceNitra/agora": ROOT,
     "DanceNitra/ramr": Path("C:/Users/Danculus/ramr-pub"),
+    # inspeximus is the product repo and we cite runnable artifacts out of it in outreach -- a reply
+    # about a data-loss fix pointed at its regression test and this gate refused with "NO artifact
+    # resolved", because it had never been told the repo exists. A checker that cannot see a repo we
+    # publish from audits nothing there and says so only as an empty target set.
+    "DanceNitra/inspeximus": Path("C:/Users/Danculus/inspeximus-repo"),
 }
 BLOB_RE = re.compile(r"github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/blob/[^/]+/([A-Za-z0-9_/.\-]+\.py)")
 

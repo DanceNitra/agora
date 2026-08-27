@@ -1,0 +1,58 @@
+{
+ "version": "2.17.1",
+ "cases": {
+  "1 same count, different population": {
+   "must_invalidate": true,
+   "shipped_report_changes": true,
+   "candidate_commitment_changes": true,
+   "shipped_correct": true,
+   "candidate_correct": true,
+   "keys_before": 3,
+   "keys_after": 3,
+   "note": "his class 1: {A,B,C} and {A,B,D} are three keys either way"
+  },
+  "1   pair: identical population, re-read": {
+   "must_invalidate": false,
+   "shipped_report_changes": false,
+   "candidate_commitment_changes": false,
+   "shipped_correct": true,
+   "candidate_correct": true,
+   "keys_before": 3,
+   "keys_after": 3,
+   "note": "must NOT invalidate"
+  },
+  "2 CHECK -> INSERT -> USE (colliding insert)": {
+   "must_invalidate": true,
+   "shipped_report_changes": true,
+   "candidate_commitment_changes": true,
+   "shipped_correct": true,
+   "candidate_correct": true,
+   "keys_before": 2,
+   "keys_after": 3,
+   "note": "the inserted key collides with an existing one at prefix_8"
+  },
+  "2   pair: non-colliding insert": {
+   "must_invalidate": true,
+   "shipped_report_changes": true,
+   "candidate_commitment_changes": true,
+   "shipped_correct": true,
+   "candidate_correct": true,
+   "keys_before": 2,
+   "keys_after": 3,
+   "note": "still a different population, so a use-time check must also invalidate"
+  },
+  "3 collision -> delete -> clean scan": {
+   "must_invalidate": true,
+   "collision_before": 1,
+   "collision_after": 0,
+   "historical_evidence_survives": false,
+   "shipped_correct": false,
+   "note": "the survivors are clean; his claim is that the history must stay sticky"
+  }
+ },
+ "writer_policy_machine_checkable": false,
+ "scope_attributable": true,
+ "blind_classes": [
+  "collision -> delete -> clean scan"
+ ]
+}

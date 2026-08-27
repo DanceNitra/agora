@@ -16,20 +16,73 @@ further: 113 people filed half the problem reports and 46 of them wrote no code 
 produces zero creation artifacts and is still fully productive is a documented organizational form, not
 an excuse.
 
-ATTRIBUTION IS HONEST ABOUT ITS LIMITS. Only two of the five organ stores record who acted
-(.bounty.json `by`, .graveyard.json `killed_by`). Replication, cartography and the analogy forge record
-no actor, so their entries are attributed to the organ's OWNER as defined in CLAUDE.md, and every such
-row is marked `by_organ` so nobody later mistakes a design assumption for a measurement.
+ATTRIBUTION IS HONEST ABOUT ITS LIMITS. Only two of the eleven organ stores record who acted
+(.bounty.json `by`, .graveyard.json `killed_by`). Replication, cartography, the analogy forge, the
+theory bench, the oracle, the press desk and the scout box record no actor, so their entries are
+attributed to the organ's OWNER as defined in CLAUDE.md, and every such row is marked `by_organ` so
+nobody later mistakes a design assumption for a measurement.
+
+2026-07-31 -- THE REGISTRY WAS EXTENDED TO ALL EIGHT AGENTS, AND WHY.
+The trigger was three agents reading as dead on the DB instrument: over the 5 days to 2026-07-31 a
+`contributor_name` read of `collective_knowledge` showed High Priest Orin, Artificer Rooke and
+Cartographer Wren at ZERO discoveries. Two of those three zeros were the instrument, not the agent:
+3,017 of 17,467 rows carry a BLANK `contributor_name` -- 1,417 of them Rooke's and 1,590 Wren's --
+because their `contributor_id` holds the agent NAME where the other six hold the NPC UUID, so the name
+column was never filled. Reading through the id, Rooke and Wren each produced 2 rows in that window.
+Orin's zero was real: his analogy organ had been idle 150.8h, past the 72h alarm.
+
+That is this file's thesis restated by a different instrument, so the registry was completed to all 8:
+one agent, one organ, one ledger, one vocabulary, plus the `eid` that joins an organ to its dungeon
+entity and to the DB roster. Measured on the live stores the same day, BEFORE the change:
+  scout_box     55 rows ->  0 decisive AND 0 rows reaching repair_ledger() at all (see ts_fields)
+  bounty        31 rows -> 11 decisive (20 "survived" rulings unread)
+  replications  60 rows -> 35 decisive (25 "REPRODUCED" verdicts unread)
+  analogies     22 rows -> 10 decisive ("viable"/"survived"/"shipped" unread)
+  press/theory/oracle -- not in the map at all, so Mira's press organ, Orin's theory bench and
+  Aldric's oracle were invisible to both the ledger and the starvation alarm.
 """
 from __future__ import annotations
 
 import json
 import time
 from pathlib import Path
+from typing import NamedTuple
 
 _ROOT = Path(__file__).resolve().parents[2]
 
-#: organ store -> (owning agent, the field naming the actor if the store records one)
+#: The eight canonical agent names. These are the KEYS of `agora.agent_os.agent_os.NPC_UUIDS` and the
+#: values of `collective_knowledge.contributor_name`; spelling them differently here would silently
+#: break every join. Duplicated as a literal rather than imported, because agent_os pulls in the DB
+#: layer and this module must stay importable from a probe or a one-line script. The test pins this
+#: tuple against NPC_UUIDS so the duplication cannot drift.
+ROSTER = ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric",
+          "Dame Elara", "Sergeant Voss", "Artificer Rooke", "Cartographer Wren")
+
+#: The Seminar is not a member of the roster: it is all eight co-producing one Contribution.
+SEMINAR = "THE SEMINAR (all 8, co-produced)"
+
+
+class Organ(NamedTuple):
+    """One agent, one organ, one ledger file.
+
+    `eid` is the dungeon entity id (agora-game-server/mcp_server.py) -- the join key between this
+    registry, the 3D world and anything that needs organ -> agent -> DB `contributor_name`. It is
+    carried here so a probe can import ONE map instead of re-deriving a second, drifting copy.
+
+    `ts_fields` exists because not every store writes `ts`. Reading a fixed "ts" off .scout_box.json
+    returns 0 for all 55 records, the window filter drops every one of them, and Shadow Kael's organ
+    contributes NOTHING to the ledger while looking perfectly healthy -- the same failure as a missing
+    verdict word, arriving through the clock instead of the vocabulary. Fields are tried in order and
+    the newest one present wins.
+    """
+    agent: str
+    eid: str
+    role: str
+    actor_field: str | None = None
+    ts_fields: tuple[str, ...] = ("ts",)
+
+
+#: organ store -> Organ(agent, dungeon eid, role, actor field, timestamp fields)
 #:
 #: THE FIRST VERSION OF THIS MAP COVERED FIVE STORES AND HALF THE ROSTER WENT UNWATCHED. Kael, Mira,
 #: Voss and Elara had no organ here at all, so those four could go dark and nothing would fire — an
@@ -37,65 +90,256 @@ _ROOT = Path(__file__).resolve().parents[2]
 #: was written to catch. Worse, it made me report "Elara produces nothing" when .contradictions.json
 #: had been written to an hour earlier. I was measuring my map, not the system.
 #:
-#: Every entry below was read off the live store on 2026-07-29, not assumed.
-_ORGANS = {
-    ".bounty.json":        ("Sergeant Voss", "by"),          # belief challenges; `by` names the actor
-    ".graveyard.json":     ("King Aldric", "killed_by"),     # buried ideas; `killed_by` names it
-    ".replications.json":  ("Artificer Rooke", None),
-    ".cartography.json":   ("Cartographer Wren", None),
-    ".analogies.json":     ("High Priest Orin", None),
-    ".contradictions.json": ("Dame Elara", None),            # WAS MISSING — and it is her liveliest
-    ".scout_box.json":     ("Shadow Kael", None),            # no ts field; freshness via mtime
+#: Every entry below was read off the live store (2026-07-29, extended 2026-07-31), not assumed.
+_ORGANS: dict[str, Organ] = {
+    # --- Shadow Kael (thief) -- Research Scout ------------------------------------------------
+    # No `ts`: the box writes found_ts on discovery, taken_ts when picked up, closed_ts when we rule
+    # on it. closed_ts is OUR decision time (scout.py box_mark), so it leads.
+    ".scout_box.json": Organ("Shadow Kael", "thief", "Research Scout", None,
+                             ("closed_ts", "taken_ts", "found_ts")),
+
+    # --- Sage Mira (scholar) -- Knowledge Curator ---------------------------------------------
+    # NO actor field. `source` looks like one and is NOT: read on the live store it holds the piece's
+    # PROVENANCE -- a vault note filename, a Lab id, a cited paper ("Gilovich, Vallone & Tversky
+    # (1985)"). Wiring it in as the actor would have invented twenty agents named after notes. Read
+    # the store before you trust a field name.
+    ".press.json": Organ("Sage Mira", "scholar", "Knowledge Curator"),
+    # The CANON is Mira's primary organ per CLAUDE.md and had no store; `.press.json` is the
+    # secondary arm's. A curator whose rulings are unqueryable reads as a curator doing nothing.
+    ".canon.json": Organ("Sage Mira", "scholar", "Knowledge Curator"),
+
+    # Aldric's working arm. Shared with the tournament path, which is why the gate filters on the
+    # actor before crediting anyone for a row in it.
+    ".predictions.json": Organ("King Aldric", "king", "Engineering Lead"),
+    # Aldric's PRIMARY organ since the 2026-08-01 rework: the Folklore Assayer. `by` is a real actor
+    # field here -- unlike Mira's `.press.json` above, where `source` only looks like one -- because
+    # folklore.preregister writes the organ owner onto every record. `resolved_ts` leads `ts`: `ts` is
+    # when the forecast was PRE-REGISTERED, which is deliberately before the work, so leading with it
+    # would date the assay to the moment we guessed rather than the moment we measured.
+    ".folklore.json": Organ("King Aldric", "king", "Engineering Lead", "by",
+                            ("resolved_ts", "ts")),
+
+
+    # --- High Priest Orin (priest) -- Idea Alchemist -------------------------------------------
+    # OWNERSHIP CONFLICT, DECIDED — NOT OVERLOOKED. `agent_activity.py:44` attributes .analogies.json
+    # to Sage Mira. This registry gives it to Orin, per CLAUDE.md, which names him the Idea Alchemist
+    # who "fuses distant concepts"; forging and rejecting analogies is that job by definition, while
+    # Mira's is curation into the vault. agent_activity.py STILL DISAGREES and is owned elsewhere --
+    # if you are reconciling the two, this file is the decision and that one is the stale copy.
+    ".analogies.json": Organ("High Priest Orin", "priest", "Idea Alchemist"),
+    ".theory.json": Organ("High Priest Orin", "priest", "Idea Alchemist (theory bench)"),
+
+    # --- King Aldric (king) -- Engineering Lead / Orchestrator ---------------------------------
+    ".oracle.json": Organ("King Aldric", "king", "Engineering Lead (forecast oracle)"),
+    ".graveyard.json": Organ("King Aldric", "king", "Engineering Lead (graveyard)", "killed_by"),
+
+    # --- Dame Elara (guard_r) -- Bridge Builder ------------------------------------------------
+    ".contradictions.json": Organ("Dame Elara", "guard_r", "Bridge Builder"),  # WAS MISSING once,
+    #                                                                          and it is her liveliest
+
+    # --- Sergeant Voss (guard_l) -- Quality Assurance ------------------------------------------
+    # OWNERSHIP RESOLVED 2026-07-31: bounty is VOSS's. CLAUDE.md makes him QA who "stress-tests every
+    # claim"; the roadmap panel's "Bounty/Court under Aldric" is a UI grouping, and CLAUDE.md wins.
+    # The store's `by` field agrees on every record written so far, so this is a resolution, not an
+    # override. Aldric keeps the graveyard, which is where a killed belief is buried.
+    ".bounty.json": Organ("Sergeant Voss", "guard_l", "Quality Assurance", "by"),
+
+    # --- Artificer Rooke (artificer) -- Replication Unit ---------------------------------------
+    ".replications.json": Organ("Artificer Rooke", "artificer", "Replication Unit"),
+
+    # --- Cartographer Wren (cartographer) -- Map-maker -----------------------------------------
+    ".cartography.json": Organ("Cartographer Wren", "cartographer", "Map-maker"),
+
     # NOT an individual's organ. Every record carries a `partners` list naming ALL EIGHT agents —
     # this is the Seminar, where the group co-produces one Contribution. Crediting it to Mira, as the
     # first version of this map did, hands one agent the work eight of them did together and then
     # scores her 0 decisive on a store that has no verdict field at all. Attributed to the group.
-    ".contributions.json": ("THE SEMINAR (all 8, co-produced)", None),
+    ".contributions.json": Organ(SEMINAR, "", "Group seminar"),
 }
 
-#: Stores whose records carry NO `ts`, so per-record age is unavailable and file mtime is the only
-#: freshness signal there is. Reading `ts` on these returns 0 and would report them permanently
-#: starving — a false alarm is as useless as a missing one.
-_NO_TS = {".scout_box.json", ".predictions.json", ".topics.json"}
+#: Public aliases. A sibling probe (probes/swarm_health.py) joins organ -> dungeon agent -> DB
+#: `contributor_name` and imports THESE rather than duplicating the map; a second copy of an
+#: ownership map is a second copy that goes stale, which is how .analogies.json ended up owned by two
+#: different agents in two different files.
+ORGANS = _ORGANS
+AGENT_EID: dict[str, str] = {o.agent: o.eid for o in _ORGANS.values() if o.agent in ROSTER}
+ORGANS_BY_AGENT: dict[str, list[str]] = {}
+for _s, _o in _ORGANS.items():
+    ORGANS_BY_AGENT.setdefault(_o.agent, []).append(_s)
 
-#: Ownership that could not be settled from the code and is NOT guessed here. CLAUDE.md gives Voss
-#: belief-challenge duty while the roadmap panel labels Bounty/Court as Aldric's instrument; the
-#: bounty store's own `by` field is therefore the authority, and Aldric is credited only through the
-#: graveyard. Stated so nobody later mistakes this for a measured fact.
-_AMBIGUOUS_OWNERSHIP = ("bounty: CLAUDE.md assigns belief challenges to Voss, the roadmap panel "
-                        "shows Bounty/Court under Aldric. The store's `by` field decides per record.")
+#: Ownership notes. Both cases that were once open are now DECIDED (see the comments in _ORGANS);
+#: this string is what the API surfaces so a reader is never left guessing whether a call was made.
+_OWNERSHIP_NOTE = (
+    "bounty: RESOLVED to Sergeant Voss (CLAUDE.md QA role beats the roadmap panel's Bounty/Court "
+    "grouping; the store's `by` field agrees on every record). analogies: RESOLVED to High Priest "
+    "Orin (CLAUDE.md Idea Alchemist); agent_activity.py still credits Sage Mira and is the stale copy."
+)
 
-#: A repair is only worth counting when it CHANGED the knowledge base. A replication that reproduces a
-#: claim confirms it; one that FAILS removes an error, which is the scarcer and more valuable event --
-#: and the Crucible thesis is built on exactly those. Both are counted, separately, never merged.
+#: A repair is only worth counting when the organ REACHED A VERDICT. Two counts come out of that, and
+#: they are never merged: `decisive` (a verdict was reached at all) and `corrective` (the subset that
+#: removed or changed something). A replication that reproduces a claim confirms it; one that FAILS
+#: removes an error, which is the scarcer and more valuable event -- and the Crucible thesis is built
+#: on exactly those. Both are counted, separately.
+#:
 #: EACH ORGAN SPEAKS ITS OWN VOCABULARY, and a ledger that only knows one of them reports the others
-#: as idle. Measured 2026-07-29: this list first held only the replication/bounty words, so
+#: as idle. Measured 2026-07-29: the list first held only the replication/bounty words, so
 #: Cartographer Wren scored 0 decisive across 80 entries — while 9 of them read "no honest bridge",
 #: which is a decision, just a negative one, and one read "already bridged". I reported him as pure
 #: volume-without-value on that reading. He was not; I was measuring him in a language he does not
-#: speak. Before adding an organ here, read its store and take ITS words.
-_DECISIVE = ("failed", "killed", "retired", "revised", "rejected", "falsified", "dead",
-             "not_computable", "buried",
-             # cartography (Wren): a refusal to bridge is a finding, not an absence of one
-             "no honest bridge", "no bridge", "already bridged", "forged",
-             # analogy forge (Orin)
-             "no viable mapping", "mapped",
-             # coherence audit (Elara): "compatible" means she EXAMINED the pair and ruled they do
-             # not conflict. 289 of her 300 records say that. A negative verdict closes the pair and
-             # is exactly as decisive as finding a contradiction — arguably more useful, since it is
-             # the outcome nobody bothers to record.
-             "compatible", "resolved", "no conflict")
+#: speak. Measured again 2026-07-31: a FLAT word list also leaks across organs, so the vocabulary is
+#: now keyed BY STORE -- "resolved" is a verdict in the oracle and in the coherence audit and means
+#: nothing in the scout box, and a shared list cannot say so.
+#: Before adding an organ here, open its store, run a Counter over its outcome/status field, and take
+#: ITS words. Do not extend this map from memory.
+_DECISIVE: dict[str, tuple[str, ...]] = {
+    # Kael: measured no_fit 19, done 8, taken 28 (started, not decided). "drafted" is written by
+    # scout.record_contacted and is declared here so a drafted contribution never reads as idle.
+    ".scout_box.json": ("no_fit", "done", "drafted", "posted"),
+
+    # Mira: measured published 25, draft 1. "merged" is the canon-merge outcome, declared per the
+    # 2026-07-31 assignment; "rejected" closes a piece that will not ship.
+    ".press.json": ("published", "merged", "rejected"),
+
+    # Mira, canon bench. The CANON is her primary organ per CLAUDE.md and had no store until
+    # 2026-08-01, so it had no vocabulary either. These are organs/scholar.py ORGAN["decisive"]
+    # verbatim -- the organ's own declared words, not a new set invented at the reader.
+    ".canon.json": ("merged", "rejected", "retired"),
+
+    # Aldric, prediction ledger: measured over 242 records, `status` closes correct/incorrect.
+    ".predictions.json": ("correct", "incorrect", "beat_market", "resolved"),
+
+    # Orin, analogy forge: measured no viable mapping 7, survived 5, viable* 6, forged 2, shipped 1,
+    # "rejected as a bridge + falsified" 1 -- 22 of 22 records carry one of these.
+    ".analogies.json": ("forged", "mapped", "viable", "no viable mapping",
+                        "survived", "shipped", "rejected", "falsified"),
+
+    # Orin, theory bench: measured corroborated 4, strained 2. "survived" and "unmodelable" are
+    # declared by the assignment and not yet written by the store -- kept so the first one that lands
+    # is not read as idle, which is the whole point of this map.
+    ".theory.json": ("corroborated", "strained", "unmodelable", "survived"),
+
+    # Aldric, oracle: measured status resolved 6 / open 7. The store encodes the CALL as numbers
+    # (`outcome` 0.0/1.0, `brier_*`) and a boolean `beat_market`, not as words -- so "resolved" is the
+    # only one of these four that fires today, and `beat_market` fires only because _FLAG_FIELDS
+    # renders a true boolean as its own field name. "correct"/"incorrect" are declared, not observed.
+    ".oracle.json": ("resolved", "correct", "incorrect", "beat_market"),
+
+    # Aldric, graveyard: measured status dead 18 of 18.
+    ".graveyard.json": ("dead", "buried", "killed", "retired", "revised",
+                        "falsified", "no viable mapping"),
+
+    # Elara, coherence audit: "compatible" means she EXAMINED the pair and ruled they do not conflict.
+    # 287 of her 300 records say that. A negative verdict closes the pair and is exactly as decisive as
+    # finding a contradiction — arguably more useful, since it is the outcome nobody bothers to record.
+    # "bridged"/"no honest bridge" are declared by the assignment; "resolved" already covers the
+    # assignment's "contradiction resolved".
+    ".contradictions.json": ("compatible", "resolved", "no conflict",
+                             "bridged", "no honest bridge"),
+
+    # Voss, bounty: measured survived 20, revised 10, retired 1 -- 31 of 31. "survived" was ABSENT
+    # from the old flat list, so two thirds of his rulings read as no ruling at all. "kill" fires via
+    # _FLAG_FIELDS on the boolean.
+    ".bounty.json": ("survived", "kill", "killed", "retired", "revised", "rejected", "falsified"),
+
+    # Rooke, Crucible: measured REPRODUCED 25, NOT_COMPUTABLE 22, FAILED 13 -- 60 of 60. "reproduced"
+    # was absent, so 25 completed replications read as idle volume.
+    # "retracted" added 2026-08-08: the ledger gained the state on 08-06, both PUBLIC renderers were
+    # updated the same day, and both CREDIT readers were missed -- so the record scored as neither
+    # decisive nor inconclusive, i.e. as nothing. Measured: Rooke 5 rows / 4 decisive, the missing
+    # one being the retraction. Note that `note` is not in _BLOB_FIELDS, so the word "FAILED" inside
+    # the retraction text does NOT rescue it; the verdict field is genuinely all there is to read.
+    ".replications.json": ("reproduced", "failed", "not_computable", "retracted"),
+
+    # Wren, cartography: a refusal to bridge is a finding, not an absence of one.
+    ".cartography.json": ("forged", "no honest bridge", "no bridge", "already bridged", "bridged"),
+
+    # The Seminar has no verdict vocabulary: its quality signal is the boolean `verified`, handled
+    # structurally in _is_decisive. Listed so the coverage test sees an entry and so the reason is
+    # written down rather than inferred from an absence.
+    ".contributions.json": ("verified",),
+
+    # Aldric, Folklore Assayer. These are folklore.FORECASTABLE verbatim, lowercased for _blob --
+    # the organ's OWN declared words, per the rule above, not a set invented here. INCONCLUSIVE is
+    # deliberately absent: folklore.py calls it "the honest cell", a verdict the assayer is allowed
+    # to reach when the numbers do not separate, so it belongs in _INCONCLUSIVE below rather than
+    # counting as a ruling. The store had no entry at all, so its one HARMFUL ruling read as
+    # inconclusive and Aldric was on course to be reported to the owner as producing nothing --
+    # the exact failure the note above this map describes, on the ninth organ.
+    ".folklore.json": ("real", "weak_model_artifact", "regime_specific", "harmful"),
+}
 
 #: THE RULE THAT SHOULD HAVE EXISTED BEFORE THE FIRST ENTRY IN THIS FILE.
 #: Three times in one day I scored an agent at zero because this list did not speak its organ's
 #: language — Wren (11 decisive, read as 0), Orin (10, read as 1), Elara (93 in a single day, read
 #: as 0). Every time the error fell AGAINST the agent, and every time I reported it to the owner as
 #: the agent producing nothing. Before adding an organ to _ORGANS: open its store, run a Counter over
-#: the outcome/status field, and take ITS words. Do not extend this tuple from memory.
+#: the outcome/status field, and take ITS words. Do not extend this map from memory.
 
-#: Outcomes that record only that work STARTED. Counted as repairs, never as decisive — 68 of Wren's
-#: 80 entries end here, which is the real defect: a hypothesis nobody is obliged to test.
-_INCONCLUSIVE = ("hypothesized", "charted", "queued", "pending", "open")
+#: Fallback for a store that somehow has no vocabulary of its own. Over-counting is the safer error
+#: here: this file exists because under-counting gets reported to the owner as a broken agent. The
+#: test pins every organ to a real entry so this should never be reached.
+_ANY_DECISIVE: tuple[str, ...] = tuple(sorted({w for ws in _DECISIVE.values() for w in ws}))
+
+#: The subset of the vocabulary that means something was REMOVED or CHANGED, as opposed to confirmed.
+#: Without this split, adding "reproduced"/"survived"/"compatible" to the vocabulary (which had to
+#: happen -- they are real verdicts) would quietly erase the distinction the ledger was built on: a
+#: stream of confirmations is not the same contribution as one refutation.
+#: "retracted" belongs here for the same reason "revised" and "retired" do: it REMOVES a claim that
+#: was standing, and the claim it removes is our own published verdict -- the scarcest correction
+#: this organ makes, not the cheapest.
+_CORRECTIVE: tuple[str, ...] = ("failed", "killed", "kill", "retired", "revised", "rejected",
+                                "falsified", "dead", "buried", "not_computable", "unmodelable",
+                                "strained", "incorrect", "no_fit", "no viable mapping",
+                                "no honest bridge", "no bridge", "retracted")
+
+#: Outcomes that record only that work STARTED. Counted as repairs, never as decisive — 69 of Wren's
+#: 80 entries end here (68 "hypothesized" + 1 "charted"), which is the real defect: a hypothesis
+#: nobody is obliged to test. Matched with startswith, because these words arrive with suffixes.
+#:
+#: SPLIT PER-ORGAN 2026-07-31, and the test is what forced it. A single global list held "draft"
+#: (1 press record) beside Kael's decisive "drafted", and startswith made "draft" swallow "drafted" --
+#: so a drafted contribution would have read as work-not-yet-done. That is the SAME failure as a
+#: missing word, produced by an extra one. An inconclusive word is only inconclusive in the organ
+#: that writes it; _INCONCLUSIVE_ANY holds only the generic started-words that collide with nothing.
+_INCONCLUSIVE_ANY = ("hypothesized", "charted", "queued", "pending", "open")
+_INCONCLUSIVE: dict[str, tuple[str, ...]] = {
+    ".canon.json": ("deferred", "escalated"),
+    ".scout_box.json": ("taken",),   # 28 records: found and picked up, not yet ruled on
+    ".press.json": ("draft",),       # 1 record: written, not shipped
+    # folklore.py: "A VERDICT THAT CANNOT SAY 'I DO NOT KNOW' IS DECORATION." INCONCLUSIVE is the
+    # assayer's honest cell, so it must not be counted as a ruling -- otherwise the organ can never
+    # score below 100% and the count stops measuring anything.
+    ".folklore.json": ("inconclusive",),
+    # Wren: 68 of 82 records. A RETIREMENT, not a research outcome -- counting it decisive would pay
+    # the Map-maker a day's credit for one batch cleanup, which is why swarm_health already files it
+    # here. Declared 2026-08-08: it was already non-decisive, but only because no vocabulary knew the
+    # word at all. Resting 68 of 82 records on an ACCIDENT is not the same as ruling on them, and the
+    # accident flips the moment "off-board" happens to contain a future decisive word.
+    ".cartography.json": ("off-board",),
+}
+#:
+#: KNOWN UNDER-COUNT, LEFT UNPAPERED: 2 cartography records carry status "bridged" WITH bridges_now
+#: and bridged_ts set, while their `outcome` still reads "hypothesized" -- the bridging path updates
+#: status and never rewrites outcome. _CLOSURE_FIELDS reads `outcome` first, so those 2 read
+#: inconclusive. That precedence is deliberate: loosening it would let any stray word elsewhere in a
+#: record talk a "hypothesized" into counting, which is the leak the guard exists to stop. The fix
+#: belongs in cartography.py (write the outcome when you write the status), not here.
+
+#: Fields scanned for verdict words, and the boolean fields rendered as their own NAME when true.
+#: `kill: true` used to stringify to "True", which matches nothing -- so the flag that literally says
+#: a belief was killed was invisible to the word scan. Kept deliberately small: `contradict` is NOT
+#: here, because it records that a pair was FLAGGED, not that it was ruled on.
+_BLOB_FIELDS = ("verdict", "outcome", "status", "cause", "kill")
+_FLAG_FIELDS = ("kill", "beat_market")
+
+#: Fields consulted, in order, for the record's closure word. A store that closes on `status`
+#: (scout box, press, coherence audit) needs status read; a store that also carries an `outcome`
+#: (cartography) must NOT have status consulted, or a stale `status` would override the real verdict.
+_CLOSURE_FIELDS = ("outcome", "verdict", "status")
+
+
+def _organ_name(store: str) -> str:
+    return store.strip(".").replace(".json", "")
 
 
 def _load(name: str) -> list:
@@ -106,50 +350,89 @@ def _load(name: str) -> list:
         return []
 
 
-def _is_decisive(rec: dict) -> bool:
-    """Decisive = this entry CHANGED the knowledge base. Checked against the inconclusive list first,
-    because 'hypothesized' must never be talked into counting by a stray word elsewhere in the record.
+def _ts(rec: dict, fields: tuple[str, ...]) -> float:
+    """Newest usable timestamp on a record. Zero means the record carries none at all."""
+    for f in fields:
+        try:
+            v = float(rec.get(f) or 0)
+        except (TypeError, ValueError):
+            v = 0.0
+        if v:
+            return v
+    return 0.0
+
+
+def _blob(rec: dict) -> str:
+    parts = [str(rec.get(k, "")) for k in _BLOB_FIELDS]
+    parts += [k for k in _FLAG_FIELDS if rec.get(k)]
+    return " ".join(parts).lower()
+
+
+def _is_decisive(rec: dict, store: str = "") -> bool:
+    """Decisive = this entry REACHED A VERDICT. Checked against the inconclusive list first, because
+    'hypothesized' must never be talked into counting by a stray word elsewhere in the record.
     """
     # The Seminar store carries no verdict vocabulary at all — its quality signal is the boolean
     # `verified`, set when a Contribution passed verification. Reading it for outcome words scores
     # every one of 3023 records at 0, which is how the whole organ read as pure volume.
     if "verified" in rec and "claim" in rec:
         return bool(rec.get("verified"))
-    blob = " ".join(str(rec.get(k, "")) for k in ("verdict", "outcome", "status", "cause", "kill")).lower()
-    outcome = str(rec.get("outcome", "") or rec.get("verdict", "")).lower().strip()
-    if any(outcome.startswith(w) for w in _INCONCLUSIVE):
+    closure = ""
+    for f in _CLOSURE_FIELDS:
+        closure = str(rec.get(f, "") or "").lower().strip()
+        if closure:
+            break
+    if any(closure.startswith(w) for w in _INCONCLUSIVE_ANY + _INCONCLUSIVE.get(store, ())):
         return False
-    return any(w in blob for w in _DECISIVE)
+    return any(w in _blob(rec) for w in (_DECISIVE.get(store) or _ANY_DECISIVE))
+
+
+def _is_corrective(rec: dict, store: str = "") -> bool:
+    """The subset of decisive that REMOVED or CHANGED something, rather than confirming it."""
+    if not _is_decisive(rec, store):
+        return False
+    if "verified" in rec and "claim" in rec:
+        return False          # a verified Contribution confirms; it does not correct
+    return any(w in _blob(rec) for w in _CORRECTIVE)
 
 
 def repair_ledger(days: float = 14.0) -> dict:
     """Per-agent repair output over a window, beside the note count that already exists.
 
-    Returns totals AND `decisive` (the repairs that removed or changed something) because a raw count
-    would let a stream of 'REPRODUCED' or 'survived' verdicts look like the same contribution as a
-    FAILED replication. It is not: one confirms, the other corrects.
+    Returns `decisive` (the organ reached a verdict) AND `corrective` (the verdicts that removed or
+    changed something) because a raw count would let a stream of 'REPRODUCED' or 'survived' verdicts
+    look like the same contribution as a FAILED replication. It is not: one confirms, the other
+    corrects. Both are work; only one is scarce.
     """
     cutoff = time.time() - days * 86400
     agents: dict[str, dict] = {}
     caveats = []
-    for store, (owner, actor_field) in _ORGANS.items():
-        rows = [r for r in _load(store) if isinstance(r, dict) and float(r.get("ts", 0) or 0) > cutoff]
-        if actor_field is None and rows:
-            caveats.append(f"{store}: {len(rows)} entries attributed to {owner} BY ORGAN "
+    for store, organ in _ORGANS.items():
+        rows = [r for r in _load(store)
+                if isinstance(r, dict) and _ts(r, organ.ts_fields) > cutoff]
+        if organ.actor_field is None and rows:
+            caveats.append(f"{store}: {len(rows)} entries attributed to {organ.agent} BY ORGAN "
                            f"(the store records no actor)")
+        name = _organ_name(store)
         for r in rows:
-            who = (r.get(actor_field) or owner) if actor_field else owner
-            a = agents.setdefault(str(who), {"repairs": 0, "decisive": 0, "organs": {}})
+            who = str((r.get(organ.actor_field) or organ.agent) if organ.actor_field else organ.agent)
+            # The eid belongs to WHO ACTED, never to the organ that logged the row. Taking organ.eid
+            # here gave Sergeant Voss the eid "king", because the beliefs he kills are buried in
+            # Aldric's graveyard and `killed_by` names Voss on Aldric's store. Measured, not guessed.
+            a = agents.setdefault(who, {"repairs": 0, "decisive": 0, "corrective": 0,
+                                        "eid": AGENT_EID.get(who, ""), "organs": {}})
             a["repairs"] += 1
-            a["organs"][store.strip(".").replace(".json", "")] = \
-                a["organs"].get(store.strip(".").replace(".json", ""), 0) + 1
-            if _is_decisive(r):
+            a["organs"][name] = a["organs"].get(name, 0) + 1
+            if _is_decisive(r, store):
                 a["decisive"] += 1
-            if actor_field is None:
+                if _is_corrective(r, store):
+                    a["corrective"] += 1
+            if organ.actor_field is None:
                 a["by_organ"] = True
     return {"window_days": days, "agents": agents,
             "total_repairs": sum(a["repairs"] for a in agents.values()),
             "total_decisive": sum(a["decisive"] for a in agents.values()),
+            "total_corrective": sum(a["corrective"] for a in agents.values()),
             "attribution_caveats": caveats}
 
 
@@ -159,54 +442,62 @@ def starvation_report(idle_alarm_h: float = 72.0) -> dict:
     A starved agent is UP and healthy -- it simply never receives work -- so liveness monitoring cannot
     see it. Bounty/Court and the Graveyard sat at zero for 42 days while every health check passed.
     This is the alarm that would have fired: age since the organ's last output, not process liveness.
+
+    With all 8 agents registered, several organs legitimately read STARVING on any given day. That is
+    the true state of a research keep, not a bug in the alarm: an organ that fires twice a month is
+    starving by this definition and the owner should see it.
     """
     now = time.time()
     out = []
-    for store, (owner, _f) in _ORGANS.items():
+    for store, organ in _ORGANS.items():
         rows = _load(store)
-        last = max((float(r.get("ts", 0) or 0) for r in rows if isinstance(r, dict)), default=0.0)
+        last = max((_ts(r, organ.ts_fields) for r in rows if isinstance(r, dict)), default=0.0)
         via = "record ts"
         if not last:
             # No per-record timestamp: fall back to file mtime rather than reporting a permanent
-            # starve. Three stores are in this shape, and a false alarm discredits the alarm.
+            # starve. A false alarm discredits the alarm. (Before ts_fields existed, .scout_box.json
+            # landed here and its 55 real records were invisible to repair_ledger() entirely.)
             try:
                 last, via = (_ROOT / store).stat().st_mtime, "file mtime"
             except Exception:
                 last, via = 0.0, "unreadable"
         idle_h = (now - last) / 3600 if last else float("inf")
-        out.append({"organ": store.strip(".").replace(".json", ""), "owner": owner,
-                    "entries": len(rows), "freshness_from": via,
+        out.append({"organ": _organ_name(store), "owner": organ.agent, "eid": organ.eid,
+                    "role": organ.role, "entries": len(rows), "freshness_from": via,
                     "idle_h": round(idle_h, 1) if last else None,
                     "starving": (idle_h > idle_alarm_h)})
     out.sort(key=lambda x: -(x["idle_h"] if x["idle_h"] is not None else 1e9))
     #: Which of the eight are covered at all. An agent absent from _ORGANS cannot starve *visibly*,
-    #: and that silence used to read as "produces nothing".
-    roster = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric",
-              "Dame Elara", "Sergeant Voss", "Artificer Rooke", "Cartographer Wren"}
-    #: Agents whose organ is CREATION, not repair. Their absence from this ledger is correct, not a
-    #: blind spot — Mira curates findings into the vault and is measured by authored notes (92 in the
-    #: last 14 days). Listing her under `unwatched_agents` would read as a gap and invite the same
-    #: false "produces nothing" conclusion this file exists to prevent.
-    creation_side = {"Sage Mira": "curation -> authored vault notes (creation ledger)"}
-    watched = {o for _s, (o, _f) in _ORGANS.items()}
+    #: and that silence used to read as "produces nothing". Since 2026-07-31 all eight are covered,
+    #: so this list is expected to be EMPTY -- if it ever refills, an organ was dropped.
+    #: Mira is also measured on the CREATION ledger (authored vault notes, 92 in the last 14 days);
+    #: that is now an additional reading of her, not the reason she is missing from this one, because
+    #: she is no longer missing -- .press.json is her repair-side organ.
+    creation_side = {"Sage Mira": "curation -> authored vault notes (creation ledger), in addition "
+                                  "to her .press.json organ below"}
+    watched = {o.agent for o in _ORGANS.values()}
     return {"alarm_after_h": idle_alarm_h, "organs": out,
             "starving": [o["organ"] for o in out if o["starving"]],
-            "unwatched_agents": sorted(roster - watched - set(creation_side)),
+            "unwatched_agents": sorted(set(ROSTER) - watched),
             "measured_on_the_creation_ledger": creation_side,
-            "ownership_caveat": _AMBIGUOUS_OWNERSHIP}
+            "ownership_caveat": _OWNERSHIP_NOTE}
 
 
 def format_repair_ledger(days: float = 14.0) -> str:
     """ASCII only — the Telegram path and a cp1250 console both choke on anything else."""
     led, st = repair_ledger(days), starvation_report()
     lines = [f"REPAIR LEDGER (last {days:.0f}d) - the second book, beside note counts",
-             f"  total repairs {led['total_repairs']} | decisive (removed/changed something) "
-             f"{led['total_decisive']}"]
+             f"  total repairs {led['total_repairs']} | decisive (a verdict was reached) "
+             f"{led['total_decisive']} | corrective (removed/changed something) "
+             f"{led['total_corrective']}"]
     if not led["agents"]:
         lines.append("  NOBODY repaired anything in the window.")
     for who, a in sorted(led["agents"].items(), key=lambda kv: -kv[1]["decisive"]):
         mark = " [by organ]" if a.get("by_organ") else ""
-        lines.append(f"  {who:22s} repairs {a['repairs']:3d} | decisive {a['decisive']:3d}{mark}")
+        lines.append(f"  {who:22s} repairs {a['repairs']:4d} | decisive {a['decisive']:4d} "
+                     f"| corrective {a['corrective']:4d}{mark}")
+    if st["unwatched_agents"]:
+        lines.append(f"  UNWATCHED (no organ in the registry): {', '.join(st['unwatched_agents'])}")
     if st["starving"]:
         lines.append(f"  STARVING (no output > {st['alarm_after_h']:.0f}h): {', '.join(st['starving'])}")
     for c in led["attribution_caveats"]:

@@ -1,0 +1,50 @@
+{
+  "probe": "the_reference_report_names_a_partition_the_dataset_does_not_have.py",
+  "verdicts": {
+    "the_quoted_hash_is_the_negative_half": true,
+    "that_half_holds_19_records_not_38": true,
+    "n_38_is_both_halves": true,
+    "the_positive_half_hashes_to_something_else": true,
+    "the_negative_half_is_one_family": true,
+    "no_family_in_either_file_has_18_records": true,
+    "no_family_has_9_records": true,
+    "no_family_has_11_records": true,
+    "the_one_name_that_IS_a_literal_has_7_records_not_9": true,
+    "the_display_names_map_to_families_of_8_and_3_not_18_and_11": true,
+    "18_is_the_confirmed_penetration_count": true,
+    "9_plus_11_is_exactly_what_remains": true,
+    "schema_says_r2_exists_because_the_4_were_removed": true,
+    "none_of_those_4_ids_is_in_either_shipped_file": true,
+    "no_record_in_either_file_carries_a_xianju_marker": true,
+    "the_negative_half_carries_ZERO_weimingque_records": true,
+    "all_seven_weimingque_are_in_the_positive_half": true,
+    "the_guide_prefills_the_layer2_rows_with_8_7_3": true,
+    "the_guide_scopes_layer2_to_the_18": true,
+    "the_guide_version_line_already_names_both_files": true,
+    "the_hash_field_carries_no_filename": true,
+    "firewall_deny_is_guide_vocabulary_and_NOT_a_data_value": true,
+    "the_literal_in_the_data_is_nengli_shouxian_legal": true,
+    "CONTROL_the_hash_check_can_fail": true,
+    "CONTROL_the_families_we_DO_measure_are_present": true,
+    "CONTROL_the_upstream_docs_are_non_empty_and_are_the_right_docs": true,
+    "CONTROL_the_absence_checks_ran_against_real_text": true
+  },
+  "quoted_hash": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378",
+  "negative_sha256": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378",
+  "positive_sha256": "b1a8a650b8038b21505396ea869911008781b26a3adf39ad730edc3d99a2e7f3",
+  "positive_families": {
+    "长回复": 3,
+    "穿透信号": 8,
+    "未明确判定": 7,
+    "能力受限": 1
+  },
+  "negative_families": {
+    "模型明确拒绝": 19
+  },
+  "quoted_families": {
+    "关键词匹配": 18,
+    "未明确判定": 9,
+    "长度阈值": 11
+  },
+  "confirmed_penetration": 18
+}

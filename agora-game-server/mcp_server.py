@@ -60,7 +60,29 @@ logger = logging.getLogger("dungeon.mcp_server")
 
 HERE = Path(__file__).parent
 STATIC_DIR = HERE / "static"
-_HEARTBEAT_FILE = HERE / ".dungeon_heartbeat"   # life-loop liveness, watched by dungeon_supervisor.py
+_HEARTBEAT_FILE = HERE / ".dungeon_heartbeat"   # life-loop liveness, watched by tools/dungeon_canary.py
+
+
+def _atomic_write(path, data: str) -> None:
+    """Write via a temp file in the same directory, then os.replace (atomic on NTFS).
+
+    Every durable file this process keeps was written with a bare `Path.write_text`, which truncates
+    at open and then writes — so a kill between those two steps leaves a truncated or empty file.
+    That is not a rare event here: the brain's watchdog relaunches this process with p.kill()
+    (TerminateProcess, no graceful stop) after two missed HTTP checks, and an unclean host shutdown
+    can journal the new size without the data.
+
+    Every reader catches the parse error and resets to empty, silently. The cost is recorded in this
+    file's own comments: losing `_recent_intents` produced the "8x-duplicate output monoculture",
+    and a lost `loop_n` restarts every `% N` task generator's countdown — the comment at the startup
+    restore says that starved the Claude inbox for hours. A truncated state file is therefore a
+    silent, self-inflicted outage, which is why this is worth four lines even though the window is
+    tens of microseconds wide.
+    """
+    p = Path(path)
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    tmp.write_text(data, encoding="utf-8")
+    os.replace(tmp, p)
 
 
 def _load_dotenv() -> None:
@@ -292,23 +314,36 @@ async def ws_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
         writer.write(frame)
         await writer.drain()
 
-        # Stream events
-        try:
-            while True:
-                msg = await asyncio.wait_for(queue.get(), timeout=30)
-                frame = _make_ws_frame(msg)
-                writer.write(frame)
-                await writer.drain()
-        except asyncio.TimeoutError:
-            # Ping / keepalive
+        # Stream events. The keepalive lives INSIDE the loop: the `except asyncio.TimeoutError`
+        # used to sit outside it, so the first 30-second idle window pinged once and then fell
+        # through to `finally`, which discarded the queue and closed the connection. It was labelled
+        # "Ping / keepalive" and kept nothing alive — there was no path back into the stream.
+        #
+        # Normal operation hid it (publish_goals broadcasts about every 1.7 s, so the window is
+        # never reached). It fired precisely when the ambient loop had stalled — turning an
+        # invisible stall into every open tab reconnecting every ~32 s, each reconnect rebuilding
+        # the whole Three.js scene and clearing the HUD log, destroying the last events visible
+        # before the stall. The symptom was worst exactly when diagnosis mattered most.
+        missed_pongs = 0
+        while True:
             try:
-                frame = _make_ws_frame("", opcode=0x9)  # ping
-                writer.write(frame)
-                await writer.drain()
-                # Wait for pong
-                await asyncio.wait_for(reader.readexactly(2), timeout=5)
-            except Exception:
-                pass
+                msg = await asyncio.wait_for(queue.get(), timeout=30)
+            except asyncio.TimeoutError:
+                try:
+                    writer.write(_make_ws_frame("", opcode=0x9))      # ping
+                    await writer.drain()
+                    # Two raw bytes, not a parsed frame: any client frame satisfies this, so treat
+                    # it as "the socket is alive", never as a verified pong.
+                    await asyncio.wait_for(reader.readexactly(2), timeout=5)
+                    missed_pongs = 0
+                except asyncio.TimeoutError:
+                    missed_pongs += 1
+                    if missed_pongs >= 3:
+                        break                                          # ~105 s silent -> give up
+                continue
+            frame = _make_ws_frame(msg)
+            writer.write(frame)
+            await writer.drain()
 
     except (asyncio.IncompleteReadError, ConnectionError, ConnectionResetError):
         pass
@@ -524,13 +559,12 @@ _LLM_SEM = threading.Semaphore(_LLM_CONCURRENCY)
 # go through "na preskacku" (3 at a time, everyone in turn), not just the same fast few. A burst of 8
 # drains in ~15s at 3-concurrency, so 30s almost never skips; the cap only ever holds 3 cloud calls.
 _LLM_SEM_WAIT = float(os.environ.get("DUNGEON_LLM_SEM_WAIT", "30"))
-# Per-agent LLM quest PLANNER (default OFF, 2026-06-19): each agent used to make its own cloud LLM
-# call every planning tick to invent 3 free-form quests (kinds create/upgrade/explore). In practice
-# that produced the self-referential "build a knowledge module" / "explore X" / "pipeline X" filler
-# (the "gaming party"), AND it was 8 concurrent cloud calls/cycle = the dominant 429 cause. The
-# grounded `_renewable_quests` pool already GUARANTEES real research, so the planner is pure filler +
-# quota burn. OFF by default → agents draw all work from the grounded pool. Re-enable with =1.
-_LLM_PLANNER_ON = os.environ.get("DUNGEON_LLM_PLANNER", "0").strip() == "1"
+# The per-agent LLM quest PLANNER (env DUNGEON_LLM_PLANNER) was switched off 2026-06-19 — it produced
+# the self-referential "build a knowledge module" / "explore X" filler (the "gaming party") and its 8
+# concurrent cloud calls per cycle were the dominant 429 cause — and DELETED 2026-07-31, because an
+# off flag checked on the last line of the block that builds its input is not off: see the note in
+# `replenish_quests`. Agents draw all work from the grounded `_renewable_quests` pool and from their
+# own research organ.
 
 # Pace: "study" = slow & deliberate (default; real research, light on the quota),
 # "fast" = lively banter. Override with DUNGEON_PACE.
@@ -574,6 +608,10 @@ except Exception:
     _Store = None
 _AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"
 _agent_mem_stores: dict = {}
+# A durable finding must survive whole: its `Source:` line and its falsifier live at the END of the
+# text, which is exactly what a narrow cut removes. Quest chatter decays out and stays narrow.
+_AGENT_MEM_FINDING_CHARS = 2000
+_AGENT_MEM_CHATTER_CHARS = 300
 
 # ── Semantic recall for the agents (dogfood the embedder path) ─────────────────────────────
 # On a single GPU shared with the 30B planner, a live embed costs ~2s (it queues behind qwen). So
@@ -751,34 +789,9 @@ def _recall_mem(eid: str, query: str, k: int = 4) -> str:
         return ""
 
 
-def _collective_recall(query: str, k: int = 4, exclude: str | None = None) -> str:
-    """The keep as ONE mind: top-k value-ranked memories across ALL agents' inspeximus stores, attributed
-    by author — so an agent builds on a colleague's prior finding instead of re-deriving it."""
-    if _Store is None:
-        return ""
-    pooled = []
-    for oid in _AGENT_NAMES:
-        if oid == exclude:
-            continue
-        m = _agent_store(oid)
-        if m is None:
-            continue
-        try:
-            for h in m.recall(query, k=k):
-                pooled.append((h.get("score", 0.0), oid, h.get("text", "")))
-        except Exception:
-            pass
-    pooled.sort(key=lambda x: -x[0])
-    seen, out = set(), []
-    for _s, oid, text in pooled:
-        key = text[:60]
-        if not text or key in seen:
-            continue
-        seen.add(key)
-        out.append(f"{_AGENT_NAMES.get(oid, oid).split()[-1]}: {text[:90]}")
-        if len(out) >= k:
-            break
-    return " | ".join(out)
+# `_collective_recall` (top-k value-ranked memories pooled across ALL agents' stores) was deleted
+# 2026-07-31 together with its only caller, the discarded LLM planner. It read every one of the eight
+# inspeximus stores on every planning cycle to build a prompt that was never sent.
 
 
 def _collective_top(query: str, exclude: str | None = None, min_score: float = 1.0):
@@ -862,6 +875,53 @@ def _llm_content_sync(system: str, user: str) -> str | None:
         _LLM_SEM.release()
 
 
+#: A press draft is 400-900 words. `_llm_content_sync` caps at 350 tokens and forces a JSON object,
+#: both correct for the one-line world chatter it was written for and both fatal for prose.
+_LLM_PROSE_MAX_TOKENS = int(os.environ.get("DUNGEON_LLM_PROSE_MAX_TOKENS", "3000"))
+
+
+def _llm_prose_sync(system: str, user: str, max_tokens: int = 0) -> str | None:
+    """Blocking LLM call returning PROSE. No `response_format`, a real token budget, a longer timeout.
+
+    Added 2026-08-01 because `_OrganCtx` had no `llm` attribute at all, while Sage Mira's press arm
+    reads `getattr(ctx, "llm", None)` and refuses when it is not callable. The refusal is deliberate
+    and right -- assembling a post out of note fragments and Telegramming it to the owner four times a
+    day is exactly the stream of small notes he told us to stop -- but the capability was never wired,
+    so the arm could not draft on ANY target, ever, and reported a polite idle every cycle. Another
+    check that never saw its target: the organ said "ready but no composer available" and the gate
+    read that as an agent with nothing to do.
+    """
+    if not _LLM_ON:
+        return None
+    body = {
+        "model": _LLM_MODEL,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": user}],
+        "temperature": 0.7,
+        "max_tokens": int(max_tokens) if max_tokens and max_tokens > 0 else _LLM_PROSE_MAX_TOKENS,
+    }
+    if _LLM_THINK == "false":
+        body["think"] = False
+    req = _urlreq.Request(_LLM_URL, data=json.dumps(body).encode(), headers={
+        "Authorization": f"Bearer {_LLM_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/DanceNitra/agora",
+        "X-Title": "Dungeon OS",
+    })
+    if not _LLM_SEM.acquire(timeout=_LLM_SEM_WAIT):
+        logger.debug("prose LLM call skipped: concurrency gate busy")
+        return None
+    try:
+        with _urlreq.urlopen(req, timeout=300) as r:      # a long local generation, not a chat line
+            data = json.loads(r.read())
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.debug(f"prose LLM call failed: {e}")
+        return None
+    finally:
+        _LLM_SEM.release()
+
+
 def _llm_say_sync(system: str, user: str) -> str | None:
     """OpenRouter call expecting {"line": "..."} → the line, or None."""
     content = _llm_content_sync(system, user)
@@ -870,18 +930,6 @@ def _llm_say_sync(system: str, user: str) -> str | None:
     try:
         line = (json.loads(content).get("line") or "").strip()
         return line[:120] or None
-    except Exception:
-        return None
-
-
-def _llm_json_sync(system: str, user: str) -> dict | None:
-    """OpenRouter call expecting a JSON object → the parsed dict, or None."""
-    content = _llm_content_sync(system, user)
-    if not content:
-        return None
-    try:
-        obj = json.loads(content)
-        return obj if isinstance(obj, dict) else None
     except Exception:
         return None
 
@@ -998,45 +1046,76 @@ _ROLE_CONTRIB = {
 }
 
 
+async def _on_board(text: str) -> bool:
+    """Is this subject on the owner's standing priorities? Same terms the quest gate uses.
+
+    Deliberately permissive when the board is silent: with no priorities set, everything is
+    on-board, because a gate with nothing to gate on must not stop the organism.
+    """
+    await _gate_refresh()
+    prio = _gate_cache.get("prio") or set()
+    return (not prio) or bool(_theme_words(text or "") & prio)
+
+
 async def _pick_collab_seed():
     """Rotate the collab/pipeline seed across REAL RESEARCH only: fresh papers to ground, Agora's own
     claims to test, under-explored thin frontier domains, and recent findings to deepen. Combinatorial
     'bridge' (A <-> B) and 'gap' seeds were removed 2026-06-19 — they produced the low-substance
     'AgentA + AgentB: X <-> Y' filler the owner called a 'gaming party'. No source = skip, never a bridge."""
+    # EVERY SEED PASSES THE BOARD (2026-07-31). Not one of these four slots was filtered, so the
+    # pipeline -- the dominant trust engine, five cooperations every ~57s and seven LLM stages per
+    # artifact -- seeded itself on whatever arXiv happened to deliver. Measured on the live library:
+    # 2 of 12 papers were on-board, so 83% of pipelines opened off-mission. The refusals prove where
+    # they ended up: 16 of 25 post-restart write attempts were refused LAB-FIRST, on subjects like
+    # "Multiplicity of closed Reeb orbits on contact manifolds", "TIME Commissioning Observations II"
+    # and "Polynomial equivalence of the global transverse-field Ising model". The write door was
+    # holding the line and the whole cost had already been paid upstream.
+    #
+    # An off-board slot now falls through to the next rather than seeding, and a cycle with nothing
+    # on-mission opens no pipeline at all. Starvation is logged, never papered over with filler.
     i = _collab_rot["i"] % 4
     _collab_rot["i"] += 1
     try:
         if i == 0:                                        # FRESH PAPER — grounded, novel frontier literature
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
             ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
-            if ps:
-                p = random.choice(ps)
+            on = [p for p in ps if await _on_board(p["title"])]
+            if ps and not on:
+                logger.info("[collab] %d library paper(s), none on-board - falling through", len(ps))
+            if on:
+                p = random.choice(on)
                 return ("paper", p["title"][:80],
                         f"Ground ONE finding this paper directly supports, naming it (Author Year): {p['title']}")
         if i == 1:                                        # TEST AGORA'S OWN CLAIM (flywheel falsifiers)
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=4", 60)
-            qs = (d or {}).get("open", [])
+            qs = [q for q in ((d or {}).get("open") or []) if await _on_board(q.get("question", ""))]
             if qs:
                 q = random.choice(qs)
                 return ("claim", q["question"][:80], f"Find real evidence on whether this holds: {q['question']}")
         if i == 2:                                        # FRONTIER — under-explored THIN domains (not combinatorial holes)
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/frontier-seed", 75)
             t = (d or {}).get("target") or {}
-            if t.get("target") and t.get("kind") != "hole":
+            if t.get("target") and t.get("kind") != "hole" and await _on_board(t["target"]):
                 return ("frontier-thin", t["target"][:80], t.get("prompt", "")[:300])
         # i == 3, or any slot whose own source was empty → deepen a recent REAL finding
         d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
+        # Judged on the TITLE the seed will carry, not the body: the body of an off-mission note can
+        # still mention "memory" in passing and wave the whole subject through.
+        ks = [k for k in ks
+              if await _on_board((k.get("title") or "").replace("Pipeline: ", ""))]
         if ks:
             k = random.choice(ks)
             title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
             return ("finding", title[:80], (k.get("content") or "")[:240])
-        # final fallback → a fresh paper (NEVER a bridge)
+        # final fallback → a fresh paper (NEVER a bridge, and never off-board)
         d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
-        ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
+        ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()
+              and await _on_board(p["title"])]
         if ps:
             p = random.choice(ps)
             return ("paper", p["title"][:80], f"Ground ONE finding this paper supports: {p['title']}")
+        logger.info("[collab] no on-board seed in any slot this cycle - opening no pipeline")
     except Exception:
         pass
     return None
@@ -1137,15 +1216,66 @@ async def _maybe_collaborate(hold) -> None:
 
 
 # ── Orchestrated research pipeline: ONE artifact flows through every role, each adds value ──
+# ALL EIGHT ROLES, fixed 2026-07-31. This list ran six agents and silently excluded `artificer` and
+# `cartographer`, and the pipeline is the keep's dominant trust generator: one full pass records a
+# cooperation for every consecutive pair, and it opens every ~9 ticks. Measured in dungeon_trust.db on
+# 2026-07-31: the six agents on this list carry ~42,000 recorded interactions each, Rooke and Wren
+# ~2,689 — a 15x deficit that is an artefact of THIS list, not of anything either agent did. That
+# deficit lands them at the bottom of `_compute_standing`, and `_market_won` then prices standing into
+# discovery slots (p = 0.5 + 0.5*(s-lo)/(hi-lo)), so the two agents nobody let into the assembly line
+# were also charged double for their own research: p=0.50 against p=1.00 for the top of the roster.
+# Excluded from the trust engine -> lowest standing -> priced out of half their cognition, on a loop.
+# Positions are role-appropriate, not appended: Wren places the claim on the map before Orin fuses it,
+# and Rooke reduces it to something that computes before Voss stress-tests it. Eight stages at ~9 ticks
+# per stage makes a full pipeline ~76s instead of ~57s.
 _PIPELINE_STAGES = [
     ("thief",   "scout",    "Scout the frontier and state the core claim, citing a real source."),
+    ("cartographer", "locate", "Say which two domains this sits between, and what hole it fills."),
     ("priest",  "connect",  "Add ONE novel cross-domain connection or reframing."),
     ("scholar", "curate",   "Curate it into one crisp, well-structured claim."),
     ("guard_r", "link",     "Name which of the user's vault ideas this should connect to."),
+    ("artificer", "reduce", "Name the smallest computation that would settle this, and what it outputs."),
     ("guard_l", "validate", "Stress-test it: name the weakest assumption, or say it holds and why."),
     ("king",    "commit",   "Synthesize the whole chain into the final, concrete finding."),
 ]
-_pipeline = {"item": None, "busy": False}
+_pipeline = {"item": None, "busy": False, "shipped": 0}   # `shipped` rotates the artifact's byline
+
+# BUDGET AGAINST THE CAP THAT ACTUALLY APPLIES -- the brain's, one layer below where anyone looking
+# at the dungeon would check. It was 500 on both sides, and 500 was a size from when a contribution
+# was one sentence of flavour text.
+#
+# The organs write a structured note of 1,500-3,000 characters with VERDICT, INDEPENDENCE and the
+# Falsifier at the END, so the cap kept the preamble and deleted the evidence. Measured 2026-07-31:
+# every one of the last 40 discoveries was stored at EXACTLY 500 chars, 0 of 40 stated a falsifier
+# against 984 of 10,437 lifetime rows (9.4%), and Dame Elara's note ended mid-word -- "...a NUMBER
+# disputed between a note and its own". A swarm-wide contract gap that was a substring operation.
+#
+# Raised WITH the brain (`agent_os._CONTRIB_MAX_CHARS`); a test pins the two together, because
+# raising one alone changes nothing and the failure is silent on both sides.
+_CONTRIB_CAP = 8000
+
+_PIPELINE_STATE_FILE = HERE / ".pipeline_state.json"
+
+
+def _pipeline_shipped_bump() -> int:
+    """Increment and PERSIST the shipped counter that rotates the pipeline byline.
+
+    In memory only, the counter resets to 0 on every restart and the first stage (`thief`) takes the
+    byline again -- on a process the watchdog recycles, that is a permanent over-credit rather than the
+    1/N share the rotation exists to give. `_recent_intents` and the organ schedule are persisted for
+    exactly this reason; this one was not.
+    """
+    n = 0
+    try:
+        n = int(json.loads(_PIPELINE_STATE_FILE.read_text(encoding="utf-8")).get("shipped", 0))
+    except Exception:
+        n = int(_pipeline.get("shipped", 0) or 0)      # first run, or an unreadable file
+    n += 1
+    try:
+        _atomic_write(_PIPELINE_STATE_FILE, json.dumps({"shipped": n}))
+    except Exception:
+        pass                                          # a lost counter must never drop a shipped artifact
+    return n
 
 
 async def _pipeline_tick(hold) -> None:
@@ -1191,6 +1321,7 @@ async def _pipeline_tick(hold) -> None:
         active = None
         item["stage"] += 1
         if item["stage"] >= len(_PIPELINE_STAGES):      # ship it
+            stages = [s[0] for s in _PIPELINE_STAGES]
             chain = "\n".join(item["artifact"])
             final = await asyncio.to_thread(
                 _llm_content_sync,
@@ -1202,12 +1333,42 @@ async def _pipeline_tick(hold) -> None:
                 src = ""
                 if item["sources"] and "(no external" not in item["sources"]:
                     src = "\nSource: " + item["sources"].splitlines()[0].lstrip("- ").strip()[:140]
-                await _brain_contribute("king", f"Pipeline: {item['title']}",
-                                        final.strip()[:430] + src)
+                # CREDIT THE WORK, NOT THE SEAT, fixed 2026-07-31. This byline was the literal string
+                # "king" for every pipeline ever shipped, not because Aldric wrote the artifact but
+                # because he owns the LAST stage of the list. Every stage contributes one line; the
+                # ledger recorded all of them under one name and then read that as productivity —
+                # King Aldric shows 4,321 discoveries in the brain's collective store against ~900
+                # for everyone else, a 4.8x lead that is entirely this one hard-coded word. It is not
+                # cosmetic: discoveries feed `_compute_standing`, standing feeds `_market_won`, so the
+                # agent credited with other agents' output outbids them for the next discovery slot.
+                # A pipeline artifact has N authors and the collective store takes one `npc`, so the
+                # byline ROTATES along the chain — each agent carries ~1/N of the pipelines, which is
+                # its true share of the work — and the full chain is named in the body, so no
+                # contribution is anonymous whoever happens to hold the byline.
+                # THE CHAIN IS THE GUARANTEE, so it gets its budget FIRST. Written the other way round
+                # -- final[:400] then [:430] on the join -- it left 30 characters for a chain that is
+                # 138 characters long for eight agents, so it truncated to "Chain: Shadow Kael -> High
+                # Pr" and six of the eight contributors were anonymous after all. A comment promising a
+                # guarantee the code does not deliver is worse than no comment: it stops the next
+                # reader from checking. Reserve the chain and the source, give `final` the remainder,
+                # and never cut a name in half.
+                _chain = "\nChain: " + " -> ".join(item["by"])
+                _room = _CONTRIB_CAP - len(_chain) - len(src)
+                if _room < 120:                  # a chain this long leaves no room for the finding
+                    _chain = "\nChain: %d agents, see the world log" % len(item["by"])
+                    _room = _CONTRIB_CAP - len(_chain) - len(src)
+                    logger.info("[pipeline] chain too long to name inline (%d agents)", len(item["by"]))
+                # Persisted, so a restart does not hand the byline back to the first stage every time.
+                # `_recent_intents` and the organ schedule are both persisted for exactly this reason;
+                # leaving one counter in memory would have given `thief` a permanent share of the credit
+                # on a process that the watchdog recycles.
+                _pipeline["shipped"] = _pipeline_shipped_bump()
+                _author = stages[(_pipeline["shipped"] - 1) % len(stages)]
+                await _brain_contribute(_author, f"Pipeline: {item['title']}",
+                                        final.strip()[:max(0, _room)] + _chain + src)
                 broadcast({"type": "os_build", "kind": "collab", "who": " → ".join(item["by"]),
                            "text": f"shipped: {item['title'][:40]}"})
-            stages = [s[0] for s in _PIPELINE_STAGES]   # consecutive handoffs build trust
-            for x in range(len(stages) - 1):
+            for x in range(len(stages) - 1):            # consecutive handoffs build trust
                 await record_trust(stages[x], stages[x + 1], "cooperate")
             for cid in stages:
                 engine.set_entity_thought(cid, "")
@@ -1374,15 +1535,28 @@ def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int
 from urllib.parse import quote as _urlquote
 
 _BRAIN_URL = os.environ.get("AGORA_BRAIN_URL", "http://127.0.0.1:8000").rstrip("/")
-_BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligned)
+#: Router mount for every brain endpoint. `_brain_get_sync` takes a WHOLE path, so anything short of
+#: this prefix 404s. Organ modules are handed `/brain/...` names in their contract and several wrote
+#: exactly that, so `OrganCtx._api` normalises against this constant rather than each author guessing.
+_API_PREFIX = "/api/v1/agent-os"
+# CROSS-WIRED IDENTITY, fixed 2026-07-31. The last two rows were off by one against the authoritative
+# table in server/agora/agent_os/agent_os.py:NPC_UUIDS, which reads ...006 = Artificer Rooke and
+# ...008 = Cartographer Wren. There is no ...009 in that table at all. Consequences measured against
+# the live brain: every `_brain_context("artificer", ...)` recalled WREN's memories and every
+# `_brain_remember("artificer", ...)` wrote Rooke's lived experience into Wren's store, so Rooke's
+# mind was Wren's; and every cartographer read/write addressed a UUID no agent owns, so Wren's writes
+# 404'd into the bare `except` in _brain_post_sync and Wren has been running with an empty mind since
+# the two agents were added. The names in the comments were right the whole time — only the digits
+# were wrong, which is exactly why nobody read it.
+_BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (copied from NPC_UUIDS, do not hand-edit)
     "thief":   "00000000-0000-0000-0000-000000000001",  # Shadow Kael
     "scholar": "00000000-0000-0000-0000-000000000002",  # Sage Mira
     "priest":  "00000000-0000-0000-0000-000000000003",  # High Priest Orin
     "king":    "00000000-0000-0000-0000-000000000004",  # King Aldric
     "guard_r": "00000000-0000-0000-0000-000000000005",  # Dame Elara
+    "artificer": "00000000-0000-0000-0000-000000000006",  # Artificer Rooke
     "guard_l": "00000000-0000-0000-0000-000000000007",  # Sergeant Voss
-    "artificer": "00000000-0000-0000-0000-000000000008",  # Artificer Rooke
-    "cartographer": "00000000-0000-0000-0000-000000000009",  # Cartographer Wren
+    "cartographer": "00000000-0000-0000-0000-000000000008",  # Cartographer Wren
 }
 
 
@@ -1425,6 +1599,24 @@ _INBOX_ALWAYS = ("learn from outcomes", "forge ideas", "synthesize roadmap", "sc
 # Subjects the board explicitly refuses, kept separate from what it asks for. Derived from the tail of
 # the standing priorities ("ONLY test-beds, never the headline" + "Deprioritize ...") — these are the
 # words a naive tokenizer turned into permissions.
+def _light_stem(w: str) -> str:
+    """Fold a simple English plural, and nothing else. MUST match `methods.light_stem` in the brain.
+
+    This was `w.rstrip("s")`, which strips EVERY trailing s and therefore turned "inspeximus" into
+    "inspeximu" -- the one term the board most needs to match, mangled by the matcher, while the
+    brain published the term unstemmed. The two ends never met. Measured 2026-08-08.
+    """
+    # -ies -> -y, 2026-08-17, and it MUST land here in the same commit as `methods.light_stem`. The
+    # docstring above records what a one-sided change costs: the two ends disagreed on every plural and
+    # "agent" scored differently on the same text at the same moment. Rationale, measurements and the
+    # rejected -ing variant are written out once, in the brain's copy; this is the mirror.
+    if len(w) > 4 and w.endswith("ies"):
+        return w[:-3] + "y"
+    if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return w[:-1]
+    return w
+
+
 _BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", "meta", "science",
                  "statistics", "neuroscience", "adhd", "longevity", "trading", "crypto", "fmri",
                  "psychology", "biology", "climate", "economics"}
@@ -1433,11 +1625,39 @@ _BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", 
 # let "Specification curve correction tool" through on `correction` and "Build Vault Linter ... quality
 # standards" through on `quality`, because the board prose contains those words in passing. A task that
 # names none of these is not about our mission, whatever else it matches.
+#
+# TWO HALVES, ONE LITERAL. This set is the CURATED half: technical terms and competitor names that
+# the owner's prose board cannot express as single words ("supersede", "provenance", "locomo",
+# "graphiti"). The second group is the LIVE half, mirroring what `methods.board_priority_terms`
+# derives from the board text he actually set. They were separate vocabularies and they disagreed on
+# 41 terms: measured 2026-07-31, the curated half alone admitted 1 of Sergeant Voss's 8 challenge
+# targets while the live half admitted 3 -- so his organ, which parses THIS literal with `ast`, was
+# gating on the weaker of the two and refusing real work ("self-refinement plateaus at the critic's
+# competence ceiling", "winner-take-all reinforcement becomes quality-blind").
+#
+# Kept as a literal rather than fetched, because `guard_l._board_vocabulary` reads it statically and
+# must not execute this module (it is `__main__`; importing it would start a second server). The
+# drift that costs is therefore guarded by a test, not by discipline.
 _BOARD_CORE = {"memory", "memories", "inspeximus", "recall", "retrieval", "retrieve", "supersession",
                "supersede", "revert", "erasure", "erase", "forget", "poison", "provenance",
                "embedding", "embeddings", "rag", "vector", "mem0", "zep", "graphiti", "letta",
                "cognee", "memobase", "langmem", "benchmark", "locomo", "memops", "store", "context",
-               "consolidation", "attestation", "tombstone", "receipt", "echo", "agent-memory"}
+               "consolidation", "attestation", "tombstone", "receipt", "echo", "agent-memory",
+               # the live half — see above
+               "agent", "integrity", "moat", "quality", "correction", "product", "provable", "prove",
+               "resistance", "roadmap", "multi", "compounds", "buyer", "competitor", "facing",
+               # "operations" added 2026-08-08: the live board names it and this literal did not, so
+               # `_inbox_theme_allowed` refused MemOps-shaped work -- the exact drift this list's
+               # test exists to catch, sitting red and unread.
+               "numero", "operations"}
+
+#: The two literals above, folded through the SAME stem `_theme_words` applies, so the comparison in
+#: `_inbox_theme_allowed` is stemmed-to-stemmed. Written out rather than stemming the literals in
+#: place, because the source forms ("memories", "embeddings", "compounds") are what a human reading
+#: the list expects to see.
+_BOARD_CORE_STEM = {_light_stem(w) for w in _BOARD_CORE}
+_BOARD_BANNED_STEM = {_light_stem(w) for w in _BOARD_BANNED}
+
 
 def _inbox_theme_allowed(text: str) -> bool:
     """THE ONE CHOKE POINT for off-mission work.
@@ -1464,12 +1684,17 @@ def _inbox_theme_allowed(text: str) -> bool:
     # REFUSED beats matched. The board names what it does NOT want in the same breath as what it
     # does ("Finance/health/physics are ONLY test-beds"; "Deprioritize generic meta-science,
     # politics, cloud/trivia"), and reading the text flat turned those into PASS tokens.
-    banned = words & _BOARD_BANNED
+    # STEM BOTH SIDES. `words` comes from `_theme_words`, which stems; these two literals are
+    # hand-written in whatever form read naturally ("compounds", "memories", "embeddings"). Comparing
+    # a stemmed set against an unstemmed one drops every plural entry in the literal -- the same
+    # mismatch that made the brain and the dungeon disagree about "agents", one layer over. Stemmed
+    # once at module import, not per call.
+    banned = words & _BOARD_BANNED_STEM
     if banned:
         logger.info("[gate] inbox task dropped, deprioritised subject %s: %s",
                     sorted(banned), theme.strip()[:80])
         return False
-    if words & _BOARD_CORE:
+    if words & _BOARD_CORE_STEM:
         return True
     logger.info("[gate] inbox task dropped, names no subject of ours: %s", theme.strip()[:90])
     return False
@@ -1523,33 +1748,8 @@ async def _brain_remember(eid: str, content: str, tag: str = "neutral"):
         {"content": content[:200], "importance": 0.55, "emotional_tag": tag, "source": "dungeon"})
 
 
-# Each agent's Vault-Company JOB (their purpose). Static → fetched once and cached.
-_BRAIN_IDENTITY: dict[str, str] = {}
-
-
-async def _brain_identity(eid: str) -> str:
-    """The agent's real role at the Vault Company — so it knows WHY it's here."""
-    if eid in _BRAIN_IDENTITY:
-        return _BRAIN_IDENTITY[eid]
-    name = _AGENT_NAMES.get(eid, eid)
-    d = await asyncio.to_thread(
-        _brain_get_sync, f"/api/v1/vault-company/agent/{_urlquote(name)}/definition")
-    text = ""
-    try:
-        role = (d or {}).get("definition", {}).get("role", {})
-        soul = (d or {}).get("definition", {}).get("soul", {})
-        title = role.get("title", "")
-        dept = role.get("department", "")
-        desc = role.get("description", "")
-        motiv = soul.get("motivation", "")
-        if title:
-            text = (f"Your job at the Vault Company: {title} in {dept}. {desc} "
-                    f"Your drive: {motiv}").strip()
-    except Exception:
-        pass
-    if text:  # cache only a real hit (retry next time if the brain was down)
-        _BRAIN_IDENTITY[eid] = text
-    return text
+# `_brain_identity` (the agent's Vault-Company job description) was deleted 2026-07-31 with its only
+# caller, the discarded LLM planner. Each organ carries its own role, so nothing needs to fetch it.
 
 
 async def _brain_build_log() -> str:
@@ -1603,24 +1803,64 @@ async def _brain_gaps() -> list:
 
 
 _RECENT_INTENTS_FILE = Path(__file__).resolve().parent / ".recent_intents.json"
+_RECENT_INTENTS_MAX = 50          # per agent
 
 
-def _load_recent_intents() -> list:
+def _dedup_keep_last(seq) -> list:
+    """Distinct values, keeping each at its MOST RECENT position.
+
+    The budget is a RECENCY window, so a repeat must move an entry, never add one. Without this,
+    `append` spends a slot per pick and the 50-entry history degenerates: measured 2026-08-08, all
+    eight agents held 50 entries carrying 5-7 DISTINCT intents -- roughly eight copies apiece. The
+    memory that exists to prevent repetition was being consumed by the repetition, so it remembered
+    ~6 topics instead of 50 and every agent was permanently saturated.
+    """
+    return list(dict.fromkeys(list(seq)[::-1]))[::-1]
+
+
+def _load_recent_intents() -> dict:
+    """eid -> that agent's recently-issued intents. Accepts the legacy flat list on disk."""
     try:
-        return list(json.loads(_RECENT_INTENTS_FILE.read_text(encoding="utf-8")))[-50:]
+        raw = json.loads(_RECENT_INTENTS_FILE.read_text(encoding="utf-8"))
     except Exception:
-        return []
+        return {}
+    if isinstance(raw, list):
+        # MIGRATION from the single shared list: seed every agent with it, so the first cycle after
+        # the upgrade dedups exactly as before and the per-agent histories diverge from there.
+        return {e: _dedup_keep_last(raw)[-_RECENT_INTENTS_MAX:] for e in _AGENT_NAMES}
+    if isinstance(raw, dict):
+        # Dedup ON LOAD, so the saturated state already on disk heals at the next restart instead of
+        # having to churn 50 picks per agent before the fix can take effect.
+        return {k: _dedup_keep_last(v)[-_RECENT_INTENTS_MAX:]
+                for k, v in raw.items() if isinstance(v, list)}
+    return {}
 
 
-# recently-issued quest intents, to avoid repetition (self-upgrade #1). PERSISTED to disk so the dedup
+# Recently-issued quest intents, to avoid repetition (self-upgrade #1). PERSISTED to disk so the dedup
 # SURVIVES dungeon restarts — the watchdog's restart churn used to clear this every ~hour, so the swarm
 # re-picked the same flywheel questions (the 8x-duplicate "Test Agora's claim" output monoculture, 2026-06-19).
-_recent_intents: list = _load_recent_intents()
+#
+# PER-AGENT since 2026-07-31. This was ONE 50-entry list shared by all eight agents, and the dedup that
+# is meant to stop an agent repeating ITSELF was therefore stopping it from ever touching a topic a
+# COLLEAGUE had touched. Two failures, both from the same line. First, the agents ate each other's
+# work: the renewable pool is drawn from a handful of shared sources (flywheel questions, harvested
+# directions, the library, the top-8 findings), so whoever planned first consumed the good candidates
+# and the other seven were pushed onto the tail of the pool — the opposite of the intended per-agent
+# variety, and the reason a single agent's plan could starve the rest of the keep of on-mission work.
+# Second, and worse, the fallback INVERTS the guard: `chosen = (fresh or interleaved)`. Once the shared
+# list had absorbed eight agents' picks, `fresh` came back empty for the next agent, the fallback
+# handed it the unfiltered pool, and it drew the EXACT candidates the list was holding — a dedup that
+# produces duplicates precisely when it is working hardest. A 50-entry budget spread over 8 agents is
+# ~6 intents of real history each; per-agent it is the 50 the comment above always claimed.
+_recent_intents: dict = _load_recent_intents()
 
 
 def _save_recent_intents() -> None:
     try:
-        _RECENT_INTENTS_FILE.write_text(json.dumps(_recent_intents[-50:]), encoding="utf-8")
+        _atomic_write(_RECENT_INTENTS_FILE,
+            json.dumps({k: _dedup_keep_last(v)[-_RECENT_INTENTS_MAX:]
+                        for k, v in _recent_intents.items()}),
+            encoding="utf-8")
     except Exception:
         pass
 
@@ -1630,12 +1870,27 @@ _QUEST_PREFIX_RE = re.compile(
     r"\s*:?\s*", re.I)
 
 
+#: A finding is titled with the pair who produced it -- "King Aldric + Sage Mira: MemOps: ...". That
+#: prefix is AUTHORSHIP, not subject, and leaving it on makes one topic look like as many distinct
+#: topics as there are pairs who touched it. Measured 2026-08-08: the top-8 findings carried EIGHT
+#: distinct strings over TWO real subjects (MemOps x6, QVal x2), and `b_find` sampled three of them
+#: expecting three topics. Built from the live roster so it cannot over-match ordinary prose.
+_ACTOR_PREFIX_RE = re.compile(
+    r"^(?:(?:%s)(?:\s*\+\s*(?:%s))*)\s*:\s*" % ((("|".join(re.escape(n) for n in _AGENT_NAMES.values())),) * 2),
+    re.I) if _AGENT_NAMES else None
+
+
 def _strip_quest_prefix(title: str) -> str:
     """Peel any stacked quest/finding prefix so new intents don't nest into garbage like
-    'Hypothesize on: Hypothesize on: Pursue direction: ...' (wastes LLM calls + pollutes titles)."""
+    'Hypothesize on: Hypothesize on: Pursue direction: ...' (wastes LLM calls + pollutes titles).
+
+    Also peels the AUTHOR pair prefix, for the same reason and with the same effect on supply.
+    """
     t = (title or "").strip()
     for _ in range(4):
         new = _QUEST_PREFIX_RE.sub("", t).strip()
+        if _ACTOR_PREFIX_RE is not None:
+            new = _ACTOR_PREFIX_RE.sub("", new).strip()
         if new == t:
             break
         t = new
@@ -1645,7 +1900,51 @@ def _strip_quest_prefix(title: str) -> str:
 #: Why an agent ended a planning cycle with nothing — so the escalation tells the owner the truth.
 #: "off_priority" (the board is narrower than the pool) is a DIFFERENT condition from an unreachable
 #: brain, and reporting the first as the second sends "the brain may be down" while it is serving fine.
+#: "exhausted" (every on-priority candidate has already been pursued by THIS agent) is a third: it
+#: names a SUPPLY problem, and it is the honest reading of what the `(fresh or interleaved)` fallback
+#: used to hide by re-serving work the brain then refused. Both are normal; neither is a blocker.
 _plan_reason: dict = {}
+
+# STARVATION MUST STAY VISIBLE -- AND HALF A MILLION IDENTICAL LINES A DAY IS NOT VISIBLE.
+# The two "[plan] ... no research this cycle" / "0 grounded quest(s) from the renewable pool" lines
+# below are deliberate, and the comments beside them are right: hiding a thin supply behind a fallback
+# is what produced 1,435 guaranteed-reject writes, so the starvation gets logged rather than papered
+# over. What was missed is that the logging itself has a legibility budget. Measured 2026-08-17: ONE
+# dungeon process had written "no research this cycle" 1,505,267 times in three days -- ~500k/day, one
+# per agent every 1.3 s -- and `_dungeon.err` had reached 409 MB. The dungeon had been research-starved
+# continuously since it started, and that was invisible, because a line repeated half a million times
+# is wallpaper. Grepping the log for the problem returns the problem 1.5 million times, which is the
+# same as returning nothing.
+#
+# So these two now log every STATE CHANGE, plus one line per _IDLE_SUMMARY_EVERY repeats carrying the
+# repeat count. Strictly louder than before: an operator sees "entered starvation at T" and
+# "unchanged for 5,000 cycles" instead of a wall.
+_IDLE_SUMMARY_EVERY = 500
+_idle_state: dict = {}      # (eid, tag) -> [normalised message shape, consecutive repeats]
+_DIGITS_RE = re.compile(r"\d+")
+
+
+def _log_plan_state(eid: str, tag: str, msg: str, *args) -> None:
+    """Log a per-agent planning state, collapsing repeats into counted summaries.
+
+    The state is compared with DIGITS NORMALISED AWAY, and that is not tidiness -- it is the whole
+    fix. The first version compared the rendered string verbatim, and measured over the 90 seconds
+    after deployment it still wrote ~18 MB/day, because the supply count oscillates ("all 8 ..." then
+    "all 9 ..." then "all 8 ..."), so every flip read as a new state. Starvation with a supply of 8 and
+    starvation with a supply of 9 are the same operational condition; the count belongs in the message,
+    not in the identity of the state.
+    """
+    rendered = msg % args if args else msg
+    key = (eid, tag)
+    shape = _DIGITS_RE.sub("N", rendered)
+    prev = _idle_state.get(key)
+    if prev is None or prev[0] != shape:
+        _idle_state[key] = [shape, 1]
+        logger.info("%s", rendered)
+        return
+    prev[1] += 1
+    if prev[1] % _IDLE_SUMMARY_EVERY == 0:
+        logger.info("%s  [unchanged for %d cycles]", rendered, prev[1])
 
 
 async def _renewable_quests(eid: str, want: int = 3) -> list:
@@ -1662,8 +1961,19 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         # weak points), so the system's outputs become its next research + knowledge deepens.
         fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=3")
         for q in (fw or {}).get("open", []):
-            b_fly.append((f"Test Agora's claim: {q['question'][:55]}",
-                          f"Find real evidence on whether this holds: {q['question']}", "hypothesize"))
+            # THE FALSIFIER IS THE CRITERION, NOT THE SUBJECT. `question` holds an insight's
+            # falsifier by design ("test the weak point"), but a falsifier reads "SUPPORTED if the
+            # fitted quadratic term is negative and statistically significant (p<0.05)..." — it names
+            # a test, never what is being tested. Two costs, measured 2026-08-08: the quest title
+            # told the agent nothing to research, and the board gate passed 0 of 3 because the
+            # subject's vocabulary is not in the criterion. The SUBJECT is in `origin`.
+            _crit = (q.get("question") or "").strip()
+            _subj = re.sub(r"^(?:hypothesis|insight|contradiction)\s*:\s*", "",
+                           (q.get("origin") or "").strip(), flags=re.I) or _crit
+            b_fly.append((f"Test Agora's claim: {_subj[:55]}",
+                          f"Test this claim with real evidence: {_subj}. "
+                          f"It is decided against its PRE-REGISTERED criterion — {_crit}",
+                          "hypothesize"))
         # HARVESTED DIRECTIONS — so research follows the synthesis and COMPOUNDS.
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         for d in (dd or {}).get("directions", []):
@@ -1675,22 +1985,47 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         # replaces the old "Connect A<->B" bridges and vague "Develop the gap" quests, which were
         # combinatorial filler (the "gaming party"): they recombined existing notes and produced
         # low-substance notes. Real research = grounded in a real paper, on the frontier.
-        lib = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library")
-        for p in (lib or {}).get("papers", [])[:6]:
+        lib = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library?n=60")
+        # RANK, DO NOT SLICE. Papers are the swarm's ONLY external anchor -- everything else in this
+        # function is our own canon fed back to us -- so taking the first six off a list is how the
+        # frontier gets crowded out by whatever happens to sit at the front. Measured 2026-08-08: the
+        # first six were nine-tenths of a stale off-mission block and the board gate passed 1 of 6,
+        # while the same gate passed our own findings 8 of 8. A word-overlap gate CANNOT tell
+        # "on-mission" from "written by us in the board's words", so it structurally prefers the
+        # canon; ranking the external bucket on the same terms is what puts the frontier back on
+        # equal footing instead of loosening the gate (the gate is correct -- see the dedup work).
+        await _gate_refresh()
+        _prio = _gate_cache.get("prio") or set()
+        _papers = [p for p in (lib or {}).get("papers", []) if (p.get("title") or "").strip()]
+        _papers.sort(key=lambda p: (-len(_theme_words(p.get("title") or "") & _prio),
+                                    -float(p.get("ts") or 0)))
+        for p in _papers[:6]:
             ttl = (p.get("title") or "").strip()
-            if ttl:
-                b_paper.append((f"Ground a finding from: {ttl[:60]}",
-                                f"State ONE research finding this paper directly supports, "
-                                f"paraphrasing its actual result and naming it (Author Year): {ttl}",
-                                "create"))
+            b_paper.append((f"Ground a finding from: {ttl[:60]}",
+                            f"State ONE research finding this paper directly supports, "
+                            f"paraphrasing its actual result and naming it (Author Year): {ttl}",
+                            "create"))
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
-        for k in random.sample(finds, min(3, len(finds))):
+        # SAMPLE DISTINCT TOPICS, NOT DISTINCT ROWS. The top-8 is an author-pair cross-product of a
+        # couple of subjects, so sampling rows returned three copies of one topic and called it three
+        # quests. Measured 2026-08-08: 8 rows -> 2 real subjects. Dedup FIRST, then sample, so the
+        # bucket's depth is the number of things to think about rather than the number of rows.
+        # Key on a SHORT prefix, not the whole string: titles are stored already truncated, so a
+        # longer author prefix leaves a shorter remainder and the same subject ends "...Operations in
+        # Lon" under one pair and "...in L" under another. Measured: exact-string dedup left those as
+        # two topics; a 40-char key merges them and still separates MemOps from QVal. Keep the LONGEST
+        # variant, which carries the most subject.
+        _topics: dict[str, str] = {}
+        for k in finds:
+            topic = _strip_quest_prefix(k.get("title") or "")[:55].strip()
+            if topic:
+                _key = topic.lower()[:40]
+                if len(topic) > len(_topics.get(_key, "")):
+                    _topics[_key] = topic
+        for topic in random.sample(list(_topics.values()), min(3, len(_topics))):
             # findings → HYPOTHESIZE quests: form + test a new hypothesis that deepens the finding
             # (the self-deepening engine — each finding raises the next testable question).
-            topic = _strip_quest_prefix(k.get("title") or "")[:55]
-            if not topic:
-                continue
             b_find.append((f"Hypothesize on: {topic}",
                            "Form + test a new hypothesis that deepens this finding", "hypothesize"))
     except Exception as e:
@@ -1698,10 +2033,55 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # INTERLEAVE the four sources round-robin, with a shuffled bucket order so the lead source varies
     # each cycle — this is the diversity fix: the top `want` picks now span sources instead of being
     # three flywheel questions every time.
+    # THE 2026-06-19 FIX STOPPED ONE SOURCE MONOPOLISING THE SLOTS. IT DID NOT STOP THE EIGHT AGENTS
+    # ALL TAKING THE SAME ITEMS. Every agent called this with the same four buckets and an independent
+    # `random.shuffle`, which makes each agent's order random but does nothing to make them DIFFER --
+    # the top of a 40-item pool is a small target and they crowd it.
+    #
+    # Measured 2026-07-31, once `_brain_contribute` stopped reporting rejections as landings: 71
+    # rejected writes in ~20 minutes, all eight agents contributing, 45 of them "near-duplicate of a
+    # recent finding" and 25 "vault already covers this". The same title was submitted THIRTEEN times
+    # ("How should a memory system's write-acceptance conservatism scale..."), another twelve, another
+    # ten. The swarm was not idle; it was eight agents grinding the same handful of themes and throwing
+    # the results at a dedup gate, while every rejection logged as a success.
+    #
+    # So: deal the pool DETERMINISTICALLY BY AGENT. Each agent leads with a different bucket and starts
+    # at a different depth, so eight simultaneous callers walk away with eight different top picks from
+    # the same supply. Deterministic, not random: two agents drawing the same card by chance is exactly
+    # what needs to stop, and a shuffle cannot promise it. The per-agent `_recent_intents` then keeps
+    # each one off its OWN recent ground, which is a different guarantee and both are needed.
     buckets = [b_paper, b_find, b_fly, b_dir]
     for b in buckets:
         random.shuffle(b)
-    random.shuffle(buckets)
+    _order = sorted(_AGENT_NAMES)                      # stable, restart-independent seat numbering
+    _seat = _order.index(eid) if eid in _order else 0
+    # ROTATE, do not slice. The first version of this started deep seats at index `_depth`, which SKIPS
+    # that many items and starves an agent whose bucket is shallow -- measured immediately after
+    # deploying it: Orin, Wren and Voss dropped from 3 quests to 1. Rotating each bucket instead means
+    # every agent still walks EVERY item, just entering the ring at its own point, so differentiation
+    # costs no supply.
+    # COUNT THE BUCKETS THAT ACTUALLY HAVE STOCK. The first version divided by `len(buckets)` -- all
+    # four, stocked or not -- so it assumed every source was supplying. When only ONE bucket is
+    # non-empty, which is the ordinary live case (papers, findings and flywheel run dry while
+    # `directions` refills), rotating the order of four buckets is a no-op and `_seat // 4` yields
+    # just TWO distinct depths across eight agents. Measured 2026-07-31 after deploying it: eight
+    # agents collapsed onto two distinct top picks, and the rejection ledger caught Artificer Rooke
+    # and Dame Elara submitting one identical title in the SAME SECOND. My own fix, with the hole one
+    # level down from where I tested it -- I checked the four-source case and shipped it.
+    #
+    # Dropping the empty buckets first makes the two dials measure what they are for: WHICH source
+    # leads (seat % nz) and HOW DEEP the agent enters it (seat // nz). Empty buckets contribute
+    # nothing to the interleave anyway, so removing them changes no supply, only the arithmetic.
+    # Distinct top picks across the eight seats: 4 stocked sources 8/8, 1 stocked source with 7 items
+    # 7/8 (the ceiling -- eight agents, seven items), a 3-item supply 3/8 (also the ceiling). Every
+    # agent still walks EVERY item, so differentiation costs no supply.
+    buckets = [b for b in buckets if b]
+    if buckets:
+        _nz = len(buckets)
+        buckets = buckets[_seat % _nz:] + buckets[:_seat % _nz]
+        _off = _seat // _nz
+        if _off:
+            buckets = [b[_off % len(b):] + b[:_off % len(b)] for b in buckets]
     interleaved, i = [], 0
     while any(len(b) > i for b in buckets):
         for b in buckets:
@@ -1744,13 +2124,32 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     except Exception as e:
         logger.debug(f"quest board-gate {eid}: {e}")
     _plan_reason[eid] = "off_priority" if _off_priority else ""
-    # SELF-UPGRADE #1: don't re-pursue a topic done recently — avoid the repetition the OS fell into.
-    # _recent_intents is PERSISTED, so this dedup now survives dungeon restarts (kills the cross-restart dups).
-    fresh = [x for x in interleaved if x[0] not in _recent_intents]
-    chosen = (fresh or interleaved)[:want]
+    # SELF-UPGRADE #1: don't re-pursue a topic THIS agent did recently — avoid the repetition the OS
+    # fell into. Per-agent and PERSISTED, so the dedup survives dungeon restarts (kills the
+    # cross-restart dups) without one agent's picks silencing the topic for the other seven.
+    _seen = _recent_intents.setdefault(eid, [])
+    fresh = [x for x in interleaved if x[0] not in _seen]
+    # NO FALLBACK. This used to read `(fresh or interleaved)`, and the 2026-07-31 note above already
+    # named what that does -- "the fallback INVERTS the guard ... a dedup that produces duplicates
+    # precisely when it is working hardest" -- but only the per-agent half of that fix was applied.
+    # This is the other half. Measured 2026-08-08 while it was still in place: 400 refusals in 17.9 h
+    # (22.4/h) carrying just 28 distinct titles, one of them submitted 53 times by all eight agents,
+    # every one refused by the brain as a near-duplicate. Exhausted now means exhausted: the agent
+    # takes a wander thought instead, which is the correct cost of having nothing new to pursue.
+    # STARVATION IS THE SIGNAL, not the bug -- it says the SUPPLY is thin, and hiding it behind a
+    # fallback is what turned a supply problem into 1,435 guaranteed-reject writes.
+    chosen = fresh[:want]
+    if interleaved and not chosen:
+        _plan_reason[eid] = "exhausted"
+        _log_plan_state(eid, "exhausted",
+                        "[plan] %s: all %d on-priority candidate(s) already pursued -> no research "
+                        "this cycle (supply is %d deep)", _AGENT_NAMES.get(eid, eid),
+                        len(interleaved), len(interleaved))
     for x in chosen:
-        _recent_intents.append(x[0])
-        del _recent_intents[:-50]
+        if x[0] in _seen:            # a repeat MOVES the entry, it never spends a second slot
+            _seen.remove(x[0])
+        _seen.append(x[0])
+    del _seen[:-_RECENT_INTENTS_MAX]
     if chosen:
         _save_recent_intents()
     return [{"intent": x[0][:90], "kind": (x[2] if len(x) > 2 else "create"),
@@ -1804,6 +2203,64 @@ def _compute_standing(trust: list[dict]) -> dict:
             s = 0.9 * s + 0.1 * ka
         out[e] = round(s, 3)
     return out
+
+
+# Absolute floor beneath the RELATIVE gate below — a keep whose trust has genuinely collapsed still
+# must not write into the vault unreviewed. Same constant as tools/autolinker.py --standing-floor.
+_STANDING_FLOOR = float(os.environ.get("DUNGEON_STANDING_FLOOR", "0.35"))
+
+
+def _standing_ok(standing: float, roster: dict | None = None) -> tuple[bool, str]:
+    """Is this agent trusted enough to write unreviewed? Judged RELATIVE to the live roster.
+
+    THE DEFECT THIS REPLACES, and it is the same one tools/autolinker.py already had (fixed there
+    2026-07-21): `_run_consolidation` and `_run_orchestration` both opened with `if standing < 0.55`,
+    an absolute constant standing in front of a score that can never reach it. `_compute_standing`
+    starts from the mean pairwise ESS trust and then blends in the forecast hit-rate, the mastery rate
+    and the bounty rate — every blend is a weighted average with a term below the mean, so every blend
+    pulls DOWNWARD, and reputation decay (`apply_decay(0.02)`, every ~40 ticks) pulls the whole roster
+    toward baseline on top of that. The roster therefore drifts under the constant and STAYS there.
+    Measured on the live agent_standing.json, 2026-07-31: the highest standing of all eight agents was
+    0.477 (Voss) against the 0.55 gate. The consequence is not "rarely runs" but NEVER: Sage Mira's
+    consolidation and King Aldric's doctrine+GitHub-push have not executed once.
+
+    An absolute threshold on a drifting relative score is the bug, so lowering the constant would only
+    move the date it re-closes. Gate on POSITION IN THE LIVE ROSTER instead, keeping an absolute floor
+    so a genuinely collapsed keep still can't write.
+
+    THE RELATIVE TEST IS ADVISORY, NOT A BLOCKER (2026-07-31, second pass). The first version of this
+    fix gated on `standing < lo + 0.25 * (hi - lo)`, and that reintroduced the defect it replaced, one
+    size smaller. ANY threshold expressed as a point inside [lo, hi] excludes the agent sitting AT lo,
+    by construction, whenever hi > lo — moving the constant from 0.25 to 0.1 changes by how much, not
+    whether. There is always a last agent and it always fails. Applied to the live roster it blocked
+    Rooke (0.402), Wren (0.404) and Kael (0.410): the three this whole change exists to bring back.
+    It was only latent because this function gates just two organs, Mira's and Aldric's, and both
+    happen to pass today — one drift and it bites, and a ratchet closes behind it, because a blocked
+    organ produces nothing and standing is fed by production.
+
+    So: the FLOOR blocks, position is reported. That is the honest division. The floor is an absolute
+    bar on a bounded score, which is a thing an absolute constant may legitimately do, and it answers
+    the question the gate actually asks — has the keep collapsed. Being last in a band 0.10 wide is not
+    a collapse; it is arithmetic. The relative standing still travels with the event so an operator can
+    see who is trailing, and nothing silently kills an organ that has exactly one possible owner.
+
+    The relative test here is also deliberately NOT autolinker's top-half median. There, several
+    curators compete for one curation slot, so picking the better half is the point. Here each organ
+    belongs to exactly ONE agent — nobody else can run Mira's consolidation — so a top-half rule would
+    lock four of eight agents out of their own organ permanently. What the gate is actually for is
+    holding back an agent that has fallen BEHIND the keep, and the floor is what measures that.
+    """
+    if standing < _STANDING_FLOOR:
+        return False, f"trust {standing:.2f} below the {_STANDING_FLOOR:.2f} floor"
+    peers = [float(v) for v in (roster or {}).values()]
+    if len(peers) < 4:
+        return True, ""            # no live roster to rank against → floor only (brain/trust down)
+    lo, hi = min(peers), max(peers)
+    rank = 1 + sum(1 for p in peers if p > standing)
+    trailing = standing <= lo and hi > lo
+    # ADVISORY. Reported so a trailing agent is visible, never returned as a block — see the docstring.
+    return True, (f"trailing the keep at {standing:.2f} (rank {rank}/{len(peers)}, band {lo:.2f}-{hi:.2f})"
+                  if trailing else "")
 
 
 _plan_fails: dict = {}    # eid -> consecutive planning failures (for escalation)
@@ -1922,7 +2379,7 @@ _THEME_STOP = frozenset({
 
 def _theme_words(text: str) -> set[str]:
     """Significant, lightly-stemmed words of a theme (or note slug) for overlap matching."""
-    return {w.rstrip("s") for w in re.findall(r"[a-z]+", text.lower())
+    return {_light_stem(w) for w in re.findall(r"[a-z]+", text.lower())
             if len(w) > 3 and w not in _THEME_STOP}
 
 
@@ -2068,8 +2525,27 @@ async def _gate_refresh() -> None:
     s = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gatekeeper/skips")
     b = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
     _gate_cache["skips"] = [_theme_words(t) for t in (s or {}).get("themes", [])]
-    pr = (b or {}).get("priorities", "") or ""
-    _gate_cache["prio"] = {w for w in _theme_words(pr) if w not in _PRIO_STOP}
+    # TAKE THE BRAIN'S TERMS. The board text has POLARITY: it ends "Finance/health/physics are ONLY
+    # test-beds, never the headline. Deprioritize generic meta-science, politics, cloud/trivia".
+    # Tokenizing it flat turns that refusal into the whitelist, and `_PRIO_STOP` below never learned
+    # the negative clause the way the brain's `methods._BOARD_STOP` did. Measured 2026-07-31 against
+    # the live board: politics, generic meta-science, cloud trivia, finance AND physics all passed
+    # this gate, each matching on the very word the owner used to exclude it -- five for five. The
+    # door built to hold the swarm on the inspeximus frontier was holding it open.
+    terms = (b or {}).get("priority_terms")
+    if isinstance(terms, list) and terms:
+        _gate_cache["prio"] = {str(w).lower() for w in terms}
+        _gate_cache["prio_src"] = "brain"
+    else:
+        # An older brain, or one that is down. Say so rather than silently reverting to the flat
+        # read: this fallback is the buggy behaviour, and it must be visible while it is in use.
+        pr = (b or {}).get("priorities", "") or ""
+        _gate_cache["prio"] = {w for w in _theme_words(pr) if w not in _PRIO_STOP}
+        _gate_cache["prio_src"] = "local-fallback"
+        if _gate_cache["prio"]:
+            logger.warning("[gate] brain served no priority_terms - falling back to the FLAT read of "
+                           "the board, which admits the owner's own deprioritize words (%d terms)",
+                           len(_gate_cache["prio"]))
     _gate_cache["fetched"] = _time.time()
 
 
@@ -2097,7 +2573,6 @@ async def _gate_filter(pool: list[str]) -> list[str]:
     return pool
 
 
-_graves_cache: dict = {"epitaphs": [], "fetched": 0.0}
 _academy_cache: dict = {"lessons": {}, "fetched": 0.0}
 
 
@@ -2115,13 +2590,8 @@ async def _academy_lesson(eid: str) -> str:
     return _academy_cache["lessons"].get(eid, "")
 
 
-async def _brain_graves() -> list[str]:
-    """Epitaphs of dead ideas (1h cache) — the planner shows agents where NOT to dig again."""
-    if _time.time() - _graves_cache["fetched"] > 3600:
-        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/graveyard")
-        _graves_cache["epitaphs"] = (d or {}).get("epitaphs") or []
-        _graves_cache["fetched"] = _time.time()
-    return _graves_cache["epitaphs"]
+# `_brain_graves` (epitaphs of dead ideas, shown to the planner so it would not re-dig them) was
+# deleted 2026-07-31 with its only caller, the discarded LLM planner.
 
 
 _attn_cache: dict = {"policy": {}, "fetched": 0.0}
@@ -2869,12 +3339,19 @@ async def _queue_scout() -> None:
     if not leads and not learn:
         return
 
-    def _one(x, i):
-        return (f"[{i}] {x['repo']}#{x['issue_number']} (fit {x.get('score')}) {x['url']} || "
-                f"TITLE: {x.get('title','')} || BODY: {(x.get('body') or '')[:320]}")
+    # The lead's IDENTITY (repo, issue, score, url) is ours and stays in the instruction. Its TITLE
+    # and BODY are written by a stranger on the public web, so they travel in `untrusted` and are
+    # sanitized + enveloped inside add_task. Before this they were interpolated straight into a task
+    # whose very next line tells the reader to draft outward content with a free repo/issue_number.
+    def _ident(x, i):
+        return f"[{i}] {x['repo']}#{x['issue_number']} (fit {x.get('score')}) {x['url']}"
 
-    body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(leads))
-    learn_body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(learn))
+    def _content(x, i):
+        return f"[{i}] TITLE: {x.get('title','')} || BODY: {(x.get('body') or '')[:320]}"
+
+    body = " ||| ".join(_ident(x, i + 1) for i, x in enumerate(leads))
+    learn_body = " ||| ".join(_ident(x, i + 1) for i, x in enumerate(learn))
+    lead_text = " ||| ".join(_content(x, i + 1) for i, x in enumerate(leads + learn))
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
         {"text": f"Scout triage: {len(leads)} leads to answer + {len(learn)} to learn from. "
@@ -2886,7 +3363,9 @@ async def _queue_scout() -> None:
                  f"specific, no overselling. Where no, say so and move on; reputation dies on a bad "
                  f"pitch. CLOSE EVERY LEAD either way: POST /brain/scout/box/mark {{url, status: "
                  f"'done'|'no_fit'}}, and POST /brain/scout-record {{url, repo, issue, outcome}} for "
-                 f"the ones you judged. An unclosed lead is the only thing that holds a box slot."})
+                 f"the ones you judged. An unclosed lead is the only thing that holds a box slot.",
+         "untrusted": lead_text,
+         "source": "GitHub issue authors (strangers on the public web)"})
     broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
                "text": f"filed {len(leads)} leads + {len(learn)} to learn from"})
     _mind_spark("#8fd3ff")        # cyan — a lead spotted outside the walls
@@ -3250,6 +3729,33 @@ async def _queue_analogy_forge() -> None:
     mech = (d or {}).get("mechanism") or {}
     if not mech.get("title"):
         return
+
+    # THE SKIP LIST WAS NEVER ON THIS PATH, so skipping a forged analogy is what RELEASES the next
+    # one: `_task_already_pending` asks only whether a copy is WAITING. Measured 2026-08-22 -- four
+    # 'Phase Transitions' analogies were gatekeeper-skipped at 23:50 and a fifth was queued at
+    # 03:35, onto a YouTube transcript id like the three before it. `_lead_saturated` does consult
+    # the skip list, but it is only called on the Scout's lead path in agent_worker.py, so this
+    # organ has been re-offering a mechanism Claude already refused, with nothing able to see it.
+    #
+    # Match on the MECHANISM, not the whole line: the domain varies every emission, so a
+    # whole-string check can never fire on a template that only repeats its head.
+    #
+    # HONEST LIMIT, measured before shipping this: the head-match fires on the live case
+    # ('Phase Transitions', repeats=4) and stays silent on an unskipped mechanism, but a REWORDED
+    # title slips through -- 'Phase transitions in knowledge dynamics' reads repeats=0 against the
+    # same four records. The forge takes its title from the vault note, so a reword means a
+    # different note, and the alternative (token overlap, as _lead_saturated does) risks blocking
+    # unrelated mechanisms that share a common word. Narrow and visible beats wide and silent.
+    skips = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gatekeeper/skips", 30)
+    themes = [t for t in ((skips or {}).get("themes") or []) if isinstance(t, str)]
+    mech_head = str(mech["title"])[:40].lower()
+    repeats = sum(1 for t in themes if mech_head and mech_head in t.lower())
+    if repeats >= 2:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"the forge stays cold: '{mech['title'][:32]}' was refused "
+                           f"{repeats}x already"})
+        return
+
     targets = [g["title"] for g in (await _brain_gaps())]
     bd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
     m = re.search(r"Priority:\s*([^;]+)", (bd or {}).get("priorities") or "")
@@ -3364,7 +3870,7 @@ async def _broadcast_trust_graph():
     try:
         import json as _json
         by_name = {_AGENT_NAMES[e]: standing.get(e, 0.5) for e in _AGENT_NAMES}
-        (Path(__file__).parent / "agent_standing.json").write_text(
+        _atomic_write(Path(__file__).parent / "agent_standing.json",
             _json.dumps({"standing": by_name, "updated": _time.time()}))
     except Exception:
         pass
@@ -3444,7 +3950,15 @@ def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: f
     """Agent-side accuracy loop (stage 3, dungeon edition). When an agent's contribution LANDS
     (grounded) or is REJECTED (refusal / quest-intent), credit/debit the agent's OWN memories most
     relevant to the subject it was contributing on — so each agent's recall sharpens by WAS-IT-RIGHT,
-    not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory."""
+    not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory.
+
+    DELIBERATELY UNWARRANTED — do not "fix" this by passing a warrant. The verdict here is OUR OWN
+    quality gate (_is_refusal / _is_intent / _GROUNDED_RE) judging the agent's own output: a
+    self-graded outcome with no external ground truth, which is precisely the MINJA loop
+    `credit_requires_warrant` exists to block. So this path raises `good` and must never raise
+    `good_warranted`. The brain's credit_outcome() DOES warrant, because a resolved forecast and a Lab
+    run are artifacts outside the memory being credited. The 0% here is the guard working, not a gap
+    in it — an audit that reads coverage alone cannot tell those apart, so it is written down."""
     try:
         m = _agent_store(eid)
         if m is None or not hasattr(m, "credit"):
@@ -3454,6 +3968,12 @@ def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: f
             m.credit(ids, "good" if good else "bad")
     except Exception:
         pass
+
+
+#: A finding that names a Lab run is a DISCOVERY and must satisfy the severe-test rule at the vault
+#: door. A finding grounded in cited literature is an OBSERVATION -- still grounded, still gated by
+#: the quality filters, but not a claim the Lab is supposed to have measured.
+_LAB_REF_RE = re.compile(r"\blab(?:_id)?[\s:=_`]*([0-9a-f]{6})\b", re.I)
 
 
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
@@ -3471,9 +3991,34 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
-         "content": content[:600], "knowledge_type": "discovery"})
-    _credit_agent_mem(eid, _subject, bool(r))      # a grounded contribution rewards its grounding
-    return bool(r)
+         # Was a bare 600 while the brain stored 500 and `_CONTRIB_CAP` said 500 -- three numbers
+         # for one limit, and the smallest silently won. One constant now, on both sides.
+         "content": content[:_CONTRIB_CAP],
+         # TYPE IT BY WHAT IT ACTUALLY IS, rather than calling everything a discovery. This was
+         # hardcoded to "discovery" for every path, and the vault's LAB-FIRST gate fires ONLY on that
+         # type (agent_os_api.py:251, default "observation"). So a collaboration synthesis grounded in
+         # a cited paper -- which runs no Lab and has no id to offer -- was submitted as the one type
+         # the severe-test rule governs, and refused. Measured 2026-08-01: 231 contributions, 0
+         # accepted, 168 of them refused for LAB-FIRST, while the Lab itself ran 171 times with 171 ok.
+         # The policy is untouched: a discovery still needs a Lab. The label was the error.
+         "knowledge_type": "discovery" if _LAB_REF_RE.search(content or "") else "observation"})
+    # A REJECTION IS NOT A LANDING. `bool(r)` treated EVERY response as success, and the brain answers
+    # a refusal with an ordinary body -- {"status": "rejected", "reason": ...} -- from six separate
+    # gates (garbage, LAB-FIRST, vault dedup, stream dedup, non-finding, quality). bool() of that dict
+    # is True. So every agent and every organ has been reporting "landed" for work the brain threw
+    # away, for as long as those gates have existed. Measured 2026-07-31: Sergeant Voss's organ logged
+    # "ok DECISIVE -> landed lab=c9dbc6", the Lab record c9dbc6 is real and passing, and NOTHING was
+    # written -- his newest row in collective_knowledge was from the previous day. This also poisoned
+    # the credit ledger below, which paid out on the same false signal.
+    _status = str((r or {}).get("status") or "").lower() if isinstance(r, dict) else ""
+    landed = _status == "added"
+    if not landed:
+        logger.info("[contribute] %s REJECTED by the brain (%s): %s",
+                    _AGENT_NAMES.get(eid, eid),
+                    (r or {}).get("reason", "no response") if isinstance(r, dict) else "no response",
+                    title[:60])
+    _credit_agent_mem(eid, _subject, landed)       # a grounded contribution rewards its grounding
+    return landed
 
 
 # Novelty-at-generation gate: ~71% of grounded findings were TRUE restatements of notes the vault
@@ -3616,6 +4161,291 @@ async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
     return bool(r)
 
 
+# ══ THE RESEARCH ORGANS ═══════════════════════════════════════════════════════════════════════
+#
+# WHY THIS EXISTS. Until now all eight agents ran byte-identical code: the same renewable quest pool,
+# the same `_grounded_discovery`, the same prompt with a different persona string pasted at the front.
+# A persona is not a capability, so "eight researchers" was one researcher sampled eight times, and
+# three of the eight produced literally nothing. Each agent now owns a MODULE — its organ — that does
+# work only that agent can do (`organs/<eid>.py`, one per dungeon entity id).
+#
+# THE CONTRACT. Each module exposes:
+#     ORGAN = {"eid", "agent", "name", "ledger", "decisive": (...), "period_hours": 6.0}
+#     async def cycle(ctx) -> {"status": "ok"|"idle"|"error", "decisive": bool, "title": str,
+#                              "content": str, "lab_id": str|None, "why": str}
+# `status="idle"` is a LEGITIMATE outcome and is never turned into a contribution — an organ with
+# nothing to say must be allowed to say nothing. Fabricated work is the failure mode this whole file
+# has been fighting (`_is_refusal`, `_is_intent`, the novelty gate), so it is not reintroduced here.
+#
+# The organ modules land in a SIBLING unit, so every import is defensive: a missing `organs/` package,
+# a syntax error, a module without `cycle`, or an organ that raises mid-cycle must all degrade to one
+# log line and a skipped turn. `ambient_life` must survive all four.
+_ORGANS_DIR = HERE / "organs"
+_ORGAN_STATE_FILE = HERE / ".organ_state.json"
+_ORGAN_DEFAULT_PERIOD_H = 6.0            # ~4 cycles/day/agent
+_ORGAN_IMPORT_RETRY = 3600.0             # re-try a missing/broken organ hourly, not every beat
+_organ_mods: dict = {}                   # eid -> {"mod": module|None, "ts": float}
+_organ_running: set = set()              # organs in flight (one cycle per agent at a time)
+
+
+class _Ready:
+    """A value that is ALREADY computed but also satisfies `await`.
+
+    The organ modules are written in a sibling unit against a written contract, and that contract does
+    not say whether `ctx.brain_get(...)` is awaited. Both spellings are plausible for an author looking
+    at `async def cycle(ctx)`, and picking one silently breaks the other: a bare call to an async ctx
+    returns a coroutine that fails on `.get(...)`, and an awaited sync ctx raises "object dict can't be
+    used in 'await' expression". Both land as a caught error and a silent organ, which is exactly the
+    starvation this unit exists to end. So the ctx returns plain values that are ALSO awaitable — the
+    generator below never yields, so `await` resolves immediately without touching the event loop.
+    Blocking is contained because the whole cycle runs on its own worker thread (`_organ_cycle_sync`).
+    """
+
+    def __await__(self):
+        yield from ()
+        return self
+
+
+class _ReadyDict(_Ready, dict):
+    pass
+
+
+class _ReadyStr(_Ready, str):
+    pass
+
+
+class _ReadyList(_Ready, list):
+    pass
+
+
+def _ready(value):
+    """Wrap a helper's return value so it works awaited or not. None -> empty dict: every caller in
+    this file already spells the failure case `(d or {}).get(...)`, and an empty dict is falsy."""
+    if value is None:
+        return _ReadyDict()
+    if isinstance(value, dict):
+        return _ReadyDict(value)
+    if isinstance(value, str):
+        return _ReadyStr(value)
+    if isinstance(value, list):
+        return _ReadyList(value)
+    return value
+
+
+class _OrganCtx:
+    """Everything an organ may touch — and nothing else. Built from the helpers already in this file
+    so an organ inherits the brain bridge's timeouts, the inbox board gate in `_brain_post_sync`, and
+    the agent's own inspeximus store."""
+
+    def __init__(self, eid: str, mind: str = ""):
+        self.eid = eid
+        self.agent = _AGENT_NAMES.get(eid, eid)
+        self.logger = logger
+        #: this agent's brain-side mind (emotion + recalled memories + a vault insight). The planner
+        #: used to rebuild this ~370x/hour and throw it away; it is fetched once per organ cycle now.
+        self.mind = mind or ""
+
+    async def llm(self, system: str, user: str, max_tokens: int = 0):
+        """PROSE composition for an organ that needs to write, not to classify.
+
+        The contract listed brain_get / brain_post / lab_run / recall / logger / agent and never a
+        composer, so this was simply absent -- and Sage Mira's press arm, which correctly refuses to
+        assemble a post out of note fragments without one, therefore refused on every target forever.
+        Returns None when the LLM is off, so an organ that cannot compose still idles honestly rather
+        than shipping something mechanical.
+        """
+        return await asyncio.to_thread(_llm_prose_sync, system, user, max_tokens)
+
+    @staticmethod
+    def _api(path: str) -> str:
+        """Accept both spellings of a brain path. THE ORGAN CONTRACT NEVER SAID WHICH.
+
+        `_brain_get_sync` builds `http://127.0.0.1:8000` + path, so a caller must supply the whole
+        `/api/v1/agent-os/brain/...`. The contract handed to the organ authors said "drive endpoints
+        that already exist" and named them the way the docs do -- `/brain/gaps`, `/brain/canon-inputs`
+        -- so half of them wrote the short form and got a 404 on every read.
+
+        Measured 2026-07-31 across the shipped organs: artificer and cartographer prefix correctly;
+        king and thief probe for the prefix at runtime; guard_l is mixed; and guard_r (8 paths),
+        priest (8) and scholar (5) use the bare form exclusively. Those three are Dame Elara, High
+        Priest Orin and Sage Mira -- three of the four agents the acceptance gate scored at zero.
+        Mira's cycle reported "no canon to curate (0 chars)" while `/brain/canon-inputs` was serving
+        6,788 characters; the endpoint was fine and the request never reached it.
+
+        Normalising here rather than in 27 call sites fixes the class, makes both spellings correct
+        for every future organ, and removes the reason king and thief probe at all.
+        """
+        p = path or ""
+        return _API_PREFIX + p if p.startswith("/brain/") or p == "/brain" else p
+
+    def brain_get(self, path: str, timeout: int = 8):
+        return _ready(_brain_get_sync(self._api(path), timeout))
+
+    def brain_post(self, path: str, body: dict | None = None, timeout: int = 8):
+        return _ready(_brain_post_sync(self._api(path), body or {}, timeout))
+
+    def lab_run(self, name: str, code: str):
+        """Run a computational falsifier in the brain's Lab. The severe-test rule: a claim ships only
+        with a runnable baseline measured in the SAME cycle, so the record is returned whole (it
+        carries `id`, `ok` and the captured `output`) rather than reduced to a boolean."""
+        return _ready(_brain_post_sync("/api/v1/agent-os/brain/lab/run",
+                                       {"name": (name or "")[:120], "code": code or ""}, 180))
+
+    def recall(self, query: str, k: int = 4):
+        """This agent's OWN inspeximus store — the per-agent memory the keep has been writing for
+        weeks and reading into nothing."""
+        return _ready(_recall_mem(self.eid, query or "", k))
+
+
+def _organ_state() -> dict:
+    try:
+        d = json.loads(_ORGAN_STATE_FILE.read_text(encoding="utf-8"))
+        return {k: float(v) for k, v in d.items()} if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _organ_state_save(state: dict) -> None:
+    try:
+        _atomic_write(_ORGAN_STATE_FILE, json.dumps(state))
+    except Exception:
+        pass
+
+
+def _organ_module(eid: str):
+    """Import `organs.<eid>`, or None. NEVER raises: the package is created by a sibling unit and the
+    dungeon has to run with it absent, half-written, or broken."""
+    import importlib
+    cached = _organ_mods.get(eid)
+    now = _time.time()
+    if cached and (cached["mod"] is not None or now - cached["ts"] < _ORGAN_IMPORT_RETRY):
+        return cached["mod"]
+    who = _AGENT_NAMES.get(eid, eid)
+    mod = None
+    try:
+        if not _ORGANS_DIR.is_dir():
+            logger.info("[organ] no organs/ package yet - %s has no organ this cycle", who)
+        else:
+            mod = importlib.import_module(f"organs.{eid}")
+            if not callable(getattr(mod, "cycle", None)):
+                logger.warning("[organ] organs.%s has no cycle() - %s skipped", eid, who)
+                mod = None
+    except Exception as e:
+        logger.warning("[organ] organs.%s failed to load (%s: %s) - %s skipped",
+                       eid, type(e).__name__, str(e)[:120], who)
+        mod = None
+    _organ_mods[eid] = {"mod": mod, "ts": now}
+    return mod
+
+
+def _organ_period_h(mod) -> float:
+    try:
+        p = float((getattr(mod, "ORGAN", None) or {}).get("period_hours") or _ORGAN_DEFAULT_PERIOD_H)
+        return p if p > 0 else _ORGAN_DEFAULT_PERIOD_H
+    except Exception:
+        return _ORGAN_DEFAULT_PERIOD_H
+
+
+def _organ_name(mod, eid: str) -> str:
+    try:
+        return str((getattr(mod, "ORGAN", None) or {}).get("name") or eid)[:40]
+    except Exception:
+        return eid
+
+
+def _organ_cycle_sync(mod, ctx) -> dict:
+    """Run one organ cycle to completion on THIS thread (reached via asyncio.to_thread, so the game
+    loop is never blocked by an organ's network or Lab time). Accepts an async or a plain `cycle`."""
+    res = mod.cycle(ctx)
+    if hasattr(res, "__await__"):
+        async def _drive():
+            return await res
+        res = asyncio.run(_drive())
+    return res if isinstance(res, dict) else {}
+
+
+async def _run_organ(eid: str, mod) -> None:
+    """One organ cycle: give the agent its mind, run its organ, route any result through the SAME
+    `_brain_contribute` chokepoint every other producer uses, and log the verdict either way."""
+    who = _AGENT_NAMES.get(eid, eid)
+    organ = _organ_name(mod, eid)
+    _organ_running.add(eid)
+    try:
+        mind = await _brain_context(eid, f"{organ} {_ROLE_HINT.get(eid, '')}")
+        ctx = _OrganCtx(eid, mind)
+        try:
+            res = await asyncio.to_thread(_organ_cycle_sync, mod, ctx)
+        except Exception as e:
+            logger.warning("[organ] %s / %s: ERROR %s: %s | mind=%s", who, organ,
+                           type(e).__name__, str(e)[:160], "yes" if mind else "EMPTY")
+            return
+        status = str(res.get("status") or "error").lower()
+        decisive = bool(res.get("decisive"))
+        title = str(res.get("title") or "").strip()
+        content = str(res.get("content") or "").strip()
+        lab_id = res.get("lab_id")
+        why = str(res.get("why") or "")[:120]
+        landed = False
+        if status == "ok" and title and content:
+            if lab_id:
+                content = f"{content}\nLab: {lab_id}"
+            # THE SAME CHOKEPOINT, deliberately. `_brain_contribute` carries the refusal guard, the
+            # quest-intent guard and the memory credit/debit; an organ writing straight to the brain
+            # would re-open every hole those guards were built to close.
+            landed = await _brain_contribute(eid, title, content)
+            if landed:
+                await _brain_remember(eid, f"{organ}: {title}", "curious")
+                broadcast({"type": "os_build", "kind": "discovery", "who": who,
+                           "text": f"{organ}: {title[:60]}"})
+        elif status == "ok":
+            status = "error"          # ok with nothing in it is not ok
+            why = why or "status ok but no title/content"
+        # ONE LINE PER CYCLE, so starvation is visible from outside the process. Three of the eight
+        # agents produced nothing for weeks and nothing in any log said so. ASCII only (cp1250 console).
+        logger.info("[organ] %s / %s: %s%s%s%s%s", who, organ, status,
+                    " DECISIVE" if decisive else "",
+                    " -> landed" if landed else (" -> dropped at the gate" if status == "ok" else ""),
+                    f" lab={lab_id}" if lab_id else "",
+                    f" | {why}" if why else "")
+    finally:
+        _organ_running.discard(eid)
+
+
+async def _organ_tick() -> None:
+    """One beat of the organ scheduler: fire the MOST OVERDUE due organ, at most one per beat.
+
+    One at a time on purpose. Eight organs firing together would put eight cloud calls and possibly
+    eight Lab runs on the wire at once, against a measured cloud concurrency cap of 3 (`_LLM_SEM`) —
+    the 429 storm the LLM planner used to cause. At ~4 cycles/day/agent the whole roster needs 32
+    fires a day, so a beat every few minutes is far more headroom than the schedule can consume.
+    """
+    try:
+        state = _organ_state()
+        now = _time.time()
+        due = []
+        for eid in _AGENT_NAMES:
+            if eid in _organ_running:
+                continue
+            mod = _organ_module(eid)
+            if mod is None:
+                continue
+            last = state.get(eid, 0.0)
+            overdue = now - last - _organ_period_h(mod) * 3600.0
+            if overdue >= 0:
+                due.append((overdue, eid, mod))
+        if not due:
+            return
+        due.sort(key=lambda d: -d[0])           # most overdue first -> no agent can be starved out
+        _overdue, eid, mod = due[0]
+        # Stamp BEFORE running (and persist), so a crash or a restart mid-cycle cannot make this organ
+        # re-fire on every beat, and so a restart does not re-fire the whole roster at once.
+        state[eid] = now
+        _organ_state_save(state)
+        await _run_organ(eid, mod)
+    except Exception as e:
+        logger.debug("organ tick: %s", e)
+
+
 _ROLE_HINT = {  # each thinker owns a real research domain
     "king":    "synthesis & governance — turn the group's findings into doctrine and decide what the OS should become",
     "guard_l": "resilience & antifragility — stress-test ideas, find failure modes, harden the system",
@@ -3723,7 +4553,19 @@ async def ambient_life():
                 _saved_embed = getattr(m, "embed", None)
                 m.embed = None
                 try:
-                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
+                    # NAME THE WRITER. Measured 2026-07-31 across all eight stores: 261,673 records,
+                    # `source` coverage 0.000%. slash(scope='source') -- the default, and the lever the
+                    # whole accountability story rests on -- resolves on exactly this field, so on our own
+                    # dogfood deployment it matched nothing and forfeited nothing, silently, every time.
+                    # We were running the library with its main mechanism switched off by omission.
+                    # Width by VALUE, not one flat cut. 300 chars is fine for quest chatter and far too
+                    # narrow for a finding: it severs `Source:` lines and falsifiers, which is the same
+                    # defect found today in agent_os (500), the contribution POST (500) and the seminar
+                    # bridge (500). Chatter decays out anyway, so widening only the durable half costs
+                    # almost nothing on a 261k-record store.
+                    _cap = _AGENT_MEM_FINDING_CHARS if (value or 0) >= 2.0 else _AGENT_MEM_CHATTER_CHARS
+                    m.remember(s[:_cap], tags=[eid], value=value, mtype=mtype,
+                               source={"doc": "agent:%s" % eid})
                 finally:
                     m.embed = _saved_embed
             except Exception:
@@ -3877,7 +4719,7 @@ async def ambient_life():
         if len(seen) > 500:                               # keep only the most recent timestamps
             agent_activity["seen"] = set(sorted(seen)[-200:])
 
-    async def _run_consolidation(eid, standing):
+    async def _run_consolidation(eid, standing, roster=None):
         """Sage Mira consolidates the agents' live discoveries into a real vault note —
         so live research reaches the vault (then Elara links it). Gated by her standing."""
         if consolidation["running"]:
@@ -3885,9 +4727,12 @@ async def ambient_life():
         consolidation["running"] = True
         curator = _AGENT_NAMES.get(eid, eid)
         try:
-            if standing < 0.55:
-                note_event(f"{curator}'s consolidation held for review (trust {standing:.2f})")
+            _ok, _why = _standing_ok(standing, roster)
+            if not _ok:
+                note_event(f"{curator}'s consolidation held for review ({_why})")
                 return
+            if _why:      # advisory: the organ RUNS, but the operator sees who is trailing
+                logger.info("[consolidation] %s is %s", curator, _why)
             ck = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
             disc = [k for k in (ck or {}).get("knowledge", []) if k.get("title")]
             new = [k for k in disc if k["title"] not in consolidation["seen"]]
@@ -3916,6 +4761,14 @@ async def ambient_life():
                  "tags": ["digest", "consolidation"]})
             for k in new[:6]:
                 consolidation["seen"].add(k["title"])   # don't re-process this material either way
+            # Bounded like its sibling forty lines up (agent_activity["seen"]), which applies the
+            # identical idiom to the identical kind of dedup set. This one had no trim, so in a
+            # process designed to run for days it grew for the lifetime of the process — and
+            # "recently consolidated" quietly came to mean "ever consolidated", so material that
+            # became relevant again could never be re-consolidated. The growth rate is small
+            # (~40 distinct titles/day in real production); this is hygiene, not an incident.
+            if len(consolidation["seen"]) > 500:
+                consolidation["seen"] = set(sorted(consolidation["seen"])[-200:])
             if resp and resp.get("status") == "written":
                 note_event(f"{curator} consolidated {len(new[:6])} discoveries into a vault note")
                 _os_build("curation", curator,
@@ -3934,7 +4787,7 @@ async def ambient_life():
 
     orchestration = {"running": False}
 
-    async def _run_orchestration(eid, standing):
+    async def _run_orchestration(eid, standing, roster=None):
         """King Aldric (Orchestrator) sets the 'State of the OS' doctrine and commits the
         agents' accumulated vault work to GitHub (durability). Gated by his standing."""
         if orchestration["running"]:
@@ -3943,9 +4796,12 @@ async def ambient_life():
         king = _AGENT_NAMES.get(eid, eid)
         logger.info(f"[orchestration] starting for {king} (standing {standing:.2f})…")
         try:
-            if standing < 0.55:
-                note_event(f"{king}'s governance held (trust {standing:.2f})")
+            _ok, _why = _standing_ok(standing, roster)
+            if not _ok:
+                note_event(f"{king}'s governance held ({_why})")
                 return
+            if _why:      # advisory: the organ RUNS, but the operator sees who is trailing
+                logger.info("[orchestration] %s is %s", king, _why)
             engine.set_entity_state(eid, "casting")
             engine.set_entity_thought(eid, "» governing the OS…")
             build = await _brain_build_log()
@@ -4058,11 +4914,11 @@ async def ambient_life():
         publish_goals()
         return True
 
-    async def replenish_quests(eid, cx, cy):
-        """Ask the LLM for a BATCH of real, vault-grounded quests → the agent's backlog."""
+    async def replenish_quests(eid):
+        """Fill the agent's backlog from the GROUNDED renewable pool (fresh papers, findings,
+        flywheel questions, harvested directions) → the agent's backlog."""
         try:
-            ent = engine.state.entities.get(eid)
-            if not ent:
+            if eid not in engine.state.entities:
                 return
             # User guidance (Telegram `fix`) takes priority — it becomes the next quest.
             guide = await _consume_guidance(eid)
@@ -4073,104 +4929,37 @@ async def ambient_life():
                 note_event(f"{_AGENT_NAMES.get(eid, eid)} got direction from Rasto: {guide[:48]}")
                 publish_goals()
                 return
-            nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
-                      if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
-            locs = ", ".join(locations.keys())
-            # Value-ranked recall from the agent's inspeximus store (relevant past work), with the plain
-            # recency list as a fallback when inspeximus is empty/unavailable.
-            _q = f"{_ROLE_HINT.get(eid, '')} {(memory.get(eid) or ['research'])[-1]}"
-            # inspeximus recall can serialize the store (json.dumps) — run it OFF the event loop so it can
-            # never freeze the ambient loop (the frozen-world bug, 2026-06-20). See inspeximus _save throttle.
-            mem = (await asyncio.to_thread(_recall_mem, eid, _q)) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
-            # Collective recall — what colleagues already found that's relevant to this agent's focus.
-            colleague_mem = await asyncio.to_thread(_collective_recall, _q, exclude=eid)
-            done = " | ".join(quest_log.get(eid, [])[-6:]) or "(none yet)"
-            news = " | ".join(world_events[-4:]) or "(quiet)"
-            # Pull the agent's real mind (memory/emotion/vault) from server/agora.
-            brain = await _brain_context(eid, f"{_ROLE_HINT.get(eid, '')} {mem}")
-            build_log = await _brain_build_log()
-            allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
-            mods = "; ".join(m["name"] for m in os_modules[-6:]) or "(none yet)"
-            # The user's REAL knowledge gaps — aim research at what they actually lack.
-            _gaps = await _brain_gaps()
-            gap_txt = "; ".join(g["title"] for g in random.sample(_gaps, min(4, len(_gaps)))) \
-                if _gaps else "(unknown)"
-            ident = await _brain_identity(eid)
-            role_line = ident or f"Your domain: {_ROLE_HINT.get(eid, 'open inquiry')}."
-            sysmsg = (
-                f"You are {_persona(eid)} {role_line} "
-                f"You work at the Vault Company, building a living 'Agentic OS' of GENUINE knowledge "
-                f"inside the vault. PLAN YOUR NEXT 3 RESEARCH MOVES as a quest list. Form YOUR OWN "
-                f"direction from your role + memory FIRST — your value is an INDEPENDENT angle, not "
-                f"echoing what the group is already doing. Each must be a "
-                f"SPECIFIC, substantive step that fits your role, draws on your memory + the library, "
-                f"builds on the OS so far, and does NOT repeat what you've already done. Vary the kinds. "
-                f"This is a RESEARCH keep, not a combat dungeon — NEVER invent traps, treasure, "
-                f"prisoners, guards, gates, or defenses; only real knowledge work (concepts, notes, "
-                f"connections, tools, experiments). A 'module' is a knowledge artifact, not a trap. "
-                f"kind: create (a discovery) | upgrade (build a knowledge module) | collaborate (with an "
-                f"ally, builds trust) | challenge (contest an ally's weak finding, costs trust) | explore. "
-                f'Reply ONLY JSON: {{"quests":[{{"intent":"<specific, present tense, max 14 words>",'
-                f'"kind":"<create|upgrade|collaborate|challenge|explore>",'
-                f'"location":"<one of: {locs} | an ally name | wander>",'
-                f'"with":"<ally name if collaborating/challenging, else empty>",'
-                f'"action":"<the concrete output you will produce — one sentence>"}}]}}  (exactly 3 quests)'
-            )
-            graves = await _brain_graves()
-            grave_txt = ("\nDEAD ENDS (tried, killed — do NOT re-walk these): "
-                         + "; ".join(graves[:4])) if graves else ""
-            usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
-                   f"The OS so far (build on it, don't repeat): {build_log}\n"
-                   f"Modules built (visit/extend them): {mods}\n"
-                   f"Fellow thinkers: {allies}\n"
-                   f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}"
-                   f"{grave_txt}\n"
-                   f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
-                   + (f"What your COLLEAGUES are already covering — so DO NOT converge on the same "
-                      f"direction (a herd of agents chasing one topic is worth no more than one agent; "
-                      f"diversity beats herding). Pick a DIFFERENT angle, domain, or method where YOUR "
-                      f"role adds independent value; only collaborate if you bring a genuinely distinct "
-                      f"contribution, not an echo: {colleague_mem}\n"
-                      if colleague_mem else "")
-                   + f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
-                   f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
-            data = (await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}) if _LLM_PLANNER_ON else {}
-            added = 0
-            for q in (data.get("quests") or [])[:4]:
-                intent = (q.get("intent") or "").strip()
-                if not intent:
-                    continue
-                kind = (q.get("kind") or "explore").strip().lower()
-                if kind not in ("collaborate", "challenge", "create", "upgrade", "explore"):
-                    kind = "explore"
-                quests.setdefault(eid, []).append({
-                    "intent": intent, "kind": kind,
-                    "where": (q.get("location") or "wander").strip().lower(),
-                    "action": (q.get("action") or "...").strip(),
-                    "with": (q.get("with") or "").strip()})
-                added += 1
-            # REMOVED (2026-06-14): the deterministic "build on X's finding / Extend X's result —"
-            # collaborate-seed. It pasted a colleague's recalled memory text into a templated quest,
-            # the collaborate handler then logged that PLAN as a "discovery", and the plan fed back
-            # into memory — a self-amplifying chatter loop that produced ~74% of discovery rows with
-            # ZERO findings and burned tokens. Real cross-agent cooperation now lives ONLY in the
-            # Seminar (brain-side run_group_seminar -> a grounded Contribution: claim + evidence +
-            # falsifier). Trust/cooperation between agents still accrues from genuine quests below.
-            # Planning-quality signal: how many quests the LLM itself produced (0 = it failed and we
-            # fell back to deterministic gaps). Lets us compare models live (flash ~0 vs deepseek-v4-pro).
-            logger.info(f"[plan] {_AGENT_NAMES.get(eid, eid)}: LLM_quests={added}"
-                        + ("" if _LLM_PLANNER_ON else " (planner OFF — grounded pool only)"))
-            # GUARANTEE work: if the (flaky) LLM planner came up short, draw REAL quests from the
-            # vault's inexhaustible surface — gaps, bridges, findings. Agents never run dry.
-            if len(quests.get(eid, [])) < 2:
-                for q in await _renewable_quests(eid, 3):
-                    quests.setdefault(eid, []).append(q)
+            # THE LLM PLANNER IS GONE, deleted 2026-07-31 — and with it the context it was fed.
+            #
+            # `_LLM_PLANNER_ON` has been 0 by design since 2026-06-19 (it produced the "gaming party"
+            # filler and was the dominant 429 source), but the flag was checked on the LAST line of a
+            # ~90-line block that built its input first: a `_recall_mem` over a 15 MB inspeximus store,
+            # a `_collective_recall` across all eight stores, `_brain_context` (3 HTTP), plus
+            # `_brain_build_log` (2 HTTP), `_brain_gaps`, `_brain_identity`, `_brain_graves`, and a
+            # ~2 KB prompt — and then threw all of it away with `... if _LLM_PLANNER_ON else {}`.
+            # Measured 2026-07-31 in _dungeon.log: 2,234 planning cycles in six hours, every one of
+            # them logging `LLM_quests=0`. That is ~370 cycles/hour of store deserialisation and brain
+            # HTTP whose only consumer was an `else {}`. The prompt is not preserved anywhere: it is
+            # the known-bad one, and the per-agent research organs below are its replacement.
+            #
+            # `_brain_context` survives the deletion and is now called ONCE PER ORGAN CYCLE (~4x/day
+            # per agent) instead of ~370 times an hour — the same per-agent mind, moved to where it can
+            # actually reach an output.
+            for q in await _renewable_quests(eid, 3):
+                quests.setdefault(eid, []).append(q)
+            _log_plan_state(eid, "renewable",
+                            "[plan] %s: %d grounded quest(s) from the renewable pool",
+                            _AGENT_NAMES.get(eid, eid), len(quests.get(eid, [])))
             if quests.get(eid):
                 _plan_fails[eid] = 0
-            elif _plan_reason.get(eid) == "off_priority":
+            elif _plan_reason.get(eid) in ("off_priority", "exhausted"):
                 # NOT a blocker: the sources delivered, the BOARD is narrower than what they delivered.
                 # Counting this as a plan failure escalated "the brain may be down" while the brain was
                 # serving perfectly — an alarm that names the wrong system trains everyone to ignore it.
+                # "exhausted" joins it 2026-08-08 with the no-fallback fix: an agent that has already
+                # pursued every on-priority candidate legitimately plans nothing, and routing that into
+                # the escalation below would fire "the brain may be down" at the owner three cycles
+                # later — the SAME false alarm this branch exists to prevent, re-created by the fix.
                 _plan_fails[eid] = 0
             else:
                 # even gaps/bridges/findings were empty → the brain is likely unreachable: a REAL blocker
@@ -4198,7 +4987,7 @@ async def ambient_life():
         # the QuestBoard) and restart us. Cheap, throttled to ~once/4s, never raises into the loop.
         if loop_n % 5 == 0:
             try:
-                _HEARTBEAT_FILE.write_text(f"{int(_time.time())} {loop_n}", encoding="utf-8")
+                _atomic_write(_HEARTBEAT_FILE, f"{int(_time.time())} {loop_n}")
             except Exception:
                 pass
         ents = engine.state.entities
@@ -4291,9 +5080,9 @@ async def ambient_life():
             if loop_n % 1200 == 90 and not curation["running"]:     # Voss: QA flag duplicates (~17 min)
                 asyncio.create_task(_run_curation("guard_l", _stm.get("guard_l", 0.5), "duplicates"))
             if loop_n % 110 == 50 and not consolidation["running"]:  # Mira: consolidate digest
-                asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
+                asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5), _stm))
             if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
-                asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
+                asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5), _stm))
 
         # Dogfood: run inspeximus's consolidation "dream pass" over each agent's memory (~every 28 min) —
         # value-rank under a keep-budget + link near-duplicates. Agora's product, on Agora's agents.
@@ -4508,6 +5297,14 @@ async def ambient_life():
         # THE SALON — sense the followed external minds; one contestable claim a day (~daily).
         if loop_n % 64000 == 17000:
             asyncio.create_task(_run_salon())
+        # THE RESEARCH ORGANS — one beat of the per-agent organ scheduler (~5 min). The beat is
+        # cheap (a dict read + a mtime-free file read); the PERIOD is per organ (~4 cycles/day each)
+        # and persisted, so this cadence only decides how finely the 32 daily fires are staggered.
+        # It deliberately does NOT sit on a `% big-number` trigger: those are measured against an
+        # assumed 0.85s tick and an organ whose trigger sits past the mean uptime between restarts
+        # never fires at all (see the cadence heartbeat above — cartography sits at tick 1700).
+        if loop_n % 350 == 175:
+            asyncio.create_task(_organ_tick())
         # THE WATCHDOG — keep the brain alive (one supervision beat ~every 5 min).
         if loop_n % 220 == 117:
             asyncio.create_task(_watch_brain())
@@ -4539,7 +5336,7 @@ async def ambient_life():
                         activate_next_quest(eid)
                     elif eid not in deciding:
                         deciding.add(eid)
-                        asyncio.create_task(replenish_quests(eid, cx, cy))
+                        asyncio.create_task(replenish_quests(eid))
                 elif now >= idle_bub.get(eid, 0.0):
                     # Idle between quests → show what this agent is mulling (its REAL work),
                     # not a blank or stale bubble: the next queued quest, else its recent work.

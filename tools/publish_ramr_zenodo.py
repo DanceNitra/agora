@@ -104,6 +104,16 @@ def main():
         print("  uploaded:", os.path.basename(path))
     _req("PUT", "%s/api/deposit/depositions/%d" % (BASE, dep_id), tok, data=json.dumps(META).encode("utf-8"))
     print("metadata set")
+    # A DOI cannot be retracted, and `--sandbox` is opt-IN, so a bare `python tools/
+    # publish_ramr_zenodo.py` -- the first line of this file's own usage docstring -- used to mint a
+    # permanent production record with no confirmation. The draft-then-explicit-publish pattern has
+    # been in publish_crucible_zenodo.py and publish_paper_zenodo.py since 2026-08-10; it was never
+    # ported here, to folklore, agentreceipts or inspeximus. Fixed as a class, not an instance.
+    if "--publish" not in sys.argv:
+        print("\nDRAFT ready, NOT published: %s/deposit/%d" % (BASE, dep_id))
+        print("Check the files and metadata there, then re-run with --publish to mint the DOI.")
+        print("Minting is IRREVERSIBLE -- Zenodo does not delete a published record.")
+        return 0
     st, pub = _req("POST", "%s/api/deposit/depositions/%d/actions/publish" % (BASE, dep_id), tok)
     doi = pub.get("doi") or (pub.get("metadata") or {}).get("doi")
     print("\nPUBLISHED. DOI:", doi)

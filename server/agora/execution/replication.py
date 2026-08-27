@@ -281,9 +281,159 @@ def pick_paper_target() -> dict | None:
     return None
 
 
+#: A negative admission the shared `is_non_finding` filter does not catch. Measured on the live pool:
+#: "**Final finding:** None of the provided sources contain any data, analysis, or discussion" passed
+#: it, and that is the most explicit statement of having nothing that the swarm produces.
+_EMPTY_ADMISSION = re.compile(
+    r"none of the (provided|cited|given) (sources?|papers?|abstracts?)|"
+    r"contain no (data|analysis|discussion|evidence)|"
+    r"(no|zero) substantive (claim|finding|result)", re.I)
+
+
+def _is_non_finding(title: str, content: str) -> bool:
+    """True when there is nothing here to reproduce or refute."""
+    try:
+        from agora.execution.non_finding import is_non_finding
+        if is_non_finding(title, content):
+            return True
+    except Exception:
+        pass                                   # the extra pattern below still applies
+    return bool(_EMPTY_ADMISSION.search(content or ""))
+
+
+#: Shapes that reach this table but are not somebody else's claim to re-run. Measured 2026-08-06: of
+#: the eight candidates the endpoint was serving, SIX were one of these, and Rooke walked all eight and
+#: returned `no-instrument` — correctly, every time. His refusals were read as a capability gap for five
+#: days. The gap was upstream: the query takes the FIRST SENTENCE of any `collective_knowledge` row
+#: carrying a `Source:` line, and a first sentence is not a claim.
+_NOT_A_CLAIM = (
+    # a serialised model reply, sliced mid-JSON: '{ "answer": "The claim about excess discontinuity...'
+    (re.compile(r'^\s*[\{\[]|"\s*answer\s*"\s*:|^\s*```'), "serialised model output, not prose"),
+    # our OWN lab, so re-running it is not a replication of anyone -- it is us marking our own homework
+    (re.compile(r"\bLab\s+[0-9a-f]{6}\b", re.IGNORECASE), "cites one of our own Lab runs"),
+    # the swarm narrating itself. The agent roster is fixed, so this is exact, not a guess.
+    (re.compile(r"\b(Shadow Kael|Sage Mira|High Priest Orin|King Aldric|Dame Elara|Sergeant Voss"
+                r"|Artificer Rooke|Cartographer Wren)\b"), "the swarm's own internal proposal"),
+    # Our own organ labels leaking in as if they were a paper's words. Two patterns, because
+    # enumerating the labels is a losing game: the first version listed six and the very next queue
+    # was 7/8 "Open frontier (UNCERTAIN):", a seventh label nobody had written down. The second
+    # pattern catches the SHAPE instead -- a short prefix carrying a status marker in parentheses,
+    # which no source sentence has and every one of our own status lines does.
+    # `[*_#>\s]*` leads BOTH patterns: the queue that followed the previous fix still leaked
+    # "**Finding:** Gallego (2026) demonstrates..." -- the same label, in markdown bold, so the word
+    # was no longer at the start of the string. Our organs write markdown; anchoring on a bare word
+    # anchors on a formatting choice.
+    (re.compile(r"^[*_#>\s]*(Open frontier|Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge"
+                r"|Contribution|Seminar|Verdict|Prediction|Observation)\b[^.]{0,40}?\s*[:—-]",
+                re.IGNORECASE), "one of our own organ labels, not a source's sentence"),
+    (re.compile(r"^[*_#>\s]*[A-Z][A-Za-z ]{2,28}\(\s*"
+                r"(UNCERTAIN|CONFIRMED|OPEN|UNRESOLVED|TENTATIVE|DRAFT)\s*\)\s*:"),
+     "one of our own status lines, not a source's sentence"),
+    # a paper's scope sentence. It is real prose from a real paper and still asserts no quantity.
+    (re.compile(r"^\s*(We|This paper|This work|In this (paper|work|section))\b.{0,40}\b"
+                r"(focus|present|propose|introduce|describe|review|survey|consider|study)\b",
+                re.IGNORECASE), "a paper's scope sentence, which asserts no quantity"),
+)
+
+
+#: The SOURCE has to be somebody else. Measured 2026-08-06: one candidate carried the claim "a randomly
+#: assembled diverse team outperformed the best-ability team by +1.16 (SE = 0.50)" -- which reads like a
+#: real result -- under the source "Diversity-vs-ability experiment, Lab 52597e; no named paper
+#: provided." That is OUR experiment, saying so in plain words, and a first version of this guard that
+#: only read the claim let it straight through. A replication of our own lab is not a replication.
+_NOT_A_SOURCE = (
+    (re.compile(r"\bLab\s+[0-9a-f]{6}\b", re.IGNORECASE), "the source is one of our own Lab runs"),
+    (re.compile(r"\bno (named )?(paper|source|citation|reference)s? (was |were )?(provided|given|named)"
+                r"|\bnot provided\b|\bunnamed source\b", re.IGNORECASE), "the source names no work"),
+    (re.compile(r"^\s*(OUR OWN|internal|agora|the swarm)\b", re.IGNORECASE), "the source is us"),
+)
+
+
+def not_a_claim(claim: str, source: str = "") -> str:
+    """Why this is not somebody else's claim we could replicate, or "" if it might be. Public for tests.
+
+    Deliberately NOT a quality judgement: a claim Rooke has no instrument for is still a claim, and
+    refusing it is HIS call, not this filter's. This only removes text that is not an external
+    assertion at all. Both ends are read, because the giveaway sits in whichever one you are not
+    looking at -- the first version read only the claim and admitted a target whose source said "no
+    named paper provided" out loud.
+    """
+    text = (claim or "").strip()
+    for rx, why in _NOT_A_CLAIM:
+        if rx.search(text):
+            return why
+    src = (source or "").strip()
+    for rx, why in _NOT_A_SOURCE:
+        if rx.search(src):
+            return why
+    return ""
+
+
+async def pick_targets(db, n: int = 8) -> list:
+    """SEVERAL replication targets, best first. Rooke's own instrument set decides which it can honestly
+    model, so it must be able to walk PAST one it cannot.
+
+    HEAD-OF-LINE BLOCKING, measured 2026-07-31. `pick_target` returned exactly one candidate and the
+    endpoint offered no list, so a claim outside Rooke's instrument set wedged him permanently: four
+    consecutive calls returned the same untestable claim ("The regrets do not rely on any scalarization
+    functions and reflect Pareto optimality...", an empirical statement about an algorithm, not a
+    quantity a minimal model can settle). He refused it correctly, got it again, refused it again. Over
+    the preceding five days he produced ZERO discoveries, as did High Priest Orin, whose /theory/target
+    has the same single-head shape; Shadow Kael, on single-head /scout-target, produced one. The three
+    agents on head-only endpoints were the three that produced nothing.
+
+    This is the SAME defect `belief-challenge-target` already fixed, and its comment says what it cost:
+    "taking only the head is what wedged the challenge sweep for 42 days". The fix was never carried to
+    the other endpoints. Same shape as the standing gate fixed in tools/autolinker.py and left in
+    mcp_server.py -- a class repaired at one site and left alive at the others.
+    """
+    import asyncio as _aio
+    out, seen = [], set()
+    paper = await _aio.to_thread(pick_paper_target)
+    if paper:
+        out.append(paper)
+        seen.add((paper.get("claim") or "")[:80])
+    attempted = _load()
+    cur = await db.execute(
+        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "AND content LIKE '%Source:%' ORDER BY created_at DESC LIMIT 120")
+    for r in await cur.fetchall():
+        if len(out) >= n:
+            break
+        content = (r["content"] or "").strip()
+        claim = re.split(r"(?<=[.!?])\s", content)[0][:200]
+        if len(claim) < 40 or claim[:80] in seen:
+            continue
+        # DO NOT ASK ROOKE TO REPLICATE OUR OWN NEGATIVE ADMISSIONS. Measured 2026-07-31: of the first
+        # eight candidates this query returned, FIVE were the swarm's own non-findings -- "the provided
+        # sources do not support the claim", "yields no substantive claim beyond restating", "None of
+        # the provided sources contain any data". There is nothing in those to reproduce or refute, so
+        # every one burns a cycle and returns an honest idle that looks like Rooke failing. The
+        # promotion path already filters this exact shape (is_non_finding, and _NEGATIVE_PROMO in
+        # promote_findings); this query read the same table without it.
+        if _is_non_finding(r["title"] or "", content):
+            continue
+        # Source is resolved BEFORE the guard, because the guard reads both ends.
+        m = re.search(r"Source:\s*(.+)$", content, re.MULTILINE)
+        source = (m.group(1).strip() if m else "")[:160]
+        if not source:
+            continue
+        if not_a_claim(claim, source):
+            continue
+        if already_covered(claim, attempted):
+            continue
+        seen.add(claim[:80])
+        out.append({"claim": claim, "source": source, "title": (r["title"] or "")[:90]})
+    return out
+
+
 async def pick_target(db) -> dict | None:
     """The replication target. PREFER a real arXiv paper with a simulable quantitative claim
-    (Aldric's roadmap: feed Rooke real papers); fall back to a recent sourced internal finding."""
+    (Aldric's roadmap: feed Rooke real papers); fall back to a recent sourced internal finding.
+
+    Kept as the head of `pick_targets` so existing callers keep working. A caller with its OWN gate
+    must walk the list instead -- see pick_targets for what taking only the head cost.
+    """
     import asyncio as _aio
     paper = await _aio.to_thread(pick_paper_target)
     if paper:
@@ -336,7 +486,16 @@ def by_construction_suspect(outcome: str, note: str) -> bool:
 
 
 def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = "",
-           by_construction_checked: bool = False) -> dict | None:
+           by_construction_checked: bool = False, by: str = "") -> dict | None:
+    """Ledger one replication. `by` NAMES THE REPLICATOR and is not decoration.
+
+    Measured 2026-08-01: the record held {claim, source, outcome, lab_id, note, ts} and nothing
+    identifying who ran it, so the public replication ledger -- the Crucible, our credibility
+    artifact -- could not say whose work any entry was. Artificer Rooke landed a real, grounded
+    NOT_COMPUTABLE with lab e4ec41 and the acceptance gate still scored him unattributed, correctly:
+    the ledger it reads had no actor field at all. This is the same schema gap the bounty ledger had
+    with `evidence` -- a record that keeps the ruling and drops the ruler.
+    """
     o = (outcome or "").strip().upper()
     if o not in _OUTCOMES or len((claim or "").strip()) < 10:
         return None
@@ -348,7 +507,8 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
                 "it stands on independent/real data] " + (note or ""))
         gated = True
     rec = {"claim": (claim or "")[:200], "source": (source or "")[:160], "outcome": o,
-           "lab_id": (lab_id or "")[:12], "note": (note or "")[:300], "ts": time.time()}
+           "lab_id": (lab_id or "")[:12], "note": (note or "")[:300],
+           "by": (by or "").strip()[:40], "ts": time.time()}
     if gated:
         rec["auto_gated"] = "by_construction"
     items = _load()
@@ -369,7 +529,12 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
     if o in ("REPRODUCED", "FAILED"):
         try:
             from agora.execution.inspeximus_bridge import credit_outcome
-            credit_outcome(claim, good=(o == "REPRODUCED"))
+            # The warrant names the LAB RUN that produced the verdict — the strongest exogenous anchor
+            # we have, because it is re-runnable. NO lab_id, NO warrant: a replication without a
+            # runnable artifact fails the severe-test rule, and a token invented to fill the field
+            # would warrant a verdict nobody can re-check.
+            credit_outcome(claim, good=(o == "REPRODUCED"),
+                           warrant=(f"lab:{lab_id}" if lab_id else None))
         except Exception:
             pass
     return rec

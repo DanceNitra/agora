@@ -1,0 +1,263 @@
+{
+ "construction": {
+  "monorepo paths": {
+   "keys": 4000,
+   "shared_prefix": 7,
+   "example": "src/co/AAFrfDFc/index.ts"
+  },
+  "ULID burst": {
+   "keys": 4000,
+   "shared_prefix": 8,
+   "example": "01JBKQ8V004P2431BVZ684N3Y4"
+  },
+  "binary alphabet (positive control)": {
+   "keys": 60,
+   "shared_prefix": 2,
+   "example": "00000000"
+  },
+  "unstructured hex": {
+   "keys": 4000,
+   "shared_prefix": 0,
+   "example": "000ca8681cb7c8823dcae204d56672c4"
+  }
+ },
+ "shipped": {
+  "monorepo paths|prefix_8": {
+   "verdict": "COST_MEASURED",
+   "lost": 3948,
+   "threshold": 2,
+   "saturated": 0,
+   "collides_at": 7,
+   "headroom": 1
+  },
+  "monorepo paths|prefix_12": {
+   "verdict": "ZERO_AT_SCALE",
+   "lost": 0,
+   "threshold": 2728,
+   "saturated": 0,
+   "collides_at": 11,
+   "headroom": 1
+  },
+  "ULID burst|prefix_8": {
+   "verdict": "COST_MEASURED",
+   "lost": 3999,
+   "threshold": 1,
+   "saturated": 0,
+   "collides_at": 7,
+   "headroom": 1
+  },
+  "ULID burst|prefix_12": {
+   "verdict": "COST_MEASURED",
+   "lost": 6,
+   "threshold": 145,
+   "saturated": 0,
+   "collides_at": 11,
+   "headroom": 1
+  },
+  "binary alphabet (positive control)|prefix_8": {
+   "verdict": "ZERO_AT_SCALE",
+   "lost": 0,
+   "threshold": 2,
+   "saturated": 0,
+   "collides_at": 7,
+   "headroom": 1
+  },
+  "binary alphabet (positive control)|prefix_12": {
+   "verdict": "ZERO_AT_SCALE",
+   "lost": 0,
+   "threshold": 2,
+   "saturated": 0,
+   "collides_at": 7,
+   "headroom": 5
+  },
+  "unstructured hex|prefix_8": {
+   "verdict": "NOT_YET_MEASURABLE",
+   "lost": 0,
+   "threshold": 9218,
+   "saturated": 0,
+   "collides_at": 6,
+   "headroom": 2
+  },
+  "unstructured hex|prefix_12": {
+   "verdict": "NOT_YET_MEASURABLE",
+   "lost": 0,
+   "threshold": 2352202,
+   "saturated": 0,
+   "collides_at": 6,
+   "headroom": 6
+  }
+ },
+ "sweep": {
+  "monorepo paths|6": {
+   "lost": 3999,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|7": {
+   "lost": 3999,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|8": {
+   "lost": 3948,
+   "threshold": 2,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|9": {
+   "lost": 1910,
+   "threshold": 8,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|10": {
+   "lost": 61,
+   "threshold": 53,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|11": {
+   "lost": 1,
+   "threshold": 380,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "monorepo paths|12": {
+   "lost": 0,
+   "threshold": 2728,
+   "verdict": "ZERO_AT_SCALE",
+   "headroom": 1
+  },
+  "monorepo paths|13": {
+   "lost": 0,
+   "threshold": 19594,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 2
+  },
+  "monorepo paths|14": {
+   "lost": 0,
+   "threshold": 141003,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 3
+  },
+  "monorepo paths|15": {
+   "lost": 0,
+   "threshold": 1013972,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 4
+  },
+  "monorepo paths|16": {
+   "lost": 0,
+   "threshold": 1013972,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 5
+  },
+  "monorepo paths|17": {
+   "lost": 0,
+   "threshold": 1013972,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 6
+  },
+  "monorepo paths|18": {
+   "lost": 0,
+   "threshold": 1013972,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 7
+  },
+  "monorepo paths|19": {
+   "lost": 0,
+   "threshold": 1013972,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 8
+  },
+  "ULID burst|6": {
+   "lost": 3999,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|7": {
+   "lost": 3999,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|8": {
+   "lost": 3999,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|9": {
+   "lost": 3968,
+   "threshold": 1,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|10": {
+   "lost": 2997,
+   "threshold": 5,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|11": {
+   "lost": 223,
+   "threshold": 26,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|12": {
+   "lost": 6,
+   "threshold": 145,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|13": {
+   "lost": 1,
+   "threshold": 814,
+   "verdict": "COST_MEASURED",
+   "headroom": 1
+  },
+  "ULID burst|14": {
+   "lost": 0,
+   "threshold": 4595,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 1
+  },
+  "ULID burst|15": {
+   "lost": 0,
+   "threshold": 25946,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 2
+  },
+  "ULID burst|16": {
+   "lost": 0,
+   "threshold": 146481,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 3
+  },
+  "ULID burst|17": {
+   "lost": 0,
+   "threshold": 827014,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 4
+  },
+  "ULID burst|18": {
+   "lost": 0,
+   "threshold": 4668547,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 5
+  },
+  "ULID burst|19": {
+   "lost": 0,
+   "threshold": 26372634,
+   "verdict": "NOT_YET_MEASURABLE",
+   "headroom": 6
+  }
+ },
+ "danger": [
+  "monorepo paths|12"
+ ]
+}

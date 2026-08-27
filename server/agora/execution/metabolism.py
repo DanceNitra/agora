@@ -183,8 +183,28 @@ def roi_report() -> dict:
                          "roi": round(v / ktok, 2) if ktok > 0.05 else None}
     total_ktok = round(sum(o["ktok"] for o in organs.values()), 1)
     mapped = set(_SPEND2VALUE.get(o, o) for o in organs)
-    return {"organs": organs, "total_ktok": total_ktok,
-            "unmetered_value": {k: v for k, v in value.items() if k not in mapped and v}}
+    unmetered = {k: v for k, v in value.items() if k not in mapped and v}
+    # HOW MUCH OF THIS RANKING IS ACTUALLY CONNECTED. `unmetered_value` has always been computed here
+    # and never shown, so the CFO line published "best X / worst Y" while a third of the recorded value
+    # had no spend row to pair with. Measured 2026-08-17: 3,912.5 unattributable points against 8,708
+    # attributed (31%), and of 17 spend organs exactly ONE resolved to a value key -- every other organ
+    # reported ROI 0.000 not because it produced nothing but because its value lives under a name the
+    # mapping no longer reaches.
+    #
+    # The cause is a naming drift, not a missing writer: the spend label is a ROUTE name when the HTTP
+    # middleware sets one and a MODULE name otherwise, while _SPEND2VALUE was written entirely against
+    # route names (verify-findings, replication-target, cartography-hole). Today's spend is mostly
+    # module names (seminar, scan, match, directions). The pairs are not guessed back into place here,
+    # because inventing an attribution is worse than admitting there is none -- what ships is the
+    # ADMISSION, so a reader can see the ranking's coverage before trusting its order.
+    attributed = sum(o["value"] for o in organs.values())
+    priced = sum(1 for o in organs.values() if o["value"])
+    return {"organs": organs, "total_ktok": total_ktok, "unmetered_value": unmetered,
+            "unmetered_total": round(sum(unmetered.values()), 1),
+            "attributed_total": round(attributed, 1),
+            "organs_with_value": priced, "organs_total": len(organs),
+            "value_coverage": round(attributed / (attributed + sum(unmetered.values())), 3)
+            if (attributed + sum(unmetered.values())) else None}
 
 
 def format_metabolism() -> str:
@@ -196,4 +216,14 @@ def format_metabolism() -> str:
     for organ, o in ranked[:10]:
         roi = f"ROI {o['roi']}" if o["roi"] is not None else "—"
         lines.append(f"• {organ}: {o['ktok']}k tok / {o['calls']} calls · value {o['value']:g} · {roi}")
+    # The coverage line goes FIRST among the notes, because it decides whether the ROI column above is
+    # a ranking or a rumour.
+    if r.get("organs_total"):
+        lines.append(f"\n⚖️ _value coverage:_ {r['organs_with_value']}/{r['organs_total']} organs "
+                     f"resolve to a value ledger; {r['unmetered_total']:g} points "
+                     f"({100 * (1 - (r['value_coverage'] or 1)):.0f}%) have no spend row to pair with, "
+                     f"so a 0.000 below means UNMEASURED, not unproductive.")
+    if r.get("unmetered_value"):
+        top = sorted(r["unmetered_value"].items(), key=lambda kv: -kv[1])[:5]
+        lines.append("_unattributed:_ " + " · ".join(f"{k} {v:g}" for k, v in top))
     return "\n".join(lines)

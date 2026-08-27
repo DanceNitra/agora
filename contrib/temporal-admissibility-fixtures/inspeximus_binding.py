@@ -1,5 +1,10 @@
 """The inspeximus binding for the temporal-admissibility cases.
 
+It answers in CML's status vocabulary (safal207/Causal-Memory-Layer) because inspeximus already
+implements those six outcomes and that precedence -- shipped 2026-08-11, reported in the thread at
+15/15 against the frozen fixture. The first version of this file invented its own reason codes,
+which was a second vocabulary from the codebase that had just adopted his. Caught by a red team.
+
 Deliberately thin. Every judgement below is made by inspeximus; this file only translates the
 fixture's vocabulary into calls and the answers back into `{admissible, reason}`. Where a mapping
 required a decision rather than a lookup, the decision is written down beside it, because those
@@ -98,7 +103,7 @@ class InspeximusBinding:
         h.consulted = []
         rows = [r for r in h.mem.items if r.get("key") == key]
         if not rows:
-            return {"admissible": False, "reason": None, "consulted": h.consulted}
+            return {"status": "UNRESOLVABLE", "reason": None, "consulted": h.consulted}
         rec = rows[-1]
         src = rec.get("source") or {}
         doc_path = src.get("doc")
@@ -108,7 +113,7 @@ class InspeximusBinding:
         # would otherwise look fine, because the reason they look fine is that nothing is watching.
         if window == "OBSERVE_TO_CAPTURE" and not h.collector_live:
             h.consulted.append("collector_liveness")
-            return {"admissible": False, "reason": "COLLECTOR_SILENT", "consulted": h.consulted}
+            return {"status": "UNRESOLVABLE", "reason": "observation_collector_silent", "consulted": h.consulted}
 
         if window == "OBSERVE_TO_CAPTURE":
             h.consulted.append("observation_session_attribution")
@@ -118,11 +123,11 @@ class InspeximusBinding:
             # implementation finds the wrong session's observation and reports it as its own.
             mine = [s for (sess, s) in obs if sess == session]
             if mine:
-                return {"admissible": True, "reason": None, "consulted": h.consulted}
+                return {"status": "MATCH", "reason": None, "consulted": h.consulted}
             if obs:
-                return {"admissible": False, "reason": "OBSERVATION_FOREIGN_SESSION",
+                return {"status": "REVALIDATE", "reason": "source_observation_foreign_session",
                         "consulted": h.consulted}
-            return {"admissible": False, "reason": "NEVER_OBSERVED", "consulted": h.consulted}
+            return {"status": "UNRESOLVABLE", "reason": None, "consulted": h.consulted}
 
         if window in ("CAPTURE_TO_VERIFY", "VERIFY_TO_USE"):
             h.consulted.append("source_re_read" if window == "CAPTURE_TO_VERIFY"
@@ -131,14 +136,15 @@ class InspeximusBinding:
             if now is None:
                 # ORPHANED, not DRIFTED. Different remedy: re-source rather than revalidate, and
                 # collapsing them is what T3's control exists to catch.
-                return {"admissible": False, "reason": "SOURCE_ORPHANED", "consulted": h.consulted}
+                return {"status": "ORPHAN", "reason": None, "consulted": h.consulted}
             was = h.verified.get(key) if window == "VERIFY_TO_USE" else src.get("observed_sha256")
             if was and now != was:
-                return {"admissible": False,
-                        "reason": "STALE_AT_USE" if window == "VERIFY_TO_USE" else "SOURCE_DRIFTED",
+                return {"status": "DRIFT",
+                        "reason": ("source_drift_after_verification"
+                                   if window == "VERIFY_TO_USE" else None),
                         "consulted": h.consulted}
             if not was:
-                return {"admissible": False, "reason": "NEVER_OBSERVED", "consulted": h.consulted}
-            return {"admissible": True, "reason": None, "consulted": h.consulted}
+                return {"status": "UNRESOLVABLE", "reason": None, "consulted": h.consulted}
+            return {"status": "MATCH", "reason": None, "consulted": h.consulted}
 
         raise KeyError(f"unknown window {window!r}")

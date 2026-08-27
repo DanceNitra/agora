@@ -26,6 +26,50 @@ def _chat() -> str:
     return os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
 
 
+# One refusal notice per process: a wrong-sender loop must not turn into a message flood.
+_REFUSED_ONCE = False
+
+
+def _allowed_senders() -> set[str]:
+    return {s.strip() for s in os.getenv("HERMES_TELEGRAM_ALLOWED_USER_IDS", "").split(",")
+            if s.strip()}
+
+
+def sender_ok(msg: dict) -> tuple[bool, str]:
+    """May THIS SENDER drive the control plane? -> (ok, reason when not).
+
+    The only identity check in the whole control plane compared the CHAT id against
+    HERMES_TELEGRAM_CHAT_ID. `msg["from"]["id"]` was never read anywhere in this file.
+
+    For a 1:1 chat that is sound: chat.id equals the sole peer's user id, so the check IS a sender
+    allowlist. For a GROUP it degrades to "is a member of that group" — and a member holds
+    `approve <id>` (outward publication), `board <text>` (rewrites the standing research
+    priorities) and `cc <text>` (the Claude inbox, i.e. instructions executed against the
+    repository with full tool access). Group membership is granted socially and can be widened by
+    anyone with invite rights, with no code change and no audit trail.
+
+    Which one is configured could not be determined from anything committed — the value lives in a
+    gitignored .env, .env.example has no CHAT_ID key, and no code path reads a group-specific
+    field. So this does not guess: it reads `chat.type`, which Telegram sends on every message.
+    Private stays a no-op; a group without an explicit allowlist is REFUSED rather than trusted,
+    because that is the configuration where the check never meant what it appeared to mean.
+    """
+    chat = msg.get("chat") or {}
+    if str(chat.get("id")) != str(_chat()):
+        return False, ""                       # not our chat at all — silent, as before
+    allow = _allowed_senders()
+    sender = str(((msg.get("from") or {}).get("id")) or "")
+    if allow:
+        if sender and sender in allow:
+            return True, ""
+        return False, (f"sender {sender or '(none)'} is not in HERMES_TELEGRAM_ALLOWED_USER_IDS")
+    if (chat.get("type") or "") == "private":
+        return True, ""                        # chat.id IS the peer's id; the old check sufficed
+    return False, (f"this is a '{chat.get('type')}' chat, where the chat-id check only proves "
+                   f"membership. Set HERMES_TELEGRAM_ALLOWED_USER_IDS to the owner's numeric "
+                   f"user id to enable commands here.")
+
+
 def _api(method: str, params: dict) -> dict:
     url = f"https://api.telegram.org/bot{_tok()}/{method}"
     data = urllib.parse.urlencode(params).encode()
@@ -156,6 +200,9 @@ async def _save_to_vault(query: str, brief: str, sources: str) -> dict:
         "content": f"{brief}\n\n## Sources\n{sources}",
         "agent": "Agora (kept by Rasto)",
         "tags": ["research", "kept", "agora"],
+        # Say who kept it. Without this the endpoint's default applied, and a note the OWNER chose to
+        # keep was filed under an agent's name -- credit for a judgement no agent made.
+        "agent": "Owner (kept via Telegram)",
         "gate": False,
     }).encode()
     req = urllib.request.Request(
@@ -631,7 +678,13 @@ async def poll_loop(app) -> None:
             for u in upd.get("result", []):
                 offset = u["update_id"] + 1
                 msg = u.get("message", {})
-                if str(msg.get("chat", {}).get("id")) != str(_chat()):
+                ok, why = sender_ok(msg)
+                if not ok:
+                    if why:                    # our chat, wrong/unverifiable sender — say so ONCE
+                        global _REFUSED_ONCE
+                        if not _REFUSED_ONCE:
+                            _REFUSED_ONCE = True
+                            await send(f"🔒 Command refused: {why}")
                     continue
                 txt = (msg.get("text") or "").strip()
                 if txt:

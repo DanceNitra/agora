@@ -1,0 +1,32 @@
+{
+  "probe": "gate_82056_147_split_body.py",
+  "verdicts": {
+    "the_60_char_arm_carries_12200_units": true,
+    "nothing_cut_the_60_char_arm": true,
+    "the_prior_bracket_is_24955_25074": true,
+    "arm_count_carrying_the_notice_is_derived_not_typed": true,
+    "every_named_size_figure_appears_in_a_receipt": true,
+    "zero_tools_on_every_arm_that_carries_it": true,
+    "the_under_cap_arm_says_NO_INDICATOR": true,
+    "the_200x125_arm_reports_25200": true,
+    "the_three_boundary_lines_are_right": true,
+    "the_file_is_180_lines_and_26640_units": true,
+    "last_kept_line_is_168_unanimously": true,
+    "the_new_bracket_and_widths_are_right": true,
+    "25000_is_inside_the_new_bracket": true,
+    "the_next_boundary_is_24990": true,
+    "the_number_of_other_widths_is_recomputed": true,
+    "this_machine_has_18_sessions_in_3_buckets": true,
+    "CONTROL_the_body_is_not_the_provenance_block": true,
+    "every_arm_count_sentence_agrees_with_the_data": true,
+    "CONTROL_a_wrong_arm_word_would_fail": true,
+    "CONTROL_a_string_not_in_the_draft_fails": true
+  },
+  "arms_carrying_the_notice": 4,
+  "warned_arms": [
+    "ascii_200x125",
+    "cjk_200x125",
+    "emoji_200x125"
+  ],
+  "other_widths": 37
+}

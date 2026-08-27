@@ -1,0 +1,16 @@
+seeds=320 workers=8  (7 calls/seed, 3 probes at one drift-free origin)
+
+seeds run                     : 320
+dropped, a call returned EMPTY: 0
+dropped, drifted before origin: 1
+analysed                      : 319
+
+self     YES 202/267 = 75.7%   NO  30/52  = 57.7%   lift +18.0 pp  CI [+3.8,+32.5]  p=0.00769
+other    YES  87/107 = 81.3%   NO 145/212 = 68.4%   lift +12.9 pp  CI [+3.1,+22.3]  p=0.00939
+neutral  -> took ONE value only (YES n=319, NO n=0, unparsed 0): carries no information
+
+SELF vs OTHER, the control we did not run before:
+  BOTH separate drift. The published claim must be WEAKENED in public: what we measured
+  is sensitivity to the conversation, not self-knowledge. An other-directed question
+  predicts the agent's own drift nearly as well, which a reading of its own state should
+  not do. This is the result we went looking for and did not want.

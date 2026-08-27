@@ -1,0 +1,106 @@
+{
+ "probe": "edrn_the_finite_size_comparison_divides_two_manifold_widths.py",
+ "controls": {
+  "bloch_law_max_err": 6.661338147750939e-16,
+  "E0_state_independent": true,
+  "negative_control_seed_spread": 2.4980018054066022e-15,
+  "mixture_is_the_same_interval": 1.942890293094024e-16
+ },
+ "L2": {
+  "degeneracy_at_s1": 2,
+  "E_ground": -24.967536579519074,
+  "a": 0.11026913715112595,
+  "b": 0.1154619946556964,
+  "E_min": 0.1102691371511259,
+  "E_max": 0.1596582438144868,
+  "width": 0.04938910666336088,
+  "his_values": [
+   0.159295,
+   0.142707,
+   0.143544,
+   0.142196,
+   0.146785
+  ],
+  "his_radii": [
+   0.9956452442847882,
+   0.7845612227553455,
+   0.7959323007472613,
+   0.7775704987047644,
+   0.8391005905876492
+  ],
+  "all_inside": true,
+  "E_at_zero": 0.24673114075776786,
+  "degeneracy_at_s0": 1,
+  "depth_interval": [
+   0.08707289694328108,
+   0.13646200360664196
+  ],
+  "depth_at_chiral_r0": 0.13646200360664196,
+  "his_depth_mean": 0.0998256,
+  "his_depth_sd": 0.006397197905333238,
+  "his_depth_rel_pct": 6.408374109780696,
+  "orbit_spread_r0": 8.662515149637784e-14,
+  "orbit_spread_r1": 0.4187556843985323,
+  "n_automorphisms": 6,
+  "real_seed_E_min": 0.15965824381448268,
+  "real_seed_E_max": 0.15965824381449178,
+  "real_seed_spread": 9.103828801926284e-15,
+  "his_values_unreachable": [
+   0.159295,
+   0.142707,
+   0.143544,
+   0.142196,
+   0.146785
+  ],
+  "global_degeneracy": 4,
+  "global_sectors": [
+   7,
+   8
+  ],
+  "multiplet_avg_equals_chiral": 1.734723475976807e-18,
+  "E_multiplet_avg": 0.11026913715112595,
+  "orbit_spread_multiplet_avg": 8.662515149637784e-14,
+  "depth_at_multiplet_avg": 0.1364620036066419,
+  "real_state_width": 7.771561172376096e-16
+ },
+ "L1": {
+  "degeneracy_at_s1": 2,
+  "E_ground": -9.000000000000007,
+  "valley_s": 1.0,
+  "valley_E": 0.23899721494605317,
+  "E_at_zero": 0.433153873099566,
+  "degeneracy_at_valley": 2,
+  "degenerate_points_on_grid": 1,
+  "manifold_E_interval": [
+   1.2549831513118703e-16,
+   0.47140452079103196
+  ],
+  "depth_interval": [
+   -0.03825064769146597,
+   0.4331538730995659
+  ],
+  "orbit_spread_at_Emin": 0.0007519915647590802,
+  "n_automorphisms_uniform": 6,
+  "degeneracy_at_s0": 1,
+  "real_seed_E_min": 0.03232379785182346,
+  "real_seed_E_max": 0.47102475946581845,
+  "real_seed_spread": 0.43870096161399497,
+  "real_seed_depths": {
+   "min": -0.037870886366252465,
+   "max": 0.4008300752477425,
+   "mean": 0.06208785094276468,
+   "sd": 0.12370614832728274,
+   "n_negative": 18,
+   "n": 40,
+   "n_negative_400": 116,
+   "frac_400": 0.29,
+   "frac_geometric": 0.3449827508624569
+  },
+  "multiplet_avg_equals_chiral": 6.938893903907228e-17,
+  "E_multiplet_avg": 0.18856180831641267,
+  "orbit_spread_multiplet_avg": 3.885780586188048e-16,
+  "depth_at_multiplet_avg": 0.24459206478315332,
+  "real_state_width": 0.47113457420180044
+ },
+ "elapsed_s": 20.70012617111206
+}

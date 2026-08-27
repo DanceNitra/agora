@@ -25,15 +25,54 @@ def _strip_private(text: str) -> str:
 
 
 def _section(body: str, heading: str) -> str:
-    m = re.search(rf"##\s*{heading}\s*\n(.+?)(?=\n##\s|\Z)", body, re.DOTALL | re.IGNORECASE)
+    m = re.search(rf"#+\s*{re.escape(heading)}\s*\n(.+?)(?=\n#+\s|\Z)", body, re.DOTALL | re.IGNORECASE)
     return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
+
+
+#: THE SAME SECTION UNDER EIGHT NAMES. `compose_digest` matched the first spelling only, so of the
+#: 67 insight notes in the vault it accepted 9 and silently dropped 58 -- and 25 of the dropped ones
+#: carry a `Falsifier`, which is the very quality the digest advertises in its own header. The
+#: selection criterion was a heading spelling, not the presence of an insight. Measured 2026-08-17.
+_CORE_HEADINGS = ("The insight", "The claim", "What it says", "What the numbers say",
+                  "The measured result", "Measured result", "Result", "Mechanism (one line)")
+
+
+def _core_section(body: str) -> str:
+    """The insight's substance, under whichever heading this note happened to use."""
+    for h in _CORE_HEADINGS:
+        s = _section(body, h)
+        if s:
+            return s
+    return ""
+
+
+def _frontier_terms() -> set:
+    """The owner's standing priority terms, from the ONE definition the gates already use.
+
+    Returns an empty set when the board cannot be read, and every caller treats that as "do not
+    filter" rather than "nothing qualifies" -- a filter that cannot see its criterion must not be
+    able to empty the digest in silence.
+    """
+    try:
+        from agora.execution.board import priorities_text
+        from agora.execution.methods import board_priority_terms, light_stem
+        return {light_stem(t) for t in board_priority_terms(priorities_text())}
+    except Exception:                                                  # noqa: BLE001
+        return set()
+
+
+def _on_frontier(text: str, terms: set) -> bool:
+    from agora.execution.methods import light_stem
+    words = {light_stem(w.strip(".,:;()[]*_`\"'").lower()) for w in text.split()}
+    return bool(terms & words)
 
 
 def compose_digest(vault_path: str) -> dict:
     """Build the public digest from the vault's Claude-synthesized insights + the live
     track record. Deterministic — the quality is already in the insights."""
     src = Path(vault_path) / "04 Resources" / "Concepts" / "Agora Agents"
-    insights = []
+    terms = _frontier_terms()
+    insights, considered, dropped = [], 0, 0
     for p in sorted(src.rglob("insight*.md")):
         try:
             body = p.read_text(encoding="utf-8", errors="replace")
@@ -41,10 +80,19 @@ def compose_digest(vault_path: str) -> dict:
             continue
         tm = re.search(r"^title:\s*(.+)$", body[:600], re.M)
         title = (tm.group(1).strip() if tm else p.stem).removeprefix("Insight:").strip()
-        core, fals = _section(body, "The insight"), _section(body, "Falsifier")
-        if core:
-            insights.append({"title": title, "core": _strip_private(core)[:900],
-                             "falsifier": _strip_private(fals)[:400]})
+        core, fals = _core_section(body), _section(body, "Falsifier")
+        if not core:
+            continue
+        considered += 1
+        # A WIDER NET IS NOT A BETTER ONE. Accepting the eight heading spellings takes the pool from
+        # 9 to 41, but the on-frontier RATE barely moves (44% -> 46%), so volume alone would ship 22
+        # off-frontier pieces instead of 5. The heading fix and the frontier filter only work
+        # together. Measured 2026-08-17 against the live board.
+        if terms and not _on_frontier(f"{title} {core[:900]}", terms):
+            dropped += 1
+            continue
+        insights.append({"title": title, "core": _strip_private(core)[:900],
+                         "falsifier": _strip_private(fals)[:400]})
     try:
         from agora.execution.prediction_ledger import calibration
         cal = calibration()
@@ -68,7 +116,12 @@ def compose_digest(vault_path: str) -> dict:
                  "knowledge vault, the published literature, and live real-world data._")
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text("\n".join(lines), encoding="utf-8")
-    return {"path": str(OUTPUT), "insights": len(insights), "chars": OUTPUT.stat().st_size}
+    # `considered` and `off_frontier` are reported so the gated action states what it DROPPED, not
+    # only what it kept. A selection that publishes its survivors and says nothing about the cut is
+    # how "the digest ships 9" read as "the vault holds 9" for 57 days.
+    return {"path": str(OUTPUT), "insights": len(insights), "chars": OUTPUT.stat().st_size,
+            "considered": considered, "off_frontier": dropped,
+            "frontier_filter": "applied" if terms else "unavailable — board unreadable, kept all"}
 
 
 def publish_digest() -> dict:
@@ -83,11 +136,11 @@ def publish_digest() -> dict:
     def _git(*args):
         return subprocess.run(["git", "-C", str(AGORA_REPO), *args],
                               capture_output=True, text=True, timeout=60)
-    _git("add", PUBLIC_REL)
-    c = _git("commit", "-m", f"Research Exchange: public digest {time.strftime('%Y-%m-%d')}")
-    if "nothing to commit" in (c.stdout + c.stderr):
-        return {"url": PUBLIC_URL, "note": "unchanged since last publish"}
-    p = _git("push", "origin", "main")
-    if p.returncode != 0:
-        return {"error": ("push failed: " + (p.stderr or p.stdout))[:200]}
-    return {"url": PUBLIC_URL}
+    from agora.execution.public_repo import commit_and_push
+    r = commit_and_push(AGORA_REPO, [PUBLIC_REL],
+                        f"Research Exchange: public digest {time.strftime('%Y-%m-%d')}")
+    if r.get("error"):
+        return {"error": r["error"]}
+    if r.get("note"):
+        return {"url": PUBLIC_URL, "note": r["note"]}
+    return {"url": PUBLIC_URL, "sha": r["sha"]}

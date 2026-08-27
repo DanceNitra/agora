@@ -21,21 +21,36 @@ def db_path(tmp_path):
     return str(p)
 
 
-@pytest.fixture
-def schema_sql():
-    """Load the schema SQL."""
-    p = Path(__file__).parent.parent / "agora" / "storage" / "schema.sql"
-    return p.read_text(encoding="utf-8")
+# The `schema_sql` fixture lived here and is gone: nothing builds a database from schema.sql any more
+# (see the `db` fixture), and a fixture still handing out that file would be an invitation back to a
+# schema which drifted from the ORM on 20 of 23 tables and exists in no running system.
 
 
 @pytest.fixture
-async def db(db_path, schema_sql):
-    """Create a test database with schema."""
+async def db(db_path):
+    """Create a test database from the ORM MODELS — the schema production actually runs.
+
+    Was `executescript(schema_sql)`. But main.py says it outright: "schema.sql is not auto-applied at
+    runtime (ORM create_all is used)". So schema.sql is a test-only artifact, and measured 2026-08-09
+    it had DRIFTED from the models on 20 of the 23 tables they share. The one that bit: schema.sql
+    declares `trust_scores.id INTEGER PRIMARY KEY AUTOINCREMENT`, every real database has
+    `VARCHAR(36)`. TrustEngine._persist inserts `uuid.uuid4().hex` — correct against production,
+    `sqlite3.IntegrityError: datatype mismatch` against schema.sql. Six trust tests were failing
+    against a database that exists nowhere, and `tasks.id` had already been @skip-ed for the same
+    drift rather than fixed.
+
+    Building from Base.metadata makes the drift unrepresentable instead of merely corrected: there is
+    now one schema definition, and it is the one that runs.
+    """
     import aiosqlite
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from agora.storage.models import Base
+    eng = create_async_engine(f"sqlite+aiosqlite:///{db_path}")
+    async with eng.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    await eng.dispose()
     d = await aiosqlite.connect(db_path)
     d.row_factory = aiosqlite.Row
-    await d.executescript(schema_sql)
-    await d.commit()
     yield d
     await d.close()
 
@@ -57,14 +72,35 @@ async def app(db_path):
     _app.state.active_connections = []
     _app.state.tick_count = 0
     await init_db(_app)
-    return _app
+    yield _app
+    # CLOSE IT. aiosqlite runs every connection on a NON-DAEMON thread parked on `self._tx.get()`,
+    # so an unclosed connection keeps the interpreter alive after the last test. This fixture is
+    # function-scoped and opened one per test, and `return` meant none of them were ever closed:
+    # measured 2026-08-09, the suite printed "500 passed" in ~42s and then simply never exited, so
+    # every run — CI included — could only end by timeout (exit 124). Ten stuck aiosqlite threads,
+    # ten tests using this fixture. The failure looked like a hang and was a leak.
+    try:
+        if getattr(_app.state, "db", None) is not None:
+            await _app.state.db.close()
+            _app.state.db = None
+    except Exception:
+        pass
 
 
 @pytest.fixture
 async def client(app):
-    """Async HTTP client."""
+    """Async HTTP client, speaking from LOOPBACK.
+
+    `base_url="http://test"` sent `Host: test`, and `_local_only_guard` correctly 403s any non-loopback
+    Host — that middleware is the defence against a foreign page reaching the local brain. Ten API
+    tests were asserting 200 and reading 403, which looked like broken endpoints and was the fixture
+    knocking on the wrong door. The live server answers these same routes 200 all day.
+
+    Keep this a loopback host. A test that has to disable the guard to pass is testing an app we do
+    not ship.
+    """
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as c:
+    async with AsyncClient(transport=transport, base_url="http://127.0.0.1:8000") as c:
         yield c
 
 
@@ -198,7 +234,11 @@ class TestAPI:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
-        assert data["agents"] == 6  # 6 seeded agents (the current dungeon roster)
+        # Against the ROSTER ITSELF, not a magic number: this said 6 while the seeder made 8 (the
+        # roster grew to the eight agents CLAUDE.md lists, and the live brain reports 8). A literal
+        # here goes stale every time someone joins the keep, and reads as a broken endpoint.
+        from agora.agent_os.agent_os import NPC_DEFS
+        assert data["agents"] == len(NPC_DEFS)
         assert data["tick"] == 0
 
     @pytest.mark.asyncio
@@ -206,7 +246,8 @@ class TestAPI:
         resp = await client.get("/api/v1/agents/")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total"] == 6
+        from agora.agent_os.agent_os import NPC_DEFS
+        assert data["total"] == len(NPC_DEFS)
         roles = {a["role"] for a in data["agents"]}
         assert len(roles) >= 1 and all(isinstance(r, str) for r in roles)
 
@@ -260,11 +301,12 @@ class TestAPI:
         assert data["trust_score"] < initial
 
 
-@pytest.mark.skip(reason="pre-existing schema/ORM mismatch: schema.sql declares tasks.id as "
-                         "INTEGER AUTOINCREMENT but the ORM model (Base.metadata.create_all, used "
-                         "by the app) declares it String(36) uuid, so the raw-SQL inserts that rely "
-                         "on autoincrement/lastrowid fail. Reconciling task-id type across schema + "
-                         "ORM + all references is a deliberate refactor, tracked separately.")
+# UN-SKIPPED 2026-08-09. The reason above was stale AND wrong, and the wrongness was expensive: it
+# blamed schema.sql, called the fix "a deliberate refactor, tracked separately", and so read as a
+# cosmetic test-only drift. What these two tests were actually catching was a LIVE 500 —
+# `TaskResponse.id` was declared `int` while every real task id is a uuid string, so the model raised
+# on the way out and GET /api/v1/tasks/ was down on the running brain over 65,210 rows. A skip marker
+# is a claim about why something fails; when the claim is wrong it stops anyone from looking.
 class TestTasksAPI:
     @pytest.mark.asyncio
     async def test_create_task(self, client):
@@ -320,8 +362,6 @@ class TestDungeonAPI:
         assert data["status"] == "spawned"
         assert data["agent_name"] == "TestHero"
 
-    @pytest.mark.skip(reason="depends on task creation — same pre-existing tasks.id schema/ORM "
-                             "mismatch as TestTasksAPI (tracked separately).")
     @pytest.mark.asyncio
     async def test_announce_task_and_bid(self, client):
         # Need dungeon agents to bid

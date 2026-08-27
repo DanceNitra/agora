@@ -1,0 +1,127 @@
+{
+  "N": 6,
+  "total_tests": 15,
+  "valley_count": 15,
+  "results": [
+    {
+      "label": "\u968f\u673a\u6811 (seed=42)",
+      "topology": "\u968f\u673a\u6811",
+      "seed": 42,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.09448911252837049
+    },
+    {
+      "label": "\u968f\u673a\u6811 (seed=123)",
+      "topology": "\u968f\u673a\u6811",
+      "seed": 123,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.11967028389045839
+    },
+    {
+      "label": "\u968f\u673a\u6811 (seed=789)",
+      "topology": "\u968f\u673a\u6811",
+      "seed": 789,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.11967028389045786
+    },
+    {
+      "label": "\u661f\u5f62\u6811 (seed=42)",
+      "topology": "\u661f\u5f62\u6811",
+      "seed": 42,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.08053446181126299
+    },
+    {
+      "label": "\u661f\u5f62\u6811 (seed=123)",
+      "topology": "\u661f\u5f62\u6811",
+      "seed": 123,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.1365231373124719
+    },
+    {
+      "label": "\u661f\u5f62\u6811 (seed=789)",
+      "topology": "\u661f\u5f62\u6811",
+      "seed": 789,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.11509107321091491
+    },
+    {
+      "label": "\u4e8c\u53c9\u6811(h=2) (seed=42)",
+      "topology": "\u4e8c\u53c9\u6811(h=2)",
+      "seed": 42,
+      "has_valley": true,
+      "valley_s": 1.25,
+      "valley_depth": 0.11806815714006075
+    },
+    {
+      "label": "\u4e8c\u53c9\u6811(h=2) (seed=123)",
+      "topology": "\u4e8c\u53c9\u6811(h=2)",
+      "seed": 123,
+      "has_valley": true,
+      "valley_s": 1.25,
+      "valley_depth": 0.11977480220172143
+    },
+    {
+      "label": "\u4e8c\u53c9\u6811(h=2) (seed=789)",
+      "topology": "\u4e8c\u53c9\u6811(h=2)",
+      "seed": 789,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.14425463270435512
+    },
+    {
+      "label": "\u8def\u5f84\u56fe (seed=42)",
+      "topology": "\u8def\u5f84\u56fe",
+      "seed": 42,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.12313718125127096
+    },
+    {
+      "label": "\u8def\u5f84\u56fe (seed=123)",
+      "topology": "\u8def\u5f84\u56fe",
+      "seed": 123,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.12313718125127156
+    },
+    {
+      "label": "\u8def\u5f84\u56fe (seed=789)",
+      "topology": "\u8def\u5f84\u56fe",
+      "seed": 789,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.12313718125127134
+    },
+    {
+      "label": "Pr\u00fcfer\u6811 (seed=42)",
+      "topology": "Pr\u00fcfer\u6811",
+      "seed": 42,
+      "has_valley": true,
+      "valley_s": 1.0,
+      "valley_depth": 0.1453458900603839
+    },
+    {
+      "label": "Pr\u00fcfer\u6811 (seed=123)",
+      "topology": "Pr\u00fcfer\u6811",
+      "seed": 123,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.11967028389045778
+    },
+    {
+      "label": "Pr\u00fcfer\u6811 (seed=789)",
+      "topology": "Pr\u00fcfer\u6811",
+      "seed": 789,
+      "has_valley": true,
+      "valley_s": 0.25,
+      "valley_depth": 0.162868442476988
+    }
+  ]
+}

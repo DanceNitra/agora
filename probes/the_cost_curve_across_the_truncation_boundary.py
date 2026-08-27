@@ -223,6 +223,13 @@ def run_arm(arm: dict, root: str, tag: str) -> dict:
 
     idx = run_claude(cwd)
     res["index_total"] = idx["startup_total"]
+    # Persist the cache SPLIT, not only the total. The total answers "what did the index
+    # cost"; the split answers "did adding bytes past the cut invalidate the prompt cache",
+    # which is a different question and the one a re-sorting truncation policy would change.
+    # The first version of this probe computed the split and threw it away, so a later
+    # argument about cache stability could not be checked without re-running everything.
+    res["index_usage"] = idx["usage"]
+    res["baseline_usage"] = base["usage"]
     res["index_hook_bytes"] = idx["hook_stdout_bytes"]
     res["answer"] = (idx["answer"] or "")[:400]
     res["elapsed_s"] = base["elapsed_s"] + idx["elapsed_s"]

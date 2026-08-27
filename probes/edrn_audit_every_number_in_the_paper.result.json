@@ -1,0 +1,1460 @@
+{
+ "total": 242,
+ "distinct": 147,
+ "with_receipt": 241,
+ "not_derivable": 1,
+ "rows": [
+  {
+   "value": "1.000",
+   "section": "(abstract/preamble)",
+   "context": "N=15$), a contradiction edge at $(0,6)$ produces a sharp valley at $s=1.000$ with position reproducibility exact at the scan grid node across fiv",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.0874",
+   "section": "(abstract/preamble)",
+   "context": "grid node across five Lanczos seeds; the valley depth varies between $0.0874$ and $0.1045$ across the five seeds, reflecting the choice of ground",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.1045",
+   "section": "(abstract/preamble)",
+   "context": "oss five Lanczos seeds; the valley depth varies between $0.0874$ and $0.1045$ across the five seeds, reflecting the choice of ground state within",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.1000",
+   "section": "(abstract/preamble)",
+   "context": "ree ($N=15$) shows a very flat valley near $s=0.92$ with depth about $0.1000$; a random graph ($N=15$) shows no stable valley. A non-trivial coars",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "(abstract/preamble)",
+   "context": "the enhanced valley depth. Its precise height is not well defined: $s=1.000$ is an exact level crossing, so the value there depends on which stat",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "The default-observable caveat and a non-trivial control",
+   "context": "In short, $D_{\\text{default}}$ shows only a weak local maximum at $s=1.000$ in the fractal graph, one to two orders of magnitude smaller than th",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "ef{fig:l2_valley}. The scan step is $0.01$, so the valley position $s=1.000$ is resolved to $\\pm0.01$. \\begin{table}[h] \\centering \\caption{Mult",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "1.0000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "d & Valley position $s$ & Valley value & Valley depth \\\\ \\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.00",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.159295",
+   "section": "The valley at edge $(0,6)$",
+   "context": "y position $s$ & Valley value & Valley depth \\\\ \\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.1435",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.087436",
+   "section": "The valley at edge $(0,6)$",
+   "context": "$s$ & Valley value & Valley depth \\\\ \\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.1031",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "1.0000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "ue & Valley depth \\\\ \\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.00",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.142707",
+   "section": "The valley at edge $(0,6)$",
+   "context": "ey depth \\\\ \\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.1421",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.104024",
+   "section": "The valley at edge $(0,6)$",
+   "context": "\\midrule 0 & 1.0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.1045",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "1.0000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "0000 & 0.159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.00",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.143544",
+   "section": "The valley at edge $(0,6)$",
+   "context": "159295 & 0.087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.1467",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.103187",
+   "section": "The valley at edge $(0,6)$",
+   "context": "087436 \\\\ 1 & 1.0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.0999",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "1.0000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "0000 & 0.142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomr",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.142196",
+   "section": "The valley at edge $(0,6)$",
+   "context": "142707 & 0.104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomrule \\end{ta",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.104535",
+   "section": "The valley at edge $(0,6)$",
+   "context": "104024 \\\\ 2 & 1.0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomrule \\end{tabular} \\end",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "1.0000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "0000 & 0.143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomrule \\end{tabular} \\end{table} \\begi",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.146785",
+   "section": "The valley at edge $(0,6)$",
+   "context": "143544 & 0.103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomrule \\end{tabular} \\end{table} \\begin{figure}[t",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.099946",
+   "section": "The valley at edge $(0,6)$",
+   "context": "103187 \\\\ 3 & 1.0000 & 0.142196 & 0.104535 \\\\ 4 & 1.0000 & 0.146785 & 0.099946 \\\\ \\bottomrule \\end{tabular} \\end{table} \\begin{figure}[t] \\centerin",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.246731",
+   "section": "The valley at edge $(0,6)$",
+   "context": "t=\\small}, ] \\addplot[mark=none, color=red, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.24843",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.247248",
+   "section": "The valley at edge $(0,6)$",
+   "context": "addplot[mark=none, color=red, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.24775",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.247744",
+   "section": "The valley at edge $(0,6)$",
+   "context": "one, color=red, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.24561",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248177",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.23971",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248460",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.22083",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248433",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.15929",
+   "receipt": "edrn_is_the_valley_observable_well_defined.result.json"
+  },
+  {
+   "value": "0.247752",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.159295) }; \\addplot",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.245615",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.159295) }; \\addplot[mark=none, co",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.159295) }; \\addplot[mark=none, color=blue, thic",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.159295) }; \\addplot[mark=none, color=blue, thick] coordinates",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.159295",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.159295) }; \\addplot[mark=none, color=blue, thick] coordinates { (0.0,0.24673",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.246731",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".159295) }; \\addplot[mark=none, color=blue, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.24843",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.247248",
+   "section": "The valley at edge $(0,6)$",
+   "context": "ddplot[mark=none, color=blue, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.24775",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.247744",
+   "section": "The valley at edge $(0,6)$",
+   "context": "ne, color=blue, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.24561",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248177",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.23971",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248460",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.22083",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248433",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.14270",
+   "receipt": "edrn_is_the_valley_observable_well_defined.result.json"
+  },
+  {
+   "value": "0.247752",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142707) }; \\addplot",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.245615",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142707) }; \\addplot[mark=none, co",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142707) }; \\addplot[mark=none, color=green!60!b",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142707) }; \\addplot[mark=none, color=green!60!black, thick] c",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.142707",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142707) }; \\addplot[mark=none, color=green!60!black, thick] coordinates { (0",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.246731",
+   "section": "The valley at edge $(0,6)$",
+   "context": "; \\addplot[mark=none, color=green!60!black, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.24843",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.247248",
+   "section": "The valley at edge $(0,6)$",
+   "context": "k=none, color=green!60!black, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.24775",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.247744",
+   "section": "The valley at edge $(0,6)$",
+   "context": "green!60!black, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.24561",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248177",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.23971",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248460",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.22083",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248433",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.14354",
+   "receipt": "edrn_is_the_valley_observable_well_defined.result.json"
+  },
+  {
+   "value": "0.247752",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.143544) }; \\addplot",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.245615",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.143544) }; \\addplot[mark=none, co",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.143544) }; \\addplot[mark=none, color=orange, th",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.143544) }; \\addplot[mark=none, color=orange, thick] coordinat",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.143544",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.143544) }; \\addplot[mark=none, color=orange, thick] coordinates { (0.0,0.246",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.246731",
+   "section": "The valley at edge $(0,6)$",
+   "context": "43544) }; \\addplot[mark=none, color=orange, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.24843",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.247248",
+   "section": "The valley at edge $(0,6)$",
+   "context": "plot[mark=none, color=orange, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.24775",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.247744",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", color=orange, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.24561",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248177",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.23971",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248460",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.22083",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248433",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.14219",
+   "receipt": "edrn_is_the_valley_observable_well_defined.result.json"
+  },
+  {
+   "value": "0.247752",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142196) }; \\addplot",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.245615",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142196) }; \\addplot[mark=none, co",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142196) }; \\addplot[mark=none, color=purple, th",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142196) }; \\addplot[mark=none, color=purple, thick] coordinat",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.142196",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.142196) }; \\addplot[mark=none, color=purple, thick] coordinates { (0.0,0.246",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.246731",
+   "section": "The valley at edge $(0,6)$",
+   "context": "42196) }; \\addplot[mark=none, color=purple, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.24843",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.247248",
+   "section": "The valley at edge $(0,6)$",
+   "context": "plot[mark=none, color=purple, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.24775",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.247744",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", color=purple, thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.24561",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248177",
+   "section": "The valley at edge $(0,6)$",
+   "context": ", thick] coordinates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.23971",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248460",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inates { (0.0,0.246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.22083",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.248433",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".246731)(0.1,0.247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.14678",
+   "receipt": "edrn_is_the_valley_observable_well_defined.result.json"
+  },
+  {
+   "value": "0.247752",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247248)(0.2,0.247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.146785) }; \\addlege",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.245615",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".247744)(0.3,0.248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.146785) }; \\addlegendentry{Seed 0",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248177)(0.4,0.248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.146785) }; \\addlegendentry{Seed 0} \\addlegenden",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248460) (0.5,0.248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.146785) }; \\addlegendentry{Seed 0} \\addlegendentry{Seed 1} \\a",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.146785",
+   "section": "The valley at edge $(0,6)$",
+   "context": ".248433)(0.6,0.247752)(0.7,0.245615)(0.8,0.239717)(0.9,0.220838) (1.0,0.146785) }; \\addlegendentry{Seed 0} \\addlegendentry{Seed 1} \\addlegendentry{S",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "points, five seeds). All seeds locate the valley at the grid node $s=1.000$ with zero standard deviation; valley values scatter only near $s=1.0",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "The valley at edge $(0,6)$",
+   "context": "\\addplot[mark=*, color=red, thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.17",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.233217",
+   "section": "The valley at edge $(0,6)$",
+   "context": "*, color=red, thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "The valley at edge $(0,6)$",
+   "context": "thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.24",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.195225",
+   "section": "The valley at edge $(0,6)$",
+   "context": "e=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.148515",
+   "section": "The valley at edge $(0,6)$",
+   "context": "tes { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addleg",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "0.171756",
+   "section": "The valley at edge $(0,6)$",
+   "context": "9717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{Enhanc",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.212551",
+   "section": "The valley at edge $(0,6)$",
+   "context": "33217)(0.9,0.220838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{Enhanced (mean of 3",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.243000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "0838)(0.95,0.195225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{Enhanced (mean of 3 seeds)} \\end{ax",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.263279",
+   "section": "The valley at edge $(0,6)$",
+   "context": "95225) (1.0,0.148515)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{Enhanced (mean of 3 seeds)} \\end{axis} \\end{tikzp",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "it at edge $(0,6)$ ($N=15$, 21 points, three seeds). The valley at $s=1.000$ is an interior minimum: the enhanced diagnosis at $s=0.8$ is $0.2397",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.2397",
+   "section": "The valley at edge $(0,6)$",
+   "context": "=1.000$ is an interior minimum: the enhanced diagnosis at $s=0.8$ is $0.2397$, at $s=1.0$ is $0.1485$, and at $s=1.2$ is $0.2633$, all values on b",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.1485",
+   "section": "The valley at edge $(0,6)$",
+   "context": "inimum: the enhanced diagnosis at $s=0.8$ is $0.2397$, at $s=1.0$ is $0.1485$, and at $s=1.2$ is $0.2633$, all values on both sides exceeding the",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "0.2633",
+   "section": "The valley at edge $(0,6)$",
+   "context": "is at $s=0.8$ is $0.2397$, at $s=1.0$ is $0.1485$, and at $s=1.2$ is $0.2633$, all values on both sides exceeding the valley value. The valley val",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "The valley at edge $(0,6)$",
+   "context": "lues on both sides exceeding the valley value. The valley value at $s=1.000$ shown here ($0.1485$) is from an independent three-seed focused audi",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.1485",
+   "section": "The valley at edge $(0,6)$",
+   "context": "xceeding the valley value. The valley value at $s=1.000$ shown here ($0.1485$) is from an independent three-seed focused audit and differs slightl",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "0.6176",
+   "section": "Degeneracy-control experiment",
+   "context": "Measured in this sector the gap is non-zero across the entire scan: $0.6176$ at $s=0$, $0.5226$ at $s=0.5$, $0.3346$ at $s=0.76$ and $0.3231$ at",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.5226",
+   "section": "Degeneracy-control experiment",
+   "context": "ector the gap is non-zero across the entire scan: $0.6176$ at $s=0$, $0.5226$ at $s=0.5$, $0.3346$ at $s=0.76$ and $0.3231$ at $s=0.77$, decreasin",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.3346",
+   "section": "Degeneracy-control experiment",
+   "context": "zero across the entire scan: $0.6176$ at $s=0$, $0.5226$ at $s=0.5$, $0.3346$ at $s=0.76$ and $0.3231$ at $s=0.77$, decreasing monotonically to $0",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.3231",
+   "section": "Degeneracy-control experiment",
+   "context": "an: $0.6176$ at $s=0$, $0.5226$ at $s=0.5$, $0.3346$ at $s=0.76$ and $0.3231$ at $s=0.77$, decreasing monotonically to $0.0115$ at $s=0.99$. The s",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.0115",
+   "section": "Degeneracy-control experiment",
+   "context": "6$ at $s=0.76$ and $0.3231$ at $s=0.77$, decreasing monotonically to $0.0115$ at $s=0.99$. The step across $s=0.76\\to0.77$ is $0.0115$: the gap do",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.0115",
+   "section": "Degeneracy-control experiment",
+   "context": "onically to $0.0115$ at $s=0.99$. The step across $s=0.76\\to0.77$ is $0.0115$: the gap does not open at $s=0.77$, it has been open throughout and",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "-24.9675365795",
+   "section": "Degeneracy-control experiment",
+   "context": "t $s=1.00$ the ground level is exactly two-fold---two eigenvalues at $-24.9675365795$ with splitting $6\\times10^{-14}$---and the quoted $0.186$ is the",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.186",
+   "section": "Degeneracy-control experiment",
+   "context": "t $-24.9675365795$ with splitting $6\\times10^{-14}$---and the quoted $0.186$ is the gap to the next distinct level, $0.1857$. The enhanced diagno",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.1857",
+   "section": "Degeneracy-control experiment",
+   "context": "14}$---and the quoted $0.186$ is the gap to the next distinct level, $0.1857$. The enhanced diagnosis remains approximately constant for $s<0.5$,",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "Degeneracy-control experiment",
+   "context": "lly from $s=0.5$ to $s=1.0$, including the non-zero-gap region. At $s=1.000$ the seed-to-seed spread in the reported gap---some seeds near zero,",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.011549",
+   "section": "Degeneracy-control experiment",
+   "context": "rather than near-degenerate: the splitting closes as a symmetric V, $0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldot",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.001092",
+   "section": "Degeneracy-control experiment",
+   "context": "near-degenerate: the splitting closes as a symmetric V, $0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Bot",
+   "receipt": "edrn_the_size_question_needs_a_trend_test_not_a_pairwise_one.result.json"
+  },
+  {
+   "value": "0.000000",
+   "section": "Degeneracy-control experiment",
+   "context": "rate: the splitting closes as a symmetric V, $0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Both ground sta",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.001077",
+   "section": "Degeneracy-control experiment",
+   "context": "litting closes as a symmetric V, $0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Both ground states carry to",
+   "receipt": "edrn_the_size_question_needs_a_trend_test_not_a_pairwise_one.result.json"
+  },
+  {
+   "value": "0.010084",
+   "section": "Degeneracy-control experiment",
+   "context": "es as a symmetric V, $0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Both ground states carry total spin $S=",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.990",
+   "section": "Degeneracy-control experiment",
+   "context": "$0.011549$, $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Both ground states carry total spin $S=1/2$, so the two-",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.010",
+   "section": "Degeneracy-control experiment",
+   "context": ", $0.001092$, $0.000000$, $0.001077$, $0.010084$ across $s=0.990\\ldots1.010$. Both ground states carry total spin $S=1/2$, so the two-fold degene",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.618",
+   "section": "Degeneracy-control experiment",
+   "context": "rk=*, color=blue!60!black, thick, mark size=1.5pt] coordinates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.607",
+   "section": "Degeneracy-control experiment",
+   "context": "=blue!60!black, thick, mark size=1.5pt] coordinates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.595",
+   "section": "Degeneracy-control experiment",
+   "context": "ack, thick, mark size=1.5pt] coordinates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.578",
+   "section": "Degeneracy-control experiment",
+   "context": "mark size=1.5pt] coordinates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323)",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.555",
+   "section": "Degeneracy-control experiment",
+   "context": "1.5pt] coordinates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.523",
+   "section": "Degeneracy-control experiment",
+   "context": "inates { (0.0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.473",
+   "section": "Degeneracy-control experiment",
+   "context": ".0,0.618)(0.1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.397",
+   "section": "Degeneracy-control experiment",
+   "context": ".1,0.607)(0.2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.06",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.335",
+   "section": "Degeneracy-control experiment",
+   "context": "2,0.595)(0.3,0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.01",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.323",
+   "section": "Degeneracy-control experiment",
+   "context": ",0.578)(0.4,0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.18",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.286",
+   "section": "Degeneracy-control experiment",
+   "context": "0.555) (0.5,0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addle",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.219",
+   "section": "Degeneracy-control experiment",
+   "context": "0.523)(0.6,0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addlegendentry{Ga",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.145",
+   "section": "Degeneracy-control experiment",
+   "context": "0.473)(0.7,0.397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addlegendentry{Gap} \\end{axi",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.067",
+   "section": "Degeneracy-control experiment",
+   "context": ".397)(0.76,0.335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addlegendentry{Gap} \\end{axis} \\end{tikz",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.012",
+   "section": "Degeneracy-control experiment",
+   "context": ".335)(0.77,0.323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addlegendentry{Gap} \\end{axis} \\end{tikzpicture} \\ca",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.186",
+   "section": "Degeneracy-control experiment",
+   "context": ".323) (0.8,0.286)(0.85,0.219)(0.9,0.145)(0.95,0.067)(0.99,0.012) (1.0,0.186) }; \\addlegendentry{Gap} \\end{axis} \\end{tikzpicture} \\caption{Energy",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.6176",
+   "section": "Degeneracy-control experiment",
+   "context": "vel. The gap is non-zero throughout: it decreases monotonically from $0.6176$ at $s=0$ to a minimum of $0.0115$ at $s=0.99$, and the step across $",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.0115",
+   "section": "Degeneracy-control experiment",
+   "context": "t: it decreases monotonically from $0.6176$ at $s=0$ to a minimum of $0.0115$ at $s=0.99$, and the step across $s=0.76\\to0.77$ is $0.0115$ rather",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.0115",
+   "section": "Degeneracy-control experiment",
+   "context": "imum of $0.0115$ at $s=0.99$, and the step across $s=0.76\\to0.77$ is $0.0115$ rather than a discontinuity. At $s=1.00$ the ground level is exactly",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.1857",
+   "section": "Degeneracy-control experiment",
+   "context": "nd the quantity plotted there is the gap to the next distinct level, $0.1857$. All points are plotted to three decimals. The enhanced diagnosis co",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.000000",
+   "section": "Control edge $(0,1)$",
+   "context": "--shows a completely flat enhanced diagnosis over $s\\in[0,1]$: range $0.000000$, cross-seed standard deviation $1.4\\times10^{-11}$. This is based on",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.1000",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "s=1.0$; tree shows a very flat valley near $s=0.92$ with depth about $0.1000$; random graph shows no stable valley.} \\label{tab:control_graphs} \\b",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "0.0891",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "ti) & Cross-seed std.\\ of position & Stable? \\\\ \\midrule Ring & 1.0 & 0.0891 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.",
+   "receipt": "edrn_smallworld_ensemble.result.json"
+  },
+  {
+   "value": "0.0993",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "ss-seed std.\\ of position & Stable? \\\\ \\midrule Ring & 1.0 & 0.0891 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "0.0286",
+   "section": "Control graphs: ring, tree, and random",
+   "context": ".\\ of position & Stable? \\\\ \\midrule Ring & 1.0 & 0.0891 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/A & Yes (fl",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "0.000",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "ition & Stable? \\\\ \\midrule Ring & 1.0 & 0.0891 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/A & Yes (flat) \\\\ R",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.1000",
+   "section": "Control graphs: ring, tree, and random",
+   "context": ".0 & 0.0891 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/A & Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "0.1000",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "91 & 0.0993$\\pm$0.0286 & 0.000 & Yes \\\\ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/A & Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.0014$\\pm$",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "0.0026",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "t) & 0.1000 & 0.1000 & N/A & Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.0014$\\pm$0.0013 & 1.561 & No \\\\ \\bottomrule \\end{tabular} \\end{ta",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.0014",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "00 & 0.1000 & N/A & Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.0014$\\pm$0.0013 & 1.561 & No \\\\ \\bottomrule \\end{tabular} \\end{table*} Th",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.0013",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "& N/A & Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.0014$\\pm$0.0013 & 1.561 & No \\\\ \\bottomrule \\end{tabular} \\end{table*} The ring vall",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "1.561",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "Yes (flat) \\\\ Random & 1.25 (unstable) & 0.0026 & 0.0014$\\pm$0.0013 & 1.561 & No \\\\ \\bottomrule \\end{tabular} \\end{table*} The ring valley occur",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.1000",
+   "section": "Control graphs: ring, tree, and random",
+   "context": "graph edge $(0,6)$. The tree valley is very flat: its depth is about $0.1000$, but the position is not sharply resolved and is only approximately",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "1.595",
+   "section": "Local vs.\\ global correlation reorganization",
+   "context": ". The local valley depth exceeds the global depth: single-seed ratio $1.595$, multi-seed ratio $\\approx1.3$ (global depth mean $0.1097$, local de",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.1097",
+   "section": "Local vs.\\ global correlation reorganization",
+   "context": "seed ratio $1.595$, multi-seed ratio $\\approx1.3$ (global depth mean $0.1097$, local depth mean $0.1421$). This indicates that the correlation flu",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.1421",
+   "section": "Local vs.\\ global correlation reorganization",
+   "context": "eed ratio $\\approx1.3$ (global depth mean $0.1097$, local depth mean $0.1421$). This indicates that the correlation fluctuation reorganization is",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.953270",
+   "section": "Non-trivial default observable control",
+   "context": "$s$ & $D_{\\text{default}}$ & $E_{\\text{enhanced}}$ \\\\ \\midrule 0.99 & 0.953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.16045",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.164032",
+   "section": "Non-trivial default observable control",
+   "context": "text{default}}$ & $E_{\\text{enhanced}}$ \\\\ \\midrule 0.99 & 0.953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.160451 \\\\ \\botto",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.954210",
+   "section": "Non-trivial default observable control",
+   "context": "E_{\\text{enhanced}}$ \\\\ \\midrule 0.99 & 0.953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.160451 \\\\ \\bottomrule \\end{tabular}",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.159658",
+   "section": "Non-trivial default observable control",
+   "context": "hanced}}$ \\\\ \\midrule 0.99 & 0.953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.160451 \\\\ \\bottomrule \\end{tabular} \\end{table",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.940725",
+   "section": "Non-trivial default observable control",
+   "context": "le 0.99 & 0.953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.160451 \\\\ \\bottomrule \\end{tabular} \\end{table} \\begin{figure}[t",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.160451",
+   "section": "Non-trivial default observable control",
+   "context": ".953270 & 0.164032 \\\\ 1.00 & 0.954210 & 0.159658 \\\\ 1.01 & 0.940725 & 0.160451 \\\\ \\bottomrule \\end{tabular} \\end{table} \\begin{figure}[t] \\centerin",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.239717",
+   "section": "Non-trivial default observable control",
+   "context": "\\addplot[mark=*, color=red, thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.17",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.233217",
+   "section": "Non-trivial default observable control",
+   "context": "*, color=red, thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.220838",
+   "section": "Non-trivial default observable control",
+   "context": "thick, mark size=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.24",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.195225",
+   "section": "Non-trivial default observable control",
+   "context": "e=2pt] coordinates { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.159658",
+   "section": "Non-trivial default observable control",
+   "context": "tes { (0.8,0.239717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addleg",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.171756",
+   "section": "Non-trivial default observable control",
+   "context": "9717)(0.85,0.233217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{$E_{\\t",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.212551",
+   "section": "Non-trivial default observable control",
+   "context": "33217)(0.9,0.220838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{$E_{\\text{enhanced}}",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.243000",
+   "section": "Non-trivial default observable control",
+   "context": "0838)(0.95,0.195225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{$E_{\\text{enhanced}}$} \\addplot[mar",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.263279",
+   "section": "Non-trivial default observable control",
+   "context": "95225) (1.0,0.159658)(1.05,0.171756)(1.1,0.212551)(1.15,0.243000)(1.2,0.263279) }; \\addlegendentry{$E_{\\text{enhanced}}$} \\addplot[mark=square*, col",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.969147",
+   "section": "Non-trivial default observable control",
+   "context": "ot[mark=square*, color=blue, thick, mark size=2pt] coordinates { (0.8,0.969147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.93",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.965055",
+   "section": "Non-trivial default observable control",
+   "context": ", color=blue, thick, mark size=2pt] coordinates { (0.8,0.969147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.958503",
+   "section": "Non-trivial default observable control",
+   "context": "thick, mark size=2pt] coordinates { (0.8,0.969147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.94",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.945861",
+   "section": "Non-trivial default observable control",
+   "context": "e=2pt] coordinates { (0.8,0.969147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.954210",
+   "section": "Non-trivial default observable control",
+   "context": "tes { (0.8,0.969147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950362) }; \\addleg",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.937228",
+   "section": "Non-trivial default observable control",
+   "context": "9147)(0.85,0.965055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950362) }; \\addlegendentry{$D_{\\t",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.948481",
+   "section": "Non-trivial default observable control",
+   "context": "65055)(0.9,0.958503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950362) }; \\addlegendentry{$D_{\\text{default}}$",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.949271",
+   "section": "Non-trivial default observable control",
+   "context": "8503)(0.95,0.945861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950362) }; \\addlegendentry{$D_{\\text{default}}$} \\end{axis} \\e",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.950362",
+   "section": "Non-trivial default observable control",
+   "context": "45861) (1.0,0.954210)(1.05,0.937228)(1.1,0.948481)(1.15,0.949271)(1.2,0.950362) }; \\addlegendentry{$D_{\\text{default}}$} \\end{axis} \\end{tikzpicture",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "Non-trivial default observable control",
+   "context": "ller than the valley depth; its height is not well defined because $s=1.000$ is an exact level crossing.} \\label{fig:default_control} \\end{figure",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "Non-trivial default observable control",
+   "context": "fig:default_control} \\end{figure} At the enhanced valley position $s=1.000$, $D_{\\text{default}}$ exhibits a local maximum of height about $0.00",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.001",
+   "section": "Non-trivial default observable control",
+   "context": ".000$, $D_{\\text{default}}$ exhibits a local maximum of height about $0.001$ ($0.954210$ vs.\\ $0.953270$ at $s=0.99$ and $0.940725$ at $s=1.01$).",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.954210",
+   "section": "Non-trivial default observable control",
+   "context": "_{\\text{default}}$ exhibits a local maximum of height about $0.001$ ($0.954210$ vs.\\ $0.953270$ at $s=0.99$ and $0.940725$ at $s=1.01$). This local",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.953270",
+   "section": "Non-trivial default observable control",
+   "context": "}$ exhibits a local maximum of height about $0.001$ ($0.954210$ vs.\\ $0.953270$ at $s=0.99$ and $0.940725$ at $s=1.01$). This local peak is reproduc",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.940725",
+   "section": "Non-trivial default observable control",
+   "context": "of height about $0.001$ ($0.954210$ vs.\\ $0.953270$ at $s=0.99$ and $0.940725$ at $s=1.01$). This local peak is reproducible across all four seeds",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "Non-trivial default observable control",
+   "context": "m0.08$). The height itself should not be quoted to a fixed figure: $s=1.000$ is an exact level crossing, and an independent run in the same secto",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "0.956778",
+   "section": "Non-trivial default observable control",
+   "context": "uces $D_{\\text{default}}$ exactly at $s=0.99$ and $s=1.01$ but gives $0.956778$ at $s=1.00$, a prominence of $0.003509$ against $0.000940$ here. The",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.003509",
+   "section": "Non-trivial default observable control",
+   "context": "0.99$ and $s=1.01$ but gives $0.956778$ at $s=1.00$, a prominence of $0.003509$ against $0.000940$ here. The two runs agree that $s=1.000$ is a loca",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "0.000940",
+   "section": "Non-trivial default observable control",
+   "context": "but gives $0.956778$ at $s=1.00$, a prominence of $0.003509$ against $0.000940$ here. The two runs agree that $s=1.000$ is a local maximum and disag",
+   "receipt": "edrn_gap_structure_and_sector.result.json"
+  },
+  {
+   "value": "1.000",
+   "section": "Non-trivial default observable control",
+   "context": "nce of $0.003509$ against $0.000940$ here. The two runs agree that $s=1.000$ is a local maximum and disagree on its size, which is what a crossin",
+   "receipt": "edrn_two_of_the_papers_own_open_items.result.json"
+  },
+  {
+   "value": "-9.000000",
+   "section": "Independent tensor-RG verification",
+   "context": "te energies of the L1 and L2 fractal graphs: the L1 ground energy is $-9.000000$ and the L2 ground energy is $-24.967537$. A truncation-control test",
+   "receipt": "edrn_the_last_three_numbers.result.json"
+  },
+  {
+   "value": "-24.967537",
+   "section": "Independent tensor-RG verification",
+   "context": "phs: the L1 ground energy is $-9.000000$ and the L2 ground energy is $-24.967537$. A truncation-control test on the impurity-explicit RG compares two",
+   "receipt": "edrn_corrected_gap_curve.result.json"
+  },
+  {
+   "value": "0.190238",
+   "section": "Independent tensor-RG verification",
+   "context": "tion schemes against the same untruncated L2 reference (valley depth $0.190238$ on 18 bonds; untruncated block dimension 4096), with one strength gr",
+   "receipt": "edrn_the_recovery_percentages_we_published.result.json"
+  },
+  {
+   "value": "-16.921463",
+   "section": "Independent tensor-RG verification",
+   "context": "lock assembly from which L2 is built (dimension 32768, ground energy $-16.921463$, and distinct from the L1 graph above) has a four-fold degenerate gr",
+   "receipt": null
+  },
+  {
+   "value": "0.3721",
+   "section": "L1 finite-size check",
+   "context": "3)$) was audited with 101 points and five seeds. The valley depth is $0.3721\\pm0.1478$, larger than the L2 depth ($0.0874$ to $0.1045$ across the",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.1478",
+   "section": "L1 finite-size check",
+   "context": "audited with 101 points and five seeds. The valley depth is $0.3721\\pm0.1478$, larger than the L2 depth ($0.0874$ to $0.1045$ across the five seed",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.0874",
+   "section": "L1 finite-size check",
+   "context": "ds. The valley depth is $0.3721\\pm0.1478$, larger than the L2 depth ($0.0874$ to $0.1045$ across the five seeds of Table~\\ref{tab:l2_valley}). The",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.1045",
+   "section": "L1 finite-size check",
+   "context": "ey depth is $0.3721\\pm0.1478$, larger than the L2 depth ($0.0874$ to $0.1045$ across the five seeds of Table~\\ref{tab:l2_valley}). The finite-size",
+   "receipt": "edrn_table1_depth_column.result.json"
+  },
+  {
+   "value": "0.176842",
+   "section": "A small-world graph: full edge survey",
+   "context": "prule Edge & Fine range & Valley $s$ & Valley gap \\\\ \\midrule (0,1) & 0.176842 & 1.500 & 0.77--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.500",
+   "section": "A small-world graph: full edge survey",
+   "context": "& Fine range & Valley $s$ & Valley gap \\\\ \\midrule (0,1) & 0.176842 & 1.500 & 0.77--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.078783",
+   "section": "A small-world graph: full edge survey",
+   "context": "lley gap \\\\ \\midrule (0,1) & 0.176842 & 1.500 & 0.77--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.110",
+   "section": "A small-world graph: full edge survey",
+   "context": "\\midrule (0,1) & 0.176842 & 1.500 & 0.77--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8) & 0.06",
+   "receipt": "edrn_the_size_question_needs_a_trend_test_not_a_pairwise_one.result.json"
+  },
+  {
+   "value": "0.083366",
+   "section": "A small-world graph: full edge survey",
+   "context": ".500 & 0.77--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.020",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.82 \\\\ (0,9) & 0.078783 & 0.110 & 0.55--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9) & 0.11",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.065437",
+   "section": "A small-world graph: full edge survey",
+   "context": ".110 & 0.55--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.860",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.65 \\\\ (0,2) & 0.083366 & 1.020 & 0.70--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4) & 0.10",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.113332",
+   "section": "A small-world graph: full edge survey",
+   "context": ".020 & 0.70--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.310",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.78 \\\\ (0,8) & 0.065437 & 0.860 & 0.50--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.103002",
+   "section": "A small-world graph: full edge survey",
+   "context": ".860 & 0.50--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.250",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.60 \\\\ (1,9) & 0.113332 & 0.310 & 0.55--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.085229",
+   "section": "A small-world graph: full edge survey",
+   "context": ".310 & 0.55--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.720",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.65 \\\\ (1,4) & 0.103002 & 1.250 & 0.75--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.089372",
+   "section": "A small-world graph: full edge survey",
+   "context": ".250 & 0.75--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.800",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.85 \\\\ (1,8) & 0.085229 & 0.720 & 0.65--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4) & 0.07",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.085424",
+   "section": "A small-world graph: full edge survey",
+   "context": ".720 & 0.65--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.090",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.75 \\\\ (1,6) & 0.089372 & 0.800 & 0.70--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5) & 0.11",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.077994",
+   "section": "A small-world graph: full edge survey",
+   "context": ".800 & 0.70--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.940",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.80 \\\\ (2,3) & 0.085424 & 1.090 & 0.65--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4) & 0.10",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.119505",
+   "section": "A small-world graph: full edge survey",
+   "context": ".090 & 0.65--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.750",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.75 \\\\ (2,4) & 0.077994 & 0.940 & 0.60--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5) & 0.07",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.100840",
+   "section": "A small-world graph: full edge survey",
+   "context": ".940 & 0.60--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.840",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.70 \\\\ (2,5) & 0.119505 & 0.750 & 0.60--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.073179",
+   "section": "A small-world graph: full edge survey",
+   "context": ".750 & 0.60--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.980",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.70 \\\\ (3,4) & 0.100840 & 0.840 & 0.70--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.087107",
+   "section": "A small-world graph: full edge survey",
+   "context": ".840 & 0.70--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.100",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.80 \\\\ (3,5) & 0.073179 & 0.980 & 0.60--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6) & 0.08",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.089948",
+   "section": "A small-world graph: full edge survey",
+   "context": ".980 & 0.60--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.910",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.70 \\\\ (4,5) & 0.087107 & 1.100 & 0.70--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7) & 0.10",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.082213",
+   "section": "A small-world graph: full edge survey",
+   "context": ".100 & 0.70--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.080",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.80 \\\\ (4,6) & 0.089948 & 0.910 & 0.70--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8) & 0.15",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.104364",
+   "section": "A small-world graph: full edge survey",
+   "context": ".910 & 0.70--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.470",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.80 \\\\ (5,6) & 0.082213 & 1.080 & 0.65--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8) & 0.10",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.157596",
+   "section": "A small-world graph: full edge survey",
+   "context": ".080 & 0.65--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "1.380",
+   "section": "A small-world graph: full edge survey",
+   "context": "--0.75 \\\\ (6,7) & 0.104364 & 0.470 & 0.60--0.70 \\\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.85 \\\\ (7",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.107895",
+   "section": "A small-world graph: full edge survey",
+   "context": ".470 & 0.60--0.70 \\\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.85 \\\\ (7,9) & 0.081416 & 2.140 & 0.80--0.",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.000",
+   "section": "A small-world graph: full edge survey",
+   "context": "\\ (6,8) & 0.157596 & 1.380 & 0.85--0.95 \\\\ (7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.85 \\\\ (7,9) & 0.081416 & 2.140 & 0.80--0.90 \\\\ \\bottomrul",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.081416",
+   "section": "A small-world graph: full edge survey",
+   "context": "5--0.95 \\\\ (7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.85 \\\\ (7,9) & 0.081416 & 2.140 & 0.80--0.90 \\\\ \\bottomrule \\end{tabular} \\end{table} \\textb",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "2.140",
+   "section": "A small-world graph: full edge survey",
+   "context": "(7,8) & 0.107895 & \\textbf{0.000*} & 0.75--0.85 \\\\ (7,9) & 0.081416 & 2.140 & 0.80--0.90 \\\\ \\bottomrule \\end{tabular} \\end{table} \\textbf{* Edge",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.000",
+   "section": "A small-world graph: full edge survey",
+   "context": "\\textbf{* Edge $(7,8)$:} The minimum occurs at the scan boundary $s=0.000$. We cannot distinguish between a genuine valley and a boundary artif",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.001",
+   "section": "A small-world graph: full edge survey",
+   "context": "ative edges were selected for high-resolution multi-seed audit (step $0.001$, five seeds), with exact cross-seed reproducibility of valley positi",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.096864",
+   "section": "A small-world graph: full edge survey",
+   "context": "min)$; the two are close where both apply---for the tree, prominence $0.096864$ against endpoint depth $0.100030$---but they are not the same quanti",
+   "receipt": "edrn_the_size_question_needs_a_trend_test_not_a_pairwise_one.result.json"
+  },
+  {
+   "value": "0.100030",
+   "section": "A small-world graph: full edge survey",
+   "context": "h apply---for the tree, prominence $0.096864$ against endpoint depth $0.100030$---but they are not the same quantity and should not be compared acro",
+   "receipt": "the_winning_index_line_was_written_by_the_query_writer.result.json"
+  },
+  {
+   "value": "1.496",
+   "section": "A small-world graph: full edge survey",
+   "context": "graphic prominence & Cross-seed std.\\ of position \\\\ \\midrule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4)",
+   "receipt": "edrn_is_the_vanishing_gap_a_density_artifact.result.json"
+  },
+  {
+   "value": "0.124449",
+   "section": "A small-world graph: full edge survey",
+   "context": "prominence & Cross-seed std.\\ of position \\\\ \\midrule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 &",
+   "receipt": "edrn_smallworld_seed_sweep.result.json"
+  },
+  {
+   "value": "0.000000",
+   "section": "A small-world graph: full edge survey",
+   "context": "& Cross-seed std.\\ of position \\\\ \\midrule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 &",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "0.311",
+   "section": "A small-world graph: full edge survey",
+   "context": "f position \\\\ \\midrule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bott",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.008856",
+   "section": "A small-world graph: full edge survey",
+   "context": "on \\\\ \\midrule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bottomrule \\end",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.000000",
+   "section": "A small-world graph: full edge survey",
+   "context": "ule (0,1) & 1.496 & 0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bottomrule \\end{tabular} \\",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  },
+  {
+   "value": "1.251",
+   "section": "A small-world graph: full edge survey",
+   "context": "0.124449 & 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bottomrule \\end{tabular} \\end{table*}",
+   "receipt": "edrn_smallworld_exact.result.json"
+  },
+  {
+   "value": "0.061969",
+   "section": "A small-world graph: full edge survey",
+   "context": "& 0.000000 \\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bottomrule \\end{tabular} \\end{table*}",
+   "receipt": "edrn_smallworld_size_trend.result.json"
+  },
+  {
+   "value": "0.000000",
+   "section": "A small-world graph: full edge survey",
+   "context": "\\\\ (1,9) & 0.311 & 0.008856 & 0.000000 \\\\ (1,4) & 1.251 & 0.061969 & 0.000000 \\\\ \\bottomrule \\end{tabular} \\end{table*}",
+   "receipt": "cv_of_two_peaks_is_an_identity.result.json"
+  }
+ ]
+}

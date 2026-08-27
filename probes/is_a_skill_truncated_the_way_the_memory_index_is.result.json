@@ -8,8 +8,12 @@
     "NO_WORD_IN_THE_BODY_ANNOUNCES_THE_DEGRADATION": true,
     "CONTROL_a_small_listing_arrives_whole": true,
     "CONTROL_every_arm_reached_the_recorder": true,
+    "CONTROL_the_config_was_ISOLATED_our_own_skills_are_absent": true,
     "CONTROL_every_sweep_arm_planted_the_same_24000_units": true,
-    "THE_LISTING_IS_CUT_and_well_under_the_memory_index_cap": true,
+    "THE_LISTING_IS_CUT_in_the_arms_that_exceed_the_bound": true,
+    "THE_BOUND_IS_ONE_SIZE_across_every_shape": true,
+    "AND_IT_IS_THE_SAME_ORDER_AS_THE_MEMORY_INDEX_CAP_25000": true,
+    "A_KEPT_ENTRY_ARRIVES_AT_FULL_LENGTH_no_shortening_at_these_widths": true,
     "it_is_not_a_count_cap": true,
     "CONTROL_the_same_60_skills_arrive_whole_when_short": true
   },
@@ -26,16 +30,20 @@
       "name_only_entries": 0,
       "delivered_listing_units": 239,
       "notice_words_in_whole_body": {
-        "truncat": 7,
+        "truncat": 6,
         "omitted": 3,
         "not loaded": 0,
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
       "last_description_seen": "SKILLCAN-D003",
-      "wire_chars": 41968
+      "wire_chars": 16840,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 3,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "many_short",
@@ -49,16 +57,20 @@
       "name_only_entries": 0,
       "delivered_listing_units": 4799,
       "notice_words_in_whole_body": {
-        "truncat": 7,
+        "truncat": 6,
         "omitted": 3,
         "not loaded": 0,
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
       "last_description_seen": "SKILLCAN-D060",
-      "wire_chars": 46528
+      "wire_chars": 21400,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 60,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w400_n60",
@@ -66,11 +78,11 @@
       "desc_chars": 400,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 26,
+      "descriptions_on_wire": 60,
       "names_on_wire": 60,
       "bodies_on_wire": 0,
-      "name_only_entries": 34,
-      "delivered_listing_units": 10919,
+      "name_only_entries": 0,
+      "delivered_listing_units": 25199,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -78,10 +90,14 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D026",
-      "wire_chars": 49988
+      "last_description_seen": "SKILLCAN-D060",
+      "wire_chars": 41666,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 60,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w600_n40",
@@ -89,11 +105,11 @@
       "desc_chars": 600,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 18,
+      "descriptions_on_wire": 40,
       "names_on_wire": 40,
       "bodies_on_wire": 0,
-      "name_only_entries": 22,
-      "delivered_listing_units": 11159,
+      "name_only_entries": 0,
+      "delivered_listing_units": 24799,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -101,10 +117,14 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D018",
-      "wire_chars": 49964
+      "last_description_seen": "SKILLCAN-D040",
+      "wire_chars": 41400,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 40,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w800_n30",
@@ -112,11 +132,11 @@
       "desc_chars": 800,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 13,
+      "descriptions_on_wire": 30,
       "names_on_wire": 30,
       "bodies_on_wire": 0,
-      "name_only_entries": 17,
-      "delivered_listing_units": 10659,
+      "name_only_entries": 0,
+      "delivered_listing_units": 24599,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -124,10 +144,14 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D013",
-      "wire_chars": 49992
+      "last_description_seen": "SKILLCAN-D030",
+      "wire_chars": 41200,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 30,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w200_n120",
@@ -135,11 +159,11 @@
       "desc_chars": 200,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 47,
+      "descriptions_on_wire": 114,
       "names_on_wire": 120,
       "bodies_on_wire": 0,
-      "name_only_entries": 73,
-      "delivered_listing_units": 10339,
+      "name_only_entries": 6,
+      "delivered_listing_units": 25079,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -147,10 +171,14 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D047",
-      "wire_chars": 49990
+      "last_description_seen": "SKILLCAN-D114",
+      "wire_chars": 41654,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 114,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w120_n200",
@@ -158,11 +186,11 @@
       "desc_chars": 120,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 66,
+      "descriptions_on_wire": 177,
       "names_on_wire": 200,
       "bodies_on_wire": 0,
-      "name_only_entries": 134,
-      "delivered_listing_units": 9239,
+      "name_only_entries": 23,
+      "delivered_listing_units": 24779,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -170,10 +198,14 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D066",
-      "wire_chars": 49988
+      "last_description_seen": "SKILLCAN-D177",
+      "wire_chars": 41660,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 177,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     },
     {
       "arm": "w300_n80",
@@ -181,11 +213,11 @@
       "desc_chars": 300,
       "body_chars": 200,
       "planted_desc_units": 24000,
-      "descriptions_on_wire": 33,
+      "descriptions_on_wire": 78,
       "names_on_wire": 80,
       "bodies_on_wire": 0,
-      "name_only_entries": 47,
-      "delivered_listing_units": 10559,
+      "name_only_entries": 2,
+      "delivered_listing_units": 24959,
       "notice_words_in_whole_body": {
         "truncat": 6,
         "omitted": 3,
@@ -193,16 +225,17 @@
         "only part": 0,
         "more skill": 0,
         "description omitted": 0,
-        "listing": 10
+        "listing": 7
       },
-      "last_description_seen": "SKILLCAN-D033",
-      "wire_chars": 49934
+      "last_description_seen": "SKILLCAN-D078",
+      "wire_chars": 41596,
+      "OUR_OWN_SKILLS_ON_THE_WIRE": [],
+      "kept_at_full_length": 78,
+      "kept_but_SHORTENED": 0,
+      "model_declared_on_the_wire": "claude-opus-5"
     }
   ],
   "cut_arms": [
-    "w400_n60",
-    "w600_n40",
-    "w800_n30",
     "w200_n120",
     "w120_n200",
     "w300_n80"
@@ -221,8 +254,8 @@
   },
   "finding": "REPLICATION of documented behaviour: the skill listing degrades rather than truncates. Every skill NAME reaches the prompt; past a size limit the entry stops carrying its description, so the listing changes from '- name: description' to '- name' partway down with nothing marking the transition. Six fixtures each planting 24,000 UTF-16 units of descriptions at six entry widths all degrade this way; the same 60 skills keep every description at 3,600 units, so it is size and not count. The model still knows the skill exists and no longer knows what it does.",
   "delivered_range": [
-    9239,
-    11159
+    24599,
+    25199
   ],
   "notice_words_note": "counted over the WHOLE request body per arm; truncat and omitted occur in unrelated prompt text and their counts differ between cut and uncut arms, so they are reported per arm and never as one constant",
   "not_settled": [

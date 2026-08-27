@@ -1,0 +1,29 @@
+{
+  "equivocation": {
+    "same_feed": "refused: sequence 1 conflict: 'err_A' and 'err_B' both claim it",
+    "importer_1": "partial",
+    "importer_2": "partial"
+  },
+  "undeclared_lineage": {
+    "markdown": {
+      "coverage": "verified",
+      "artifacts": 2,
+      "limitation": false
+    },
+    "prompt_cache": {
+      "coverage": "unknown",
+      "artifacts": 0,
+      "limitation": true
+    },
+    "silent_store": {
+      "coverage": "verified",
+      "artifacts": 0,
+      "limitation": false
+    },
+    "vector": {
+      "coverage": "verified",
+      "artifacts": 2,
+      "limitation": false
+    }
+  }
+}

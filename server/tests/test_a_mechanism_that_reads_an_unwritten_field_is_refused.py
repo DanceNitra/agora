@@ -25,6 +25,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 TOOL = ROOT / "tools" / "mechanism_coverage.py"
 
@@ -39,11 +41,31 @@ def _load():
 
 mc = _load()
 
+# Captured before the autouse fixture replaces them. Without this the discovery tests below call the
+# fixture's stub and assert against `[]` — measuring the mock instead of the code, which is the exact
+# failure this file is about. It cost two red tests to notice, which is the cheap way to find out.
+_REAL_WRITER_STORE = mc._writer_store
+_REAL_DISCOVERED = mc._discovered
 
-def _store(tmp_path, records):
-    p = tmp_path / "store.json"
+
+def _store(tmp_path, records, name="store.json"):
+    p = tmp_path / name
     p.write_text(json.dumps(records), encoding="utf-8")
     return p
+
+
+@pytest.fixture(autouse=True)
+def _hermetic(monkeypatch):
+    """Keep the fixtures hermetic after 2026-08-09.
+
+    The gate now (a) discovers stores under ROOT and (b) always reads the deployment's writer store —
+    both deliberately outside the caller's control, which is the point. But that means a test that
+    patches STORES alone would quietly be measuring this machine's real 219k-record production corpus
+    and passing on data it never declared. Every test below therefore starts from "discovery finds
+    nothing, and the writer store IS the fixture"; the tests that exercise those two paths override it.
+    """
+    monkeypatch.setattr(mc, "_discovered", lambda declared: [])
+    monkeypatch.setattr(mc, "_writer_store", lambda: mc.STORES[0] if mc.STORES else None)
 
 
 # ------------------------------------------------------------------ must REFUSE a dead mechanism
@@ -105,6 +127,129 @@ def test_no_readable_store_is_a_refusal_not_a_pass(monkeypatch):
     monkeypatch.setattr(mc, "STORES", [Path("does") / "not" / "exist.json"])
     monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
     assert mc.main() == 1
+
+
+# ------------------------------------------------------- the writer store, which is where signing lands
+#
+# 2026-08-09. inspeximus 2.3.0 shipped `writer_key`, the MCP server was restarted with it, and a write
+# was verified ON DISK to carry `attested_key`. This gate still printed `attested_key 0 0.0000%` over
+# 215,023 records — because `STORES` was a hand-written literal of ten repo files and the store the MCP
+# server writes was not one of them. The zero was structurally guaranteed: identical whether signing
+# worked or not. These tests pin the store list's completeness, not just the counting.
+
+
+def test_the_writer_store_is_read_even_when_it_is_not_declared(tmp_path, monkeypatch):
+    """THE regression test. `attested_key` lives only in the writer store; if the gate reads around it,
+    the count is 0 and the refusal is fiction. Passing here REQUIRES that store to have been opened."""
+    declared = _store(tmp_path, [{"id": "1", "text": "a", "source": "s", "key": "k",
+                                  "good_warranted": 1.0}], "declared.json")
+    writer = _store(tmp_path, [{"id": "2", "text": "b", "source": "s", "key": "k",
+                                "attested_key": "cc" * 32, "ts": 1.0}], "writer.json")
+    monkeypatch.setattr(mc, "STORES", [declared])
+    monkeypatch.setattr(mc, "_writer_store", lambda: writer)
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    assert mc.main() == 0, "the only attested record is in the writer store; refusing means it went unread"
+
+
+def test_a_writer_store_that_cannot_be_read_is_refused(tmp_path, monkeypatch, capsys):
+    """The control, and the harder half: every DECLARED store is perfectly healthy here. A gate that
+    merely counts would report OK. Not looking where the field is written is itself the finding."""
+    healthy = _store(tmp_path, [{"id": "1", "text": "a", "source": "s", "key": "k",
+                                 "attested_key": "dd" * 32, "good_warranted": 1.0}])
+    monkeypatch.setattr(mc, "STORES", [healthy])
+    monkeypatch.setattr(mc, "_writer_store", lambda: tmp_path / "never" / "written.json")
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    assert mc.main() == 1, "coverage computed without reading the writer store is not a measurement"
+    assert "writer store was not read" in capsys.readouterr().out
+
+
+def test_an_unresolvable_writer_store_is_refused(tmp_path, monkeypatch, capsys):
+    """'I could not find where writes go' must not degrade into 'nothing to report'."""
+    monkeypatch.setattr(mc, "STORES", [_store(tmp_path, [
+        {"id": "1", "text": "a", "source": "s", "key": "k",
+         "attested_key": "ee" * 32, "good_warranted": 1.0}])])
+    monkeypatch.setattr(mc, "_writer_store", lambda: None)
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    assert mc.main() == 1
+    assert "unresolvable" in capsys.readouterr().out
+
+
+def test_freshness_is_reported_separately_from_corpus_coverage(tmp_path, monkeypatch, capsys):
+    """A corpus of legacy records can never be retro-filled, so one populated write pins coverage above
+    zero forever — and the gate would stay green straight through an outage. The recent-writes line is
+    the number that can still fall."""
+    recs = [{"id": str(i), "text": "t", "source": "s", "key": "k", "good_warranted": 1.0,
+             "ts": float(i)} for i in range(200)]
+    recs[0]["attested_key"] = "ff" * 32          # oldest record signed, nothing since
+    writer = _store(tmp_path, recs, "writer.json")
+    monkeypatch.setattr(mc, "STORES", [writer])
+    monkeypatch.setattr(mc, "_writer_store", lambda: writer)
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    assert mc.main() == 0, "the write path does exist; this line informs, it does not gate"
+    out = capsys.readouterr().out
+    assert "most recent writer-store records: 0" in out
+    assert "not reaching new writes" in out
+
+
+def test_every_new_write_only_field_gets_a_freshness_line(tmp_path, monkeypatch, capsys):
+    """The freshness denominator was applied to `attested_key` and NOT to `good_warranted`, so the
+    corpus zero for the second field read as "nothing writes this" when the truth was "every record
+    predates the writer that can". Caught in review 2026-08-09 — the defect this file is about, inside
+    the tool, one field over from where it had just been fixed. Fixing the instance is not fixing the
+    class, so this asserts the LIST, not one member of it."""
+    recs = [{"id": str(i), "text": "t", "source": "s", "key": "k",
+             "attested_key": "ee" * 32, "good_warranted": 1.0, "ts": float(i)} for i in range(10)]
+    writer = _store(tmp_path, recs, "writer.json")
+    monkeypatch.setattr(mc, "STORES", [writer])
+    monkeypatch.setattr(mc, "_writer_store", lambda: writer)
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    mc.main()
+    out = capsys.readouterr().out
+    assert mc.NEW_WRITE_ONLY, "the list is empty; this test would pass vacuously"
+    for field in mc.NEW_WRITE_ONLY:
+        assert ("%s " % field) in out and "most recent writer-store records" in out, (
+            "%s is declared new-write-only but gets no freshness line, so its corpus zero is "
+            "indistinguishable from an outage" % field)
+
+
+# ------------------------------------------------------------------- discovery, and its false positives
+def test_discovery_finds_a_store_the_literal_omits(tmp_path, monkeypatch):
+    monkeypatch.setattr(mc, "ROOT", tmp_path)
+    (tmp_path / ".inspeximus").mkdir()
+    real = tmp_path / ".inspeximus" / "coding_memory.json"
+    real.write_text("[]", encoding="utf-8")
+    assert real.resolve() in {p.resolve() for p in _REAL_DISCOVERED(set())}
+
+
+def test_a_tombstone_sidecar_is_not_a_store(tmp_path, monkeypatch):
+    """Found by running it: `.agent_memory/*.json` also matches `king.json.tombstones.json`, and the
+    first run named eight of them. A discovery pass that cries wolf eight times is one nobody reads."""
+    monkeypatch.setattr(mc, "ROOT", tmp_path)
+    (tmp_path / ".agent_memory").mkdir()
+    (tmp_path / ".agent_memory" / "king.json").write_text("[]", encoding="utf-8")
+    (tmp_path / ".agent_memory" / "king.json.tombstones.json").write_text("[]", encoding="utf-8")
+    names = {p.name for p in _REAL_DISCOVERED(set())}
+    assert "king.json" in names
+    assert "king.json.tombstones.json" not in names
+
+
+def test_an_already_declared_store_is_not_discovered_twice(tmp_path, monkeypatch):
+    """Double-counting a store would inflate every denominator and quietly weaken the percentages."""
+    monkeypatch.setattr(mc, "ROOT", tmp_path)
+    (tmp_path / ".inspeximus").mkdir()
+    p = tmp_path / ".inspeximus" / "coding_memory.json"
+    p.write_text("[]", encoding="utf-8")
+    assert _REAL_DISCOVERED({p.resolve()}) == []
+
+
+def test_this_deployment_resolves_a_writer_store_that_exists():
+    """Assert the target EXISTS and RESOLVES — the rule the tool broke. Skips where no MCP server is
+    configured (CI), because there the absence is honest rather than a stale literal."""
+    w = _REAL_WRITER_STORE()
+    if w is None:
+        import pytest as _p
+        _p.skip("no inspeximus MCP store configured on this machine")
+    assert w.exists(), f"writer store resolves to {w}, which does not exist — the gate would refuse"
 
 
 def test_it_runs_as_a_script_against_the_real_stores():

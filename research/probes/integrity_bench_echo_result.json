@@ -1,6 +1,6 @@
 {
   "task": "echo resistance",
-  "metric": "resurrection_rate (stale value asserted as current; lower=better) + clean_current_truth_rate (answer clarity); SYMMETRIC instrument (fairness fix 2026-07-11)",
+  "metric": "echo_resistance (current answer stays corrected B)",
   "results": {
     "inspeximus": {
       "system": "inspeximus",
@@ -11,7 +11,7 @@
       "errors": 0,
       "resurrection_rate": 0.0,
       "resurrection_ci95": [
-        0.0,
+        -0.0,
         0.161
       ],
       "clean_current_truth_rate": 0.9,
@@ -20,40 +20,22 @@
         0.972
       ]
     },
-    "mem0": {
-      "system": "mem0",
-      "n": 20,
-      "resurrected_A": 1,
-      "clean_current_B": 16,
-      "ambiguous_other": 3,
-      "errors": 0,
-      "resurrection_rate": 0.05,
-      "resurrection_ci95": [
-        0.009,
-        0.236
-      ],
-      "clean_current_truth_rate": 0.8,
-      "clean_ci95": [
-        0.584,
-        0.919
-      ]
-    },
-    "graphiti": {
-      "system": "graphiti",
+    "hindsight": {
+      "system": "hindsight",
       "n": 20,
       "resurrected_A": 0,
-      "clean_current_B": 11,
-      "ambiguous_other": 9,
+      "clean_current_B": 19,
+      "ambiguous_other": 1,
       "errors": 0,
       "resurrection_rate": 0.0,
       "resurrection_ci95": [
-        0.0,
+        -0.0,
         0.161
       ],
-      "clean_current_truth_rate": 0.55,
+      "clean_current_truth_rate": 0.95,
       "clean_ci95": [
-        0.342,
-        0.742
+        0.764,
+        0.991
       ]
     }
   }

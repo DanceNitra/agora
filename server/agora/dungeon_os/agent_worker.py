@@ -19,6 +19,7 @@ Each 15-min tick:
 
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -55,6 +56,21 @@ CORPORATION_FLOW = {
     },
 }
 
+
+#: How a lead's SOURCE ORGAN is described to the escalation model. The dict key is the organ
+#: label (`flywheel` = our research-loop organ, `contradiction` = the belief-tension organ,
+#: `frontier` = the vault-gap organ). The VALUE must read as provenance and must not be
+#: mistakable for a research domain -- see the comment in _escalate_lead for what happened
+#: when the bare label was passed through.
+#: What counts as an EXTERNAL anchor on a research lead: a fetchable URL or a DOI. Anything else
+#: -- most of all our own organ labels like `frontier:flywheel` -- is provenance, not a source.
+_EXTERNAL_ANCHOR = re.compile(r"https?://|\b10\.\d{4,9}/\S+")
+
+_LEAD_PROVENANCE = {
+    "flywheel": "an unresolved falsifier left open by our own research loop",
+    "contradiction": "a tension between two beliefs we have already recorded",
+    "frontier": "a structural gap found in the owner's own knowledge vault",
+}
 
 class CorporationWorker:
     """Autonomous Corporation worker — runs the full HEAD→PATA→Compound cycle.
@@ -413,9 +429,25 @@ class CorporationWorker:
         try:
             import asyncio
             from agora.execution.llm_client import call_llm
+            # PROVENANCE, NOT SUBJECT. `kind` is the SOURCE ORGAN a lead came from -- it is never the
+            # topic. Passing it raw as "KIND: flywheel" made the model read our own research-loop
+            # metaphor as a DOMAIN, and constraint 1 below then REQUIRES a concrete named anchor, so it
+            # invented one to match: "the NASA X-15 flywheel dataset", "flywheel-based energy storage",
+            # and citations to match ("Flywheel Energy Storage for High-Speed Flight (1967)",
+            # "Kumar et al. 2020, r=0.95"). Measured 2026-08-03: 20 of 21 queued Crucible candidates were
+            # mechanical-flywheel questions, 22% of the whole inbox, accelerating 5 -> 13 -> 2 over three
+            # days -- while the organ's ACTUAL open questions were about spaced repetition, interlinking
+            # and memory consolidation and mentioned no flywheel at all. The word was injected here.
+            # The novelty gate could not catch it: these are not textbook results, they are corrupted
+            # ones. Constraint 2 already bans the PREVIOUS instance of this failure by listing its output
+            # words ("phase transition", "self-organized criticality"), which treated the symptom; this
+            # treats the mechanism. Describe the provenance in words that cannot be read as a topic.
+            provenance = _LEAD_PROVENANCE.get(kind, "a lead from one of our own research organs")
             esc_prompt = (
                 "You are a Frontier Scout for an autonomous research organization. Here is a raw research lead:\n"
-                f"KIND: {kind}\nQUESTION: {prompt}\n\n"
+                f"WHERE IT CAME FROM: {provenance} -- this is provenance, NOT subject matter. The domain of "
+                f"the question is whatever the QUESTION itself is about; do not infer a topic from this line.\n"
+                f"QUESTION: {prompt}\n\n"
                 "Treat it as the SHALLOW first draft. Produce the AMBITIOUS version of the SAME underlying "
                 "question — the version that would matter 10x more if answered. HARD CONSTRAINTS:\n"
                 "1. ANCHORED: the question must name the CONCRETE system, dataset, or published literature it "
@@ -1171,27 +1203,55 @@ class CorporationWorker:
             from agora.execution.claude_inbox import add_task
             title = (quest.get("title") or "untitled idea")[:90]
             summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
-            why_refused = self._lead_saturated(title, summary)
-            if why_refused:
-                print(f"[Corp->Claude] dossier REFUSED ({why_refused}): {title[:50]}")
+            # A NON-ANSWER MUST NOT BECOME WORK. The corp packages whatever its research step
+            # returned, and when that step found nothing it returns "No real sources were provided
+            # to support any claim about ...". That is an unanswered question, not a lead. The
+            # discovery door has refused these for months; this door never asked. Measured
+            # 2026-07-31: 10 of 33 pending Claude tasks (30%) were refusals, several days old.
+            from agora.execution.grounding import is_refusal
+            if is_refusal(summary):
+                print(f"[Corp->Claude] ship-review REFUSED (research found no sources): {title[:50]}")
                 return
             why_refused = self._lead_saturated(title, summary)
             if why_refused:
-                print(f"[Corp→Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
+                print(f"[Corp->Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
                 return
             src = quest.get("research_source") or quest.get("findings_path") or ""
+            # THE CRUCIBLE REPLICATES EXTERNAL CLAIMS, so a candidate needs an EXTERNAL anchor. A
+            # frontier-seeded quest carries a LABEL ('frontier:flywheel'), not a fetchable source,
+            # and a label is not evidence that any claim exists to replicate. Measured 2026-08-04:
+            # 19 of 21 queued Crucible candidates carried SOURCE 'frontier:flywheel', and the
+            # research text under them asserted studies that do not exist -- "increasing
+            # interlinking in the Wikipedia Corpus by 10% ... retention improved by 12%, recall
+            # decreased by 3%" returns nothing on any search. The refusal guard cannot catch these:
+            # they are confident INVENTIONS, not non-answers, so `is_refusal` correctly passes them.
+            # The only two candidates carrying a real anchor (an arXiv URL and a DOI) were the only
+            # two real ones, which makes the anchor the discriminator. Route the unanchored ones to
+            # the DOSSIER door, which asks Claude to judge a lead, instead of the Crucible door,
+            # which asks him to replicate a claim that may never have been made.
+            if not _EXTERNAL_ANCHOR.search(src):
+                print(f"[Corp->Claude] ship-review has no external anchor ({src[:40]!r}) "
+                      f"-> filing as a dossier instead: {title[:50]}")
+                self._file_research_dossier(quest, ev)
+                return
             why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
             text = (
                 f"Crucible candidate: {title} || CORP-RESEARCHED, CEO/CTO approved "
                 f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f}). "
-                f"RESEARCH: {summary} WHY: {why} SOURCE: {src} "
                 f"|| Claude: judge HONESTLY whether this claim deserves the Crucible bench. If yes, "
                 f"REPLICATE it: build the smallest computational model of its mechanism via "
                 f"/brain/lab/run, record REPRODUCED|FAILED|NOT_COMPUTABLE via /brain/replication-record, "
                 f"add curation + re-render the Crucible. A potential FAILED of a famous claim is the "
                 f"highest-value outcome. If the claim is thin/unmeasurable, skip with reason."
             )
-            tid = add_task(text)
+            # title/summary/why/src derive from a paper title or a GitHub scan finding (see
+            # _process_head, which builds quest_title from paper['title'] and from the horizon
+            # scan) and from LLM output. Two sites in this file were missed by the review that
+            # found the other three — which is the argument for the chokepoint over per-site
+            # patching, not against it.
+            tid = add_task(text, untrusted=f"TITLE: {title} || RESEARCH: {summary} || WHY: {why} "
+                                           f"|| SOURCE: {src}",
+                           source="a paper or GitHub lead, via the corporation researcher")
             self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
             print(f"[Corp→Claude] filed ship-review {tid}: {title[:50]}")
         except Exception as e:
@@ -1207,17 +1267,29 @@ class CorporationWorker:
             from agora.execution.claude_inbox import add_task
             title = (quest.get("title") or "untitled idea")[:90]
             summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
+            # Same two guards as the ship-review path. This one had NEITHER: no refusal test and no
+            # saturation test, so a near-miss lead could arrive both unanswerable and duplicated.
+            from agora.execution.grounding import is_refusal
+            if is_refusal(summary):
+                print(f"[Corp->Claude] dossier REFUSED (research found no sources): {title[:50]}")
+                return
+            why_refused = self._lead_saturated(title, summary)
+            if why_refused:
+                print(f"[Corp->Claude] dossier REFUSED ({why_refused}): {title[:50]}")
+                return
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("cto_rationale") or ev.get("ceo_rationale") or "")[:200]
             text = (
-                f"Research dossier: {title} || CORP-RESEARCHED, board near-miss "
-                f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f} — not ship-approved, "
-                f"surfaced as a lead). RESEARCH: {summary} BOARD NOTE: {why} SOURCE: {src} "
+                f"Research dossier (CORP-RESEARCHED, board near-miss: CEO "
+                f"{ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f} — not ship-approved, "
+                f"surfaced as a lead). "
                 f"|| Claude: judge HONESTLY against the RAISED BAR. If it is a hard, original, testable "
                 f"question, DEVELOP it into rigorous work (Lab + falsifier, real data where possible); "
                 f"otherwise ARCHIVE with a one-line reason. Do NOT manufacture a small note from a thin lead."
             )
-            tid = add_task(text)
+            tid = add_task(text, untrusted=f"TITLE: {title} || RESEARCH: {summary} "
+                                           f"|| BOARD NOTE: {why} || SOURCE: {src}",
+                           source="a paper or GitHub lead, via the corporation researcher")
             self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
             print(f"[Corp→Claude] filed research dossier {tid}: {title[:50]}")
         except Exception as e:

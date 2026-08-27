@@ -174,9 +174,9 @@ agora/
 │   │   ├── config.py                   # App configuration
 │   │   ├── storage/
 │   │   │   ├── __init__.py
-│   │   │   ├── schema.sql              # PostgreSQL schema
-│   │   │   ├── connection.py           # DB connection management
-│   │   │   └── migrations/             # Alembic version files
+│   │   │   ├── models.py               # THE schema — SQLAlchemy models, the single source of
+│   │   │   │                           #   truth; Base.metadata.create_all builds every database
+│   │   │   └── db.py                   # engine + session, init_db()
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── agent.py               # Agent identity model

@@ -1,0 +1,46 @@
+{
+ "words": 7,
+ "indexed": 316,
+ "with_hook": 65,
+ "generated": 250,
+ "over_cap": 2,
+ "report": {
+  "current (today)": {
+   "tokens": 3063,
+   "questions": 0.3333333333333333,
+   "searchbox": 0.5083333333333333
+  },
+  "hybrid, CUT to 7": {
+   "tokens": 5764,
+   "questions": 0.575,
+   "searchbox": 0.7583333333333333
+  },
+  "hybrid, WRITTEN to 7": {
+   "tokens": 5535,
+   "questions": 0.5083333333333333,
+   "searchbox": 0.6666666666666666
+  }
+ },
+ "sample": {
+  "build-on-our-products-never-split-value-out.md": "Premature extraction from products loses value",
+  "read-every-link-the-owner-sends-in-full-before-replying.md": "Study forwarded material fully before replying.",
+  "gate-before-push-always-and-adversarial-pass-for-security-paths.md": "Gate before push, but not sufficient",
+  "a-consistency-control-cannot-see-a-shared-defect.md": "Lab-id regex copies agreed but were wrong",
+  "a-lever-that-selects-on-an-unfilled-field-reports-success.md": "Measure field coverage before trusting levers.",
+  "arxiv-author-search-is-token-and-of-not-exact.md": "Zero-result claims require positive controls.",
+  "over-credit-runs-in-both-directions.md": "Never widen roster without checking writer distribution.",
+  "measure-alternatives-before-declaring-a-dead-end.md": "Don't write off capability from one endpoint.",
+  "gate-every-number-a-check-that-cannot-fail.md": "Gate applies to fixture, not just guard.",
+  "know-before-act-preflight-general.md": "Pre-flight checks before any non-trivial action.",
+  "post-reset-loop-checklist-alpha-omega.md": "Scout scan functional, inbox backlog prevents reports",
+  "fix-the-class-not-the-instance-reaudit-always.md": "Repeated patching means the shape is wrong",
+  "verify-the-intervention-not-just-the-instrument.md": "Two-sided manipulation checks must include cardinality.",
+  "re-measure-both-ends-of-a-delta.md": "Deltas require committed instruments and re-measured baselines.",
+  "gate-on-work-counters-when-the-clock-is-noise.md": "Gate on work counters, not wall-clock.",
+  "a-guard-that-builds-its-target-by-string-mangling.md": "Assert target exists before mutating in CI.",
+  "library-upper-bound-has-a-measured-resolver-cost.md": "Prefer floors over caps for dependencies.",
+  "mutation-score-not-test-count.md": "Mutation score reveals test weakness, not count.",
+  "a-guard-with-half-recall-reports-safe.md": "Mutation testing proves guard's teeth.",
+  "test-the-remedy-your-error-message-names.md": "Untested remedy is worse than no remedy."
+ }
+}

@@ -1,0 +1,138 @@
+{
+ "n": 301,
+ "peaks": [
+  34,
+  51
+ ],
+ "is_circular_trailing_boxcar": true,
+ "boxcar_residual": 8.326672684688674e-17,
+ "step_identity_holds_everywhere": true,
+ "step_identity_max_dev": 5.328853677766254e-17,
+ "fine_0": 0.05013197779827605,
+ "neighbour_level": 0.2429967636791682,
+ "depression_of_windows_containing_it": 0.00385736044403448,
+ "a51_unchanged_by_repair": 0.0,
+ "peaks_after_repair_frozen_gate": [
+  34
+ ],
+ "peaks_after_repair_recomputed_gate": [
+  34
+ ],
+ "relocation_control": {
+  "100": {
+   "peaks": [
+    34
+   ],
+   "target": 151,
+   "companion_present": false,
+   "height_at_target_sd": -1.2381872608943802
+  },
+  "150": {
+   "peaks": [
+    34
+   ],
+   "target": 201,
+   "companion_present": false,
+   "height_at_target_sd": -0.6861878545760723
+  },
+  "200": {
+   "peaks": [
+    34
+   ],
+   "target": 251,
+   "companion_present": false,
+   "height_at_target_sd": 0.09821094112506082
+  }
+ },
+ "step_at_51": 0.001072140787085979,
+ "step_rank_of_301": 19,
+ "step_z": 1.0023965840590547,
+ "peak_heights_sd": {
+  "34": 1.856016251260834,
+  "51": 1.701382364511058
+ },
+ "height_separation_sd": 0.15463388674977607,
+ "peaks_vs_height_constant": {
+  "1.0": [
+   34,
+   51
+  ],
+  "1.25": [
+   34,
+   51
+  ],
+  "1.5": [
+   34,
+   51
+  ],
+  "1.7": [
+   34,
+   51
+  ],
+  "1.75": [
+   34
+  ],
+  "1.9": [],
+  "2.0": []
+ },
+ "non_circular_step": 0.001072140787085979,
+ "non_circular_step_identical": true,
+ "seven_curves": [
+  {
+   "L": 6,
+   "n_interior_minima": 0,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 8,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 10,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 12,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 14,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 16,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  },
+  {
+   "L": 18,
+   "n_interior_minima": 1,
+   "branch": "fallback",
+   "equals_argmin": true
+  }
+ ],
+ "seven_all_fallback": true,
+ "seven_all_equal_argmin": true,
+ "index_space": {
+  "from_smooth": [
+   13,
+   32,
+   51
+  ],
+  "true_minima": [
+   14,
+   33,
+   52
+  ]
+ }
+}

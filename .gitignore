@@ -35,6 +35,10 @@ agora-game-server/_dungeon.err
 
 # dungeon runtime state (persisted across restarts, not source)
 agora-game-server/.recent_intents.json
+# per-agent organ schedule (eid -> last fire); persisted so a restart does not re-fire the roster
+agora-game-server/.organ_state.json
+# pipeline byline rotation counter (persisted so a restart does not re-credit stage 1)
+agora-game-server/.pipeline_state.json
 
 # NOTE (updated 2026-06-20): public digests under agora_output/ stay TRACKED, but agora_output/lab/ is now
 # treated as SCRATCH and ignored. Rationale: the brain's Lab organ writes experiments there continuously and
@@ -76,6 +80,9 @@ server/*.flag
 server/.*.flag
 # database backups
 *.db.bak*
+# tools/backfill_contributor_names.py writes agora.db.backup-<timestamp> next to the
+# DB. Verified that *.db.bak* does NOT cover that name, and the file is ~262 MB.
+*.db.backup-*
 # dungeon supervisor stderr (its .log is already ignored)
 agora-game-server/_supervisor.err
 # tools runtime state + scratch lab scripts (real tools have no leading underscore)
@@ -218,3 +225,23 @@ err.log
 err2.log
 *.json.bak
 agora-game-server/_dungeon.err2
+
+# refused writes: what the swarm has already tried and been turned away on (runtime state)
+.rejected_writes.json
+
+# Run artifacts from probes/swarm_health.py. Both were tracked on the integration branch: gate.json
+# is a verdict dump that embeds an absolute path from the machine that produced it, and gate.err was
+# an empty file. Neither is referenced by any code.
+gate.json
+gate.err
+
+# Compressed log archives (tools/log_archive.py). NEVER committed: git history is permanent, and
+# a 2.4 GB pile of logs put into it cannot be taken back out without rewriting history for every
+# clone. They are backed up as GitHub RELEASE ASSETS, which live outside the object store.
+agora_output/log_archive/
+
+# a dry-run copy of the private auto-memory index -- never publish it
+probes/an_index_that_fits_the_window.candidate.md
+
+# pinned copies of the PRIVATE auto-memory index; the probes need them, the public repo must not have them
+probes/fixtures/

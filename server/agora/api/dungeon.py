@@ -19,22 +19,40 @@ import uuid
 
 # ── Dungeon Agent IDs (stable UUIDs for Trust Engine) ──
 
+# This map MUST stay a superset of `agent_os.NPC_UUIDS` — one entry per dungeon agent, or that
+# agent's work is filed under a name instead of a UUID. Rooke and Wren were missing here even
+# though they have always been in NPC_UUIDS, `dungeon_npcs` and `agent_identities`. Callers resolve
+# with `DUNGEON_AGENT_IDS.get(name) or name` (agent_os_api.py:322), so for those two the fallback
+# put the literal NAME into npc_id; `_get_npc_name()` then matched no `dungeon_npcs` row and
+# `_contribute_to_collective` stored `contributor_name = ""`.
+# Measured on the live agora.db 2026-07-31 (read-only): of 17,467 `collective_knowledge` rows,
+# 3,007 carry a blank contributor — 1,417 under "Artificer Rooke" and 1,590 under
+# "Cartographer Wren" — and their `contributor_id` holds a name where every other row holds a
+# UUID, so every join keyed on UUID silently dropped them.
+# Guarded by `server/tests/test_dungeon_agent_ids.py`.
 DUNGEON_AGENT_IDS = {
     "Shadow Kael": "00000000-0000-0000-0000-000000000001",
     "Sage Mira": "00000000-0000-0000-0000-000000000002",
     "High Priest Orin": "00000000-0000-0000-0000-000000000003",
     "King Aldric": "00000000-0000-0000-0000-000000000004",
     "Dame Elara": "00000000-0000-0000-0000-000000000005",
+    "Artificer Rooke": "00000000-0000-0000-0000-000000000006",
     "Sergeant Voss": "00000000-0000-0000-0000-000000000007",
+    "Cartographer Wren": "00000000-0000-0000-0000-000000000008",
 }
 
+# Same omission, same two agents. `_ensure_dungeon_agents_seeded` reads this map, so a missing
+# entry also seeded the agent under the generic "explorer" fallback role. The roles below match
+# `NPC_DEFS` in agent_os.py and the `role` column already stored in `dungeon_npcs`.
 DUNGEON_AGENT_ROLES = {
     "Shadow Kael": "adventurer",
     "Sage Mira": "scout",
     "High Priest Orin": "sage",
     "King Aldric": "blacksmith",
     "Dame Elara": "alchemist",
+    "Artificer Rooke": "artificer",
     "Sergeant Voss": "guard",
+    "Cartographer Wren": "cartographer",
 }
 
 _DUNGEON_SEEDED = False

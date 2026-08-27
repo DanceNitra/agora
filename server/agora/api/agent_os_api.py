@@ -217,12 +217,23 @@ def _garbage_finding(title: str, content: str):
     # doubled single one — the old check missed mixed nesting. Also reject a doubled prefix in the body.
     if sum(tl.count(p) for p in _PREFIXES) >= 2 or any(cl.count(p) >= 2 for p in _PREFIXES):
         return "nested quest prefix"
-    body = cl.split("source:")[0].strip()
+    # Cut the TRAILING citation block before measuring substance -- and only that. An unanchored
+    # split on "source:" also cuts at an inline parenthetical, which is where a note declares its
+    # provenance in the very first line. Measured 2026-07-31: Shadow Kael's scout verdict opens
+    # "SCOUT FIT - owner/repo#333 (source: github-scan)" and then runs eleven more lines carrying
+    # VERDICT, MEASURED, a lab id, the board match, the vault citations and the reachability audit.
+    # The flat split measured that note at 34 characters and the gate refused it as "too short".
+    # His organ was returning ok DECISIVE with a lab id and being dropped at the door every cycle.
+    body = re.split(r"(?im)^[ \t]*sources?[ \t]*:", cl)[0].strip()
     if len(body) < 50:
         return "too short"
     if body.strip(". ") == tl.strip(". "):               # content merely restates the title
         return "content restates title (no real finding)"
-    if _REFUSAL_AT_SOURCE.search(c):
+    # ONE DEFINITION (2026-07-31). The private pattern below required a source noun IMMEDIATELY
+    # after "no", so "No REAL sources were provided" -- the exact wording the corp emits -- walked
+    # past it. Measured on the live inbox: of ten refusals, this caught one.
+    from agora.execution.grounding import is_refusal as _is_refusal
+    if _is_refusal(c) or _REFUSAL_AT_SOURCE.search(c):
         return "refusal / non-finding (no source supports the claim)"
     if len(body) < 80 and _TRIVIAL_COPULA.match(body) and not _SIG_MARK.search(body):
         return "low significance (bare definitional fact, no measured/comparative claim)"
@@ -244,6 +255,7 @@ async def add_collective(request: Request):
                 _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
             elif g.startswith("low significance"):
                 _PROMOTE_STATS["src_trivial"] = _PROMOTE_STATS.get("src_trivial", 0) + 1
+            _record_rejection(body.get("npc", ""), body.get("title", ""), str(g))
             return {"status": "rejected", "reason": g}
         # LAB-FIRST gate (2026-06-19, flag AGORA_REQUIRE_LAB): a 'discovery' must be backed by a REAL
         # Lab experiment (a reproducible measured result), not a paraphrase. Require a lab_id that
@@ -251,12 +263,23 @@ async def add_collective(request: Request):
         # literature) at the write chokepoint. Reversible: unset the flag.
         import os as _os
         if _os.environ.get("AGORA_REQUIRE_LAB", "0") == "1":
-            import re as _re, json as _json
+            import json as _json
             from pathlib import Path as _Pth
-            _mlab = _re.search(r"[Ll]ab[ _]?(?:id[ =:]*)?([0-9a-f]{6})\b", body["content"] or "")
+            # ONE DETECTOR, and this one had teeth. The private regex here was
+            # `[Ll]ab[ _]?(?:id[ =:]*)?([0-9a-f]{6})` -- after "Lab" it allowed a space or an
+            # underscore and NOT a colon. `_run_organ` appends the receipt as `Lab: <id>`, so the
+            # chokepoint could not read the format the dispatcher itself writes, and REJECTED every
+            # organ result whose lab id arrived that way with "LAB-FIRST: discovery has no
+            # reproducible Lab result". Measured 2026-08-01: Sage Mira's canon ruling, grounded by a
+            # real lab, refused at the door for a colon.
+            #
+            # The two regexes were each blind to what the other saw -- this one caught `lab_id=<id>`
+            # and missed `Lab: <id>`; the shared one did the reverse. Both forms are now in
+            # `grounding.lab_id`, which is the only copy left.
+            from agora.execution.grounding import lab_id as _lab_of
+            _lid = _lab_of(body["content"] or "")
             _ok_lab = False
-            if _mlab:
-                _lid = _mlab.group(1)
+            if _lid:
                 for _ledger in (".lab.json", ".methods.json"):
                     try:
                         _items = _json.load(open(_Pth(__file__).resolve().parents[2] / _ledger, encoding="utf-8"))
@@ -267,6 +290,7 @@ async def add_collective(request: Request):
                         pass
             if not _ok_lab:
                 _PROMOTE_STATS["src_no_lab"] = _PROMOTE_STATS.get("src_no_lab", 0) + 1
+                _record_rejection(body.get("npc", ""), body.get("title", ""), str("LAB-FIRST: discovery has no reproducible Lab result (lab_id)"))
                 return {"status": "rejected", "reason": "LAB-FIRST: discovery has no reproducible Lab result (lab_id)"}
         # NOVELTY GATE AT THE SOURCE: if this finding lexically near-duplicates a note the vault
         # already has, don't store it — it would only clog the promotion funnel and be deduped later
@@ -279,6 +303,7 @@ async def add_collective(request: Request):
                 import asyncio as _a
                 if await _a.to_thread(_w._find_duplicate, body["title"], body["content"]):
                     _PROMOTE_STATS["src_deduped"] = _PROMOTE_STATS.get("src_deduped", 0) + 1
+                    _record_rejection(body.get("npc", ""), body.get("title", ""), str("vault already covers this (source dedup)"))
                     return {"status": "rejected", "reason": "vault already covers this (source dedup)"}
             except Exception:
                 pass
@@ -300,6 +325,7 @@ async def add_collective(request: Request):
                     _ex = _tokens((_r["title"] or "") + " " + _claim(_r["content"] or ""))
                     if _ex and _containment(_newtok, _ex) >= 0.6:
                         _PROMOTE_STATS["src_stream_dup"] = _PROMOTE_STATS.get("src_stream_dup", 0) + 1
+                        _record_rejection(body.get("npc", ""), body.get("title", ""), str("near-duplicate of a recent finding (stream dedup)"))
                         return {"status": "rejected", "reason": "near-duplicate of a recent finding (stream dedup)"}
         except Exception:
             pass
@@ -318,6 +344,7 @@ async def add_collective(request: Request):
     from agora.execution.non_finding import is_non_finding
     if is_non_finding(body.get("title"), body.get("content")):
         _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
+        _record_rejection(body.get("npc", ""), body.get("title", ""), str("not a finding — a refusal / no-fit statement"))
         return {"status": "rejected", "reason": "not a finding — a refusal / no-fit statement"}
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
@@ -350,7 +377,12 @@ async def write_vault_note(request: Request):
     path = await writer.write_note(
         title=title, content=content,
         tags=body.get("tags") or ["agora", "consolidation"],
-        agent_name=body.get("agent") or "Sage Mira")
+        # THE SAME LITERAL, ONE DOOR OVER (fixed 2026-07-31). `promote_findings` hardcoded
+        # agent_name="Sage Mira" and made every agent's productivity unmeasurable; this default did the
+        # quieter version of it. The live caller that relies on it is telegram_bot.py, which posts notes
+        # the OWNER chose to keep -- those are not Mira's work, and attributing them to her inflates the
+        # one agent whose apparent output was already an artifact. An unattributed note should say so.
+        agent_name=body.get("agent") or "Agora (unattributed)")
     # Compounding Flywheel: when an INSIGHT or HYPOTHESIS lands, register its falsifier as an open
     # research question so the agents go test the weak point — outputs become the next inputs.
     if {"insight", "hypothesis"} & set(body.get("tags") or []):
@@ -368,10 +400,21 @@ _PROMOTED: set = set()   # finding titles already promoted to the vault (avoid d
 _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for the research-ROI metric
 
 
+from pathlib import Path as _Path
+import time as _time
 import re as _grade_re
+# The lab-id branch was `lab[:_ ]?[0-9a-f]{6}` -- ONE optional character after "lab". The organ
+# dispatcher appends its receipt as "Lab: <id>", which is two (colon and space), so this pattern
+# could not read the format our own code writes. Measured 2026-08-01: Sage Mira's canon ruling,
+# carrying lab 8e5669, MEASURED: and VERDICT:, scored ungrounded here AND was refused at the
+# LAB-FIRST door, by two separate copies of this same too-narrow expression.
 _G_MEASURED = _grade_re.compile(
-    r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
-_G_CITE = _grade_re.compile(r"10\.\d{4,9}/|arxiv[:\s]*\d{4}\.\d|\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", _grade_re.I)
+    r"MEASURED:|VERDICT:|\blab[:=_\s-]*(?:id\s*)?[:=#]?\s*[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
+# Citation detection DELEGATES to the one shared definition (2026-07-31). The regex that used to sit
+# here accepted only the parenthetical author-year form and rejected the narrative one, so a finding
+# citing "Breznau et al. (2022)" was graded LOW for having no external citation while holding one.
+# Six such detectors existed across the repo and disagreed on 8 of 9 forms. See execution/grounding.py.
+from agora.execution import grounding as _grounding  # noqa: E402
 _G_FALS = _grade_re.compile(r"falsif|would (?:refute|disprove|be wrong)|refuted if", _grade_re.I)
 
 
@@ -380,7 +423,7 @@ def _evidence_grade(content: str):
     vault is honest about confidence per note. HIGH = a measured result + (citation or falsifier);
     MODERATE = one of those; LOW = grounded but no measured result or external citation."""
     c = content or ""
-    meas, cite, fals = bool(_G_MEASURED.search(c)), bool(_G_CITE.search(c)), bool(_G_FALS.search(c))
+    meas, cite, fals = bool(_G_MEASURED.search(c)), _grounding.is_cited(c), bool(_G_FALS.search(c))
     if meas and (cite or fals):
         return "HIGH", "measured result with a citation/falsifier"
     if meas or cite:
@@ -454,9 +497,51 @@ async def promote_findings(request: Request, n: int = 16):
     writer = getattr(request.app.state, "vault_writer", None)
     if not writer:
         return {"status": "no-writer", "promoted": 0}
+    # ATTRIBUTION FIX (2026-07-31): this SELECT did not even read contributor_name, and the
+    # write_note() call below hardcoded agent_name="Sage Mira" — so EVERY finding promoted into the
+    # owner's vault carried `author: Sage Mira` in its frontmatter (vault_writer.write_note:96)
+    # regardless of which agent produced it. A vault-side count read "Mira 32 notes, five agents
+    # zero": it was counting a string literal, not the agents. Measured on the live DB the same
+    # 150-row window carries 7 distinct contributor_name values — King Aldric 42, Sergeant Voss 23,
+    # High Priest Orin 20, Dame Elara 19, Sage Mira 18, blank 17, Shadow Kael 11 — plus two MORE
+    # agents hiding inside those blanks (see below), so seven agents' work was credited to an
+    # eighth and per-agent productivity was unmeasurable. Same pattern as
+    # /brain/verify-findings below, which already selects and uses contributor_name.
+    _UNATTRIBUTED = "Agora (unattributed)"   # named sentinel — never an empty `author:` frontmatter
+    # A blank contributor_name is usually RECOVERABLE, so the sentinel must be the last resort, not
+    # the first. Measured: all 1,417 blank-name discovery rows are Cartographer Wren (726) and
+    # Artificer Rooke (691), and for those rows contributor_id holds their literal display name.
+    # Root cause is upstream, in api/dungeon.py: DUNGEON_AGENT_IDS maps only 6 of the 8 agents (no
+    # Rooke, no Wren), so POST /brain/collective falls through to the raw name and the name lookup
+    # then misses. We therefore resolve against dungeon_npcs — the authoritative 8-agent roster —
+    # and NOT against DUNGEON_AGENT_IDS/UUID_TO_NAME, which is the very map that lost these two.
+    # Without this, the sentinel would bury exactly the two agents whose output we cannot currently
+    # see, and _PROMOTE_STATS would report an attribution gap that is actually resolvable.
+    _npc_by_id: dict = {}
+    _npc_names: set = set()
+    try:
+        _nc = await db.execute("SELECT npc_id, npc_name FROM dungeon_npcs")
+        for _n in await _nc.fetchall():
+            _nid, _nnm = (_n["npc_id"] or "").strip(), (_n["npc_name"] or "").strip()
+            if _nid and _nnm:
+                _npc_by_id[_nid] = _nnm
+                _npc_names.add(_nnm)
+    except Exception:
+        pass          # fail-soft: no roster -> only truly unresolvable rows hit the sentinel
+
+    def _author_of(row) -> str:
+        """The agent that actually produced this finding, or '' if genuinely unknowable.
+        contributor_id is accepted as a name ONLY if it matches the real roster, so a stray id can
+        never be promoted into an author."""
+        nm = (row["contributor_name"] or "").strip()
+        if nm:
+            return nm
+        cid = (row["contributor_id"] or "").strip()
+        return _npc_by_id.get(cid) or (cid if cid in _npc_names else "")
+
     cur = await db.execute(
-        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
-        "ORDER BY created_at DESC LIMIT 150")
+        "SELECT title, content, contributor_name, contributor_id FROM collective_knowledge "
+        "WHERE knowledge_type='discovery' ORDER BY created_at DESC LIMIT 150")
     rows = await cur.fetchall()
     import re as _re
     # A vault note must carry a real finding — not a quest PLAN, not a NEGATIVE admission, not a
@@ -479,6 +564,7 @@ async def promote_findings(request: Request, n: int = 16):
     for r in rows:
         title = (r["title"] or "").strip()
         content = (r["content"] or "").strip()
+        author = _author_of(r)              # carried through scoring to the vault note's `author:`
         tl = title.lower()
         # GROUNDED = a real citation ("Source:") OR a Lab-measured result (MEASURED:/VERDICT:) — the
         # latter is grounded by its own measurement, not a paper, and was previously rejected outright
@@ -500,7 +586,7 @@ async def promote_findings(request: Request, n: int = 16):
         if any(_containment(_ct, pt) >= 0.6 for pt in _acc_toks):  # NEW findings — drop near-duplicates of ones
             continue                                       # already accepted this run (containment >= 0.6)
         _acc_toks.append(_ct)
-        cands.append((title, content))
+        cands.append((title, content, author))
         if len(cands) >= 40:                              # wider funnel — more gems reach the vault
             break
 
@@ -524,7 +610,8 @@ async def promote_findings(request: Request, n: int = 16):
         if si:
             try:
                 from agora.execution.semantic_index import _embed_batch
-                cvecs = _embed_batch([(t + " " + c)[:300] for t, c in cands])  # ONE batched embed call
+                # unchanged embedding input — the author rides along in the tuple, it is NOT embedded
+                cvecs = _embed_batch([(t + " " + c)[:300] for t, c, _a in cands])  # ONE batched embed call
                 V = si.vecs
                 for i, cv in enumerate(cvecs):
                     if not cv:
@@ -536,17 +623,21 @@ async def promote_findings(request: Request, n: int = 16):
             except Exception:
                 pass
         scored = []
-        for i, (t, c) in enumerate(cands):
+        for i, (t, c, a) in enumerate(cands):
             spec = 0.3 if _re.search(r"\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", c) else 0.0
-            scored.append((conns[i] + spec, t, c))
+            scored.append((conns[i] + spec, t, c, a))   # author carried, NOT part of the score
         return sorted(scored, key=lambda x: -x[0])
     import asyncio
     ranked = await asyncio.to_thread(_score_all)
 
     # 3) promote the top-valued candidates that pass the quality gate
     promoted, checked, deduped = [], 0, 0
+    # Per-run attribution breakdown — the number that used to be unmeasurable. Same denominator as
+    # `promoted` (promotions attempted that raised no exception); the writer's own near-duplicate
+    # dedup can still skip the file, so read this as "notes credited", not "files created".
+    by_author: dict = {}
     import asyncio as _asyncio
-    for _v, title, content in ranked:
+    for _v, title, content, author in ranked:
         if len(promoted) >= n:
             break
         checked += 1
@@ -587,10 +678,19 @@ async def promote_findings(request: Request, n: int = 16):
             graded = (f"> **Evidence grade: {_g}** — {_gwhy}. (Grades the strength of the evidence, "
                       f"not the claim's importance.)\n\n"
                       + (f"> ⚠ Credibility: {_caveat}\n\n" if _lowcred else "") + content)
+            # Credit the agent that actually produced the finding. Only a row we could NOT resolve
+            # (neither a contributor_name nor a roster-valid contributor_id) gets the sentinel — it
+            # must never write an empty `author:` and must never be silently handed to another
+            # agent. Both counters ride in the /brain/pulse JSON under p["promote"] (they are not
+            # rendered in the Telegram pulse text, which prints only promoted/checked).
+            _author = author or _UNATTRIBUTED
             await writer.write_note(title=title[:70], content=graded,
-                                    tags=_tags, agent_name="Sage Mira")
+                                    tags=_tags, agent_name=_author)
             _PROMOTED.add(title)                      # definitive: landed in the vault
             promoted.append(title[:50])
+            by_author[_author] = by_author.get(_author, 0) + 1
+            if not author:
+                _PROMOTE_STATS["unattributed"] = _PROMOTE_STATS.get("unattributed", 0) + 1
         except Exception as _we:
             # transient (do NOT burn the title — retry next run), and SAY so instead of hiding it
             print(f"[promote] write_note failed for '{title[:60]}': {type(_we).__name__}: {_we}")
@@ -598,7 +698,7 @@ async def promote_findings(request: Request, n: int = 16):
     _PROMOTE_STATS["promoted"] += len(promoted)
     _PROMOTE_STATS["checked"] += checked
     return {"status": "ok", "promoted": len(promoted), "checked": checked,
-            "deduped": deduped, "titles": promoted}
+            "deduped": deduped, "titles": promoted, "by_author": by_author}
 
 
 @router.get("/brain/web-scout")
@@ -781,18 +881,137 @@ async def brain_directions(request: Request, n: int = 14):
     from agora.execution.harvest import synthesize_directions
     d = await synthesize_directions(findings)
     global _DIRECTIONS
-    _DIRECTIONS = {**d, "ts": time.time()}
-    return {"status": "ok", **d}
+    # AN EMPTY HARVEST MUST NOT ERASE THE SUPPLY IT FAILED TO REFILL. This assigned unconditionally,
+    # so one failed LLM call replaced the stored directions with nothing -- and `current_directions`
+    # serves `frontier + _DIRECTIONS["directions"]`, so the harvested half of the swarm's research
+    # supply vanished until some later call happened to succeed. Measured 2026-07-31 during an
+    # account-wide Ollama Cloud outage ("you have reached your weekly usage limit", 429 on cheap,
+    # main and reasoning alike): the harvest returned 0 themes and 0 directions from 14 real
+    # findings, and the stored half was empty while 19 durable frontier directions carried the swarm
+    # alone. A refill that fails should leave the tank where it was, and say so.
+    if d.get("directions") or d.get("themes"):
+        _DIRECTIONS = {**d, "ts": time.time()}
+        return {"status": "ok", **d}
+    kept = _DIRECTIONS.get("directions") or []
+    return {"status": "ok", **d, "harvest_empty": True, "kept_previous": len(kept),
+            "note": "the harvest produced nothing (the model tier is likely down); the %d stored "
+                    "direction(s) were KEPT rather than overwritten" % len(kept)}
+
+
+_DIR_COVER_CACHE: dict = {"ts": 0.0, "cov": {}}
+_DIR_COVER_TTL = 600.0            # the vault moves in minutes, not seconds; 8 agents poll this endpoint
+
+
+async def _direction_coverage(_writer, titles: list) -> dict:
+    """Which directions has the swarm already tried and been REFUSED on? {title: True/False}.
+
+    TWO EARLIER VERSIONS OF THIS MEASURED THE WRONG THING, and both reported ZERO covered on a system
+    refusing 76% of writes:
+      1. `_containment` against collective_knowledge -- but a refused finding is never written there,
+         so the evidence of exhaustion is precisely what is missing from that table;
+      2. `writer._find_duplicate` against the vault -- but a direction is a QUESTION and the vault
+         holds ANSWERS, so a direction title matches nothing by construction.
+
+    The evidence lives in the REJECTIONS, which is why they had to start being recorded at all. A
+    direction is exhausted when findings derived from it keep being turned away. Matched by the same
+    `_containment >= 0.6` the stream-dedup gate uses, so the two answers cannot drift.
+    """
+    from agora.execution.finding_diversity import _containment, _tokens
+    import time as _t
+    now = _t.time()
+    if _DIR_COVER_CACHE["cov"] and now - _DIR_COVER_CACHE["ts"] < _DIR_COVER_TTL:
+        return _DIR_COVER_CACHE["cov"]
+    refused = [_tokens(t) for t in _rejected_titles() if t]
+    out = {}
+    for t in titles:
+        tt = _tokens(t or "")
+        out[t] = bool(tt) and sum(1 for r in refused if r and _containment(tt, r) >= 0.6) >= 2
+    _DIR_COVER_CACHE.update(ts=now, cov=out)
+    return out
+
+
+# ── REJECTION LEDGER ─────────────────────────────────────────────────────────────────────────────
+# The brain refused a write and FORGOT it. Only counters were kept (_PROMOTE_STATS["src_*"]), never
+# the title, so nothing downstream could learn what had already been tried. That is why the 19
+# research directions re-seeded forever: a direction is a QUESTION, the vault holds the ANSWER, so
+# checking a direction's title against the vault finds nothing -- and the findings that WOULD prove
+# it exhausted were rejected, therefore absent from collective_knowledge too. The evidence lived
+# only in a dungeon log line. Measured 2026-07-31: 67 write attempts in ten minutes, 51 refused as
+# "vault already covers this", across 10 distinct titles, repeating for as long as anyone had looked.
+_REJECTED_FILE = _Path(__file__).resolve().parents[3] / ".rejected_writes.json"
+_REJECTED_CAP = 400
+
+
+def _record_rejection(npc: str, title: str, reason: str) -> None:
+    """Append a refused write. Never raises: losing the ledger must not fail the request."""
+    try:
+        import json as _j
+        try:
+            items = _j.loads(_REJECTED_FILE.read_text(encoding="utf-8"))
+            if not isinstance(items, list):
+                items = []
+        except Exception:
+            items = []
+        items.append({"npc": (npc or "")[:40], "title": (title or "")[:120],
+                      "reason": (reason or "")[:90], "ts": _time.time()})
+        _REJECTED_FILE.write_text(_j.dumps(items[-_REJECTED_CAP:]), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _rejected_titles(max_age_h: float = 168.0) -> list:
+    """Titles refused recently -- what the swarm has already tried and been turned away on."""
+    try:
+        import json as _j
+        items = _j.loads(_REJECTED_FILE.read_text(encoding="utf-8"))
+        cut = _time.time() - max_age_h * 3600.0
+        return [x.get("title", "") for x in items if float(x.get("ts", 0) or 0) >= cut]
+    except Exception:
+        return []
 
 
 @router.get("/brain/directions/current")
-async def current_directions():
+async def current_directions(request: Request):
     """The latest harvested directions — agents pull these to pursue them (closing the loop). Durable
     FRONTIER directions are merged FIRST so the swarm reliably quests on the template-backed frontier
-    questions (the swarm's _renewable_quests interleaves + dedups these, so it rotates through them)."""
+    questions (the swarm's _renewable_quests interleaves + dedups these, so it rotates through them).
+
+    COVERED DIRECTIONS ARE WITHHELD (2026-07-31). This list is described in frontier_harvest.py as "the
+    ONLY RENEWABLE source of research themes", and it did not renew: a direction record carries only
+    {kind, title, why} — no timestamp, no status — and no endpoint has ever existed to mark one
+    researched (unlike the flywheel, which has mark-deepened). So the same 19 re-seeded forever while the
+    vault grew around them. Measured on the live system once `_brain_contribute` stopped reporting
+    rejections as landings: of 67 write attempts in ten minutes, 51 (76%) were refused as "vault already
+    covers this", across only 10 distinct titles. The agents were not idle and not wrong; they were
+    honestly researching questions the vault had already answered, and being refused at the door.
+
+    Coverage is judged by the SAME `_containment >= 0.6` the write path rejects duplicates with, so a
+    direction is withheld exactly when the finding it would produce would be refused. Deriving it a
+    second way would let the two answers drift, which is the defect this repo keeps finding.
+
+    SOFT BY DESIGN: if every direction is covered, the least-covered ones are served anyway. A research
+    supply that can empty itself is worse than a repetitive one, and starvation must be visible rather
+    than silent — the response says how many were withheld and why.
+    """
     frontier = _load_frontier_directions()
-    return {"directions": frontier + _DIRECTIONS.get("directions", []),
-            "themes": _DIRECTIONS.get("themes", [])}
+    all_ds = frontier + _DIRECTIONS.get("directions", [])
+    try:
+        writer = getattr(request.app.state, "vault_writer", None)
+        if writer is None:
+            raise RuntimeError("no vault writer; cannot judge coverage with the write path's own check")
+        cov = await _direction_coverage(writer, [d.get("title", "") for d in all_ds])
+    except Exception as e:                                   # never take the supply down over a metric
+        return {"directions": all_ds, "themes": _DIRECTIONS.get("themes", []),
+                "coverage_error": "%s: %s" % (type(e).__name__, str(e)[:90])}
+    fresh = [d for d in all_ds if not cov.get(d.get("title", ""))]
+    withheld = len(all_ds) - len(fresh)
+    if not fresh and all_ds:                                 # everything covered -> serve the thinnest
+        all_ds = sorted(all_ds, key=lambda d: bool(cov.get(d.get("title", ""))))
+        fresh, withheld = all_ds[:3], len(all_ds) - 3
+    return {"directions": fresh, "themes": _DIRECTIONS.get("themes", []),
+            "withheld_as_covered": withheld, "offered": len(fresh),
+            "note": ("%d direction(s) withheld: the vault already covers them by the same containment "
+                     "bar the write path uses" % withheld) if withheld else ""}
 
 
 _LAST_UPGRADES: list = []   # the last self-upgrade proposals (numbered) — pick one by replying its number
@@ -1000,6 +1219,81 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+def _outreach_destination_provenance(repo: str, issue_no: int) -> tuple[bool, str]:
+    """Where did this destination come from? -> (backed by a record, which record).
+
+    IT REPORTS, IT DOES NOT REFUSE — and that reversal is the finding, not a softening.
+
+    WHY THIS EXISTS. The Scout files its leads into the Claude inbox with the instruction
+    "POST /brain/correspondent/draft {title, body, repo, issue_number}" -- parameters left FREE,
+    unlike the envoy and harvest paths, which hardcode repo and issue from the record they came
+    from. The lead text is a stranger's GitHub issue title and body. So an injection inside a lead
+    could name a destination the Scout never surfaced, and the outreach would be composed, proposed
+    and (on one `approve`) posted there under our GitHub identity.
+
+    The inbox envelope (add_task's `untrusted=`) makes that harder to say; this makes it impossible
+    to act on. A destination is allowed only when we can point at the record that put it in front of
+    us:
+
+      * a lead the Scout actually found and filed in .scout_box.json, or
+      * a thread we already hold a correspondence record for (replying into our own thread), or
+      * a thread the Scout has RULED ON in .scout.json -- which is how a thread we engaged with by
+        hand is still recognised. The first version of this guard missed that store and refused
+        deepseek-ai/DeepSeek-V3#1466, a thread carrying 47 of our own comments, because those went
+        out through tools/send_approved.py rather than the correspondent. A guard that blocks the
+        conversation we are actually having is worse than the redirect it prevents, or
+      * no thread at all -- a new issue on our own public repo, which is the pre-existing default.
+
+    The first version REFUSED anything outside those records, and testing it against reality killed
+    that design: deepseek-ai/DeepSeek-V3#1466 came back unknown -- a thread carrying 47 of our own
+    comments -- because we found and joined it by hand, outside the Scout pipeline. So did
+    llm-errata, edrn, hermes and the Guanghao thread. Every collaboration that actually matters was
+    hand-initiated, so a refusal would have blocked exactly those and left the automated leads
+    working. That is the same shape as a sender check that locks the owner out of his own control
+    plane.
+
+    The real gate is the owner's approval, and the injection risk was never that he cannot see the
+    destination -- it is that an unremarkable line does not make him LOOK. So an unrecorded
+    destination is proposed with a loud warning naming it. That cannot cause an outage and an
+    injection cannot make itself quiet, which a refusal-based version bought at the price of
+    blocking our real work.
+
+    Errs toward "known" when a store cannot be read: a momentarily unreadable JSON file must not
+    turn every proposal into a false alarm, or the warning stops being read.
+    """
+    if not repo or not issue_no:
+        return True, "new issue on our own repo"
+    try:
+        from agora.execution.scout import box_load
+        for x in box_load() or []:
+            if (x.get("repo") or "").strip().lower() == repo.lower() \
+                    and int(x.get("issue_number") or 0) == issue_no:
+                return True, "a lead the Scout filed"
+    except Exception:
+        # unreadable store: do not turn a guard into a false alarm on every proposal
+        return True, "unverified (scout box unreadable)"
+    try:
+        from agora.execution.correspondent import _load as _corr_load
+        for c in _corr_load() or []:
+            if (c.get("target_repo") or "").strip().lower() == repo.lower() \
+                    and int(c.get("target_issue") or 0) == issue_no:
+                return True, "an existing correspondence of ours"
+    except Exception:
+        return True, "unverified (correspondence store unreadable)"
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        p = _P(__file__).resolve().parents[2] / ".scout.json"
+        if p.exists():
+            for r in _json.loads(p.read_text(encoding="utf-8")) or []:
+                if (r.get("repo") or "").strip().lower() == repo.lower() \
+                        and int(r.get("issue") or 0) == issue_no:
+                    return True, "a lead the Scout has ruled on"
+    except Exception:
+        return True, "unverified (scout ledger unreadable)"
+    return False, "no record"
+
+
 @router.post("/brain/correspondent/draft")
 async def brain_correspondent_draft(request: Request):
     """THE CORRESPONDENT — store Claude's composed outreach and propose the GATED action.
@@ -1013,17 +1307,29 @@ async def brain_correspondent_draft(request: Request):
     if any(x.get("kind") == "outreach" for x in pending_approvals()):
         return {"status": "already_pending"}
     repo, issue_no = (b.get("repo") or "").strip(), int(b.get("issue_number") or 0)
+    known, provenance = _outreach_destination_provenance(repo, issue_no)
     rec = save_draft(title, body, repo, issue_no)
     nov = novelty_report(body, exclude_id=rec["id"])     # catch templated repetition BEFORE it posts
     where = f"comment on {repo}#{issue_no}" if repo and issue_no else "new public GitHub issue"
     act = propose_action("outreach", f"Post public outreach ({where}): {title[:60]}",
                          body[:300], {"corr_id": rec["id"]})
     nov_line = format_novelty(nov)
+    # An unrecorded destination is named LOUDLY rather than refused. The Scout files its leads with
+    # "POST /brain/correspondent/draft {title, body, repo, issue_number}" and those parameters are
+    # free, while the lead text is a stranger's issue body — so an injection could name a thread the
+    # Scout never surfaced. The owner's approval is the gate; the risk was that an unremarkable
+    # destination line does not make him look at it.
+    dest_line = ("" if known else
+                 f"⚠️ DESTINATION NOT FROM ANY RECORD: `{repo}#{issue_no}`. Neither the Scout box, "
+                 f"the scout ledger nor our correspondences know this thread — check it is the one "
+                 f"you mean before approving.\n")
     await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: {where}\n"
-                         f"*{title[:80]}*\n_{body[:180]}…_\n"
+                         + dest_line
+                         + f"*{title[:80]}*\n_{body[:180]}…_\n"
                          + (nov_line + "\n" if nov_line else "")
                          + f"Reply `approve {act['id']}` or `reject {act['id']}`.")
-    return {"status": "proposed", "draft": rec, "action": act, "novelty": nov}
+    return {"status": "proposed", "draft": rec, "action": act, "novelty": nov,
+            "destination_known": known, "destination_provenance": provenance}
 
 
 @router.post("/brain/correspondent/harvest")
@@ -1032,16 +1338,18 @@ async def brain_correspondent_harvest(request: Request):
     import asyncio as _aio
     from agora.execution.correspondent import harvest_replies
     fresh = await _aio.to_thread(harvest_replies)
-    from agora.execution.input_shield import wrap_as_data
     for c in fresh[:3]:
         from agora.execution.claude_inbox import add_task
-        safe = wrap_as_data(f"GitHub user {c['by']}", c["text"])
+        # Was the ONE site that called wrap_as_data directly. It now goes through the same
+        # `untrusted=` parameter as every other caller, so there is one way to do this rather than
+        # a convention three of four callers did not follow.
         add_task(f"Correspondence reply by {c['by']} on '{c['title'][:50]}' "
-                 f"(corr {c['corr_id']}, thread {c['repo']}#{c['issue']}). {safe}\n"
+                 f"(corr {c['corr_id']}, thread {c['repo']}#{c['issue']}).\n"
                  f"If (and only if) a substantive reply is warranted, draft one back into the "
                  f"SAME thread via POST /brain/correspondent/draft "
                  f"{{title, body, repo: '{c['repo']}', issue_number: {c['issue']}}} — "
-                 f"gated by owner approval, never automatic.")
+                 f"gated by owner approval, never automatic.",
+                 untrusted=c["text"], source=f"GitHub user {c['by']}")
     return {"status": "ok", "new_replies": len(fresh)}
 
 
@@ -1206,8 +1514,24 @@ async def brain_metabolism():
 async def brain_oracle_scan():
     """THE ORACLE — open, liquid, in-domain prediction markets worth an independent call."""
     import asyncio as _aio
-    from agora.execution.oracle import fetch_candidates
-    return {"status": "ok", "candidates": await _aio.to_thread(fetch_candidates)}
+    from agora.execution.oracle import fetch_candidates, fetch_candidates_manifold
+    # FALL BACK TO A REACHABLE BOOK. Measured 2026-08-01 across five prediction-market APIs from this
+    # machine: Polymarket is behind a DNS content filter (Whalebone serves its block page), while
+    # Manifold and Kalshi both answer 200 from the same interpreter. The Oracle had been dead for a
+    # month on the one blocked source, reporting an empty candidate list that read as "no market is
+    # worth a call".
+    #
+    # THE SOURCE TRAVELS WITH THE CANDIDATE, and it must keep travelling: Manifold is PLAY MONEY, so
+    # a Brier record built against it is calibration against a softer crowd than Polymarket's
+    # real-money one. Informative, but not the same claim, and never to be quoted as if it were.
+    cands = await _aio.to_thread(fetch_candidates)
+    src = "polymarket"
+    if not cands:
+        cands = await _aio.to_thread(fetch_candidates_manifold)
+        src = "manifold" if cands else "none"
+    return {"status": "ok", "candidates": cands, "source": src,
+            "caveat": ("manifold is play-money: calibration against it is a weaker claim than "
+                       "against a real-money book" if src == "manifold" else None)}
 
 
 @router.post("/brain/oracle/call")
@@ -1217,16 +1541,27 @@ async def brain_oracle_call(request: Request):
     b = await request.json()
     return {"status": "ok", **record_call(
         b.get("market_id") or "", b.get("question") or "", float(b.get("market_prob", 0.5)),
-        b.get("ends") or "", float(b.get("agora_prob", 0.5)), b.get("reasoning") or "")}
+        b.get("ends") or "", float(b.get("agora_prob", 0.5)), b.get("reasoning") or "",
+        # which book priced it; the ledger keeps it so no Brier number is ever quoted without it
+        source=(b.get("source") or "polymarket"))}
 
 
 @router.post("/brain/oracle/resolve")
 async def brain_oracle_resolve(request: Request):
     """Score open positions whose markets have resolved — Brier vs hard reality, vs the market."""
     import asyncio as _aio
-    from agora.execution.oracle import resolve_open, scorecard
+    from agora.execution.oracle import resolve_open, scorecard, LAST_RESOLVE_DIAG
     resolved = await _aio.to_thread(resolve_open)
-    return {"status": "ok", "resolved": resolved, **scorecard()}
+    # SAY WHY NOTHING SCORED. `resolved: 0` used to cover an unreachable API, a changed response
+    # shape and a market that has simply not closed yet, all three identically. Measured 2026-08-01:
+    # 7 overdue positions, every one failing TLS verification, reported as an empty queue.
+    # `**scorecard()` also carries a "resolved" key -- the LIFETIME int -- which silently shadows the
+    # list of positions resolved by THIS call. King Aldric's organ documents the shadowing and works
+    # around it by snapshotting /brain/oracle either side of the call and diffing. The list is now
+    # also returned under a name nothing overwrites; `resolved` keeps its current meaning so that
+    # workaround, and anything else reading it, is untouched.
+    return {"status": "ok", "resolved": resolved, "resolved_now": resolved,
+            "diagnostic": dict(LAST_RESOLVE_DIAG), **scorecard()}
 
 
 @router.get("/brain/oracle")
@@ -1365,8 +1700,25 @@ async def brain_board_decide(request: Request):
 
 @router.get("/brain/board")
 async def brain_board():
+    """The owner's standing priorities, plus the ON-PRIORITY TERMS derived from them.
+
+    `priority_terms` is published so nothing downstream has to re-derive it. The board text carries
+    POLARITY -- it ends with "Finance/health/physics are ONLY test-beds, never the headline.
+    Deprioritize generic meta-science, politics, cloud/trivia" -- and a naive tokenizer turns the
+    words of that refusal into the whitelist. `methods._BOARD_STOP` strips them, and the brain's Lab
+    door has been using it since it was measured. The dungeon's own quest gate kept a SECOND,
+    smaller stop-list that never got the fix, so the two doors disagreed: measured 2026-07-31, all
+    five themes the owner explicitly deprioritized (politics, generic meta-science, cloud trivia,
+    finance, physics) passed the dungeon gate, each on the very word he used to exclude it.
+
+    One definition, served over the bridge that already exists. A consumer that cannot reach this
+    field is expected to fall back and say so, not to grow a third copy of the list.
+    """
     from agora.execution.board import format_board, priorities_text
-    return {"status": "ok", "report": format_board(), "priorities": priorities_text()}
+    from agora.execution.methods import board_priority_terms
+    text = priorities_text()
+    return {"status": "ok", "report": format_board(), "priorities": text,
+            "priority_terms": sorted(board_priority_terms(text))}
 
 
 @router.post("/brain/annals/today")
@@ -1444,22 +1796,19 @@ async def brain_crucible_synthesis():
             "n_findings": len(gather_findings()), "proposals": _load(_STORE, [])[-5:]}
 
 
-@router.post("/brain/crucible-synthesis/run")
-async def brain_crucible_synthesis_run(request: Request):
-    """Queue a grand-synthesis task for Claude (the organ gathers the rigorous corpus; Claude
-    produces the unifying thesis — cross-finding synthesis is Claude's job, not a cheap LLM call)."""
-    import asyncio as _aio
-    from agora.execution.synthesis import queue_synthesis
-    return await _aio.to_thread(queue_synthesis)
-
-
-@router.post("/brain/crucible-synthesis/record")
-async def brain_crucible_synthesis_record(request: Request):
-    """Claude writes the synthesized thesis back to the organ's ledger."""
-    from agora.execution.synthesis import record_thesis
-    b = await request.json()
-    return record_thesis(b.get("thesis") or "", b.get("rests_on") or [], b.get("why") or "",
-                         b.get("falsifier") or "", b.get("honest", True), b.get("note_path") or "")
+# REMOVED 2026-08-06: `/brain/crucible-synthesis/run` and `/brain/crucible-synthesis/record`.
+#
+# Measured that day: across the whole live tree, NOTHING called either one. `/run` existed to queue a
+# synthesis task, `/record` to receive the thesis afterwards — a coherent pair with no first mover, so
+# the write path had never executed. A route with no client is not neutral: it reports a capability the
+# system does not have, and it read as "the synthesis organ is wired" in every audit of the swarm's
+# write path, which is exactly the audit that spent five days looking for a defect that was an absence.
+#
+# The GET above SURVIVES deliberately. It is a read surface over `.synthesis.json`, which holds five
+# real theses — including the Consolidation-Gate Coupling and Adaptation–Corruption Separation laws.
+# Deleting a reader because its writer was never wired would orphan real content, which is a different
+# error from the one being fixed here. Synthesis is produced through the standing gate by Claude and
+# recorded there; if a first mover is ever built, restore these two from this commit.
 
 
 @router.get("/brain/methods")
@@ -1534,8 +1883,11 @@ async def brain_contradictions():
 async def brain_contradictions_status(request: Request):
     from agora.execution.contradictions import set_status
     b = await request.json()
-    set_status(b.get("id") or "", b.get("status") or "open")
-    return {"status": "ok"}
+    # REPORT WHETHER IT MATCHED. This returned {"status":"ok"} unconditionally, so a write against a
+    # stale id read as success while the record stayed open -- the caller's own comment says it had
+    # to re-read the open set to find out. `evidence` carries the Lab id that decided the ruling.
+    hit = set_status(b.get("id") or "", b.get("status") or "open", b.get("evidence") or "")
+    return {"status": "ok" if hit else "not_found", "matched": bool(hit)}
 
 
 @router.get("/brain/desk")
@@ -1636,6 +1988,25 @@ async def brain_canon_inputs():
     return {"status": "ok", **gather_canon_inputs(vault)}
 
 
+@router.post("/brain/canon-ruling")
+async def brain_canon_ruling(request: Request):
+    """Ledger one canon curation decision: merged | rejected | retired.
+
+    The Canon is the organ CLAUDE.md calls Sage Mira's PRIMARY, and it was the only one writing no
+    ledger at all -- Rooke has `.replications.json`, Voss `.bounty.json`, Kael `.scout_box.json`. A
+    ruling that eight artifacts were held out for want of a receipt, or that the statement of belief
+    is at capacity and owes a written merge, existed only as prose. A curation decision nobody can
+    query is, to every instrument in this repo, a decision that did not happen.
+    """
+    from agora.execution.canon import record_ruling
+    b = await request.json()
+    rec = record_ruling(b.get("verdict") or "", b.get("summary") or "",
+                        b.get("by") or b.get("agent") or "Sage Mira",
+                        evidence=b.get("evidence") or "",
+                        held_out=b.get("held_out") or 0, escalated=b.get("escalated") or 0)
+    return {"status": "recorded" if rec else "invalid", "record": rec}
+
+
 @router.post("/brain/canon-write")
 async def brain_canon_write(request: Request):
     """Replace the Canon with the merged text (history lives in git)."""
@@ -1646,7 +2017,13 @@ async def brain_canon_write(request: Request):
     content = (b.get("content") or "").strip()
     if len(content) < 200:
         return {"status": "too_short"}
-    return {"status": "written", "path": write_canon(vault, content)}
+    # 200 is an absolute floor and cannot see the document it would replace; write_canon adds the
+    # relative one. `force` is explicit so a deliberate shrink stays possible and a truncated model
+    # reply does not silently become the Canon.
+    r = write_canon(vault, content, force=bool(b.get("force")))
+    if isinstance(r, dict) and r.get("error"):
+        return {"status": "refused", "error": r["error"]}
+    return {"status": "written", "path": r}
 
 
 @router.get("/brain/canon")
@@ -1682,8 +2059,14 @@ async def brain_belief_revise(request: Request):
     res = stamp_belief(b.get("path") or "", b.get("verdict") or "",
                        b.get("by_note") or "", b.get("reason") or "")
     if not res.get("error"):
+        # CARRY THE RECEIPT INTO THE LEDGER. The bounty record held {verdict, kill, target, by, ts}
+        # and nothing else, so a "survived" asserted that a belief had been attacked while keeping no
+        # trace of WHAT it survived -- indistinguishable from a challenge that could never have killed
+        # anything. `reason` is what the caller already sends to stamp the note; a challenger that ran
+        # a falsifier passes its lab id in `evidence`.
         record_challenge(b.get("verdict") or "", Path(b.get("path") or "").stem,
-                         b.get("challenger") or "Sergeant Voss")
+                         b.get("challenger") or "Sergeant Voss",
+                         evidence=(b.get("evidence") or b.get("reason") or ""))
         if (b.get("verdict") or "").lower() in ("revised", "retired"):
             from agora.execution.graveyard import bury
             bury(Path(b.get("path") or "").stem, b.get("reason") or "challenge succeeded",
@@ -1751,9 +2134,18 @@ async def brain_graveyard():
 
 @router.get("/brain/replication-target")
 async def brain_replication_target(request: Request):
-    """THE REPLICATION UNIT — the next sourced claim awaiting a minimal computational re-run."""
-    from agora.execution.replication import pick_target
-    return {"status": "ok", "target": await pick_target(request.app.state.db)}
+    """THE REPLICATION UNIT — the next sourced claims awaiting a minimal computational re-run.
+
+    `targets` is the walkable list; `target` stays as its head so existing callers keep working. A
+    caller with its OWN gate MUST walk `targets`: Rooke's instrument set decides what he can honestly
+    model, and with a single head an untestable claim wedged him permanently — measured 2026-07-31,
+    four consecutive calls returned the same empirical claim he had correctly refused, and he produced
+    zero discoveries in the preceding five days. Identical to the wording on belief-challenge-target,
+    whose comment records that head-only cost that sweep 42 days.
+    """
+    from agora.execution.replication import pick_targets
+    ts = await pick_targets(request.app.state.db, n=8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts}
 
 
 @router.post("/brain/replication-record")
@@ -1763,7 +2155,10 @@ async def brain_replication_record(request: Request):
     b = await request.json()
     r = record(b.get("claim") or "", b.get("source") or "", b.get("outcome") or "",
                b.get("lab_id") or "", b.get("note") or "",
-               by_construction_checked=bool(b.get("by_construction_checked")))
+               by_construction_checked=bool(b.get("by_construction_checked")),
+               # CARRY THE REPLICATOR THROUGH. The Crucible is a public credibility ledger and every
+               # entry in it was anonymous; the acceptance gate reading it correctly found nobody.
+               by=(b.get("by") or b.get("agent") or b.get("challenger") or ""))
     gated = bool(r and r.get("auto_gated"))
     return {"status": "ok" if r else "invalid", "record": r,
             "gated": gated,
@@ -1961,8 +2356,18 @@ async def brain_scout_box():
     """
     from agora.execution.scout import box_load, box_stats
     items = box_load()
+    # A LEAD THE SCOUT HAS ALREADY RULED IS NOT AWAITING TRIAGE. `status` stays `open` on a fit by
+    # design -- the owner's approval gate owns it from there -- but a selector that keeps offering it
+    # hands the same lead back every cycle. Measured 2026-07-31: Shadow Kael re-ruled
+    # fmind-ai/fgentic#333 on four consecutive cycles, each with a fresh Lab run, and every resulting
+    # contribution was refused at the vault door as a duplicate of the one before. Same shape as the
+    # cartography backlog re-offering its oldest eight, and as belief-challenge-target before it was
+    # made walkable: a selector must not hand out work that has already been done.
+    unruled = [x for x in items if x.get("status") == "open" and not x.get("verdict")]
     return {"status": "ok", "stats": box_stats(),
-            "open": [x for x in items if x.get("status") == "open"][-40:]}
+            "open": unruled[-40:],
+            "ruled_open": sum(1 for x in items
+                              if x.get("status") == "open" and x.get("verdict"))}
 
 
 @router.post("/brain/scout/box/add")
@@ -1991,6 +2396,19 @@ async def brain_scout_box_mark(request: Request):
     return {"status": "ok" if ok else "not_found", "stats": box_stats()}
 
 
+@router.post("/brain/scout/box/rule")
+async def brain_scout_box_rule(request: Request):
+    """Record the Scout's ruling on a lead (drafted | no_fit) WITHOUT closing it.
+
+    Separate from `/box/mark` on purpose: `status` is where the gated pipeline stands and a real fit
+    stays `open` until the owner approves, while `verdict` is the decision the Scout already made.
+    """
+    from agora.execution.scout import box_rule, box_stats
+    b = await request.json()
+    ok = box_rule(b.get("url") or "", b.get("verdict") or "", b.get("by") or "")
+    return {"status": "ok" if ok else "not_found", "stats": box_stats()}
+
+
 @router.get("/brain/scout/box/take")
 async def brain_scout_box_take(kind: str = "contribute", n: int = 1):
     """Hand out the top `n` open leads for triage, highest score first.
@@ -2000,10 +2418,31 @@ async def brain_scout_box_take(kind: str = "contribute", n: int = 1):
     pointless; promoting them as separate inbox tasks would flood the inbox instead. One task carrying
     several leads is the shape that matches the work.
     """
-    from agora.execution.scout import box_stats, box_take
-    leads = [x for x in (box_take(kind) for _ in range(max(1, min(int(n), 10)))) if x]
+    from agora.execution.scout import box_stats, box_mark, box_take, thread_is_open
+    want = max(1, min(int(n), 10))
+    leads: list = []
+    dropped: list = []
+    # RE-CHECK THE STATE HERE, not only at discovery. `is:issue is:open` in the search query was true
+    # when the lead was FOUND; the box then holds it for up to 8 days, and this endpoint is the moment
+    # a human is handed the work. Measured 2026-08-26: of the 22 leads then reachable by a human (11
+    # sitting in the box, 11 already promoted into two inbox tasks) 5 were on threads that had since
+    # closed, four of them within 48 hours. `thread_is_open` returns None when it cannot tell, and
+    # None is KEPT -- a network blip must never silently delete real work, because a lead dropped is
+    # indistinguishable to the reader from a lead never found.
+    for _ in range(want * 3):                      # top up, so a closed lead does not shrink the batch
+        if len(leads) >= want:
+            break
+        x = box_take(kind)
+        if not x:
+            break
+        if thread_is_open(x) is False:
+            box_mark(x.get("url") or "", "closed_upstream")
+            dropped.append({"url": x.get("url"), "repo": x.get("repo"),
+                            "issue_number": x.get("issue_number")})
+            continue
+        leads.append(x)
     return {"status": "ok", "leads": leads, "lead": leads[0] if leads else None,
-            "stats": box_stats()}
+            "dropped_closed_upstream": dropped, "stats": box_stats()}
 
 
 @router.get("/brain/scout")
@@ -2052,7 +2491,9 @@ async def brain_scout_status():
                "ts": x.get("ts", 0), "iso": _iso(x.get("ts", 0))} for x in items[-12:][::-1]]
     cur_theme = _THEMES[int(_t.time() // 3600) % len(_THEMES)]
     try:
-        target = await _aio.to_thread(find_opportunity)
+        # tries=1: a status read may not pay for discovery. Walking every theme here turned
+        # this endpoint into five GitHub searches and hung it past any sane timeout.
+        target = await _aio.to_thread(find_opportunity, None, 1)
     except Exception as e:
         target = {"error": str(e)[:120]}
     # DISCOVERY, measured where discovery actually lands: the box. `last_scan*` keeps its old name and
@@ -2135,12 +2576,19 @@ async def brain_press_draft(request: Request):
 
 @router.get("/brain/press-target")
 async def brain_press_target():
-    """The strongest unpublished artifact awaiting a press draft."""
+    """Unpublished artifacts awaiting a press draft, best first.
+
+    `target` is the head and stays for existing callers. `targets` is the list, because the consumer
+    applies four further gates after receiving a candidate and terminated its whole arm on the first
+    refusal -- one candidate offered, four ways to reject it.
+    """
     import asyncio as _aio
     from agora.config import settings
-    from agora.execution.press import pick_target
+    from agora.execution.press import pick_targets
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    return {"status": "ok", "target": await _aio.to_thread(pick_target, vault)}
+    ts = await _aio.to_thread(pick_targets, vault, 8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts,
+            "with_falsifier": sum(1 for t in ts if t.get("has_falsifier"))}
 
 
 @router.get("/brain/press")
@@ -2319,9 +2767,20 @@ async def brain_library_record(request: Request):
 
 
 @router.get("/brain/library")
-async def brain_library():
+async def brain_library(n: int = 40):
+    """The reading log. `papers` is NEWEST-FIRST and deep enough to choose from.
+
+    It used to be `_load()[-12:]` — the INSERTION-ORDER tail, which is not the newest and is not
+    anything else in particular. Measured 2026-08-08: of the 12 it served, NINE were a stale
+    2026-07-03 block (image synthesis, Reeb orbits, an Ising model) while 205 papers were stored and
+    161 on-mission ones sat queued unread. The dungeon's paper bucket reads this endpoint and takes
+    the first six, so the swarm's only EXTERNAL anchor was six month-old off-mission titles, of which
+    the board gate then passed exactly one. The supply was never missing; it was unreachable.
+    """
     from agora.execution.library import format_library, _load
-    return {"status": "ok", "report": format_library(), "papers": _load()[-12:]}
+    papers = sorted(_load(), key=lambda p: float(p.get("ts") or 0), reverse=True)
+    return {"status": "ok", "report": format_library(),
+            "papers": papers[:max(1, min(200, n))]}
 
 
 @router.get("/brain/experiments")
@@ -2618,7 +3077,12 @@ async def brain_predict_record(request: Request):
     return {"status": "ok", **record_prediction(
         b.get("theme", ""), b.get("metric", "hackernews_stories"), int(b.get("baseline", 0)),
         b.get("direction", "FLAT"), float(b.get("confidence", 0.6)), b.get("why", ""),
-        int(b.get("horizon_days", 14)))}
+        int(b.get("horizon_days", 14)),
+        # SIGN THE FORECAST. The record carries a `by` field and this endpoint never filled it, so
+        # every forecast an ORGAN made was banked under the default. Measured 2026-08-01: 4 resolved
+        # records -- all of them `correct` -- carry no author at all, decisive outcomes belonging to
+        # nobody, and King Aldric's own calls would have joined them.
+        by=(b.get("by") or b.get("agent") or "claude"))}
 
 
 @router.get("/brain/program/start")
@@ -2818,7 +3282,7 @@ async def _send_telegram(text: str) -> bool:
     import asyncio
     import json
     import os
-    import subprocess
+    import urllib.request
     from agora.execution.claude_inbox import feed_append
     feed_append(text)                               # so Claude Code reads the same feed the user sees
     token, chat = os.getenv("HERMES_TELEGRAM_BOT_TOKEN", ""), os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
@@ -2826,13 +3290,25 @@ async def _send_telegram(text: str) -> bool:
         return False
 
     def _s():
-        payload = json.dumps({"chat_id": chat, "text": text[:4000], "parse_mode": "Markdown"})
-        r = subprocess.run(
-            ["curl", "-s", "--max-time", "12", "-X", "POST",
-             f"https://api.telegram.org/bot{token}/sendMessage",
-             "-H", "Content-Type: application/json", "-d", payload],
-            capture_output=True, text=True, timeout=15)
-        return '"ok":true' in (r.stdout or "")
+        # urllib, not a curl subprocess: keeps the bot token out of the process argument list, where
+        # `ps` (or Get-CimInstance Win32_Process on Windows) hands it to any local process without
+        # elevation. Whoever holds the token can read the owner's whole control-plane chat via
+        # getUpdates and send messages that look like ours. real_action_engine.py:139 was fixed for
+        # this in 2026-07 and carried the comment; this call site and hermes.py kept the defect
+        # because the fix was applied to the instance and not to the class.
+        payload = json.dumps({"chat_id": chat, "text": text[:4000],
+                              "parse_mode": "Markdown"}).encode()
+        req = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendMessage",
+                                     data=payload,
+                                     headers={"Content-Type": "application/json"})
+        try:
+            return '"ok":true' in urllib.request.urlopen(req, timeout=12).read().decode(
+                "utf-8", "replace")
+        except Exception:
+            # A notifier that raises into its awaiter turns a failed notice into a failed request.
+            # The curl version could not raise on an API error (curl exits 0 and prints ok:false);
+            # urlopen raises HTTPError, so the equivalence has to be restored here.
+            return False
     return await asyncio.to_thread(_s)
 
 
@@ -2988,14 +3464,91 @@ async def claude_inbox_add(request: Request):
     text = (body.get("text") or "").strip()
     if not text:
         return {"status": "empty"}
-    return {"status": "queued", "id": add_task(text)}
+    # `untrusted` carries third-party content (a stranger's issue body, a harvested reply). It is
+    # sanitized and enveloped inside add_task, so a remote caller cannot smuggle it in as
+    # instructions by concatenating it into `text` — the dungeon's Scout triage does exactly this.
+    return {"status": "queued",
+            "id": add_task(text, untrusted=(body.get("untrusted") or ""),
+                           source=(body.get("source") or ""))}
 
 
 @router.get("/brain/claude-inbox")
-async def claude_inbox_list():
-    """Claude Code reads its pending tasks here on each wake."""
+async def claude_inbox_list(check_threads: int = 0):
+    """Claude Code reads its pending tasks here on each wake.
+
+    `check_threads=1` annotates every task carrying a GitHub issue link with that thread's CURRENT
+    state, because a lead can die between being queued and being worked. Measured 2026-08-17 over the
+    14 distinct issue links then pending: 7 open, 5 closed, and the split matters -- only 2 were
+    already closed when the Scout queued them, while 3 CLOSED WHILE THEY SAT in a queue whose oldest
+    item was 9.8 days old. So the dominant cause is our latency, not the Scout's blindness, and a check
+    at scoring time would have caught fewer than half of them. This is the point where a human decides
+    what to work on, so it is the point where the room gets read.
+
+    OPT-IN, deliberately. The dungeon hits this endpoint on every organ cycle (`_task_already_pending`),
+    and a network call per lead there would be a self-inflicted stall. It annotates rather than filters:
+    a closed thread is still worth seeing -- it may be worth a fresh issue -- and silently dropping a
+    task is how a queue lies about what it is holding.
+    """
     from agora.execution.claude_inbox import pending
-    return {"pending": pending()}
+    items = pending()
+    if not check_threads:
+        return {"pending": items}
+
+    # `json` is NOT imported at this module's top level -- 5 other uses in this file each import it
+    # locally. Omitting it here raised NameError inside the try below, my own `except Exception`
+    # swallowed it, and every thread came back UNKNOWN: a checker that measured nothing while
+    # reporting "0 not open". It failed SAFE only because UNKNOWN is deliberately not OPEN.
+    import json as _json
+    import re as _re
+    import subprocess as _sp
+    seen: dict = {}
+    checked = closed = 0
+    for t in items:
+        m = _re.search(r"https://github\.com/([\w.-]+/[\w.-]+)/issues/(\d+)", t.get("text") or "")
+        if not m:
+            continue
+        key = (m.group(1), m.group(2))
+        if key not in seen:
+            # REST, not `gh issue view`, which goes through GraphQL. Measured 2026-08-17: GraphQL was
+            # intermittently 503 all day (a comment took four attempts, a PR five) while REST answered,
+            # and the first version of this check inherited that flakiness -- two runs minutes apart
+            # disagreed about a thread I already knew was closed. One retry on top, because a transient
+            # 503 is exactly what this is.
+            info = {"state": "UNKNOWN", "error": "not attempted"}
+            for _attempt in (1, 2):
+                try:
+                    r = _sp.run(["gh", "api", "repos/%s/issues/%s" % (key[0], key[1]),
+                                 "--jq", "{state:.state,closed_at:.closed_at}"],
+                                capture_output=True, text=True, timeout=25,
+                                encoding="utf-8", errors="replace")
+                    if r.stdout.strip():
+                        d = _json.loads(r.stdout)
+                        info = {"state": (d.get("state") or "unknown").upper(),
+                                "closedAt": d.get("closed_at")}
+                        break
+                    err = (r.stderr or "").strip().splitlines()[-1:] or ["empty response"]
+                    info = {"state": "UNKNOWN", "error": err[0][:90]}
+                except Exception as e:                                 # noqa: BLE001
+                    # UNKNOWN, never OPEN: a lead we could not look at must not read as live.
+                    info = {"state": "UNKNOWN", "error": type(e).__name__}
+            seen[key] = info
+        st = seen[key]
+        # The failure REASON travels with UNKNOWN. Without it an unreadable lead and a genuinely
+        # unresolvable one look identical, and "4 of 7 unknown" gives a reader nothing to act on --
+        # which is the same shape as the 0.000 ROI this system published for a year.
+        t["thread"] = {"repo": key[0], "number": key[1], "state": st.get("state"),
+                       "closed_at": st.get("closedAt"),
+                       **({"why_unknown": st["error"]} if st.get("error") else {})}
+        checked += 1
+        if st.get("state") not in ("OPEN", "UNKNOWN"):
+            closed += 1
+    unknown = sum(1 for v in seen.values() if v.get("state") == "UNKNOWN")
+    # DEGRADED travels with the split. Without it "5 open, 2 closed" reads as a complete picture while
+    # three threads were never actually looked at, which is the failure this endpoint exists to stop.
+    return {"pending": items,
+            "thread_check": {"links_checked": checked, "not_open": closed,
+                             "distinct_threads": len(seen), "unknown": unknown,
+                             "degraded": bool(unknown)}}
 
 
 @router.post("/brain/claude-inbox/done")
@@ -3028,6 +3581,35 @@ async def claude_inbox_done(request: Request):
         raise HTTPException(status_code=409, detail=verdict["detail"])
     mark_done(tid, body.get("result") or "")
     return {"status": "ok", **({"note": verdict["note"]} if verdict.get("note") else {})}
+
+
+@router.post("/brain/claude-inbox/skip")
+async def claude_inbox_skip(request: Request):
+    """Record that a task was READ and judged not to be work. The exit the queue never had.
+
+    The triage doctrine says an off-board task, a refusal or a stale duplicate should be skipped.
+    There was no way to do that: `claude_inbox` could set `pending` and `done` and nothing else, and
+    `/brain/gatekeeper/skip` records a THEME so upstream generators stop offering it without ever
+    touching the task. So the only way to clear one was to call it done.
+
+    Measured over the 100 tasks the store holds, 2026-08-27: 48 done, 13 of them with NO result at
+    all. 27% of our record of completed work cannot be told apart from a discard. That is the exact
+    confusion the product we sell exists to prevent, sitting in our own ledger.
+
+    A reason under eight characters is refused, because a blank one makes this `done` wearing a
+    different word.
+    """
+    from agora.execution.claude_inbox import mark_skipped
+    body = await request.json()
+    tid = body.get("id") or ""
+    reason = body.get("reason") or ""
+    if not mark_skipped(tid, reason):
+        raise HTTPException(
+            status_code=409,
+            detail=("REFUSED: skip needs a task that is still pending and a reason of at least "
+                    "eight characters saying why it is not work. A blank reason records a discard "
+                    "as though it were a judgement."))
+    return {"status": "ok", "skipped": tid, "reason": reason[:400]}
 
 
 @router.get("/brain/brainstorm")
@@ -3472,6 +4054,18 @@ async def brain_repair_ledger(days: float = 14.0):
     from agora.execution.repair_ledger import repair_ledger, starvation_report, format_repair_ledger
     return {"status": "ok", "ledger": repair_ledger(days),
             "starvation": starvation_report(), "report": format_repair_ledger(days)}
+
+
+@router.get("/brain/cartography/research-map")
+async def brain_cartography_research_map():
+    """The map of OUR OWN measured work: domains found by clustering the Lab's questions by MEANING,
+    and what bridges them. The vault-taxonomy map (`/brain/cartography/hole`) charts the owner's
+    second brain; this one charts the research, which is what the board asks the swarm to advance.
+    """
+    import asyncio as _aio
+    from agora.execution.cartography import research_map, find_research_hole
+    m = await _aio.to_thread(research_map)
+    return {"status": "ok", "hole": await _aio.to_thread(find_research_hole), **m}
 
 
 @router.get("/brain/cartography/untested")

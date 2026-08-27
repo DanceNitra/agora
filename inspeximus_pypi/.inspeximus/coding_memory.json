@@ -1,1 +1,99 @@
-[{"id":"efe1384bb1","text":"ran: cd /c/Users/Danculus/agora/inspeximus_pypi && python -c \"import inspeximus; print('pypi copy: default_distiller=', hasattr(inspeximus,'default_distiller')); from inspeximus.browser import render_html; print('browser impo…","tags":["bash"],"value":1.0,"ts":1784477721.762301,"iso":"2026-07-19T16:15:21Z","valid_from":1784477721.762301,"source":null,"mtype":"episodic","last_access":1784477721.762301,"status":"active","links":[],"meta":{},"key":"cmd:8c9c99592f","object":"cd /c/Users/Danculus/agora/inspeximus_pypi && python -c \"import m"},{"id":"043d0b1024","text":"..\\..\\inspeximus-repo\\CHANGELOG.md :: current state -> ## Unreleased (built, not yet published)  **Offline memory browser (`inspeximus.browser` + `inspeximus browse`).** Renders the store to a SINGLE self-contained HTML file (all data inlined, v…","tags":["file","edit"],"value":1.0,"ts":1784477734.8987474,"iso":"2026-07-19T16:15:34Z","valid_from":1784477734.8987474,"source":null,"mtype":"semantic","last_access":1784477734.8987474,"status":"active","links":[],"meta":{},"key":"file:..\\..\\inspeximus-repo\\CHANGELOG.md","object":"## Unreleased (built, not yet published)  **Offline memory browser (`inspeximus.brows…"}]
+[
+ {
+  "id": "efe1384bb1",
+  "text": "ran: cd /c/Users/Danculus/agora/inspeximus_pypi && python -c \"import inspeximus; print('pypi copy: default_distiller=', hasattr(inspeximus,'default_distiller')); from inspeximus.browser import render_html; print('browser impo…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784477721.762301,
+  "iso": "2026-07-19T16:15:21Z",
+  "valid_from": 1784477721.762301,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784477721.762301,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:8c9c99592f",
+  "object": "cd /c/Users/Danculus/agora/inspeximus_pypi && python -c \"import m"
+ },
+ {
+  "id": "043d0b1024",
+  "text": "..\\..\\inspeximus-repo\\CHANGELOG.md :: current state -> ## Unreleased (built, not yet published)  **Offline memory browser (`inspeximus.browser` + `inspeximus browse`).** Renders the store to a SINGLE self-contained HTML file (all data inlined, v…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784477734.8987474,
+  "iso": "2026-07-19T16:15:34Z",
+  "valid_from": 1784477734.8987474,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784477734.8987474,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\inspeximus-repo\\CHANGELOG.md",
+  "object": "## Unreleased (built, not yet published)  **Offline memory browser (`inspeximus.brows…"
+ },
+ {
+  "id": "87d2465077",
+  "text": "ran: cd C:/Users/Danculus/agora/inspeximus_pypi && grep -n \"^import time\\|^import \" inspeximus/inspeximus.py | head -12 && python -c \"import ast,io; ast.parse(io.open('inspeximus/inspeximus.py',encoding='u…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1785353598.275182,
+  "iso": "2026-07-29T19:33:18Z",
+  "valid_from": 1785353598.275182,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1785353598.275182,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:56800cb32e",
+  "object": "cd C:/Users/Danculus/agora/inspeximus_pypi && grep -n \"^impo"
+ },
+ {
+  "id": "d475022782",
+  "text": "..\\research\\probes\\credit_burst_window_falsifier.py :: current state -> \"\"\"FALSIFIER for credit_burst_window â€” the opt-in fix for the co-recall suppression attack.  Four things must hold or the change does not ship:    T1 OFF BY DEFAULT IS BYTE-IDENT…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1785353622.9844532,
+  "iso": "2026-07-29T19:33:42Z",
+  "valid_from": 1785353622.9844532,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1785353622.9844532,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\research\\probes\\credit_burst_window_falsifier.py",
+  "object": "\"\"\"FALSIFIER for credit_burst_window â€” the opt-in fix for the co-recall suppre…"
+ },
+ {
+  "id": "e04c76c5f6",
+  "text": "ran: cd C:/Users/Danculus/agora/inspeximus_pypi && ls; ls tests 2>/dev/null | head",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1785353634.6593862,
+  "iso": "2026-07-29T19:33:54Z",
+  "valid_from": 1785353634.6593862,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1785353634.6593862,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7a067ec939",
+  "object": "cd C:/Users/Danculus/agora/inspeximus_pypi && ls; ls tests 2"
+ }
+]

@@ -23,12 +23,27 @@ coverage. It is deliberately pointed at production data rather than fixtures: a 
 field CAN be written, which is the very thing that was never in doubt.
 
 Exit 1 if any mechanism is unreachable. Run it after shipping anything that reads a record field.
+
+2026-08-09 — AND THEN IT HAPPENED TO THIS TOOL. `STORES` was a hand-written literal of ten files, all
+inside this repo. The one store the MCP server writes -- `~/.inspeximus/mcp_memory.json`, the store a
+writer key can actually sign -- was not on it. So after 2.3.0 shipped signing and an ordinary write
+was verified on disk to carry `attested_key`, this gate still printed `attested_key 0 0.0000%` over
+215,023 records. That zero was structurally guaranteed: it would have printed identically whether
+signing worked or not. A coverage checker blind to the writer's own store measures everything except
+the thing that changed.
+
+So the store list is no longer trusted to be complete. `_writer_store()` RESOLVES where this
+deployment's MCP server writes (env, then its MCP config, then the library default), that store is
+always read, and the gate REFUSES if it could not be resolved or could not be read -- rather than
+reporting coverage it had no way to observe. A gate must not be able to examine its way out of its
+own input.
 """
 from __future__ import annotations
 
 import argparse
 import io
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -49,6 +64,8 @@ MECHANISMS = [
 STORES = [
     ROOT / ".inspeximus" / "coding_memory.json",
     ROOT / "server" / ".inspeximus" / "coding_memory.json",
+    ROOT / "server" / ".inspeximus_brain.json",
+    ROOT / "agora-game-server" / ".inspeximus" / "coding_memory.json",
     ROOT / "agora-game-server" / ".agent_memory" / "artificer.json",
     ROOT / "agora-game-server" / ".agent_memory" / "cartographer.json",
     ROOT / "agora-game-server" / ".agent_memory" / "king.json",
@@ -58,6 +75,71 @@ STORES = [
     ROOT / "agora-game-server" / ".agent_memory" / "guard_l.json",
     ROOT / "agora-game-server" / ".agent_memory" / "guard_r.json",
 ]
+
+# Where a store might live that nobody remembered to declare. Filename patterns only -- matching is a
+# glob, never a parse, so this stays cheap enough to run on every invocation. These are DISCOVERED AND
+# READ, not merely warned about: a list that must be edited by hand to stay complete is the defect,
+# and a warning nobody acts on is the same defect with extra output. `.tombstones.json` sidecars sit
+# next to real stores and are not stores.
+DISCOVER = (".inspeximus/coding_memory.json", ".inspeximus_brain.json", ".agent_memory/*.json")
+DISCOVER_SKIP = (".tombstones.json",)
+
+# How many of the newest writer-store records the freshness line looks at.
+FRESH_N = 100
+
+# Fields only a NEW write can carry, so a corpus percentage is the wrong denominator for them: legacy
+# records can never be retro-filled, and one populated write pins the corpus figure above zero forever.
+#
+# `good_warranted` was missing from this list and it cost a real misreading. On 2026-08-09 the write path
+# for it shipped, and the corpus number stayed 0 of 220,415 -- which reads as "nothing writes this" when
+# the truth was "every record predates the writer that can". A reviewer called that zero structurally
+# guaranteed, and they were right: the same defect this tool exists to catch, inside this tool, one field
+# over from where it had already been fixed. Fixing the instance is not fixing the class.
+NEW_WRITE_ONLY = ("attested_key", "good_warranted")
+
+
+def _writer_store():
+    """The store THIS deployment's MCP server writes -- the only one a writer key can sign.
+
+    Resolved rather than assumed, because assuming it is what produced a structurally-guaranteed zero.
+    Order: explicit env, then the MCP server config that actually launches it, then the library
+    default. Returns None only when none of the three yields a path at all, which the caller treats as
+    a refusal — an unlocatable writer store is not an absent problem, it is an unmeasured one.
+    """
+    env = os.environ.get("INSPEXIMUS_PATH")
+    if env:
+        return Path(env)
+    try:
+        cfg = json.load(io.open(Path.home() / ".claude.json", encoding="utf-8", errors="replace"))
+        for name, spec in (cfg.get("mcpServers") or {}).items():
+            if "inspeximus" in str(name).lower():
+                p = ((spec or {}).get("env") or {}).get("INSPEXIMUS_PATH")
+                if p:
+                    return Path(p)
+    except Exception:
+        pass
+    default = Path.home() / ".inspeximus" / "mcp_memory.json"
+    return default if default.exists() else None
+
+
+def _discovered(declared):
+    """Repo stores that exist and are on nobody's list — returned to be READ, not warned about.
+
+    The hand-written literal above went stale exactly once and cost a structurally-guaranteed zero.
+    Anything matching a store filename is a store; requiring a human to remember it is the failure
+    mode, not the safeguard.
+    """
+    out = []
+    for pat in DISCOVER:
+        for p in ROOT.glob("**/" + pat):
+            s = str(p).replace("\\", "/")
+            if "/node_modules/" in s or "/.git/" in s or "/.claude/worktrees/" in s:
+                continue
+            if any(s.endswith(x) for x in DISCOVER_SKIP):
+                continue
+            if p.resolve() not in declared:
+                out.append(p)
+    return sorted(set(out))
 
 
 def _records(obj):
@@ -90,7 +172,20 @@ def main() -> int:
     counts = {f: 0 for f, _, _ in MECHANISMS}
     total = 0
     seen = 0
-    for p in STORES:
+
+    # The writer store is READ WHETHER OR NOT ANYONE DECLARED IT. Leaving it to the literal is the
+    # defect this control exists to prevent, so the literal does not get a vote.
+    writer = _writer_store()
+    stores = list(STORES)
+    found = _discovered({p.resolve() for p in stores})
+    stores += found
+    n_declared, n_found = len(STORES), len(found)
+    if writer is not None and writer.resolve() not in {p.resolve() for p in stores}:
+        stores.append(writer)
+    writer_read = False
+    writer_recs = []
+
+    for p in stores:
         if not p.exists():
             continue
         try:
@@ -100,6 +195,8 @@ def main() -> int:
             continue
         seen += 1
         total += len(rs)
+        if writer is not None and p.resolve() == writer.resolve():
+            writer_read, writer_recs = True, rs
         for f in counts:
             counts[f] += sum(1 for r in rs if _populated(r, f))
 
@@ -108,7 +205,18 @@ def main() -> int:
               "         which is the exact failure this tool exists to catch.")
         return 1
 
-    print("stores read: %d   records: %d\n" % (seen, total))
+    # The control. `attested_key` can ONLY appear where a writer key signs, so a run that never opened
+    # that store cannot distinguish "signing is off" from "I did not look" — and it reported the first.
+    if not writer_read:
+        where = str(writer) if writer is not None else "unresolvable (no env, no MCP config, no default)"
+        print("REFUSED: the writer store was not read — %s\n"
+              "         Every attestation field is written THERE and nowhere else, so any coverage\n"
+              "         number below would describe stores that structurally cannot carry it. This is\n"
+              "         the tool's own failure mode: a zero that is guaranteed rather than measured." % where)
+        return 1
+
+    print("stores read: %d of %d (%d declared, %d discovered)   records: %d   writer store: %s (%d)\n"
+          % (seen, len(stores), n_declared, n_found, total, writer.name, len(writer_recs)))
     print("%-16s %10s %9s   %s" % ("field", "populated", "coverage", "mechanism"))
     dead = []
     for field, mech, breaks in MECHANISMS:
@@ -118,6 +226,19 @@ def main() -> int:
         print("%-16s %10d %8.4f%%   %s%s" % (field, n, pct, mech, flag))
         if not n and field not in allow:
             dead.append((field, mech, breaks))
+
+    # A corpus percentage is the WRONG denominator for a field only new writes can carry: 215k legacy
+    # records can never be retro-signed, so one signed write pins this above zero forever and the gate
+    # would stay green through a signing outage. Recent coverage is the number that can still move.
+    fresh = sorted((r for r in writer_recs if isinstance(r.get("ts"), (int, float))),
+                   key=lambda r: r["ts"])[-FRESH_N:]
+    if fresh:
+        print("")
+        for field in NEW_WRITE_ONLY:
+            n = sum(1 for r in fresh if _populated(r, field))
+            print("%-16s on the %d most recent writer-store records: %d (%.1f%%)%s"
+                  % (field, len(fresh), n, 100.0 * n / len(fresh),
+                     "   <-- not reaching new writes" if not n else ""))
 
     if dead:
         print("\nREFUSED — %d mechanism(s) read a field nothing in production writes:" % len(dead))

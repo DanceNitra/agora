@@ -1,0 +1,36 @@
+{
+  "probe": "integrity_bench_hindsight_adapter.py",
+  "verdicts": {
+    "the_embedded_server_starts": true,
+    "retain_then_recall_returns_the_fact": true,
+    "client_exposes_no_revert_by_name": true,
+    "a_memory_unit_can_be_listed": true,
+    "after_correction_the_new_value_is_present": true,
+    "CONTROL_recall_is_not_empty": true,
+    "CONTROL_the_two_recalls_differ": true
+  },
+  "notes": [
+    {
+      "client_surface_size": 62,
+      "lifecycle_named": [
+        "update_bank_config",
+        "update_directive",
+        "update_knowledge_node",
+        "update_mental_model"
+      ]
+    },
+    {
+      "memories_repr": "items=[{'id': 'c54c94fe-3483-421e-8258-795f07b9c9f1', 'text': 'The staging database is db-3.internal.', 'context': '', 'date': '2026-08-25T15:42:16.349265+00:00', 'fact_type': 'world', 'document_id': '4fc2cc54-fa74-47a5-a5e2-b2817f9155b2', 'mentioned_at': '2026-08-25T15:42:16.349265+00:00', 'occurred_start': None, 'occurred_end': None, 'entities': 'staging database, db-3.internal', 'chunk_id': 'in"
+    },
+    {
+      "old_value_still_in_recall_after_correction": true,
+      "recall_after_correction": "\"results=[RecallResult(id='c54c94fe...', type='world', text='The staging database is db-3.internal.'), RecallResult(id='6c9eae11...', type='world', text='The staging database has been corrected to db-7.internal.')] trace=None entities=None chunks=None source_facts=None source_facts_truncated=None\""
+    }
+  ],
+  "llm": {
+    "base_url": "https://ollama.com/v1",
+    "model": "deepseek-v4-flash:0731-cloud",
+    "NOT_native_config": "their README documents openai/gpt-5-mini; this run uses our Ollama credit and is a wiring test only"
+  },
+  "hindsight_version": "0.9.2"
+}

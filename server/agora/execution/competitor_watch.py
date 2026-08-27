@@ -34,7 +34,55 @@ COMPETITORS = [
     ("Supermemory", "supermemoryai/supermemory", ""),
     ("MemOS / MemTensor", "MemTensor/MemOS", "memoryos"),
     ("txtai", "neuml/txtai", "txtai"),
+    ("Memanto", "moorcheh-ai/memanto", ""),
+    # ADDED 2026-08-25, and the gap is the point. Hindsight shipped "Reversible Memory Curation"
+    # (edit / invalidate / revert, history preserved) in 0.8.2 on 2026-06-12 -- our exact axis, from
+    # a 21k-star product -- and this watcher, whose whole reason for existing is to catch a
+    # competitor shipping a revert, did not have them on the list. Ten weeks later it surfaced by
+    # accident, while charting an unrelated inbox task. A watcher is only as wide as its roster, and
+    # nothing in it fails when a name is missing: it reports a clean scan over the ones it knows.
+    #
+    # THE PYPI NAME IS `hindsight-api`, NOT `hindsight`. Bare `hindsight` on PyPI is version 0.1.7,
+    # "Python tools for Hindsight Software", an unrelated project -- wiring that in would have had
+    # this organ reporting a stranger's releases as a competitor's, which is worse than not
+    # watching. The real one is confirmed by its metadata naming vectorize; `hindsight-all` and
+    # `hindsight-client` are the same release train and do not need separate rows.
+    ("Hindsight / Vectorize", "vectorize-io/hindsight", "hindsight-api"),
 ]
+
+# Orgs that ship a competing memory product AND things we partner with. Their competitor repo is
+# excluded by exact name; the rest of the org is NOT. langchain-ai is the live case: langmem competes
+# with us, while langgraph is a partner that merged our integration docs (langchain-ai/docs#5019) and
+# whose InMemoryStore we pass an operation-by-operation parity audit against. An org-wide rule here
+# would have blacklisted the single best distribution channel we have.
+# vectorize-io joined on 2026-08-25 for the same reason and it was NOT optional: adding
+# vectorize-io/hindsight to the roster above immediately blacklisted the whole org, including
+# vectorize-io/agent-memory-benchmark -- the thread we opened on 2026-07-16 offering our
+# integrity axis for their manifesto, still open, and the collaboration the owner actually wants.
+# Measured by running is_competitor_repo across the org right after the edit rather than assuming
+# the blast radius: hindsight True, agent-memory-benchmark True. The second one is the mistake.
+_MIXED_ORGS = {"langchain-ai", "vectorize-io"}
+
+
+def is_competitor_repo(repo: str) -> bool:
+    """True when a GitHub repo belongs to a competing memory product.
+
+    Used to keep competitors OUT of anywhere we offer help — the contribution shortlist and the
+    scout's outreach candidates. Reading them is fine and this does not gate that: competitor_watch
+    itself exists to learn from them, and scout.find_learning() is deliberately left unfiltered.
+    What the owner rules out is HELPING them.
+
+    Matches on the exact `owner/repo`, plus the whole org for single-product owners (so mem0ai/mem0-ts
+    is caught, not just mem0ai/mem0). Orgs in _MIXED_ORGS match on the exact repo only.
+    """
+    r = (repo or "").strip().lower().strip("/")
+    if not r or "/" not in r:
+        return False
+    known = {c[1].lower() for c in COMPETITORS if c[1]}
+    if r in known:
+        return True
+    owner = r.split("/", 1)[0]
+    return owner in {k.split("/", 1)[0] for k in known} - _MIXED_ORGS
 
 # Words that mean "this release is on our axis" — the moat, not the feature list.
 ON_OUR_AXIS = ("revert", "rollback", "undo", "supersede", "superseded", "correction", "correct a",

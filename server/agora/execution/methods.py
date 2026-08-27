@@ -426,6 +426,7 @@ def _norm_theme(t: str) -> str:
 # ...", "every finding must answer ..."). Without that stop-list the gate matches on the board's own
 # boilerplate and passes everything — the exact bug measured on the quest-pool gate the same day.
 _BOARD_STOP = frozenset("""priority priorities prioritize prioritise research finding findings theme themes
+frontier
 question questions standing owner deprioritize topic topics work make better every answer does that this
 which their they there been more most only very also into from with must should when where what have
 about test tests testing measure measured result results claim claims
@@ -436,11 +437,134 @@ finance financial health longevity physics politics cloud trivia generic meta be
 # headline", "Deprioritize generic meta-science, politics, cloud/trivia"). Naively tokenizing the board
 # text turns those into PRIORITY words, so a finance or cloud theme would pass the gate on the strength of
 # the sentence telling us to deprioritize it. Measured on the real board text before this fix.
+#
+# `frontier` sits in the FIRST group because it is how the board LABELS its priority, not a subject:
+# the text opens "frontier: Make inspeximus the #1 agent-memory product". Both sides carry the word --
+# task templates say "Frontier:" too -- so it matches a task against the board's own stationery.
+# Measured on the live inbox 2026-07-31: of 33 pending tasks, ELEVEN were classified on-board solely by
+# this word, every one of them Bayesian-network structure learning (bnlearn ALARM / HEPAR-II / ANDES,
+# Erdos-Renyi DAGs, NOTEARS) -- a third of the queue, none of it on the memory frontier. Removing it
+# costs nothing legitimate: the four tasks that carry `frontier` AND a real subject term stay on-board
+# on that term, and `roadmap` and `quality` stay in because the board names both as real subjects
+# ("the buyer-facing gap roadmap", "retrieval quality measured vs mem0/Zep/Cognee").
 
 
 def _theme_tokens(t: str) -> set:
     import re as _re
     return {w for w in _re.findall(r"[a-z0-9]+", (t or "").lower()) if len(w) > 3}
+
+
+#: A sentence carrying one of these is the board REFUSING something, and none of its words are a
+#: priority. Matched against whole sentences rather than words on purpose: the word-list above had
+#: to name every noun the owner might refuse, and it already missed one -- `science` was absent, so
+#: "generic meta-science", a phrase lifted verbatim from the deprioritize clause, still passed the
+#: gate on that token. Any hand-maintained list of forbidden nouns silently rots the next time the
+#: owner re-words his priorities; the grammar of a refusal does not.
+_REFUSAL = __import__("re").compile(
+    r"deprioriti[sz]e|never the headline|not the headline|only\s+test[\s-]?bed|"
+    r"off[\s-]?domain|do not |don't |avoid |exclude ", __import__("re").I)
+
+
+def light_stem(w: str) -> str:
+    """Fold a simple English plural, and NOTHING else.
+
+    `w.rstrip("s")` -- what the dungeon used -- is not this. It strips every trailing `s`, so
+    **"inspeximus" becomes "inspeximu"**: our own product name, the single term the board most needs
+    to match, mangled by the matcher. It also eats "class" -> "cla". The dungeon has been doing that
+    the whole time, and because the published board terms were UNSTEMMED the two ends disagreed
+    ("inspeximu" vs "inspeximus") and quietly never matched at all.
+
+    So: drop a trailing `s` only when what remains is still a word, and never after `ss`/`us`/`is`,
+    which are not plural endings. agents->agent, operations->operation, compounds->compound;
+    inspeximus, class and analysis are left alone.
+    """
+    w = (w or "")
+    # -ies -> -y, ADDED 2026-08-17. The trailing-s rule alone cannot fold an -ies plural, so
+    # "memories" stemmed to "memorie" and never met the board's "memory" -- the single most important
+    # word in this domain. Measured cost of that: a flywheel question reading "Uniform consolidation of
+    # agent MEMORIES reduces the diversity..." scored off-board and was never offered as a quest, while
+    # the pool it sits in had ZERO on-frontier items by any other term.
+    #
+    # Scoped by measurement over the 3,929 distinct words the gate actually sees: this rule changes 39
+    # of them, unlocks exactly ONE board match (memories -> memory, 8 occurrences) and loses none. It
+    # also mis-stems "series" -> "sery" and "species" -> "specy", which are wrong and harmless -- what
+    # matters is that they collide with no board term, checked, and that BOTH ends stem identically.
+    #
+    # An -ing rule was measured at the same time and REJECTED: 286 words changed for 2 new matches
+    # (poisoning, compounding), with 67 mangled below five characters -- trading->trad, writing->writ,
+    # running->runn. `_theme_words` also feeds skip-ledger coverage, the inbox dedup signature and
+    # cartography, all of which compare word SETS, so that much noise would move similarity everywhere
+    # for two words.
+    if len(w) > 4 and w.endswith("ies"):
+        return w[:-3] + "y"
+    if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return w[:-1]
+    return w
+
+
+def board_priority_terms(text: str) -> set:
+    """The ON-PRIORITY words of a board, with its refusals removed.
+
+    THE ONE DEFINITION. The brain's Lab door and the dungeon's quest gate both gate on this; they
+    used to derive it separately and disagreed. Measured 2026-07-31 against the live board, the
+    dungeon's copy admitted all five subjects the owner had explicitly deprioritized -- politics,
+    generic meta-science, cloud trivia, finance and physics -- each matching on the very word he
+    used to exclude it. `/brain/board` now publishes the result of this function as
+    `priority_terms` so there is nothing left to re-derive.
+
+    STEMMED, since 2026-08-08, and that is not cosmetic. The claim above -- one definition, nothing
+    left to re-derive -- was still false one layer down: this function returned EXACT tokens while
+    the dungeon's `_theme_words` lightly stems (`w.rstrip("s")`), so the two gates disagreed on
+    every plural. Measured on the live board: "LLM agents" scored NONE here and `agent` there, on
+    the same text, at the same moment. `agent` is the commonest word in our domain, so the brain was
+    filing on-mission work as off-board -- and the error runs in the EXCLUDING direction, which is
+    the expensive one: it does not add noise, it silently withholds real work.
+
+    Found while triaging the inbox with this very function, one step before six tasks would have
+    been skipped on its verdict. Both sides now stem, so `stem(text) & stem(board)` is the same
+    comparison wherever it is made.
+    """
+    keep = [s for s in __import__("re").split(r"(?<=[.!?])\s+", text or "") if not _REFUSAL.search(s)]
+    terms = {light_stem(w) for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
+    return terms | {g for t in terms for g in _gerunds(t)}
+
+
+def _gerunds(t: str) -> set:
+    """The -ing forms of a board term, so the BOARD matches a task that uses the verb.
+
+    light_stem folds -ies and a trailing -s; it does NOT fold -ing, so `poisoning` stays
+    `poisoning` and misses the board's own `poison`, and `reverting` misses `revert`. Those are
+    the two most action-shaped moat terms this organisation has, and a gerund is how they are
+    written in a paper title: "Memory Poisoning Attacks on LLM Agents".
+
+    THE FIX GOES HERE AND NOT IN light_stem, deliberately. Naive -ing stripping in the shared
+    stemmer breaks string -> str, thing -> th, during -> dur, and BOTH the brain and the dungeon
+    read that function. Widening the BOARD instead is one-directional: a generated form can only
+    ever match text that literally contains it, so a nonsense one like `cogneeing` costs a set
+    entry and can match nothing. One emission point covers both ends, because the dungeon takes
+    this function's output verbatim from /brain/board (mcp_server._gate_refresh) rather than
+    re-deriving it -- which is exactly what the -ies episode cost us and what that fix bought.
+
+    MEASURED IMPACT IS SMALL AND SAID SO: 1 task of 59 on 2026-08-18, and 0 of 37 live items on
+    2026-08-27. This lands because the error runs in the EXCLUDING direction -- it silently
+    withholds on-frontier work while reporting a clean gate -- not because it recovers a backlog.
+    """
+    if len(t) < 3:
+        return set()
+    out = {t + "ing"}
+    if t.endswith("e"):
+        out.add(t[:-1] + "ing")
+    # NO CONSONANT DOUBLING. The CVC rule (ship -> shipping) is correct English and wrong here: it
+    # fired on `buyer` -> `buyerring` and `competitor` -> `competitorring`, and capping it by length
+    # kept the first, because `buyer` is five characters. Getting gerund morphology right needs a
+    # verb list, which this file has no dependency for. No current board term needs doubling, so the
+    # rule is dropped and the miss is stated rather than hidden: a future board term like `ship`
+    # would need `shipping` added here by hand.
+    #
+    # The set still contains inert forms by construction -- `cogneeing`, `erasureing` -- and that is
+    # the trade this function is built on: a generated form can only match text that literally
+    # contains it, so a nonsense one costs one set entry and can match nothing.
+    return {g for g in out if g != t}
 
 
 def _match_cache_get(key: str):
@@ -494,7 +618,7 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
             and not str(requester or "").lower().startswith(("claude", "api", "owner"))):
         try:
             from agora.execution.board import priorities_text
-            _prio = {w for w in _theme_tokens(priorities_text()) if w not in _BOARD_STOP}
+            _prio = board_priority_terms(priorities_text())
             if _prio and not (_theme_tokens(theme) & _prio):
                 try:
                     from agora.execution.gatekeeper import record_skip

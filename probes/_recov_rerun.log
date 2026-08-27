@@ -1,0 +1,50 @@
+REFERENCE -- untruncated L2, the run the published 0.1902 should come from
+   depth=0.1902 min_at=0.50 bonds=18 (24s)
+
+ARM 1 -- far bath only (defect neighbourhood kept explicit)
+   far-bath chi_B=1: depth=0.1646 min_at=0.50 (1s)
+   far-bath chi_B=2: depth=0.1834 min_at=0.25 (2s)
+   far-bath chi_B=4: depth=0.1736 min_at=0.50 (9s)
+   far-bath chi_B=8: depth=0.1902 min_at=0.50 (15s)
+
+ARM 2 -- uniform truncation (same chi applied to every block)
+   uniform chi=1: depth=0.0000 min_at=1.75 (0s)
+   uniform chi=2: depth=0.0001 min_at=0.75 (0s)
+   uniform chi=4: depth=0.0212 min_at=0.25 (0s)
+   uniform chi=8: depth=0.0466 min_at=1.00 (9s)
+
+C1 REFERENCE  untruncated depth 0.1902 vs published 0.1902 OK
+C2 SAME SET   bond counts across all arms: [18] OK
+C3a MONOTONE  uniform recovery non-decreasing in chi: [0.0, 0.0001, 0.0212, 0.0466] OK
+C3b ORDERING  far-bath > uniform at every chi OK -- this is the claim, and it holds
+C4 DENOM      L2 untruncated block dimension is 4096; chi=8 is a 512x truncation, which is why uniform chi=8 recovers only 24%
+
+==============================================================================
+RECOVERY, both arms against the SAME untruncated reference 0.1902 on 18 bonds:
+
+    chi               far-bath-only                     uniform
+      1  0.1646 =  86.5%         0.0000 =   0.0%
+      2  0.1834 =  96.4%         0.0001 =   0.0%
+      4  0.1736 =  91.2%         0.0212 =  11.1%
+      8  0.1902 = 100.0%         0.0466 =  24.5%
+
+C5 STABILITY  L1 ground manifold dimension = 4 (E0=-16.921463)
+   far-bath chi_B=1: depth=0.1611 min_at=0.50 (1s)
+   far-bath chi_B=1: depth=0.1663 min_at=0.50 (1s)
+   far-bath chi_B=1: depth=0.1659 min_at=0.50 (1s)
+              chi_B=1 across 4 runs: [0.1611, 0.1663, 0.1659, 0.1646] spread=0.0052 NOT STABLE -- cannot be quoted as one number
+
+   TRUNCATED TO A SINGLE STATE: far-bath 87%, uniform 0%
+   PUBLISHED IN THE MANUSCRIPT: far-bath 86%, uniform 20%
+
+   far-bath observed RANGE over repeats: 85%-87%  -- published 86% is inside it
+   uniform   DOES NOT reproduce the published 20% -- measured 0%
+
+   HONEST STATEMENT the manuscript can carry instead:
+     truncating only the far bath leaves the valley essentially intact (85-87% of 0.1902),
+     while a uniform truncation to a single state removes it entirely (0%). The single-state
+     far-bath figure is a RANGE, not a number, because the L1 ground manifold is
+     4-fold degenerate and chi_B=1 retains one arbitrary vector from it.
+==============================================================================
+CONTROLS FAILED: C5 -- do not cite anything above.
+receipt -> C:\Users\Danculus\agora\probes\edrn_the_recovery_percentages_we_published.result.json

@@ -1,0 +1,31 @@
+{
+ "verdict": "fixed",
+ "CONTROL (pre-2.10.1 write path)": {
+  "elapsed": 1.4,
+  "ok": 119,
+  "changed_on_disk": 97,
+  "unparseable": 9,
+  "other": 15,
+  "watch": {
+   "polls": 90,
+   "torn": 1,
+   "busy": 4
+  },
+  "final": "parses, 947 records",
+  "leftover_tmp": []
+ },
+ "FIXED (2.10.1)": {
+  "elapsed": 8.9,
+  "ok": 226,
+  "changed_on_disk": 14,
+  "unparseable": 0,
+  "other": 0,
+  "watch": {
+   "polls": 624,
+   "torn": 0,
+   "busy": 8
+  },
+  "final": "parses, 1120 records",
+  "leftover_tmp": []
+ }
+}

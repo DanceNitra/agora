@@ -1,0 +1,9 @@
+{
+  "repo": "C:\\Users\\Danculus\\inspeximus-repo",
+  "baseline_passed": 3158,
+  "sabotages": {
+    "remember_is_a_noop": {
+      "refused": "3283 of 3173 accounted for (gap -110)"
+    }
+  }
+}

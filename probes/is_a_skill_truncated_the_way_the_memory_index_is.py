@@ -147,9 +147,36 @@ def plant(root: str, n_skills: int, desc_chars: int, body_chars: int) -> list:
     return canaries
 
 
-def run(cwd: str, prompt: str) -> str:
+# Real skills installed on THIS machine. Used only as a tripwire: none of them may reach the wire
+# once CLAUDE_CONFIG_DIR is isolated. Six fixtures were published before this existed, measured
+# against a listing that our own 39 skills had already eaten into.
+FOREIGN_SKILLS = ("n8n-mcp-tools-expert", "n8n-expression-syntax", "n8n-code-python",
+                  "n8n-code-javascript", "last30days", "n8n-node-configuration")
+
+
+def run(cwd: str, prompt: str, cfg: str = "") -> str:
+    """One non-interactive turn against the local recorder.
+
+    THE CONFIG MUST BE ISOLATED, and for six published fixtures it was not. This function set only
+    ANTHROPIC_BASE_URL and ANTHROPIC_API_KEY, so every fixture ran with the 39 real skills in
+    ~/.claude/skills competing for the same listing budget. Measured 2026-08-26, re-running two of
+    the six both ways: `60 x 400` gives 26/60 descriptions ambient and 60/60 isolated -- the row we
+    were about to publish as evidence of a cut is not a cut on a clean machine -- and `200 x 120`
+    gives 66/200 ambient against 177/200 isolated, understating by 2.7x.
+
+    It also explains a factor-2 gap between this probe and its sibling that nobody had flagged:
+    `does_the_listing_drop_by_usage_or_by_position.py` isolates (its line 135) and kept ~21,150
+    units, this one kept ~10,500. The difference was our own skills, eaten first.
+
+    The correction makes the finding STRONGER, which is the part worth keeping: under isolation the
+    delivered totals collapse from a 21% spread to one constant near 25,400 characters across three
+    fixtures of different shape, so the bound is on SIZE and the alternatives (an entry-count cap, a
+    per-entry width cap) are excluded rather than merely unlikely.
+    """
     env = dict(os.environ, ANTHROPIC_BASE_URL="http://127.0.0.1:%d" % PORT,
                ANTHROPIC_API_KEY="x")
+    if cfg:
+        env["CLAUDE_CONFIG_DIR"] = cfg
     p = subprocess.Popen([CLAUDE, "-p", "--output-format", "stream-json", "--verbose",
                           "--strict-mcp-config", prompt],
                          cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -176,11 +203,39 @@ def wire_text() -> str:
     return NL.join(parts)
 
 
+def _wire_model() -> str:
+    """The model name the CLI put in the request body. The listing budget is a fraction of THAT
+    model's context window, so a delivered size is meaningless without it."""
+    try:
+        return json.loads(BODIES[-1]).get("model") or ""
+    except Exception:
+        return ""
+
+
+def _kept_lengths(text: str, cans: list, desc_chars: int) -> tuple:
+    """(kept at full planted length, kept but shortened) among entries that carry a description."""
+    full = short = 0
+    for c in cans:
+        i = text.find("- " + c["skill"])
+        if i < 0:
+            continue
+        line = text[i:text.find(NL, i)]
+        if c["desc_canary"] not in line:
+            continue                                   # a name-only entry, counted elsewhere
+        d = line.split(": ", 1)[1] if ": " in line else ""
+        if len(d) >= desc_chars - 2:
+            full += 1
+        else:
+            short += 1
+    return full, short
+
+
 def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
     root = tempfile.mkdtemp(prefix="skillcap_")
+    cfg = tempfile.mkdtemp(prefix="skillcfg_")     # see run(): unisolated, our own 39 skills eat the budget
     cans = plant(root, n, desc_chars, body_chars)
     BODIES.clear()
-    run(root, "Reply with only: OK")
+    run(root, "Reply with only: OK", cfg=cfg)
     text = wire_text()
     d_seen = [c["desc_canary"] for c in cans if c["desc_canary"] in text]
     b_seen = [c["body_canary"] for c in cans if c["body_canary"] in text]
@@ -215,7 +270,20 @@ def arm(label: str, n: int, desc_chars: int, body_chars: int) -> dict:
            "delivered_listing_units": delivered,
            "notice_words_in_whole_body": notice,
            "last_description_seen": d_seen[-1] if d_seen else None,
-           "wire_chars": len(text)}
+           "wire_chars": len(text),
+           # Named skills of OURS that reached the wire. Must be empty: if any arrive, the config
+           # was not isolated and this arm is measuring our own installation, not the fixture.
+           "OUR_OWN_SKILLS_ON_THE_WIRE": [m for m in FOREIGN_SKILLS if m in text],
+           # FULL or NONE? The canary is a 12-char PREFIX, so a SHORTENED description still matches
+           # it and would be counted as present. The vendor documents both shortening and dropping,
+           # so "an entry carries its full description or none of it" cannot be asserted from the
+           # canary alone -- measure the delivered length of each kept entry instead.
+           "kept_at_full_length": _kept_lengths(text, cans, desc_chars)[0],
+           "kept_but_SHORTENED": _kept_lengths(text, cans, desc_chars)[1],
+           # The budget is 1% of the MODEL's context window (vendor docs), so every size here is an
+           # operating point tied to whatever model the CLI declares. Record it: without this the
+           # bound reads as a constant, and it is not one.
+           "model_declared_on_the_wire": _wire_model()}
     shutil.rmtree(root, ignore_errors=True)
     return row
 
@@ -266,13 +334,35 @@ def main() -> int:
     v["CONTROL_a_small_listing_arrives_whole"] = (
         by["small"]["descriptions_on_wire"] == by["small"]["skills"])
     v["CONTROL_every_arm_reached_the_recorder"] = all(r["wire_chars"] > 500 for r in rows)
+    # THE CONTROL THIS PROBE DID NOT HAVE, and its absence contaminated six published fixtures.
+    # Isolation is only real if our OWN skills stop arriving, so assert it against the wire instead
+    # of trusting that the env var was set. Named after real skills on this machine, so it fails
+    # loudly if `CLAUDE_CONFIG_DIR` is ever dropped from run() again.
+    v["CONTROL_the_config_was_ISOLATED_our_own_skills_are_absent"] = not any(
+        r.get("OUR_OWN_SKILLS_ON_THE_WIRE") for r in rows)
     sweep = [r for r in rows if r["arm"].startswith("w")]
     v["CONTROL_every_sweep_arm_planted_the_same_24000_units"] = (
         len({r["planted_desc_units"] for r in sweep}) == 1
         and sweep[0]["planted_desc_units"] == 24000)
-    v["THE_LISTING_IS_CUT_and_well_under_the_memory_index_cap"] = all(
-        0 < r["descriptions_on_wire"] < r["skills"] for r in sweep)
+    # THIS VERDICT USED TO READ `..._and_well_under_the_memory_index_cap` AND IT WAS AN ARTEFACT.
+    # Unisolated, our own 39 skills ate ~14,000 characters first, so the listing appeared to stop
+    # near 10,500 units -- comfortably "well under" the index's 25,000 -- and all six sweep arms
+    # appeared to cut. Isolated, three of the six do not cut at all, and the delivered size clusters
+    # at ~25,000: the SAME bound as the auto-memory index, not a smaller one. The probe's title
+    # question turns out to have the sharper answer, and the contaminated run had hidden it.
+    cut = [r for r in sweep if 0 < r["descriptions_on_wire"] < r["skills"]]
+    v["THE_LISTING_IS_CUT_in_the_arms_that_exceed_the_bound"] = len(cut) >= 2
+    delivered = [r["delivered_listing_units"] for r in sweep if r["delivered_listing_units"] > 0]
+    spread = (max(delivered) - min(delivered)) / max(delivered) if delivered else 1.0
+    # ONE BOUND, not a per-shape one: six fixtures of different width and count, one delivered size.
+    v["THE_BOUND_IS_ONE_SIZE_across_every_shape"] = spread < 0.05 and len(delivered) >= 5
+    v["AND_IT_IS_THE_SAME_ORDER_AS_THE_MEMORY_INDEX_CAP_25000"] = (
+        bool(delivered) and 22000 <= sum(delivered) / len(delivered) <= 28000)
     # If it were a COUNT cap the kept number would not move with entry width. It moves from 13 to 66.
+    # The claim the send gate flagged as a negative existence claim, now measured instead of asserted.
+    v["A_KEPT_ENTRY_ARRIVES_AT_FULL_LENGTH_no_shortening_at_these_widths"] = (
+        all(r["kept_but_SHORTENED"] == 0 for r in rows)
+        and sum(r["kept_at_full_length"] for r in rows) > 100)
     v["it_is_not_a_count_cap"] = len({r["descriptions_on_wire"] for r in sweep}) > 3
     # And a 3,600-unit listing of the same 60 skills arrives whole, so it is the SIZE that binds.
     v["CONTROL_the_same_60_skills_arrive_whole_when_short"] = (

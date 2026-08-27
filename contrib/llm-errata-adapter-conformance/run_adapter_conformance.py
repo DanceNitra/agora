@@ -28,6 +28,7 @@ TO RUN IT AGAINST YOUR OWN STORE, implement one class (see `InspeximusBinding` a
         name = "your-store"
         def build(self, records):   # -> (StoreAdapter, handle)
         def active_texts(self, handle):  # -> list[str] of currently-asserted propositions
+        def persisted_root(self, handle):    # -> str, the directory it persists into
 
     python run_adapter_conformance.py --pkg <dir with prototype/> --binding your.module:YourBinding
 """
@@ -143,13 +144,58 @@ def apply_mutation(adapter, importer, mutation, binding, handle, root):
                          "cannot install, which means the case has never been shown to fail" % target)
 
 
-def evaluate(case, binding, pkg, mutate=False):
+def _stub(adapter, method):
+    """Replace one protocol method with an inert but well-formed answer.
+
+    Inert, not broken: returning a plausible empty value is what a lazy implementation does, and it
+    is the case that must notice. Raising would prove only that the call happens.
+    """
+    from prototype.adapters import Coverage
+    stands_in = {
+        "enumerate": [lambda *a, **k: ()],
+        "repair_inputs": [lambda *a, **k: ()],
+        "snapshot": [lambda *a, **k: {}],
+        "dispositions": [lambda *a, **k: {}],
+        "recall": [lambda *a, **k: ()],
+        "is_quarantined": [lambda *a, **k: False, lambda *a, **k: True],
+        "quarantine": [lambda *a, **k: None],
+        "retire": [lambda *a, **k: None],
+        "source_artifact": [lambda x, *a, **k: x],
+        "rebuild": [lambda *a, **k: ""],
+        "coverage_detail": [lambda *a, **k: {}],
+        # BOTH DIRECTIONS. A single stand-in that happens to agree with the case's expected outcome
+        # changes nothing, and the method then reads as inert when it is simply un-probed. Measured:
+        # `lineage_complete -> True` left a case expecting `verified` untouched and was reported
+        # INERT; `-> False` flips it immediately.
+        "lineage_complete": [lambda *a, **k: True, lambda *a, **k: False],
+        "coverage": [lambda *a, **k: Coverage.VERIFIED, lambda *a, **k: Coverage.UNKNOWN],
+        "quarantine_coverage": [lambda *a, **k: Coverage.VERIFIED,
+                                lambda *a, **k: Coverage.UNKNOWN],
+    }
+    options = stands_in.get(method)
+    if not options:
+        raise ValueError("no stand-in for %r" % method)
+    return options
+
+
+def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     """Run one case and return what was observed. Never decides pass/fail; the caller compares."""
     from prototype.scenario import build_importer
     from prototype.signing import Ed25519Signer
 
     owner = Ed25519Signer(b"\x01" * 32, key_id="key-1")
-    adapter, handle = binding.build(case["store"]["records"])
+    # THE RUNNER ALLOCATES THE OBSERVED DIRECTORY. Pointing `tempfile.tempdir` here for the duration
+    # of build() means a store creating its files the ordinary way lands inside it whether or not the
+    # binding admits where it writes. The previous design scanned a directory the BINDING named, so a
+    # copy one level above it, or a decoy sub-root holding only a view file, was never looked at.
+    channel_root = tempfile.mkdtemp(prefix="conformance-observed-")
+    prior_tmp = tempfile.tempdir
+    tempfile.tempdir = channel_root
+    try:
+        before = _scan(channel_root)
+        adapter, handle = binding.build(case["store"]["records"])
+    finally:
+        tempfile.tempdir = prior_tmp
     importer = build_importer(owner)
     importer.adapters = [adapter]
     importer.roots = (case["erratum"]["target_root"],)
@@ -157,6 +203,13 @@ def evaluate(case, binding, pkg, mutate=False):
     if mutate:
         apply_mutation(adapter, importer, case["mutation"], binding, handle,
                        case["erratum"]["target_root"])
+    if stub_method:
+        options = _stub(adapter, stub_method[0] if isinstance(stub_method, tuple) else stub_method)
+        idx = stub_method[1] if isinstance(stub_method, tuple) else 0
+        if idx >= len(options):
+            raise IndexError("no variant %d" % idx)
+        setattr(adapter, stub_method[0] if isinstance(stub_method, tuple) else stub_method,
+                options[idx])
 
     observed = {}
     with Tracer(target=adapter) as t:
@@ -170,16 +223,175 @@ def evaluate(case, binding, pkg, mutate=False):
         observed["triad"] = {k: str(v) for k, v in dict(receipt.triad).items()}
 
     texts = list(binding.active_texts(handle))
+
+    # CONCEALMENT. `active_texts` only says what is in present-tense recall, so an adapter whose
+    # retire() copies the value into a side field and demotes the record satisfies every check
+    # above. Measured: such an adapter scored a full PASS on the erasure case while the store still
+    # held "is vegetarian" verbatim. Erasure has to be checked against the PERSISTED state, so the
+    # binding must hand over everything it wrote.
+    # deliberately not read yet -- see below
+
+    # SELF-ATTESTATION. `active_texts` is written by the implementation under test; a binding that
+    # returns a hard-coded list is never contradicted. Cross-check each answer against the adapter's
+    # own recall(), which is the protocol's surface rather than the binding's.
+    disagreements = []
+    for term in set(texts):
+        try:
+            hits = adapter.recall(term)
+        except Exception:
+            continue
+        if term and not any(term in getattr(h, "content", "") for h in hits):
+            disagreements.append(term)
+
     observed["store_property"] = {
         "duplicate_active_assertions": len(texts) - len(set(texts)),
-        "erased_text_absent": None, "preserved_text_present": None, "unrelated_text_present": None}
+        "erased_text_absent": None, "preserved_text_present": None, "unrelated_text_present": None,
+        "erased_text_absent_from_persisted_state": None,
+        "binding_disagrees_with_recall": disagreements}
     observed["receipt_property"] = {
         "names_the_store": getattr(adapter, "name", "") in blob,
-        "is_non_trivial": len(blob) > 200, "forbidden_value_absent": None}
+        "is_non_trivial": len(blob) > 200, "forbidden_value_absent": None,
+        # An empty snapshot() makes pre_state_root == post_state_root while coverage still reads
+        # `verified` and no limitation is recorded, so the receipt attests state roots that bind
+        # nothing. Both are now observable.
+        "snapshot_is_non_empty": bool(adapter.snapshot()),
+        "state_roots_differ": (receipt.to_dict().get("pre_state_root")
+                               != receipt.to_dict().get("post_state_root"))}
+    # READ LAST. A store that re-persists the value on the next `recall()` -- a call this runner
+    # itself makes for the cross-check -- would slip past a channel read any earlier. Everything
+    # that touches the store has happened by this point.
+    raw, channel_note = read_channel(channel_root, before)
+    observed["_raw"] = raw
+    observed["channel"] = channel_note
     observed["_texts"] = texts
     observed["_blob"] = blob
     observed["methods_reached"] = sorted(t.hits)
     return observed
+
+
+def _needle_forms(needle):
+    """Every byte form a store might plausibly have written this proposition in.
+
+    The previous search decoded files as utf-8 with errors="replace" and looked for a string. That is
+    blind to anything not stored as readable utf-8 text: a gzip side copy, utf-16, base64. Since the
+    check exists to prove a value is GONE, every form it cannot see is a false clean bill. Erasure
+    requests are names and addresses, so the encodings involved are not exotic.
+    """
+    import base64
+    forms = set()
+    for enc in ("utf-8", "utf-16-le", "utf-16-be", "latin-1"):
+        try:
+            forms.add(needle.encode(enc))
+        except Exception:
+            pass
+    raw = needle.encode("utf-8")
+    forms.add(base64.b64encode(raw))
+    forms.add(base64.b64encode(raw).rstrip(b"="))
+    forms.add(needle.encode("unicode_escape"))          # the ensure_ascii=True case
+    forms.add(json.dumps(needle)[1:-1].encode("utf-8"))  # as JSON would embed it
+    return {f for f in forms if f}
+
+
+def _decompressed_views(data):
+    """`data` plus anything it decompresses to, so a gzipped copy is not invisible."""
+    import gzip
+    import zlib
+    views = [data]
+    for opener in (gzip.decompress, zlib.decompress,
+                   lambda d: zlib.decompress(d, -zlib.MAX_WBITS)):
+        try:
+            views.append(opener(data))
+        except Exception:
+            pass
+    # a gzip member embedded inside a larger file
+    idx = data.find(bytes((0x1F, 0x8B)))
+    if idx > 0:
+        try:
+            views.append(gzip.decompress(data[idx:]))
+        except Exception:
+            pass
+    return views
+
+
+def present_in_bytes(needle, data):
+    """Is this proposition present in these bytes, in ANY plausible encoding or container?"""
+    forms = _needle_forms(needle)
+    for view in _decompressed_views(data):
+        for form in forms:
+            if form in view:
+                return True
+    return False
+
+
+def _present(needle, haystack):
+    """Is `needle` in `haystack`, whatever encoding the binding chose to dump in?
+
+    A binding is free to serialise with `json.dumps(..., ensure_ascii=True)`, which turns
+    "je vegetarian" with an accent into "je vegetari\u00e1n". A plain substring search then misses
+    it, and the runner reports a clean erasure over a store that kept the value verbatim. Erasure
+    requests are overwhelmingly names and addresses, so the values most likely to be searched for
+    are exactly the ones that carry non-ASCII characters. The runner cannot dictate a third party's
+    encoding, so it searches for both forms.
+    """
+    if needle in haystack:
+        return True
+    escaped = needle.encode("unicode_escape").decode("ascii")
+    if escaped != needle and escaped in haystack:
+        return True
+    try:                                    # and the reverse: an escaped dump decoded back
+        return needle in haystack.encode("ascii", "ignore").decode("unicode_escape")
+    except Exception:
+        return False
+
+
+def _scan(root):
+    """Every file under `root` with its size and mtime. The observation primitive."""
+    out = {}
+    for base, _dirs, names in os.walk(root):
+        for n in names:
+            fp = os.path.join(base, n)
+            try:
+                st = os.stat(fp)
+                out[fp] = (st.st_size, st.st_mtime_ns)
+            except OSError:
+                pass
+    return out
+
+
+def read_channel(root, before):
+    """Read every byte written under a root THE RUNNER CHOSE, not one the binding named.
+
+    THE FIFTH DESIGN. Each earlier one asked the subject something and was answered dishonestly:
+
+      v1  `raw_dump()` -- returned "", or "{}", or a hard-coded list.
+      v2  a canary the binding had to reproduce -- the sentinel was `hash(tuple(paths))`, a function
+          of paths the BINDING chooses, computed in the same process, so a binding forged it, wrote
+          it to a decoy, and passed with no store write at all.
+      v3  `persisted_root()` plus a before/after scan -- the diff proves LIVENESS and never SCOPE, so
+          a copy one directory above the declared root, or a decoy sub-root holding only a view file,
+          was never looked at. And reading with errors="replace" was blind to a gzip side copy.
+
+    So nothing about the location is asked. The runner allocates a private directory and points
+    `tempfile.tempdir` at it while the store is built, so a store creating files the ordinary way
+    lands inside it whether or not the binding admits where it writes. Files are read as BYTES and
+    matched against every plausible encoding and container, because a value the reader cannot decode
+    is a value it will certify as erased.
+
+    THE GAP THAT REMAINS, stated rather than papered over: a write after this returns -- an atexit
+    hook, a finalizer, a lazy flush -- is still missed. Closing it needs the case in a subprocess.
+    """
+    after = _scan(root)
+    if not after:
+        return None, "nothing was written under the runner-allocated root at all"
+    touched = [f for f, meta in after.items() if before.get(f) != meta]
+    chunks = []
+    for fp in sorted(after):
+        try:
+            chunks.append(io.open(fp, "rb").read())
+        except OSError:
+            pass
+    return chunks, "%d file(s) present, %d changed, read as bytes under a runner-allocated root" % (
+        len(after), len(touched))
 
 
 def compare(case, observed, strict=True):
@@ -194,16 +406,37 @@ def compare(case, observed, strict=True):
     """
     exp, fails = case["expect"], []
     if strict:
+        if not (observed.get("_texts") or []):
+            # `all([])` is True, so an empty list satisfied the faithfulness and cross-check tests
+            # at once. A store that claims to assert nothing after a repair is a finding, not a pass.
+            fails.append("the store reports no active propositions at all, so every check that reads "
+                         "them is vacuous")
+        if observed.get("store_property", {}).get("binding_disagrees_with_recall"):
+            fails.append("the binding's active_texts disagrees with the adapter's own recall() for "
+                         "%s; a self-reported store state is not evidence"
+                         % observed["store_property"]["binding_disagrees_with_recall"][:3])
         for arm, got in observed.get("triad", {}).items():
             if arm not in (exp.get("triad") or {}) and got != "pass":
                 fails.append("unspecified triad.%s = %s (case did not declare it; it must still "
                              "conform)" % (arm, got))
+        if ("checkpoint_coverage" not in exp
+                and observed.get("checkpoint_coverage") not in (None, "verified", "(absent)")):
+            fails.append("unspecified checkpoint_coverage = %s (case did not declare it; it must "
+                         "still conform)" % observed.get("checkpoint_coverage"))
         if "aggregate" not in exp and observed.get("aggregate") not in (None, "verified"):
             fails.append("unspecified aggregate = %s (case did not declare it; it must still "
                          "conform)" % observed.get("aggregate"))
     for key in ("checkpoint_coverage", "aggregate"):
-        if key in exp and observed.get(key) != exp[key]:
-            fails.append("%s: expected %s, got %s" % (key, exp[key], observed.get(key)))
+        if key not in exp:
+            continue
+        want = exp[key]
+        # A contract that permits a SET must be scored as a set. Our first version pinned `unknown`
+        # where IDEA.md says "remain `partial` or `unknown`" -- the single value inspeximus happens
+        # to emit -- so a conforming adapter answering `partial` would have failed our fixture. His
+        # own reference test expects `partial` for a related shape.
+        allowed = want if isinstance(want, list) else [want]
+        if observed.get(key) not in allowed:
+            fails.append("%s: expected one of %s, got %s" % (key, allowed, observed.get(key)))
     for arm, want in (exp.get("triad") or {}).items():
         got = observed["triad"].get(arm)
         if got != want:
@@ -219,6 +452,18 @@ def compare(case, observed, strict=True):
         elif prop in ("preserved_text_present", "unrelated_text_present"):
             if want not in observed["_texts"]:
                 fails.append("%s: %r is not asserted" % (prop, want))
+        elif prop == "erased_text_absent_from_persisted_state":
+            raw = observed.get("_raw")
+            texts = observed.get("_texts") or []
+            if not raw:
+                fails.append("no persistence observed (%s), so erasure cannot be distinguished from "
+                             "concealment. Absent evidence is not evidence of absence and this case "
+                             "fails closed." % observed.get("channel", "unknown"))
+            elif not all(any(present_in_bytes(t, c) for c in raw) for t in texts if t):
+                fails.append("the observed bytes do not contain the store's own active propositions, "
+                             "so what was scanned is not a faithful record of it")
+            elif any(present_in_bytes(want, c) for c in raw):
+                fails.append("CONCEALED, not erased: %r survives in the persisted state" % want)
     for prop, want in (exp.get("receipt_property") or {}).items():
         if prop == "forbidden_value_absent":
             if want in observed["_blob"]:
@@ -278,12 +523,43 @@ def verify_citation(case, pkg):
     return None
 
 
-def source_digest(pkg):
-    """A deterministic digest of the source tree actually scored, so `--pkg` cannot be arbitrary."""
+def _implementation_identity(binding):
+    """Digest the code actually graded. The spec tree was pinned to hex; the subject was anonymous.
+
+    A conformance result that names its specification precisely and its implementation not at all
+    cannot be re-checked by anyone, which is most of what a conformance result is for.
+    """
+    import hashlib
+    out = {"binding_class": "%s.%s" % (type(binding).__module__, type(binding).__name__)}
+    seen = {}
+    for obj in (type(binding),):
+        mod = sys.modules.get(obj.__module__)
+        path = getattr(mod, "__file__", None)
+        if path and os.path.exists(path):
+            seen[os.path.basename(path)] = hashlib.sha256(
+                io.open(path, "rb").read()).hexdigest()[:16]
+    try:
+        import inspeximus
+        seen["inspeximus.__version__"] = getattr(inspeximus, "__version__", "unknown")
+    except Exception:
+        pass
+    out["source_digests"] = seen
+    return out
+
+
+def source_digest(pkg, cited=()):
+    """A deterministic digest of the source tree actually scored, so `--pkg` cannot be arbitrary.
+
+    THE CITED FILES ARE PART OF THE TREE. An earlier version walked `prototype/` and `spec/` only,
+    which left `IDEA.md` -- the normative source two of four cases quote -- outside the digest. A
+    sentence forged into it was quoted by a case and the run went green with the digest UNCHANGED,
+    so "a tampered tree is REFUSED" was false as published. Anything a case cites is now covered,
+    wherever it lives, and the citation check reads the same bytes the digest binds.
+    """
     import hashlib
     h = hashlib.sha256()
     roots = [os.path.join(pkg, "prototype"), os.path.join(pkg, "spec")]
-    files = []
+    files = [os.path.join(pkg, c) for c in cited if os.path.exists(os.path.join(pkg, c))]
     for root in roots:
         for base, _dirs, names in os.walk(root):
             if "__pycache__" in base:
@@ -291,7 +567,7 @@ def source_digest(pkg):
             for n in sorted(names):
                 if n.endswith((".py", ".json", ".md")):
                     files.append(os.path.join(base, n))
-    for path in sorted(files):
+    for path in sorted(set(files)):
         h.update(os.path.relpath(path, pkg).replace("\\", "/").encode("utf-8"))
         h.update(io.open(path, "rb").read())
     return h.hexdigest(), len(files)
@@ -301,6 +577,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--pkg", required=True, help="directory containing prototype/")
     ap.add_argument("--binding", default=None, help="module:Class implementing build/active_texts")
+    ap.add_argument("--result", default=None,
+                    help="write the result JSON here instead of beside the fixture")
     ap.add_argument("--pkg-digest", default=None,
                     help="refuse to run unless the scored tree hashes to this")
     ap.add_argument("--inspeximus", default=r"C:/Users/Danculus/inspeximus-repo")
@@ -321,21 +599,36 @@ def main(argv=None):
     # to --pkg could be scored and reported under this fixture's name. Reported upstream as a
     # source-binding gap. The adapter's own pin is asserted, the scored tree is digested, and
     # --pkg-digest makes that binding enforceable rather than merely recorded.
-    from inspeximus.integrations.llm_errata import SPEC_COMMIT, SPEC_G2_DIGEST
+    # The target is the FIXTURE's, not any implementation's. An earlier version imported
+    # inspeximus here unconditionally, so a third party with their own binding got an ImportError
+    # on line one of main() while the README promised nothing above InspeximusBinding named us.
+    # It also meant the "source binding" compared two inspeximus-authored constants against an
+    # inspeximus-authored fixture, which is a mirror, not a check.
     target = fixture.get("target", {})
-    if target.get("commit") and SPEC_COMMIT != target["commit"]:
-        raise AssertionError("the adapter is bound to %s but the fixture targets %s"
-                             % (SPEC_COMMIT[:12], target["commit"][:12]))
-    if target.get("g2_digest") and SPEC_G2_DIGEST != target["g2_digest"]:
-        raise AssertionError("the adapter carries a different G2 digest than the fixture targets")
-    tree_digest, n_files = source_digest(a.pkg)
-    if a.pkg_digest and a.pkg_digest.strip().lower() != tree_digest:
+    SPEC_COMMIT = target.get("commit", "(declared by the fixture only)")
+    SPEC_G2_DIGEST = target.get("g2_digest", "")
+    declared = getattr(binding, "spec_commit", None)
+    if declared and target.get("commit") and declared != target["commit"]:
+        raise AssertionError("the binding declares spec commit %s but the fixture targets %s"
+                             % (declared[:12], target["commit"][:12]))
+    cited = sorted({c["normative"]["source"].split(",")[0].strip()
+                    for c in fixture["adapter_cases"] if c.get("normative", {}).get("source")})
+    tree_digest, n_files = source_digest(a.pkg, cited)
+    expected_tree = a.pkg_digest or target.get("source_tree_digest")
+    if expected_tree and expected_tree.strip().lower() != tree_digest:
+        a.pkg_digest = expected_tree
+    if expected_tree and expected_tree.strip().lower() != tree_digest:
         raise AssertionError("REFUSED: --pkg does not match the declared source digest.\n"
                              "  declared : %s\n  scored   : %s" % (a.pkg_digest.strip(), tree_digest))
 
-    out = {"fixture_status": fixture["status"], "binding": binding.name,
+    out = {"fixture_status": fixture["status"],
+           "binding": binding.name,
+           # `binding.name` is self-declared: every adversarial binding in our own validation wrote
+           # "inspeximus" into this file. Record the class that actually ran.
+           "binding_class": "%s.%s" % (type(binding).__module__, type(binding).__name__),
            "spec_commit": SPEC_COMMIT, "g2_digest": SPEC_G2_DIGEST,
-           "scored_tree_digest": tree_digest, "scored_files": n_files, "cases": []}
+           "scored_tree_digest": tree_digest, "scored_files": n_files,
+           "implementation": _implementation_identity(binding), "cases": []}
     print("Candidate adapter conformance -- binding: %s" % binding.name)
     print("adapter bound to %s | scored tree %s (%d files)"
           % (SPEC_COMMIT[:12], tree_digest[:16], n_files))
@@ -353,11 +646,42 @@ def main(argv=None):
         observed = evaluate(case, binding, a.pkg, mutate=False)
         ok, fails = compare(case, observed)
 
-        # RULE 2: the case must have reached the surface it claims to test.
-        required = set(case["positive_control"]["adapter_methods_required"])
-        reached = required & set(observed["methods_reached"])
-        control_ok = reached == required
-        missing = sorted(required - reached)
+        # RULE 2: each declared method must be LOAD-BEARING, proven by stubbing it and requiring
+        # the case to stop passing.
+        #
+        # The first version asked whether a function of that name was entered on the adapter. That
+        # cannot fail: the controller drives 12 to 13 of the adapter's 14 methods on every run while
+        # a case declares 3 or 4, so every case satisfied it automatically. The tell was in our own
+        # audit, which had to require `sign` -- a method that is not on the adapter at all -- to make
+        # the guard fire. It also had the opposite error: a real method supplied as a lambda reports
+        # its code name as `<lambda>` and was scored MISSING despite running.
+        required = list(case["positive_control"]["adapter_methods_required"])
+        load_bearing, inert = [], []
+        for method in required:
+            noticed = False
+            for variant in range(2):
+                try:
+                    stubbed = evaluate(case, binding, a.pkg, stub_method=(method, variant))
+                    passes, _ = compare(case, stubbed)
+                    if not passes:
+                        noticed = True
+                        break
+                except IndexError:
+                    break
+                except ValueError:
+                    # No stand-in exists for this name. That is not evidence of anything: it means
+                    # the case declared a method this runner cannot probe, and crediting it was how
+                    # `sign` and `absolutely_not_a_method` scored "load-bearing". Refuse the case.
+                    raise AssertionError(
+                        "case %r declares %r, which has no stand-in and therefore cannot be shown "
+                        "load-bearing. A method the runner cannot probe must not be credited."
+                        % (case["id"], method))
+                except Exception:
+                    noticed = True   # the case cannot even run without it: load-bearing
+                    break
+            (load_bearing if noticed else inert).append(method)
+        control_ok = not inert
+        missing = inert
 
         # RULE 3: the case must fail against the flattering implementation it names.
         # An exception is NOT a caught mutation. The first version credited any raise, so a mutation
@@ -391,13 +715,15 @@ def main(argv=None):
         passed += bool(good)
         print("[%s] %s" % ("PASS" if good else "FAIL", case["id"]))
         print("      expectation : %s" % ("met" if ok else "; ".join(fails)))
-        print("      control     : reached %d/%d declared methods%s"
-              % (len(reached), len(required), "" if control_ok else " -- MISSING %s" % missing))
+        print("      control     : %d/%d declared methods are load-bearing%s"
+              % (len(load_bearing), len(required),
+                 "" if control_ok else " -- INERT (stubbing them changes nothing): %s" % inert))
         print("      mutation    : %s (%s)" % (case["mutation"]["flattering_behaviour"], mut_note))
         out["cases"].append({
             "id": case["id"], "pass": good, "expectation_met": ok, "failures": fails,
             "normative_source": case["normative"]["source"],
-            "methods_required": sorted(required), "methods_reached": sorted(reached),
+            "methods_required": sorted(required), "methods_load_bearing": sorted(load_bearing),
+            "methods_inert": sorted(inert),
             "positive_control_ok": control_ok, "mutation_caught": mutation_caught,
             "observed": {k: v for k, v in observed.items() if not k.startswith("_")}})
 
@@ -405,8 +731,11 @@ def main(argv=None):
     print("\n%d/%d candidate adapter cases pass for %s" % (passed, total, binding.name))
     print("This is not G2 or G4 evidence. %s" % fixture["authored_by"]["disclosure"])
     out["totals"] = {"cases": total, "passed": passed}
-    io.open(RESULT, "w", encoding="utf-8", newline="\n").write(json.dumps(out, indent=2) + "\n")
-    print("wrote %s" % os.path.basename(RESULT))
+    # The audit runs with `--result` pointing at a throwaway file. Without that it overwrote the
+    # PUBLISHED result, so the artifact we shipped was a mutant run from inside the audit.
+    dest = a.result or RESULT
+    io.open(dest, "w", encoding="utf-8", newline="\n").write(json.dumps(out, indent=2) + "\n")
+    print("wrote %s" % os.path.basename(dest))
     return 0 if passed == total else 1
 
 
@@ -439,6 +768,16 @@ class InspeximusBinding:
 
     def active_texts(self, handle):
         return [r.get("text") for r in handle.items if r.get("status") == "active"]
+
+    def persisted_root(self, handle):
+        """The DIRECTORY this store persists into. Not a file list, and not a dump.
+
+        The runner scans it before and after the case and reads whatever changed, so sidecars this
+        binding never mentions -- receipts, tombstones, indexes -- are covered without either side
+        having to enumerate them. Declaring one file was how a previous version measured an erasure
+        over a third of the persistence surface.
+        """
+        return os.path.dirname(os.path.abspath(getattr(handle, "path", "") or "."))
 
 
 if __name__ == "__main__":

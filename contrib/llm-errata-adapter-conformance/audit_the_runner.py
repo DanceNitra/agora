@@ -43,44 +43,76 @@ def main(argv=None):
         io.open(RUNNER, "w", encoding="utf-8", newline="\n").write(orig_py)
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(orig_fx)
 
+    tmp_result = os.path.join(HERE, ".audit-result.json")
+
     def run(extra=None):
-        r = subprocess.run([sys.executable, "-X", "utf8", RUNNER, "--pkg", a.pkg] + (extra or []),
+        """Run the runner into a THROWAWAY result file and return (rc, output, parsed verdicts).
+
+        Two defects fixed here. The audit used to let the runner overwrite the published
+        `adapter-conformance.result.json`, so after a clean audit the shipped artifact was the
+        guard-7 MUTANT run -- and that file went out. And every guard asserted on printed text or on
+        `rc != 0`, which the known-failing case supplies anyway, so the audit reported 7/7 with the
+        verdict line replaced by `good = ok`: it measured that the runner NARRATES its guards, not
+        that they gate anything. Guards now read the machine-readable verdict.
+        """
+        # DELETE IT FIRST. A run that ABORTS never writes, so a leftover file from the previous
+        # guard was read as this guard's verdicts, and the three refusal guards -- which require
+        # there to be no verdicts at all -- read the last successful run instead and reported
+        # DOES NOT FIRE. Reading a stale artifact as if it were this run's output is the same
+        # mistake this whole suite exists to catch.
+        try:
+            os.remove(tmp_result)
+        except OSError:
+            pass
+        r = subprocess.run([sys.executable, "-X", "utf8", RUNNER, "--pkg", a.pkg,
+                            "--result", tmp_result] + (extra or []),
                            capture_output=True, text=True, cwd=HERE)
-        return r.returncode, r.stdout + r.stderr
+        verdicts = {}
+        try:
+            doc = json.loads(io.open(tmp_result, encoding="utf-8").read())
+            verdicts = {c["id"]: c for c in doc.get("cases", [])}
+        except Exception:
+            pass
+        return r.returncode, r.stdout + r.stderr, verdicts
 
     def patch_runner(old, new):
         assert old in orig_py, "the audit's own anchor is gone: %r" % old[:50]
         io.open(RUNNER, "w", encoding="utf-8", newline="\n").write(orig_py.replace(old, new))
 
     rows = []
+    C1 = "undeclared-derivative-must-not-reach-verified"
     try:
         # GUARD 1 -- a crash during a mutation must not be credited as a caught mutation.
         patch_runner("        adapter.lineage_complete = lambda root: True",
                      '        raise RuntimeError("mutation cannot install")')
-        rc, out = run()
+        rc, out, verdicts = run()
         rows.append(("exception is not a caught mutation",
-                     rc != 0 and "is NOT a caught mutation" in out))
+                     verdicts.get(C1, {}).get("mutation_caught") is False
+                     and verdicts.get(C1, {}).get("pass") is False))
         restore()
 
-        # GUARD 2 -- the positive control must bind to the adapter INSTANCE, not a function name.
-        # `sign` exists in the process (the signer) but is never called on the adapter, so a
-        # name-matching tracer accepts it and an instance-bound one does not.
+        # GUARD 2 -- the positive control must be able to call a declared method INERT.
+        # The old guard tested a name-matching tracer and stopped applying when the control became a
+        # stub test; it reported DOES NOT FIRE, which is the audit working. `coverage_detail` is on
+        # the adapter but the repair path never consults it, so declaring it must be caught. Then the
+        # control loop is forced to mark everything load-bearing and the same case must go green,
+        # which is what proves the guard is reading the control rather than the weather.
         fx = json.loads(orig_fx)
-        fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("sign")
+        fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("coverage_detail")
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        patch_runner("        self.target = target", "        self.target = None  # MUTANT")
-        _, lax_out = run()
-        io.open(RUNNER, "w", encoding="utf-8", newline="\n").write(orig_py)
-        _, strict_out = run()
-        lax_accepts = "MISSING" not in lax_out.split("complete-lineage")[0]
-        strict_rejects = "MISSING ['sign']" in strict_out
-        rows.append(("tracing is bound to the target instance", lax_accepts and strict_rejects))
+        _, honest, _h = run()
+        catches_inert = "coverage_detail" in (_h.get(C1, {}).get("methods_inert") or [])
+        patch_runner("            (load_bearing if noticed else inert).append(method)",
+                     "            (load_bearing).append(method)  # MUTANT: nothing is ever inert")
+        _, blind, _b = run()
+        misses_inert = not (_b.get(C1, {}).get("methods_inert") or [])
+        rows.append(("an inert declared method is caught", catches_inert and misses_inert))
         restore()
 
         # GUARD 3 -- an unbound source tree must be refused, not scored.
-        rc, out = run(["--pkg-digest", "0" * 64])
+        rc, out, verdicts = run(["--pkg-digest", "0" * 64])
         rows.append(("--pkg-digest refuses a mismatched tree",
-                     rc != 0 and "does not match the declared source digest" in out))
+                     rc != 0 and "does not match the declared source digest" in out and not verdicts))
 
         # GUARD 4 -- a mutation must produce the counter-result it DECLARED, not merely any failure.
         fx = json.loads(orig_fx)
@@ -88,26 +120,27 @@ def main(argv=None):
                 if c["id"] == "undeclared-derivative-must-not-reach-verified"][0]
         case["mutation"]["must_produce"] = {"aggregate": "this-value-can-never-occur"}
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        rc, out = run()
-        rows.append(("must_produce is evaluated", "not as declared" in out))
+        rc, out, verdicts = run()
+        rows.append(("must_produce is evaluated",
+                     verdicts.get(C1, {}).get("mutation_caught") is False))
         restore()
 
         # GUARD 5 -- a case with no normative citation must be refused rather than scored.
         fx = json.loads(orig_fx)
         fx["adapter_cases"][0]["normative"] = {}
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        rc, out = run()
+        rc, out, verdicts = run()
         rows.append(("a case without a citation is refused",
-                     rc != 0 and "no normative citation" in out))
+                     rc != 0 and "no normative citation" in out and not verdicts))
         restore()
 
         # GUARD 6 -- a citation whose text is absent from the pinned source must be refused.
         fx = json.loads(orig_fx)
         fx["adapter_cases"][0]["normative"]["quote"] = "a sentence that appears in no source file"
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        rc, out = run()
+        rc, out, verdicts = run()
         rows.append(("an invented citation is refused",
-                     rc != 0 and "quoted text is not present" in out))
+                     rc != 0 and "quoted text is not present" in out and not verdicts))
         restore()
 
         # GUARD 7 -- strict comparison: an outcome the case did not mention must still conform.
@@ -118,12 +151,50 @@ def main(argv=None):
         coll["expect"].pop("aggregate", None)
         coll["expect"]["triad"] = {"preserve": "pass"}
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        rc, out = run()
-        still_fails = "[FAIL] collateral-must-survive-a-supersession" in out
+        rc, out, verdicts = run()
+        still_fails = verdicts.get("collateral-must-survive-a-supersession", {}).get("pass") is False
         rows.append(("dropping an expectation does not hide a failure", still_fails))
+        restore()
+        # GUARD 8 -- THE ONE THIS AUDIT DID NOT HAVE, and its absence is why it certified a runner
+        # that ignored its own controls. Nothing bound a guard to the VERDICT: seven guards asserted
+        # on printed text or on an rc the known-failing case supplied anyway, so replacing
+        # `good = ok and control_ok and mutation_caught` with `good = ok` still printed 7/7 and
+        # "every one noticed". An audit that cannot notice its subject ignoring its own controls is
+        # measuring narration.
+        # EACH LINK IS BROKEN SEPARATELY. The first version patched only the final expression, so
+        # rewriting the COMPUTATION -- `control_ok = not inert` to `control_ok = True` -- left all
+        # eight guards firing. The audit certified exactly the property it existed to stop
+        # certifying, and only an outside pass noticed. A chain is pinned at every link or nowhere.
+        links = [
+            ("final verdict", "        good = ok and control_ok and mutation_caught",
+             "        good = ok  # MUTANT"),
+            ("control_ok computation", "        control_ok = not inert",
+             "        control_ok = True  # MUTANT"),
+            ("inert bookkeeping", "            (load_bearing if noticed else inert).append(method)",
+             "            (load_bearing).append(method)  # MUTANT"),
+        ]
+        fx = json.loads(orig_fx)
+        fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("coverage_detail")
+        unpinned = []
+        for label, old_src, new_src in links:
+            io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
+            patch_runner(old_src, new_src)
+            _, _o, gutted = run()
+            # With coverage_detail declared, the honest runner FAILS this case. A mutant that makes
+            # it pass has severed the controls from the verdict at that link.
+            if gutted.get(C1, {}).get("pass") is not True:
+                unpinned.append(label)
+            restore()
+        if unpinned:
+            print("      links NOT pinned: %s" % unpinned)
+        rows.append(("the controls reach the verdict at every link", not unpinned))
         restore()
     finally:
         restore()
+        try:
+            os.remove(tmp_result)
+        except OSError:
+            pass
 
     print("AUDIT OF THE RUNNER'S OWN GUARDS\n")
     for name, ok in rows:

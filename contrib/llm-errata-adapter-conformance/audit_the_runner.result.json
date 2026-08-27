@@ -5,7 +5,7 @@
       "fires": true
     },
     {
-      "guard": "tracing is bound to the target instance",
+      "guard": "an inert declared method is caught",
       "fires": true
     },
     {
@@ -27,8 +27,12 @@
     {
       "guard": "dropping an expectation does not hide a failure",
       "fires": true
+    },
+    {
+      "guard": "the controls reach the verdict at every link",
+      "fires": true
     }
   ],
-  "fired": 7,
-  "total": 7
+  "fired": 8,
+  "total": 8
 }

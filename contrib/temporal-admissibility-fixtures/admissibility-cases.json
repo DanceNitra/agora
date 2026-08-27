@@ -1,5 +1,5 @@
 {
-  "description": "Candidate vendor-neutral fixtures for temporal admissibility of stored evidence. Six failure cases, each with a paired non-failure control, over the invariant that historical evidence may remain VALID without being ADMISSIBLE for the current session, the current world-state, or the current point of use. Implementations stay completely different; what interoperates is the falsification surface.",
+  "description": "Candidate cases for temporal admissibility, expressed in the CML applicability vocabulary (safal207/Causal-Memory-Layer) rather than a new one. Six failure cases, each with a paired non-failure control. The finding is that CML's six statuses need NO additions to carry all six boundaries -- what they need is four REASONS, because two pairs of cases currently share a status while having opposite remedies.",
   "status": "CANDIDATE. Drafted from the six boundaries named by @safal207 on anthropics/claude-code#34556 (2026-08-17), which folded in the two @Stratogain proposed. Not accepted by anyone. Being proposed, or merged, makes no output here independent evidence.",
   "authored_by": "inspeximus, which is one of the implementations these cases grade. An interested party wrote them. A separate producer must validate both the implementations and this fixture; nothing here is independent evidence about inspeximus.",
   "provenance": {
@@ -10,20 +10,11 @@
   "how_a_case_is_stated": {
     "history": "An ordered list of steps the binding must replay. Step kinds: write, observe, mutate_source, delete_source, advance_session, advance_clock. Every field is data; no step names a function in any implementation.",
     "question": "What is asked at the end: {key, window, session}. window is OBSERVE_TO_CAPTURE, CAPTURE_TO_VERIFY or VERIFY_TO_USE — the boundary the answer is about, because admissibility is a property of the (evidence, window) pair and not of the record.",
-    "expect": "{admissible, reason}. `reason` is drawn from the closed vocabulary below and is null when admissible. An implementation may return richer detail; it must be mappable onto exactly one of these.",
+    "expect": "{status, reason}. `status` is one of CML's six, unchanged. `reason` is null, or one of the four this set proposes. An implementation returning richer detail maps it onto exactly one pair.",
     "control": "The paired NON-FAILURE case: same shape, honest history, expect admissible true. A detector that fires on this is crying wolf, and a field that always fires is noise inside a week.",
     "must_fail_under": "A named degradation from `flattering_implementations`. The runner applies it and the case MUST then fail. A fixture nobody has watched fail is a fixture nobody has tested.",
     "reaches": "One key of `surface_vocabulary`. The binding returns the surfaces it consulted using those exact keys, and the runner checks the named one is among them. It was free text in the first draft, which made the rule unenforceable for anyone who had not read our binding.",
     "discriminates": "OPTIONAL third scenario, for cases where two failure modes are easy to lump together. It carries its own expectation and asserts the detector tells them APART. It is not the control: a control must be a NON-failure, or a detector that answers inadmissible to everything passes the pair."
-  },
-  "reason_vocabulary": {
-    "SOURCE_DRIFTED": "The locator still resolves and the bytes behind it differ from those the record was derived from.",
-    "OBSERVATION_FOREIGN_SESSION": "An observation backing this record exists but belongs to another session, so it does not establish that this agent saw these bytes.",
-    "NEVER_OBSERVED": "No read-time observation exists; any digest present was computed at write time and cannot speak for what was read.",
-    "STALE_AT_USE": "The evidence was verified, and the world moved between that verification and the point of use.",
-    "SOURCE_ORPHANED": "The locator no longer resolves at all. Distinct from drift: the remedy is to re-source, not to revalidate.",
-    "COLLECTOR_SILENT": "The out-of-band collector that supplies observations has produced none while reads continued, so coverage is unchanged for a reason unrelated to health.",
-    "IDENTIFIER_MISMATCH": "The identifier under which the record was written is not the identifier under which it is queried, so its evidence is unreachable and silently degrades."
   },
   "flattering_implementations": {
     "always_admissible": "Return admissible for everything. The floor: any case it survives is measuring nothing.",
@@ -69,8 +60,8 @@
         "session": "S1"
       },
       "expect": {
-        "admissible": false,
-        "reason": "SOURCE_DRIFTED"
+        "status": "DRIFT",
+        "reason": null
       },
       "control": {
         "why": "The same history without the mutation. If this reports drift, the field is noise and every case above it is measuring a constant.",
@@ -97,7 +88,7 @@
           "session": "S1"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -139,8 +130,8 @@
         "session": "S2"
       },
       "expect": {
-        "admissible": false,
-        "reason": "OBSERVATION_FOREIGN_SESSION"
+        "status": "REVALIDATE",
+        "reason": "source_observation_foreign_session"
       },
       "control": {
         "why": "Same file, same digest, OWN session. @Stratogain's own control, and the one that separates 'we filter by session' from 'we wiped the ledger'.",
@@ -167,7 +158,7 @@
           "session": "S2"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -214,8 +205,8 @@
         "session": "S1"
       },
       "expect": {
-        "admissible": false,
-        "reason": "SOURCE_DRIFTED"
+        "status": "DRIFT",
+        "reason": null
       },
       "control": {
         "why": "Honest capture, nothing moved. The non-failure control this case was missing.",
@@ -246,7 +237,7 @@
           "session": "S1"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -283,8 +274,8 @@
           "session": "S1"
         },
         "expect": {
-          "admissible": false,
-          "reason": "SOURCE_ORPHANED"
+          "status": "ORPHAN",
+          "reason": null
         }
       }
     },
@@ -327,8 +318,8 @@
         "session": "S1"
       },
       "expect": {
-        "admissible": false,
-        "reason": "STALE_AT_USE"
+        "status": "DRIFT",
+        "reason": "source_drift_after_verification"
       },
       "control": {
         "why": "Verified, and nothing moved. The store's own integrity answer is clean in BOTH cases, which is the point: an implementation that answers this window from store state alone passes the control and fails the case.",
@@ -360,7 +351,7 @@
           "session": "S1"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -419,8 +410,8 @@
         "session": "S1"
       },
       "expect": {
-        "admissible": false,
-        "reason": "COLLECTOR_SILENT"
+        "status": "UNRESOLVABLE",
+        "reason": "observation_collector_silent"
       },
       "control": {
         "why": "The collector keeps running and every write gets its observation. Without this the case is satisfiable by an implementation that reports COLLECTOR_SILENT whenever any record lacks an observation, which is a different and much noisier claim.",
@@ -477,7 +468,7 @@
           "session": "S1"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -515,8 +506,8 @@
         "session": "session-abcdefgh-0001"
       },
       "expect": {
-        "admissible": false,
-        "reason": "OBSERVATION_FOREIGN_SESSION"
+        "status": "REVALIDATE",
+        "reason": "source_observation_foreign_session"
       },
       "control": {
         "why": "The record's OWN session observed the doc, and another session's near-identical id is present as a distractor. A correct implementation says admissible; one that truncates says admissible too -- but it fails the case above, which is where the pair does its work.",
@@ -549,7 +540,7 @@
           "session": "session-abcdefgh-0001"
         },
         "expect": {
-          "admissible": true,
+          "status": "MATCH",
           "reason": null
         }
       },
@@ -572,5 +563,22 @@
     "re_read_at_point_of_use": "It re-read at the moment of use, not only at verification.",
     "collector_liveness": "It asked whether the observation collector is still running.",
     "identifier_equality_write_vs_read": "It compared identifiers without normalising on one side."
+  },
+  "why_not_a_new_vocabulary": "The first draft of this file invented its own reason codes. That was wrong twice over: @safal207 asked for a SHARED falsification surface, and inspeximus had already implemented his six outcomes and his precedence on 2026-08-11 (reported in the thread, 15/15 against his frozen fixture). Shipping a second vocabulary from the codebase that had just adopted his is the opposite of the request. Caught by a red-team pass before this went anywhere.",
+  "status_vocabulary": {
+    "_source": "safal207/Causal-Memory-Layer, cml/integrations/memory_applicability.py @ 18e3bee. Precedence REJECT > UNRESOLVABLE > ORPHAN > DRIFT > REVALIDATE > MATCH.",
+    "MATCH": "Admissible now.",
+    "DRIFT": "The source moved.",
+    "ORPHAN": "The locator no longer resolves.",
+    "UNRESOLVABLE": "Nothing can be fetched to check against.",
+    "REVALIDATE": "Admissible only after re-establishing something.",
+    "REJECT": "Refused outright."
+  },
+  "reasons_this_set_proposes": {
+    "_note": "FOUR reasons, no new statuses. Each exists because two situations currently share one status while wanting different remedies -- the same DRIFT/ORPHAN distinction CML already draws, applied one field over.",
+    "source_observation_foreign_session": "REVALIDATE. An observation exists for the locator but belongs to another session. Today expressible via `actor`, which means who APPLIES the memory rather than who OBSERVED the source; the two facts land on one field.",
+    "source_drift_after_verification": "DRIFT. The source matched at a verification that passed, and moved before use. Currently indistinguishable from never-verified drift; remedies differ (revalidate vs re-derive).",
+    "observation_collector_silent": "UNRESOLVABLE. The out-of-band collector stopped, so new records get no observation. Today indistinguishable from a permanently unresolvable anchor such as a writer label -- one is an outage that ends when a process restarts, the other never changes.",
+    "identifier_written_not_identifier_queried": "REVALIDATE. The lookup resolved under a different identifier than the write used. Cannot be posed to a per-record evaluator at all, because its inputs describe a record already FOUND."
   }
 }
