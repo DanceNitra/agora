@@ -45,9 +45,21 @@ jobs:
       - name: The provenance controls can fail
         run: python -X utf8 probes/prove_the_provenance_controls_can_fail.py
 
-      # And the harness must not be able to pass vacuously. If it ever reports zero mutations, the
-      # line above would still exit 0 while testing nothing.
+      # And the harness must not be able to pass vacuously. A harness that stopped running its
+      # mutations would still exit 0 while testing nothing, so the count is asserted here rather
+      # than pinned to a literal, which would only have to be edited every time one is added.
       - name: The harness ran its mutations
         run: |
-          python -X utf8 probes/prove_the_provenance_controls_can_fail.py | tee /tmp/out.txt
-          grep -qE '^4 of 4 mutations caught$' /tmp/out.txt
+          python -X utf8 probes/prove_the_provenance_controls_can_fail.py | tee out.txt
+          python - <<'EOF'
+          import re, sys
+          m = re.search(r"^(\d+) of (\d+) mutations caught$", open("out.txt").read(), re.M)
+          if not m:
+              sys.exit("the harness printed no mutation count")
+          caught, total = int(m.group(1)), int(m.group(2))
+          if total < 5:
+              sys.exit("only %d mutations ran; this suite is not exercising the controls" % total)
+          if caught != total:
+              sys.exit("%d of %d mutations survived" % (total - caught, total))
+          print("%d of %d mutations caught" % (caught, total))
+          EOF

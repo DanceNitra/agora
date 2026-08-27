@@ -77,8 +77,10 @@ stores it exits 1 and says so rather than reporting a zero over an empty scan.
 """
 from __future__ import annotations
 import collections
+import datetime
 import json
 import os
+import re
 import sys
 import tempfile
 import urllib.parse
@@ -132,33 +134,82 @@ def live_stores(argv=None):
     return out
 
 
+GIT_REF = re.compile(r"^(?:git:)?[0-9a-f]{7,40}$")
+
+
 def raw_source(rec):
+    """The `source` field as a string. What it SELECTS is deliberately unchanged: the published
+    metric is about this field, and moving the goalposts would make the correction unreadable.
+
+    One thing did change. `doc` used to outrank every other key unconditionally, so a record holding
+    both a bare {"doc": "agent:x"} and a real {"uri": "https://..."} reported the unresolvable one.
+    No record in our stores has both, so this fixes nothing here; it would matter in somebody else's
+    store, and this probe is offered to other people.
+    """
     s = rec.get("source")
     if s is None:
         s = (rec.get("meta") or {}).get("source")
     if isinstance(s, dict):
-        s = s.get("doc") or s.get("uri") or s.get("path") or json.dumps(s, sort_keys=True)
-    return s if isinstance(s, str) and s.strip() else None
+        cand = [s.get(k) for k in ("doc", "uri", "url", "path", "href")]
+        cand = [c.strip() for c in cand if isinstance(c, str) and c.strip()]
+        for c in cand:
+            if addressable(c):
+                return c
+        s = cand[0] if cand else json.dumps(s, sort_keys=True)
+    return s.strip() if isinstance(s, str) and s.strip() else None
 
 
-def addressable(loc):
+def record_locators(rec):
+    """EVERY string in the record that could name a place, not only the one under `source`.
+
+    THIS EXISTS BECAUSE THE PUBLISHED HEADLINE WAS FALSE, and an adversarial re-run caught it. We
+    wrote that nothing in these stores resolves. In the coding store all 173 sourced records carry
+    `meta.files` -- 428 repo-relative paths, 408 of which exist on disk -- beside a `meta.sha` whose
+    values are real commits. The provenance was there. It sat one key away from the field named
+    `source`, and an audit scoped to that field reported zero over it.
+
+    That is the finding rather than a footnote. A field-level provenance audit measures the NAMING,
+    and a record can carry a good reference somewhere the auditor never looks, which is the same
+    mistake the post is about, made by the probe that found it.
+    """
+    out = []
+    s = rec.get("source")
+    if isinstance(s, str):
+        out.append(s)
+    elif isinstance(s, dict):
+        out += [v for v in s.values() if isinstance(v, str)]
+    m = rec.get("meta")
+    if isinstance(m, dict):
+        for k in ("files", "file", "path", "paths", "uri", "url", "href", "doc"):
+            v = m.get(k)
+            if isinstance(v, str):
+                out.append(v)
+            elif isinstance(v, list):
+                out += [x for x in v if isinstance(x, str)]
+    return [x.strip() for x in out if isinstance(x, str) and x.strip()]
+
+
+def addressable(loc, bases=()):
     """SYNTAX only: does this name a place, whether or not anything is there?
 
-    Renamed from `recheckable` and narrowed, after @perseus-computing reported on r/RAG that the
-    original returned True for `https://example.invalid/...` without making a request, so the
-    published metric was syntax-level addressability while the write-up called it re-checkable.
-    That is correct and it was worse than reported: the original also passed the bare string
-    `https://`, a scheme with no host at all.
+    Narrowed after @perseus-computing reported on r/RAG that the published version returned True for
+    `https://example.invalid/...` without making a request, so the metric was syntax-level
+    addressability while the write-up called it re-checkable. He was right. It also passed the bare
+    string `https://`, a scheme with no host, though that is the degenerate member of the class he
+    named rather than a second one.
 
-    The zero is unaffected, because `agent:scholar` and `git:162de50e1702` fail this too, but any
-    store holding real URLs would have been scored optimistically, and this is a probe other people
-    were invited to run. A metric that cannot tell a live URL from a dead one must not be named
-    after fetching.
+    A relative path resolves against explicit bases, never against the current directory. It used to
+    use plain `os.path.exists`, which made the answer depend on where you happened to run it: the
+    same store scored differently from the repo root than from anywhere else.
     """
     if not isinstance(loc, str) or not loc.strip():
         return False
-    if os.path.exists(loc):
-        return True
+    loc = loc.strip()
+    if os.path.isabs(loc):
+        return os.path.exists(loc)
+    for b in bases:
+        if b and os.path.exists(os.path.join(b, loc)):
+            return True
     # NOT a bare `except Exception`. The first version of this function wrapped the parse in one,
     # and while the module was missing `import urllib.parse` the AttributeError was swallowed and
     # every locator on earth came back False. That is not a safe default here: this probe's headline
@@ -171,22 +222,29 @@ def addressable(loc):
     return u.scheme in ("http", "https") and bool(u.netloc)
 
 
-def fetches(loc, timeout=5.0):
-    """ONE REQUEST. Returns True only on a 2xx, and it is opt-in for the obvious reasons.
+def retrieves(loc, bases=(), timeout=5.0):
+    """Actually get the bytes: open the file, or issue one GET and require a 2xx.
 
-    @perseus-computing's separation, adopted: locator-present, syntax-valid and fetch-succeeded are
-    three different states and collapsing them is what produced the original defect. The two they
-    also named, snapshot-verified and claim-supported, are not implemented here because this probe
-    does not hold snapshots or claims, and naming a state it cannot measure would repeat the
-    mistake in a new place.
+    Named `retrieves` rather than `fetches` because for a local path it is an open() and not a
+    request, and the old name made the printed line "FETCHED is one GET returning 2xx" untrue for
+    every path. It reads a byte instead of calling os.path.exists, so a file that exists and cannot
+    be read counts as a failure, which is what a reader chasing the citation would experience.
     """
-    if not addressable(loc):
+    if not addressable(loc, bases):
         return False
-    if os.path.exists(loc):
-        return True
+    loc = loc.strip()
+    cands = [loc] if os.path.isabs(loc) else [os.path.join(b, loc) for b in bases if b]
+    for c in cands:
+        if os.path.exists(c):
+            try:
+                with open(c, "rb") as fh:
+                    fh.read(1)
+                return True
+            except OSError:
+                return False
     # Request() itself raises on a URL urlparse accepted, so it is INSIDE the try. Found by the
     # mutation harness beside this file: one malformed locator in someone else's store would
-    # otherwise abort the whole scan, and this probe is one we invite other people to run.
+    # otherwise abort the whole scan, and this is a probe we invite other people to run.
     try:
         req = urllib.request.Request(loc, method="GET", headers={"User-Agent": "provenance-probe"})
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -195,23 +253,25 @@ def fetches(loc, timeout=5.0):
         return False
 
 
+def fetches(loc, timeout=5.0):
+    """Deprecated alias kept so older scripts still answer. It cannot resolve a relative path."""
+    return retrieves(loc, (), timeout)
+
+
 def recheckable(loc):
-    """Kept so anyone who scripted against the old name still gets an answer, and gets the honest
-    one: it now means addressable, which is what it always measured."""
+    """Deprecated alias, kept honest: it means addressable, which is what it always measured."""
     return addressable(loc)
 
 
+OK, FAILED, NOT_TRIED = "ok", "failed", "not_tried"
+
+
 class Fetcher:
-    """One GET per DISTINCT addressable locator, capped, and the cap is reported rather than silent.
+    """One retrieval per DISTINCT locator, capped, with every outcome accounted for separately.
 
-    Splitting the metric was only half of @perseus-computing's point, and the first attempt at that
-    fix got the half that is easy to see. It added `fetches()` and a control for it, and then left
-    the store scan calling `addressable()`. So the fetcher existed, passed its own test, and never
-    saw a single record of the real corpus. A check that never reaches its target reports whatever
-    the absence of a target looks like, which here is the headline itself.
-
-    The cap exists because a store holding 200,000 real URLs would otherwise become a crawl. It is
-    counted and printed, because a bound nobody is told about reads as full coverage.
+    THE CAP USED TO LIE BY OMISSION. It returned False once it bound, so a locator nobody tried was
+    counted beside one that was tried and failed, and the shortfall could not be reconstructed from
+    the output. It now returns a third value and the printout carries it.
     """
 
     def __init__(self, cap=200, timeout=5.0):
@@ -219,29 +279,30 @@ class Fetcher:
         self.timeout = timeout
         self.seen = {}
         self.attempts = 0
-        self.skipped_by_cap = 0
+        self.untried = set()
 
-    def __call__(self, loc):
-        if not addressable(loc):
-            return False
-        if loc in self.seen:
-            return self.seen[loc]
+    def __call__(self, loc, bases=()):
+        key = (loc, tuple(bases))
+        if key in self.seen:
+            return self.seen[key]
         if self.attempts >= self.cap:
-            self.skipped_by_cap += 1
-            return False
+            self.untried.add(loc)
+            return NOT_TRIED
         self.attempts += 1
-        ok = fetches(loc, self.timeout)
-        self.seen[loc] = ok
-        return ok
+        out = OK if retrieves(loc, bases, self.timeout) else FAILED
+        self.seen[key] = out
+        return out
 
 
-def scan(path, fetcher):
+def scan(path, fetcher, bases=None):
     with open(path, encoding="utf-8") as fh:
         blob = json.load(fh)
     items = blob.get("items") if isinstance(blob, dict) else blob
     if not isinstance(items, list):
         return None
-    n = with_src = addr = got = 0
+    if bases is None:
+        bases = (ROOT, os.path.dirname(os.path.abspath(path)))
+    n = with_src = addr = got = failed = untried = rec_addr = gitref = 0
     vals = collections.Counter()
     for r in items:
         if not isinstance(r, dict):
@@ -251,12 +312,21 @@ def scan(path, fetcher):
         if s:
             with_src += 1
             vals[s] += 1
-            if addressable(s):
+            if GIT_REF.match(s):
+                gitref += 1
+            if addressable(s, bases):
                 addr += 1
-                if fetcher(s):
-                    got += 1
+                v = fetcher(s, bases)
+                got += v == OK
+                failed += v == FAILED
+                untried += v == NOT_TRIED
+        if any(addressable(x, bases) for x in record_locators(r)):
+            rec_addr += 1
     return {"records": n, "with_source": with_src,
-            "addressable": addr, "fetched": got, "recheckable": addr,
+            "addressable": addr, "fetched": got,
+            "fetch_failed": failed, "fetch_not_tried": untried,
+            "record_addressable": rec_addr, "git_ref_shaped": gitref,
+            "recheckable": addr,
             "distinct_sources": len(vals), "top": vals.most_common(2),
             "ratio_over_sourced": round(len(vals) / with_src, 6) if with_src else None,
             "ratio_over_all": round(len(vals) / n, 6) if n else None}
@@ -269,16 +339,22 @@ def control():
     deterministic and publishable. That is the right shape: a control that reaches a real site tests
     that site, and on a machine with no network it fails for a reason unrelated to the code.
 
-    Every state is two-sided, and each row can fail on its own:
+    THE SOURCES HERE ARE DICTS, and that is not cosmetic. The earlier fixture used plain strings
+    while every record in the real corpus carries `{"doc": ...}`. An adversarial pass mutated
+    raw_source to ignore the dict branch, which takes our published coverage figure from 90.47% to
+    0.00%, and this control stayed green the whole time. A fixture that cannot take the only shape
+    the data has is decorative.
 
-        a real file on disk       addressable, fetched
-        a missing relative doc    neither
-        served /there             addressable, fetched
-        served /missing           addressable, NOT fetched  <- kills a yes-to-everything fetcher
-        the bare string https://  NOT addressable           <- the exact reported defect
+        1 a real absolute file        addressable, retrieved
+        2 a missing relative doc      neither
+        3 served /there               addressable, retrieved
+        4 served /missing             addressable, NOT retrieved  <- kills a yes-to-everything fetcher
+        5 the bare string https://    NOT addressable             <- the defect that was reported
+        6 git: ref + meta.files       source unresolvable, RECORD resolvable  <- the false headline
+        7 doc unresolvable + uri live addressable through uri     <- key-preference guard
 
-    The last row is a regression guard. The published version returned True for it: a scheme with no
-    host, which cannot be re-checked by anyone.
+    Row 6 is the one that matters. It is the shape of every sourced record in our coding store, and
+    it is why the published claim that nothing resolves was wrong.
     """
     import threading
     from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -288,7 +364,7 @@ def control():
             pass
 
         def do_GET(self):
-            if self.path == "/there":
+            if self.path.startswith("/there"):
                 b = b"ok"
                 self.send_response(200)
                 self.send_header("content-length", str(len(b)))
@@ -310,21 +386,45 @@ def control():
     real = os.path.join(d, "runbook.md")
     with open(real, "w", encoding="utf-8") as fh:
         fh.write("host is db-old")
+    rel = "notes/inner.md"
+    os.makedirs(os.path.join(d, "notes"))
+    with open(os.path.join(d, rel), "w", encoding="utf-8") as fh:
+        fh.write("reached by a repo-relative path, the way meta.files is")
     p = os.path.join(d, "c.json")
+    u = "http://127.0.0.1:%d" % port
     with open(p, "w", encoding="utf-8") as fh:
-        json.dump({"items": [{"text": "a", "source": real},
-                             {"text": "b", "source": "no-such-doc.md"},
-                             {"text": "c", "source": "http://127.0.0.1:%d/there" % port},
-                             {"text": "d", "source": "http://127.0.0.1:%d/missing" % port},
-                             {"text": "e", "source": "https://"}]}, fh)
+        json.dump({"items": [
+            {"text": "a", "source": {"doc": real}},
+            {"text": "b", "source": {"doc": "no-such-doc.md"}},
+            {"text": "c", "source": {"doc": u + "/there"}},
+            {"text": "d", "source": {"doc": u + "/missing"}},
+            {"text": "e", "source": {"doc": "https://"}},
+            {"text": "f", "source": {"doc": "git:9e4973400d34"},
+             "meta": {"files": [rel], "sha": "9e4973400d34"}},
+            {"text": "g", "source": {"doc": "agent:scholar", "uri": u + "/there2"}},
+        ]}, fh)
     try:
-        return scan(p, Fetcher()), ""
+        return scan(p, Fetcher(), bases=(d,)), ""
     finally:
         srv.shutdown()
 
 
-CONTROL_EXPECT = {"records": 5, "with_source": 5, "distinct_sources": 5,
-                  "addressable": 3, "fetched": 2}
+CONTROL_EXPECT = {"records": 7, "with_source": 7, "distinct_sources": 7,
+                  "addressable": 4, "fetched": 3, "record_addressable": 5,
+                  "git_ref_shaped": 1}
+
+
+def print_footer():
+    print("ADDRESSABLE is syntax over the `source` field: does the value name a path or an http(s)")
+    print("URL. FETCHED opens the file or issues one GET and requires a 2xx. RECORD-ADDRESSABLE asks")
+    print("the same question of the WHOLE record.")
+    print("The first two are separate because collapsing them is the defect @perseus-computing")
+    print("reported on r/RAG: the published version called a prefix check re-checkable.")
+    print("The third is here because the published headline was wrong. Every sourced record in the")
+    print("coding store carries meta.files, and most of those repo-relative paths exist on disk, so")
+    print("the provenance was real and sat one key away from the field named `source`. The count is")
+    print("in the receipt rather than in this sentence, because it moves.")
+    print("All three can fail, and the control makes each fail on its own before a store is read.")
 
 
 def main() -> int:
@@ -338,7 +438,8 @@ def main() -> int:
         print("ABORT -- could not build the control fixture: %s" % why)
         return 1
     ok_all = True
-    for k in ("records", "with_source", "distinct_sources", "addressable", "fetched"):
+    for k in ("records", "with_source", "distinct_sources", "addressable", "fetched",
+              "record_addressable", "git_ref_shaped"):
         good = c[k] == CONTROL_EXPECT[k]
         ok_all = ok_all and good
         print("CONTROL  %-16s want %d  got %d   %s"
@@ -373,18 +474,21 @@ def main() -> int:
         print("FAIL -- no stores read; nothing was measured")
         return 1
 
-    print("%-46s %8s %7s %8s %10s %10s %6s %8s"
-          % ("store", "records", "src %", "distinct", "/sourced", "/all", "addr", "fetched"))
+    print("%-46s %8s %7s %8s %9s %6s %8s %9s"
+          % ("store", "records", "src %", "distinct", "/sourced", "addr", "fetched", "rec-addr"))
     for r in sorted(rows, key=lambda x: -x["records"]):
         pct = 100.0 * r["with_source"] / r["records"] if r["records"] else 0.0
-        print("%-46s %8d %6.2f%% %8d %10s %10s %6d %8d"
+        print("%-46s %8d %6.2f%% %8d %9s %6d %8d %9d"
               % (r["store"], r["records"], pct, r["distinct_sources"],
-                 r["ratio_over_sourced"], r["ratio_over_all"], r["addressable"], r["fetched"]))
+                 r["ratio_over_sourced"], r["addressable"], r["fetched"],
+                 r["record_addressable"]))
 
     tot = sum(r["records"] for r in rows)
     src = sum(r["with_source"] for r in rows)
     adr = sum(r["addressable"] for r in rows)
     got = sum(r["fetched"] for r in rows)
+    rad = sum(r["record_addressable"] for r in rows)
+    gref = sum(r["git_ref_shaped"] for r in rows)
     full = [r for r in rows if r["records"] and r["with_source"] == r["records"]]
     fn = sum(r["records"] for r in full)
     fd = sum(r["distinct_sources"] for r in full)
@@ -392,10 +496,22 @@ def main() -> int:
     print("\n" + "=" * 100)
     print("ALL STORES        %d records   source %.2f%%   ADDRESSABLE %d   FETCHED %d"
           % (tot, 100.0 * src / tot, adr, got))
-    print("                  %d GET(s) issued; a request is only made for an addressable locator%s"
+    print("                  RECORD-ADDRESSABLE %d -- records with a locator ANYWHERE, not only in"
+          % rad)
+    print("                  `source`. This is the column the published post did not have.")
+    print("                  %d retrieval(s) attempted%s"
           % (fetcher.attempts,
-             "" if not fetcher.skipped_by_cap
-             else ", and %d were NOT tried (cap %d)" % (fetcher.skipped_by_cap, fetcher.cap)))
+             "" if not fetcher.untried
+             else "; %d distinct locators NOT tried (cap %d)" % (len(fetcher.untried), fetcher.cap)))
+    if not fetcher.attempts:
+        print("                  FETCHED is 0 BY ENTAILMENT, not by observation: nothing was")
+        print("                  addressable, so no retrieval was attempted. The retriever was")
+        print("                  exercised only against the control fixture above.")
+    if gref:
+        print("                  %d source values are git-ref shaped. This probe does NOT resolve"
+              % gref)
+        print("                  them -- that needs the repository -- so they are reported, not")
+        print("                  counted as addressable.")
     print("AT 100%% COVERAGE  %d records across %d stores   %d distinct values   ratio %.6f"
           % (fn, len(full), fd, fd / fn if fn else 0.0))
     for r in sorted(full, key=lambda x: -x["records"])[:3]:
@@ -403,17 +519,21 @@ def main() -> int:
     print("=" * 100)
     print("The ratio is column Distinctness (Deequ, Great Expectations, ydata-profiling), not a new")
     print("check, and it does not measure traceability -- a UUID per record scores 1.0 at zero.")
-    print("ADDRESSABLE is syntax: does the value name a place. FETCHED is one GET returning 2xx.")
-    print("They are separate columns because collapsing them is the defect @perseus-computing found")
-    print("on r/RAG: the published version called a prefix check re-checkable. Both can fail, and")
-    print("the control above makes each of them fail on its own before any store is read.")
+    print_footer()
 
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    print("")
+    print("measured_at %s -- these stores are LIVE and grow while you read this, so" % stamp)
+    print("the record count moves between runs. Cite a number with its timestamp or not at all.")
     out = os.path.join(HERE, "a_provenance_field_at_100_percent_with_one_distinct_value.result.json")
     with open(out, "w", encoding="utf-8") as fh:
-        json.dump({"records": tot, "source_pct": round(100.0 * src / tot, 2),
+        json.dump({"measured_at": stamp,
+                   "records": tot, "source_pct": round(100.0 * src / tot, 2),
                    "addressable": adr, "fetched": got,
+                   "record_addressable": rad, "git_ref_shaped": gref,
                    "fetch_attempts": fetcher.attempts,
-                   "fetch_skipped_by_cap": fetcher.skipped_by_cap,
+                   "fetch_not_tried_distinct": len(fetcher.untried),
+                   "fetched_is_entailed": fetcher.attempts == 0,
                    "recheckable": adr,
                    "recheckable_note": ("deprecated alias, kept so older scripts still read: it "
                                         "equals addressable, which is what it always measured"),
