@@ -54,6 +54,12 @@ except SystemExit:
 
 PROJECTS = os.path.join(os.path.expanduser("~"), ".claude", "projects")
 PORT = 8894
+WIRE_PORT = 8895
+
+#: Request bodies captured by the wire arm. The recorder in the sibling probe answers but discards
+#: the body; this one keeps it, which is the whole difference between reading a path and reading
+#: what was actually sent.
+BODIES = []
 
 
 def init_event(d, port):
@@ -80,6 +86,94 @@ def init_event(d, port):
         if ev.get("type") == "system" and ev.get("subtype") == "init":
             return ev
     return {}
+
+
+def wire_recorder(port):
+    """Like the sibling probe's recorder, but it KEEPS the request body."""
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    import threading
+
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_POST(self):
+            n = int(self.headers.get("content-length") or 0)
+            BODIES.append(self.rfile.read(n).decode("utf-8", "replace"))
+            b = _cd.SSE.encode()
+            self.send_response(200)
+            self.send_header("content-type", "text/event-stream")
+            self.send_header("content-length", str(len(b)))
+            self.end_headers()
+            self.wfile.write(b)
+
+    srv = HTTPServer(("127.0.0.1", port), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+def wire_arm():
+    """THE ARM THAT READS THE INDEX OFF THE WIRE, not off a path or out of a completion.
+
+    @simplysdm's stated limit on #90046 was "no wire capture -- these are canary read-backs from
+    completions ... I did not disable tools, so a model reaching for disk instead of context is not
+    excluded". This closes both: distinct canaries are planted in the repo-root store and in the
+    cwd store, one session runs in <repo>/sub, and the REQUEST BODY is inspected.
+
+    THREE WAYS I GOT THIS WRONG BEFORE IT WORKED, all the same shape:
+
+      1. The canaries went into a directory computed by hand. A drive letter became one dash
+         writes `C--`, so nothing was ever planted where anything would look. Both canaries came
+         back absent and that null was meaningless.
+      2. memory_paths.auto is a DIRECTORY, not the index file. Writing to it as a file raised.
+      3. Only a positive control separated 1 from a real finding: running in this repository, whose
+         index is known to be delivered, and confirming its content DOES appear in the body. Without
+         it the first null would have been published as the result.
+
+    So the canaries are planted at the path the CLI itself reports, and the positive control is an
+    assertion rather than a memory of having checked.
+    """
+    if _cd.CLAUDE is None:
+        return {}
+    srv = wire_recorder(WIRE_PORT)
+    base = tempfile.mkdtemp(prefix="wire_arm_")
+    repo = os.path.join(base, "arepo")
+    sub = os.path.join(repo, "sub")
+    os.makedirs(sub, exist_ok=True)
+    subprocess.run(["git", "init", "-q"], cwd=repo, capture_output=True)
+
+    auto = (init_event(sub, WIRE_PORT).get("memory_paths") or {}).get("auto", "")
+    if not auto:
+        srv.shutdown()
+        return {}
+    os.makedirs(auto, exist_ok=True)
+    io.open(os.path.join(auto, "MEMORY.md"), "w", encoding="utf-8").write(
+        "# Memory Index" + chr(10) * 2 + "- CANARYROOT77 marker" + chr(10))
+
+    tag = os.path.basename(base).replace("_", "-")
+    cwd_slugs = [d for d in os.listdir(PROJECTS) if d.endswith("arepo-sub") and tag in d]
+    if cwd_slugs:
+        m = os.path.join(PROJECTS, cwd_slugs[0], "memory")
+        os.makedirs(m, exist_ok=True)
+        io.open(os.path.join(m, "MEMORY.md"), "w", encoding="utf-8").write(
+            "# Memory Index" + chr(10) * 2 + "- CANARYSUB42 marker" + chr(10))
+
+    BODIES.clear()
+    init_event(sub, WIRE_PORT)
+    body = " ".join(BODIES)
+    posts = len(BODIES)
+
+    # POSITIVE CONTROL: this repository's own index is known to be delivered. If its content is
+    # absent from the body too, the recorder is not seeing index injection and every null above is
+    # an instrument failure rather than a result.
+    BODIES.clear()
+    init_event(os.path.dirname(HERE), WIRE_PORT)
+    control_body = " ".join(BODIES)
+    srv.shutdown()
+    return {"posts": posts, "bytes": len(body),
+            "root_canary_in_request": "CANARYROOT77" in body,
+            "sub_canary_in_request": "CANARYSUB42" in body,
+            "control_real_index_reaches_the_wire": "Memory Index" in control_body}
 
 
 def slug_of(store_path):
@@ -151,7 +245,13 @@ def main():
     v["that_transcript_is_in_the_cwd_directory"] = bool(sid) and bool(cwd_dir) and any(
         sid in f for f in (os.listdir(cwd_dir) if os.path.isdir(cwd_dir) else []))
 
-    res = {"platform": sys.platform, "cli_version": arms["repo_sub"]["version"],
+    wire = wire_arm()
+    if wire:
+        v["CONTROL_a_known_delivered_index_reaches_the_wire"] = wire["control_real_index_reaches_the_wire"]
+        v["the_repo_root_canary_is_in_the_request_body"] = wire["root_canary_in_request"]
+        v["the_cwd_store_canary_is_NOT_in_the_request_body"] = not wire["sub_canary_in_request"]
+
+    res = {"platform": sys.platform, "cli_version": arms["repo_sub"]["version"], "wire": wire,
            "arms": arms, "cwd_slug": cwd_slug,
            "jsonl_in_cwd_slug": jsonl_count(cwd_slug) if cwd_slug else None,
            "jsonl_in_repo_root_slug": jsonl_count(sub_slug),
