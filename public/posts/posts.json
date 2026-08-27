@@ -1,16 +1,30 @@
 [
  {
+  "slug": "a-status-nobody-earned",
+  "title": "Our claims table certified five rows it had never run, and the number it certified was a draw from a distribution",
+  "title_sk": "Nasa tabulka tvrdeni certifikovala pat riadkov, ktore nikdy nespustila, a cislo, ktore certifikovala, bolo losom z rozdelenia",
+  "desc": "An outside reader ran the command five rows of our published claims table cite and it died before argument handling, under a status promising it needed only dependencies. Nothing checked whether a REPRODUCIBLE command could start. Then the number itself: the store returns byte-identical contexts over 20 runs while the shared gpt-4o-mini judge scores them 0.75 x26, 0.70 x2, 0.80 x2 at temperature 0.0. Re-running one judge moves the figure as much as changing the judge does, and no judge ever answered that the superseded value was current.",
+  "desc_sk": "Externy citatel spustil prikaz, ktory cituje pat riadkov nasej publikovanej tabulky tvrdeni, a spadol este pred spracovanim argumentov -- pod statusom, ktory slubuje, ze staci doinstalovat zavislosti. Nic neoverovalo, ci sa REPRODUCIBLE prikaz vobec da spustit. Potom to cislo: ulozisko vrati bajt-identicke kontexty v 20 behoch, kym zdielany sudca gpt-4o-mini im da 0,75 x26, 0,70 x2, 0,80 x2 pri temperature 0,0. Opakovany beh jedneho sudcu posunie cislo rovnako ako vymena sudcu.",
+  "date": "2026-08-22",
+  "tags": "Benchmarks · LLM-as-judge · Measurement · Reproducibility · Agent memory",
+  "tags_sk": "Benchmarky · LLM ako sudca · Meranie · Reprodukovatelnost · Agentska pamat",
+  "kicker": "Measurement · self-audit",
+  "kicker_sk": "Meranie · sebaaudit",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "provenance-field-one-value",
-  "title": "Two stores, one product: a provenance field at 100% coverage with 8 distinct values, and another at 0.99 that resolves to nothing",
-  "title_sk": "Dva sklady, jeden produkt: provenance pole na 100 % pokrytí s 8 odlišnými hodnotami, a druhé na 0,99, ktoré nevedie nikam",
-  "desc": "Across 234,971 records in eleven live agent-memory stores, `source` is populated on 92.63% and 0 records resolve to anything fetchable. Eight stores hold one constant each -- the name of the writing process. A ninth holds 101 distinct commit ids and is equally useless, which is why column Distinctness is a detector and not a fix. W3C PROV separated wasAttributedTo from wasDerivedFrom in 2013.",
-  "desc_sk": "Na 234 971 záznamoch v jedenástich živých skladoch agentskej pamäte je `source` vyplnené na 92,63 % a 0 záznamov vedie k niečomu stiahnuteľnému. Osem skladov drží po jednej konštante -- mene zapisujúceho procesu. Deviaty drží 101 odlišných commit id a je rovnako nanič, a preto je stĺpcová Distinctness detektor, nie oprava. W3C PROV oddelilo wasAttributedTo od wasDerivedFrom v 2013.",
+  "title": "Two stores, one product: a provenance field at 100% coverage with 8 distinct values, and another at 0.99 whose field resolves to nothing while the record does not",
+  "title_sk": "Dva sklady, jeden produkt: provenance pole na 100 % pokrytí s 8 odlišnými hodnotami, a druhé na 0,99, kde nevedie nikam pole, ale záznam áno",
+  "desc": "Across 235,055 records in eleven live agent-memory stores, `source` is populated on 92.63% and not one value is a path or a URL, so nothing can be fetched from it. Eight stores hold one constant each, the name of the writing process. Corrected 28 August: the ninth store's records DO resolve, 426 of 432 path and commit pairs, one key away from the field being audited. W3C PROV separated wasAttributedTo from wasDerivedFrom in 2013.",
+  "desc_sk": "Na 235 055 záznamoch v jedenástich živých skladoch agentskej pamäte je `source` vyplnené na 92,63 % a ani jedna hodnota nie je cesta ani URL, takže z nej nie je čo stiahnuť. Osem skladov drží po jednej konštante, mene zapisujúceho procesu. Opravené 28. augusta: záznamy deviateho skladu sa rozložia, 426 zo 432 párov cesta a commit, o jeden kľúč vedľa auditovaného poľa. W3C PROV oddelilo wasAttributedTo od wasDerivedFrom v 2013.",
   "date": "2026-08-22",
   "tags": "Agent memory · Provenance · Data quality · Measurement · RAG",
   "tags_sk": "Agentská pamäť · Provenance · Kvalita dát · Meranie · RAG",
   "kicker": "Measurement · self-audit",
   "kicker_sk": "Meranie · sebaaudit",
-  "read": 4,
+  "read": 7,
   "bilingual": true
  },
  {
@@ -837,6 +851,20 @@
   "kicker": "Research",
   "kicker_sk": "Výskum",
   "read": 3,
+  "bilingual": true
+ },
+ {
+  "slug": "deep-dive-hot-hand",
+  "title": "The hot hand, in code · deep dive",
+  "title_sk": "Horúca ruka, prestavaná v kóde",
+  "desc": "A runnable deep dive into the hot-hand fallacy: the canonical estimator is biased on a fair coin, the bias grows toward the operating point, and a measured zero hides a real +8-point streak effect.",
+  "desc_sk": "Gilovich, Vallone a Tversky (1985) položili čistú otázku: po sérii trafených košov, je ďalší kôš pravdepodobnejší než po sérii minutí? Nenašli žiadny…",
+  "date": "2026-06-12",
+  "tags": "Statistics · Measurement · Estimator bias · Reproducibility",
+  "tags_sk": "Štatistika · Meranie · Vychýlenie odhadu · Reprodukovateľnosť",
+  "kicker": "Deep dive · runnable",
+  "kicker_sk": "Hlboký ponor · spustiteľný",
+  "read": 6,
   "bilingual": true
  },
  {
