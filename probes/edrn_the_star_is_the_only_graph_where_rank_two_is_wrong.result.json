@@ -1,0 +1,35 @@
+{
+  "measured": {
+    "spectrum_max_diff_across_edges": 9.769962616701378e-15,
+    "full_projector_pc2_over_pc1": {
+      "0": 0.012430737721625227,
+      "3": 0.012430737721625245,
+      "5": 0.012430737721625227
+    },
+    "full_projector_pc1_plus_pc2": {
+      "0": 1.0,
+      "3": 1.0,
+      "5": 1.0
+    },
+    "arbitrary_rank2_slice_min": 0.3659565919957109,
+    "arbitrary_rank2_slice_max": 0.967482025996151,
+    "star_gap": 5,
+    "star_rank": 6,
+    "tree_rank_histogram": {
+      "2": 43,
+      "4": 7
+    }
+  },
+  "verdicts": {
+    "CONTROL_the_spectra_were_actually_computed": true,
+    "edge_choice_is_an_isomorphism": true,
+    "full_projector_is_edge_independent": true,
+    "an_arbitrary_slice_spreads": true,
+    "the_slice_range_brackets_his_range": true,
+    "CONTROL_every_generated_graph_is_a_tree": true,
+    "lieb_mattis_holds_on_every_graph": true,
+    "star_is_six_fold": true,
+    "most_random_trees_really_are_rank_two": true,
+    "CONTROL_a_broken_generator_would_be_caught": true
+  }
+}
