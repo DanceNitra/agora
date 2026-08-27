@@ -159,8 +159,11 @@ Prvy pokus o tu opravu je uzitocnejsia chyba. Pridal retriever, dal mu kontrolu 
 staru funkciu, takze retriever presiel vlastnym testom bez toho, aby videl jediny zaznam korpusu.
 
 **Potom nepriatelsky prepocet mojich vlastnych cisel zabil titulok.** Audit bol zuzeny na pole
-`source` a ja som nulu nad tym polom precital ako nulu nad zaznamami. V coding sklade ma 168 zo 174
-zdrojovanych zaznamov lokator, ktory sa naozaj nacita. Pary `meta.sha` a `meta.files` sa rozlozia v
+`source` a ja som nulu nad tym polom precital ako nulu nad zaznamami. Kazde cislo v tomto odseku je
+z receiptu s peciatkou `2026-08-27T22:03:30Z` a vsetky sa hybu: o dvadsat minut neskor, ked vznikala
+odpoved pre neho, uz prvy par cital 170 zo 176 a druhy 441 zo 447. Provenancne cislo bez casu je ta
+ista trieda chyby, o ktorej je tento post. V coding sklade ma 168 zo 174 zdrojovanych zaznamov
+lokator, ktory sa naozaj nacita. Pary `meta.sha` a `meta.files` sa rozlozia v
 strome vlastneho commitu 426-krat zo 432 a vsetkych 171 odlisnych shas su skutocne commity.
 Provenancia tam cely cas bola, o jeden kluc vedla pola, ktore som auditoval.
 
