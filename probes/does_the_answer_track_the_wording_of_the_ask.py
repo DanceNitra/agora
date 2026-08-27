@@ -39,7 +39,7 @@ treat the file as the authority, and the truncation notice we have spent a week 
 what triggers the disk read.
 
 And there were ZERO refusals in twenty trials. Our published "five refusals to answer at all" almost
-certainly counted tool attempts, which is what a scorer without a went_to_disk category must do with
+certainly counted tool attempts, which is what a scorer without an went_to_disk category must do with
 them. That category is the correction; folding a behaviour into "wrong" is what turned this into an
 accuracy claim.
 
@@ -63,6 +63,23 @@ COST, stated before spending because that is the rule here: 3 arms x N trials, o
 startup each, measured at roughly 39k tokens per startup. At N=9 that is 27 calls, about 1.05M
 tokens. The wire capture is free. Run with --dry to build the fixture, capture ground truth and
 print the cost without making a single model call.
+
+
+WHY THE THIRD OUTCOME IS NOT CALLED `went_to_disk` ANY MORE, added 2026-08-27.
+
+Every call in this file runs with `--tools ""`, which disables all tools, so NO trial in any arm
+could read anything. Those rows are the model EMITTING the text of a tool call into stdout: a claim
+that it is about to read the file, never a read. The docstring here always said "announce". The JSON
+key said `went_to_disk`. On 2026-08-27 I drafted a public comment telling a collaborator that his
+shipped canary check was defeated by sessions "shelling out and reading the file", and the only
+evidence for that sentence was the key. Our own comment 5426356913, published the day before, had
+already used the correct word.
+
+So the key is `announced_a_file_read`, and what a tools-ENABLED session does is NOT measured here and
+must not be inferred from it. That run is a different experiment: it needs `--tools` left at its
+default AND an unguessable canary, because this fixture numbers its canaries in sequence, which lets
+a model produce the file's true last line by extrapolation with no file access at all. Two trials did
+exactly that.
 """
 from __future__ import annotations
 
@@ -223,7 +240,7 @@ def score(answer: str, truth: int) -> str:
     if re.search(rf"CANARY-L0*{truth}\b", answer):
         return "answered_correctly"
     if TO_DISK.search(answer):
-        return "went_to_disk"
+        return "announced_a_file_read"
     if REFUSAL.search(answer) and not re.search(r"CANARY-L\d", answer):
         return "refused"
     return "answered_wrongly"
@@ -274,7 +291,7 @@ def main() -> int:
 
     # Interleaved, so drift over the session cannot look like a wording effect.
     order = [(k, i) for i in range(n) for k in ASKS]
-    CATS = ("answered_correctly", "went_to_disk", "answered_wrongly", "refused", "timeout")
+    CATS = ("answered_correctly", "announced_a_file_read", "answered_wrongly", "refused", "timeout")
     rows, tally = [], {k: {c: 0 for c in CATS} for k in ASKS}
     for j, (k, i) in enumerate(order, 1):
         ans = ask_once(proj, ASKS[k])
@@ -287,7 +304,7 @@ def main() -> int:
     for k in ASKS:
         t = tally[k]
         print(f"  {k:8s} {t['answered_correctly']}/{n} from context, "
-              f"{t['went_to_disk']} went to disk, {t['answered_wrongly']} wrong, "
+              f"{t['announced_a_file_read']} announced a read, {t['answered_wrongly']} wrong, "
               f"{t['refused']} refused, {t['timeout']} timed out")
 
     v = {"CONTROL_the_fixture_truncated": gt["canaries_on_wire"] < LINES,
@@ -298,7 +315,8 @@ def main() -> int:
     for k, ok in v.items():
         print(f"  {'YES' if ok else 'no '}  {k}")
 
-    json.dump({"probe": os.path.basename(__file__), "verdicts": v, "ground_truth": gt,
+    json.dump({"probe": os.path.basename(__file__), "PROBE_PASSES": all(v.values()),
+               "verdicts": v, "ground_truth": gt,
                "asks": ASKS, "n_per_arm": n, "tally": tally, "rows": rows,
                "published_claim": {"see": "9/9", "in_file": "4/9", "neutral": "2/9",
                                    "refusals_on_neutral": 5,

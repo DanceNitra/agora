@@ -96,6 +96,9 @@ def main() -> int:
     ap.add_argument("--found", default="")
     ap.add_argument("--before", type=int, default=0)
     ap.add_argument("--after", type=int, default=0)
+    ap.add_argument("--evidence", default="",
+                    help="path to an artifact the skill run produced (its output/transcript "
+                         "file). Required for `record`: a receipt must point at something.")
     a = ap.parse_args()
 
     if a.action == "status":
@@ -112,12 +115,45 @@ def main() -> int:
     if len(a.found.strip()) < 12:
         raise SystemExit("REFUSED: --found must say what the skill actually found. If it found "
                          "nothing, write that as a sentence; a blank is not a pass.")
+
+    # AND A SENTENCE IS NOT A RUN. Measured 2026-08-27: I recorded all three receipts for a draft
+    # after running ONE combined agent plus a script of my own, then reported "the gate is clean".
+    # The owner caught it. `--found` was satisfied because I can always write a sentence, so the
+    # only thing standing between an assertion and a receipt was my own honesty, which is exactly
+    # the thing the receipt exists to replace.
+    #
+    # So a receipt must now POINT AT SOMETHING the run produced. This does not prove the right skill
+    # ran; nothing local can. It does make a bare assertion impossible, and it leaves an audit trail
+    # that a later reader can open and disagree with.
+    ev = (a.evidence or "").strip()
+    if not ev:
+        raise SystemExit(
+            "REFUSED: --evidence is required. Pass the path to the artifact the skill run produced "
+            "(the agent's output file, the storm report, the verify transcript).\n"
+            "  A receipt that points at nothing is the assertion it was built to replace.")
+    if not os.path.exists(ev):
+        raise SystemExit("REFUSED: --evidence %s does not exist." % ev)
+    ev_bytes = os.path.getsize(ev)
+    if ev_bytes < 500:
+        raise SystemExit(
+            "REFUSED: --evidence %s is %d bytes. A real skill run leaves more than that; if this "
+            "is genuinely the whole output, say so in --found and point at the transcript instead."
+            % (ev, ev_bytes))
+    age_h = (time.time() - os.path.getmtime(ev)) / 3600.0
+    if age_h > 12:
+        raise SystemExit(
+            "REFUSED: --evidence %s was last written %.1f hours ago. A receipt is bound to THIS "
+            "draft's bytes; evidence from an older run is evidence about an older draft."
+            % (ev, age_h))
+    ev_sha = hashlib.sha256(io.open(ev, "rb").read()).hexdigest()
     os.makedirs(DIR, exist_ok=True)
     d = sha(a.draft)
     body = io.open(a.draft, encoding="utf-8").read()
     json.dump({"draft": os.path.relpath(a.draft, ROOT).replace(os.sep, "/"),
                "skill": a.skill,
                "content_sha256": d, "found": a.found.strip(),
+               "evidence": {"path": ev.replace(os.sep, "/"), "bytes": ev_bytes,
+                            "sha256": ev_sha, "age_hours_at_record": round(age_h, 2)},
                "before_words": a.before or len(body.split()),
                "after_words": a.after or len(body.split()),
                "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -126,7 +162,8 @@ def main() -> int:
               io.open(receipt_path(d, a.skill), "w", encoding="utf-8"),
               ensure_ascii=False, indent=2)
     print(f"  recorded {a.skill}  {os.path.basename(a.draft)}  sha {d[:32]}  "
-          f"{a.before or len(body.split())} -> {a.after or len(body.split())} words")
+          f"{a.before or len(body.split())} -> {a.after or len(body.split())} words  "
+          f"evidence {os.path.basename(ev)} ({ev_bytes} B)")
     return 0
 
 
