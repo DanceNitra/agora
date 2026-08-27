@@ -529,6 +529,13 @@ def git_pair_control(repo=None):
     import subprocess
 
     repo = repo or ROOT
+
+    def git(*a):
+        try:
+            return subprocess.run(("git",) + a, cwd=repo, capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            return None
+
     try:
         head = subprocess.run(("git", "rev-parse", "HEAD"), cwd=repo,
                               capture_output=True, text=True, timeout=30)
@@ -548,6 +555,39 @@ def git_pair_control(repo=None):
     b = git_pair_audit([bad], repo)
     if g is None or b is None:
         return None, "audit unavailable"
+
+    # THE ROW THAT SEPARATES THIS FROM A WORKING-COPY CHECK, and it was missing. An adversarial
+    # pass replaced git_pair_audit with one that ignores the sha and calls os.path.exists, and the
+    # two rows above still passed it: a file present in HEAD is also present on disk, and a file
+    # absent everywhere is absent in both. So the control could not tell "inside that commit's
+    # tree" from "on this machine right now" -- which is the distinction the whole audit exists to
+    # make, and the one the reader who prompted this fix had reported in its first form.
+    #
+    # A path that exists on disk now and did NOT exist at the root commit separates them:
+    # os.path.exists says yes, `git cat-file -e <root>:<path>` says no.
+    root = git("rev-list", "--max-parents=0", "HEAD")
+    later = None
+    if root is not None and root.returncode == 0 and root.stdout.strip():
+        r0 = root.stdout.split()[0]
+        for cand in (os.path.relpath(os.path.abspath(__file__), repo).replace("\\", "/"),
+                     "probes/prove_the_provenance_controls_can_fail.py"):
+            at_head = git("cat-file", "-e", "HEAD:%s" % cand)
+            at_root = git("cat-file", "-e", "%s:%s" % (r0, cand))
+            if (at_head is not None and at_head.returncode == 0
+                    and at_root is not None and at_root.returncode != 0
+                    and os.path.exists(os.path.join(repo, cand))):
+                later = {"meta": {"sha": r0, "files": [cand]}}
+                break
+    if later is None:
+        return None, ("no path found that exists on disk but not at the root commit, so the "
+                      "working-copy row could not be built; this control is NOT complete")
+    w = git_pair_audit([later], repo)
+    if w is None:
+        return None, "audit unavailable"
+    if w["pairs_in_tree"] != 0:
+        return False, ("a path that did not exist at that commit resolved, so this is reading the "
+                       "working copy rather than the commit's tree")
+
     if g["pairs_in_tree"] == 1 and b["pairs_in_tree"] == 0:
         return True, ""
     if g["pairs_in_tree"] == 1 and b["pairs_in_tree"] == 1:

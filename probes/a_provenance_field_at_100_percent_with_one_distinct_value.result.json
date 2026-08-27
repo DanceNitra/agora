@@ -1,26 +1,26 @@
 {
- "measured_at": "2026-08-27T22:03:30Z",
- "records": 243942,
- "source_pct": 90.43,
+ "measured_at": "2026-08-27T22:16:06Z",
+ "records": 243985,
+ "source_pct": 90.41,
  "addressable": 0,
  "fetched": 0,
- "record_addressable": 168,
- "record_retrieved": 168,
- "git_ref_shaped": 174,
+ "record_addressable": 170,
+ "record_retrieved": 170,
+ "git_ref_shaped": 176,
  "git_pairs": {
   ".inspeximus/coding_memory.json": {
-   "records_with_pair": 174,
-   "records_fully_resolved": 169,
-   "pairs": 432,
-   "pairs_in_tree": 426,
-   "distinct_shas": 171,
-   "shas_are_commits": 171,
+   "records_with_pair": 176,
+   "records_fully_resolved": 171,
+   "pairs": 447,
+   "pairs_in_tree": 441,
+   "distinct_shas": 173,
+   "shas_are_commits": 173,
    "shas_public": 161,
    "public_ref": "origin/main"
   }
  },
  "fetch_attempts": 0,
- "local_reads": 123,
+ "local_reads": 124,
  "fetch_not_tried_distinct": 0,
  "fetched_is_entailed": false,
  "recheckable": 0,
@@ -43,7 +43,7 @@
   "distinct_sources": 7,
   "top": [
    [
-    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmperm9856a\\runbook.md",
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmp0rjpfqg3\\runbook.md",
     1
    ],
    [
@@ -57,17 +57,17 @@
  "unreadable": [],
  "per_store": [
   {
-   "records": 22234,
-   "with_source": 174,
+   "records": 22277,
+   "with_source": 176,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
    "fetch_not_tried": 0,
-   "record_addressable": 168,
-   "record_retrieved": 168,
-   "git_ref_shaped": 174,
+   "record_addressable": 170,
+   "record_retrieved": 170,
+   "git_ref_shaped": 176,
    "recheckable": 0,
-   "distinct_sources": 171,
+   "distinct_sources": 173,
    "top": [
     [
      "git:162de50e1702",
@@ -78,16 +78,16 @@
      2
     ]
    ],
-   "ratio_over_sourced": 0.982759,
-   "ratio_over_all": 0.007691,
+   "ratio_over_sourced": 0.982955,
+   "ratio_over_all": 0.007766,
    "store": ".inspeximus/coding_memory.json",
    "git_pairs": {
-    "records_with_pair": 174,
-    "records_fully_resolved": 169,
-    "pairs": 432,
-    "pairs_in_tree": 426,
-    "distinct_shas": 171,
-    "shas_are_commits": 171,
+    "records_with_pair": 176,
+    "records_fully_resolved": 171,
+    "pairs": 447,
+    "pairs_in_tree": 441,
+    "distinct_shas": 173,
+    "shas_are_commits": 173,
     "shas_public": 161,
     "public_ref": "origin/main"
    }
