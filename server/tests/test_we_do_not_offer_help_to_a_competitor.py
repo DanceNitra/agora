@@ -160,5 +160,10 @@ def test_the_shipped_shortlist_would_be_cleaned():
     # whatever it flags must be a competitor we actually named, never a partner
     assert all(is_competitor_repo(r) for r in flagged)
     assert not any(is_competitor_repo(r) for r in survivors)
-    # as measured 2026-08-07 the file carried exactly these; kept as documentation, not as a gate
-    assert set(flagged) <= {"mem0ai/mem0", "moorcheh-ai/memanto"}, f"unexpected flag: {flagged}"
+    # A CHANGE DETECTOR, and it has to move when the competitor list correctly grows. Measured
+    # 2026-08-07 the file carried the first two. vectorize-io/hindsight joined on 2026-08-25, when
+    # the watcher was found to be missing a 21k-star project shipping reversible memory curation,
+    # our own axis. The comment here used to say "documentation, not a gate" while being an assert,
+    # so it failed the first time we were right.
+    assert set(flagged) <= {"mem0ai/mem0", "moorcheh-ai/memanto", "vectorize-io/hindsight"}, (
+        f"unexpected flag: {flagged}")

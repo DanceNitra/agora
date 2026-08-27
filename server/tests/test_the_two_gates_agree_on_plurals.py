@@ -100,8 +100,13 @@ def test_the_dungeon_matcher_still_looks_like_this():
     stops testing the real pair and silently starts testing itself."""
     src = (SERVER.parent / "agora-game-server" / "mcp_server.py").read_text(
         encoding="utf-8", errors="replace")
+    # THE WHOLE FUNCTION, not a fixed window. This read 500 characters until 2026-08-27, when the
+    # docstring grew a note about -ies and pushed `w.endswith(...)` out to offset 935. The assertion
+    # then failed while the code it guards was correct, which is the same defect in the safe
+    # direction: a check that cannot see its target. A bigger constant would only postpone it.
     i = src.index("def _light_stem(")
-    body = src[i:i + 500]
+    j = src.find(chr(10) + "def ", i + 1)
+    body = src[i:j if j > 0 else len(src)]
     assert 'w.endswith(("ss", "us", "is"))' in body, "the dungeon's stem drifted from the brain's"
     assert "len(w) > 4" in body
     assert 'rstrip("s")' not in src[src.index("def _theme_words("):][:400], "crude stem is back"
