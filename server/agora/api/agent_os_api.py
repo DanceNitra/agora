@@ -3583,6 +3583,35 @@ async def claude_inbox_done(request: Request):
     return {"status": "ok", **({"note": verdict["note"]} if verdict.get("note") else {})}
 
 
+@router.post("/brain/claude-inbox/skip")
+async def claude_inbox_skip(request: Request):
+    """Record that a task was READ and judged not to be work. The exit the queue never had.
+
+    The triage doctrine says an off-board task, a refusal or a stale duplicate should be skipped.
+    There was no way to do that: `claude_inbox` could set `pending` and `done` and nothing else, and
+    `/brain/gatekeeper/skip` records a THEME so upstream generators stop offering it without ever
+    touching the task. So the only way to clear one was to call it done.
+
+    Measured over the 100 tasks the store holds, 2026-08-27: 48 done, 13 of them with NO result at
+    all. 27% of our record of completed work cannot be told apart from a discard. That is the exact
+    confusion the product we sell exists to prevent, sitting in our own ledger.
+
+    A reason under eight characters is refused, because a blank one makes this `done` wearing a
+    different word.
+    """
+    from agora.execution.claude_inbox import mark_skipped
+    body = await request.json()
+    tid = body.get("id") or ""
+    reason = body.get("reason") or ""
+    if not mark_skipped(tid, reason):
+        raise HTTPException(
+            status_code=409,
+            detail=("REFUSED: skip needs a task that is still pending and a reason of at least "
+                    "eight characters saying why it is not work. A blank reason records a discard "
+                    "as though it were a judgement."))
+    return {"status": "ok", "skipped": tid, "reason": reason[:400]}
+
+
 @router.get("/brain/brainstorm")
 async def list_brainstorm(request: Request, limit: int = 10):
     """Recent brainstorm sessions with their top idea."""

@@ -170,10 +170,49 @@ def recent_texts(window_s: float = _DEDUP_WINDOW_S) -> list[str]:
 
 
 def mark_done(task_id: str, result: str) -> None:
+    """Record that a task was WORKED. A result is what makes that checkable.
+
+    `done` used to be the only exit from this queue, so the doctrine's own triage step -- "off-board
+    -> POST /brain/gatekeeper/skip + mark done" -- wrote a task nobody worked into the ledger as
+    completed. Measured 2026-08-27 over the 100 tasks the store holds: 48 done, and 13 of them carry
+    NO result at all, so 27% of our record of completed work is indistinguishable from a discard.
+    `skipped` was never a reachable status: the only two this module could set were `pending` and
+    `done`, and `gatekeeper/skip` records a THEME so upstream generators stop offering it, never
+    touching the task.
+
+    An empty result is still accepted, because refusing it would drop work rather than record it,
+    but it is now flagged in the row so the two populations can be counted apart afterwards.
+    """
     items = _load()
     for t in items:
         if t.get("id") == task_id:
             t["status"] = "done"
             t["result"] = (result or "")[:800]
             t["done_ts"] = time.time()
+            t["result_empty"] = not (result or "").strip()
     _save(items)
+
+
+def mark_skipped(task_id: str, reason: str) -> bool:
+    """Record that a task was READ and judged not to be work. The reason is not optional.
+
+    This is the exit the triage doctrine has always prescribed and the queue never had. Without it
+    the only way to clear an off-board task, a refusal or a stale duplicate was to call it done, and
+    a ledger that cannot tell "completed" from "discarded" is the exact failure our own product
+    exists to prevent.
+    """
+    reason = (reason or "").strip()
+    if len(reason) < 8:
+        return False                     # a blank reason turns this into `done` under another name
+    items = _load()
+    hit = False
+    for t in items:
+        if t.get("id") == task_id and t.get("status") == "pending":
+            t["status"] = "skipped"
+            t["result"] = ""
+            t["skip_reason"] = reason[:400]
+            t["done_ts"] = time.time()
+            hit = True
+    if hit:
+        _save(items)
+    return hit
