@@ -1,0 +1,55 @@
+{
+  "measured": {
+    "git_sha_map": {
+      "v1.0": "2df5ae7dfd4644151f38c050e46ff08d292d148b",
+      "v1.1-r1": "fb267b626740ec6e9a75571aedab28b344258197",
+      "v1.1-r2": "6aa23b9fbe4ad027bbc9620ec131a583f1354d03",
+      "v1.1-r2-id-correction": "9708a8e01144d10d2fb7e4742656dfe4a7ea9f9d",
+      "v1.1": "dafdd03c7f3100e1bf5426c59a01bbafd3fdb057"
+    },
+    "blobs": {
+      "v1.0": {
+        "commit": "2df5ae7d",
+        "neg_blob_sha256": null,
+        "bytes": null
+      },
+      "v1.1-r1": {
+        "commit": "fb267b62",
+        "neg_blob_sha256": "b78c9509b7083150",
+        "bytes": 13913
+      },
+      "v1.1-r2": {
+        "commit": "6aa23b9f",
+        "neg_blob_sha256": "156d3ebb59ec2250",
+        "bytes": 13852
+      },
+      "v1.1-r2-id-correction": {
+        "commit": "9708a8e0",
+        "neg_blob_sha256": "156d3ebb59ec2250",
+        "bytes": 13852
+      },
+      "v1.1": {
+        "commit": "dafdd03c",
+        "neg_blob_sha256": "5af2f320310f0153",
+        "bytes": 15429
+      }
+    },
+    "v1.1_r1_sha256_after_claimed": "156d3ebb59ec2250",
+    "v1.1_r1_blob_at_its_own_anchor": "b78c9509b7083150",
+    "v1.1_r2_blob": "156d3ebb59ec2250",
+    "v1_1_claim_vs_blob": [
+      "5af2f320310f0153",
+      "5af2f320310f0153"
+    ]
+  },
+  "verdicts": {
+    "CONTROL_the_ledger_was_actually_fetched": true,
+    "annotate_row_exists": true,
+    "r1_row_is_self_contradictory": true,
+    "the_claimed_hash_is_the_r2_blob": true,
+    "the_true_r1_blob_is_still_unrecorded": true,
+    "CONTROL_a_row_that_AGREES_is_seen_to_agree": true,
+    "id_correction_left_the_negative_bytes_identical": true,
+    "CONTROL_a_wrong_hash_would_be_caught": true
+  }
+}
