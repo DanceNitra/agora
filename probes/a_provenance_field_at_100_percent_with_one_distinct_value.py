@@ -279,16 +279,36 @@ class Fetcher:
         self.timeout = timeout
         self.seen = {}
         self.attempts = 0
+        self.local_reads = 0
         self.untried = set()
+
+    @staticmethod
+    def _is_local(loc, bases):
+        if os.path.isabs(loc):
+            return os.path.exists(loc)
+        return any(b and os.path.exists(os.path.join(b, loc)) for b in bases)
 
     def __call__(self, loc, bases=()):
         key = (loc, tuple(bases))
         if key in self.seen:
             return self.seen[key]
-        if self.attempts >= self.cap:
-            self.untried.add(loc)
-            return NOT_TRIED
-        self.attempts += 1
+        # THE CAP GUARDS THE NETWORK, NOT THE DISK. It was counting local opens too, and on the
+        # first run that mattered it bound at 200 while 148 further locators went untried, which
+        # turned a record-level count into an undercount reported as a result. Opening a file that
+        # is already on this machine costs nothing and nobody else's server is involved.
+        if not addressable(loc, bases):
+            # Nothing is attempted for a string that does not name a place, so nothing is counted.
+            # An earlier version counted these as network attempts and printed 169 of them on a run
+            # that never opened a socket.
+            self.seen[key] = FAILED
+            return FAILED
+        if self._is_local(loc, bases):
+            self.local_reads += 1
+        else:
+            if self.attempts >= self.cap:
+                self.untried.add(loc)
+                return NOT_TRIED
+            self.attempts += 1
         out = OK if retrieves(loc, bases, self.timeout) else FAILED
         self.seen[key] = out
         return out
@@ -302,7 +322,7 @@ def scan(path, fetcher, bases=None):
         return None
     if bases is None:
         bases = (ROOT, os.path.dirname(os.path.abspath(path)))
-    n = with_src = addr = got = failed = untried = rec_addr = gitref = 0
+    n = with_src = addr = got = failed = untried = rec_addr = rec_got = gitref = 0
     vals = collections.Counter()
     for r in items:
         if not isinstance(r, dict):
@@ -320,12 +340,19 @@ def scan(path, fetcher, bases=None):
                 got += v == OK
                 failed += v == FAILED
                 untried += v == NOT_TRIED
-        if any(addressable(x, bases) for x in record_locators(r)):
+        # RECORD LEVEL, and it retrieves rather than merely parsing. The first version of this
+        # column counted addressability only, which repeats -- one layer up, inside the fix for it
+        # -- the exact defect that was reported to us: a count of strings that look like places.
+        locs = [x for x in record_locators(r) if addressable(x, bases)]
+        if locs:
             rec_addr += 1
+            if any(fetcher(x, bases) == OK for x in locs):
+                rec_got += 1
     return {"records": n, "with_source": with_src,
             "addressable": addr, "fetched": got,
             "fetch_failed": failed, "fetch_not_tried": untried,
-            "record_addressable": rec_addr, "git_ref_shaped": gitref,
+            "record_addressable": rec_addr, "record_retrieved": rec_got,
+            "git_ref_shaped": gitref,
             "recheckable": addr,
             "distinct_sources": len(vals), "top": vals.most_common(2),
             "ratio_over_sourced": round(len(vals) / with_src, 6) if with_src else None,
@@ -410,8 +437,125 @@ def control():
 
 
 CONTROL_EXPECT = {"records": 7, "with_source": 7, "distinct_sources": 7,
-                  "addressable": 4, "fetched": 3, "record_addressable": 5,
+                  "addressable": 4, "fetched": 3,
+                  "record_addressable": 5, "record_retrieved": 4,
                   "git_ref_shaped": 1}
+
+
+def git_pair_audit(items, repo=None, public_ref="origin/main"):
+    """Resolve `meta.sha` + `meta.files` as a PAIR, inside the commit's own tree.
+
+    This is the check the coding store's records actually invite, and neither of the columns above
+    performs it. `addressable` asks whether a string names a place; `retrieves` opens whatever is
+    on disk NOW. A record saying "this came from probes/x.py at commit 9e49734" is a claim about a
+    path inside a specific tree, and the working copy is the wrong place to test it: a file can
+    exist today, untracked, and be unfetchable by any reader.
+
+    Two numbers, because they answer different questions:
+
+        pairs_in_tree     `git cat-file -e <sha>:<path>` -- did that file exist at that commit
+        shas_public       is the commit an ancestor of the public ref -- can a READER get it
+
+    A reference that resolves only in a private clone is not re-checkable by the person reading the
+    claim, and this probe exists to count what a reader can re-check.
+
+    Returns None when git or the repository is missing, and the caller reports that as NOT ATTEMPTED
+    rather than as zero. A missing tool must never look like a finding.
+    """
+    import subprocess
+
+    repo = repo or ROOT
+    def git(*a):
+        try:
+            return subprocess.run(("git",) + a, cwd=repo, capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            return None
+
+    probe = git("rev-parse", "--git-dir")
+    if probe is None or probe.returncode != 0:
+        return None
+
+    pairs = ok_pairs = 0
+    recs = full_recs = 0
+    shas = set()
+    for r in items:
+        if not isinstance(r, dict):
+            continue
+        m = r.get("meta")
+        if not isinstance(m, dict):
+            continue
+        sha = m.get("sha")
+        files = m.get("files")
+        if isinstance(files, str):
+            files = [files]
+        if not (isinstance(sha, str) and sha.strip() and isinstance(files, list) and files):
+            continue
+        sha = sha.strip()
+        shas.add(sha)
+        recs += 1
+        hit = 0
+        for f in files:
+            if not isinstance(f, str) or not f.strip():
+                continue
+            pairs += 1
+            res = git("cat-file", "-e", "%s:%s" % (sha, f.strip().replace("\\", "/")))
+            if res is not None and res.returncode == 0:
+                ok_pairs += 1
+                hit += 1
+        if hit and hit == len([f for f in files if isinstance(f, str) and f.strip()]):
+            full_recs += 1
+
+    real = pub = 0
+    for s in shas:
+        t = git("cat-file", "-t", s)
+        if t is not None and t.returncode == 0 and t.stdout.strip() == "commit":
+            real += 1
+            a = git("merge-base", "--is-ancestor", s, public_ref)
+            if a is not None and a.returncode == 0:
+                pub += 1
+    return {"records_with_pair": recs, "records_fully_resolved": full_recs,
+            "pairs": pairs, "pairs_in_tree": ok_pairs,
+            "distinct_shas": len(shas), "shas_are_commits": real,
+            "shas_public": pub, "public_ref": public_ref}
+
+
+def git_pair_control(repo=None):
+    """Two-sided, against this repository: a pair that must resolve and one that must not.
+
+    Without the negative half, a `git cat-file` that answered yes to everything would look like a
+    perfect provenance record. Without the positive half, a broken git invocation would report zero
+    resolvable pairs, which on this probe is indistinguishable from the finding.
+    """
+    import subprocess
+
+    repo = repo or ROOT
+    try:
+        head = subprocess.run(("git", "rev-parse", "HEAD"), cwd=repo,
+                              capture_output=True, text=True, timeout=30)
+        listing = subprocess.run(("git", "ls-tree", "--name-only", "HEAD"), cwd=repo,
+                                 capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None, "git not runnable"
+    if head.returncode != 0 or listing.returncode != 0:
+        return None, "not a git repository"
+    sha = head.stdout.strip()
+    names = [n for n in listing.stdout.splitlines() if n.strip()]
+    if not names:
+        return None, "empty tree at HEAD"
+    good = {"meta": {"sha": sha, "files": [names[0]]}}
+    bad = {"meta": {"sha": sha, "files": ["no/such/file/at/this/commit.xyz"]}}
+    g = git_pair_audit([good], repo)
+    b = git_pair_audit([bad], repo)
+    if g is None or b is None:
+        return None, "audit unavailable"
+    if g["pairs_in_tree"] == 1 and b["pairs_in_tree"] == 0:
+        return True, ""
+    if g["pairs_in_tree"] == 1 and b["pairs_in_tree"] == 1:
+        return False, "a path absent from the tree resolved, so this says yes to anything"
+    if g["pairs_in_tree"] == 0 and b["pairs_in_tree"] == 0:
+        return False, "a path present in the tree did NOT resolve, so this says no to everything"
+    return False, "inverted"
+
 
 
 def print_footer():
@@ -439,11 +583,18 @@ def main() -> int:
         return 1
     ok_all = True
     for k in ("records", "with_source", "distinct_sources", "addressable", "fetched",
-              "record_addressable", "git_ref_shaped"):
+              "record_addressable", "record_retrieved", "git_ref_shaped"):
         good = c[k] == CONTROL_EXPECT[k]
         ok_all = ok_all and good
         print("CONTROL  %-16s want %d  got %d   %s"
               % (k, CONTROL_EXPECT[k], c[k], "PASS" if good else "FAIL"))
+    gok, gwhy = git_pair_control()
+    if gok is None:
+        print("CONTROL  git pair        NOT ATTEMPTED   %s" % gwhy)
+    else:
+        print("CONTROL  git pair        a path in HEAD resolves, one absent from it does not   %s%s"
+              % ("PASS" if gok else "FAIL", "" if gok else "   " + gwhy))
+        ok_all = ok_all and gok
     print()
     if not ok_all:
         print("ABORT -- the instrument is broken, not the corpus. A resolver that cannot see a file")
@@ -463,6 +614,16 @@ def main() -> int:
             unreadable.append((rel, "no item list"))
             continue
         r["store"] = rel
+        # Only where a git ref actually appears; the audit shells out per path and there is no
+        # reason to spend that on stores whose sources are all `agent:<name>`.
+        if r["git_ref_shaped"]:
+            try:
+                with open(p, encoding="utf-8") as fh:
+                    blob = json.load(fh)
+                r["git_pairs"] = git_pair_audit(blob.get("items") if isinstance(blob, dict) else blob)
+            except Exception as e:                               # noqa: BLE001
+                r["git_pairs"] = None
+                unreadable.append((rel, "git pair audit: %s: %s" % (type(e).__name__, e)))
         rows.append(r)
 
     if unreadable:
@@ -488,6 +649,8 @@ def main() -> int:
     adr = sum(r["addressable"] for r in rows)
     got = sum(r["fetched"] for r in rows)
     rad = sum(r["record_addressable"] for r in rows)
+    rgot = sum(r["record_retrieved"] for r in rows)
+    gp = [r["git_pairs"] for r in rows if r.get("git_pairs")]
     gref = sum(r["git_ref_shaped"] for r in rows)
     full = [r for r in rows if r["records"] and r["with_source"] == r["records"]]
     fn = sum(r["records"] for r in full)
@@ -496,22 +659,34 @@ def main() -> int:
     print("\n" + "=" * 100)
     print("ALL STORES        %d records   source %.2f%%   ADDRESSABLE %d   FETCHED %d"
           % (tot, 100.0 * src / tot, adr, got))
-    print("                  RECORD-ADDRESSABLE %d -- records with a locator ANYWHERE, not only in"
-          % rad)
-    print("                  `source`. This is the column the published post did not have.")
-    print("                  %d retrieval(s) attempted%s"
-          % (fetcher.attempts,
+    print("                  RECORD-ADDRESSABLE %d, RECORD-RETRIEVED %d -- a locator ANYWHERE in"
+          % (rad, rgot))
+    print("                  the record, not only in `source`. This is the column the published")
+    print("                  post did not have, and it is the reason its headline was wrong.")
+    print("                  %d network retrieval(s) attempted, %d local file(s) opened%s"
+          % (fetcher.attempts, fetcher.local_reads,
              "" if not fetcher.untried
-             else "; %d distinct locators NOT tried (cap %d)" % (len(fetcher.untried), fetcher.cap)))
-    if not fetcher.attempts:
+             else "; %d distinct remote locators NOT tried (cap %d)"
+                  % (len(fetcher.untried), fetcher.cap)))
+    if not fetcher.attempts and not fetcher.local_reads:
         print("                  FETCHED is 0 BY ENTAILMENT, not by observation: nothing was")
         print("                  addressable, so no retrieval was attempted. The retriever was")
         print("                  exercised only against the control fixture above.")
-    if gref:
-        print("                  %d source values are git-ref shaped. This probe does NOT resolve"
+    if gref and not gp:
+        print("                  %d source values are git-ref shaped and were NOT resolved (no git,"
               % gref)
-        print("                  them -- that needs the repository -- so they are reported, not")
-        print("                  counted as addressable.")
+        print("                  or not a repository). Reported, never counted as zero.")
+    for r in [x for x in rows if x.get("git_pairs")]:
+        g = r["git_pairs"]
+        print("                  git pairs in %s:" % r["store"])
+        print("                    %d/%d path+commit pairs exist in the tree of their OWN commit"
+              % (g["pairs_in_tree"], g["pairs"]))
+        print("                    %d/%d records have every path resolve"
+              % (g["records_fully_resolved"], g["records_with_pair"]))
+        print("                    %d/%d distinct shas are real commits, %d reachable from %s"
+              % (g["shas_are_commits"], g["distinct_shas"], g["shas_public"], g["public_ref"]))
+        print("                    a reference only a private clone can follow is not one a reader")
+        print("                    can re-check, which is what this probe counts.")
     print("AT 100%% COVERAGE  %d records across %d stores   %d distinct values   ratio %.6f"
           % (fn, len(full), fd, fd / fn if fn else 0.0))
     for r in sorted(full, key=lambda x: -x["records"])[:3]:
@@ -530,10 +705,13 @@ def main() -> int:
         json.dump({"measured_at": stamp,
                    "records": tot, "source_pct": round(100.0 * src / tot, 2),
                    "addressable": adr, "fetched": got,
-                   "record_addressable": rad, "git_ref_shaped": gref,
+                   "record_addressable": rad, "record_retrieved": rgot,
+                   "git_ref_shaped": gref,
+                   "git_pairs": {r["store"]: r["git_pairs"] for r in rows if r.get("git_pairs")},
                    "fetch_attempts": fetcher.attempts,
+                   "local_reads": fetcher.local_reads,
                    "fetch_not_tried_distinct": len(fetcher.untried),
-                   "fetched_is_entailed": fetcher.attempts == 0,
+                   "fetched_is_entailed": (fetcher.attempts + fetcher.local_reads) == 0,
                    "recheckable": adr,
                    "recheckable_note": ("deprecated alias, kept so older scripts still read: it "
                                         "equals addressable, which is what it always measured"),
