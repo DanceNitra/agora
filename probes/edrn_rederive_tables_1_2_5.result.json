@@ -1,0 +1,258 @@
+{
+ "calibration_E0": 0.24673114075776614,
+ "counts": {
+  "REPRODUCED": 12,
+  "NOT_DERIVABLE": 16,
+  "DISAGREES": 3
+ },
+ "cells": [
+  {
+   "table": "I",
+   "cell": "seed 0 valley position",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "I",
+   "cell": "seed 0 valley value",
+   "published": 0.159295,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "seed-dependent: s=1.000 is an exact two-fold crossing, a deterministic solver returns one arbitrary vector of the manifold"
+  },
+  {
+   "table": "I",
+   "cell": "seed 0 valley depth",
+   "published": 0.087436,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "same reason"
+  },
+  {
+   "table": "I",
+   "cell": "seed 1 valley position",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "I",
+   "cell": "seed 1 valley value",
+   "published": 0.142707,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "seed-dependent: s=1.000 is an exact two-fold crossing, a deterministic solver returns one arbitrary vector of the manifold"
+  },
+  {
+   "table": "I",
+   "cell": "seed 1 valley depth",
+   "published": 0.104024,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "same reason"
+  },
+  {
+   "table": "I",
+   "cell": "seed 2 valley position",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "I",
+   "cell": "seed 2 valley value",
+   "published": 0.143544,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "seed-dependent: s=1.000 is an exact two-fold crossing, a deterministic solver returns one arbitrary vector of the manifold"
+  },
+  {
+   "table": "I",
+   "cell": "seed 2 valley depth",
+   "published": 0.103187,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "same reason"
+  },
+  {
+   "table": "I",
+   "cell": "seed 3 valley position",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "I",
+   "cell": "seed 3 valley value",
+   "published": 0.142196,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "seed-dependent: s=1.000 is an exact two-fold crossing, a deterministic solver returns one arbitrary vector of the manifold"
+  },
+  {
+   "table": "I",
+   "cell": "seed 3 valley depth",
+   "published": 0.104535,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "same reason"
+  },
+  {
+   "table": "I",
+   "cell": "seed 4 valley position",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "I",
+   "cell": "seed 4 valley value",
+   "published": 0.146785,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "seed-dependent: s=1.000 is an exact two-fold crossing, a deterministic solver returns one arbitrary vector of the manifold"
+  },
+  {
+   "table": "I",
+   "cell": "seed 4 valley depth",
+   "published": 0.099946,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "same reason"
+  },
+  {
+   "table": "I",
+   "cell": "our value lies inside the published seed spread",
+   "published": 1.0,
+   "recomputed": 0.0,
+   "verdict": "DISAGREES",
+   "note": "span 0.142196-0.159295, ours 0.159658"
+  },
+  {
+   "table": "II",
+   "cell": "ring valley s",
+   "published": 1.0,
+   "recomputed": 1.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "II",
+   "cell": "ring depth (single)",
+   "published": 0.0891,
+   "recomputed": 0.07707215481219495,
+   "verdict": "DISAGREES",
+   "note": ""
+  },
+  {
+   "table": "II",
+   "cell": "tree valley s",
+   "published": 0.92,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a tree with 14 edges on 15 vertices is not determined by the text"
+  },
+  {
+   "table": "II",
+   "cell": "tree depth (single)",
+   "published": 0.1,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a tree with 14 edges on 15 vertices is not determined by the text"
+  },
+  {
+   "table": "II",
+   "cell": "tree depth (multi)",
+   "published": 0.1,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a tree with 14 edges on 15 vertices is not determined by the text"
+  },
+  {
+   "table": "II",
+   "cell": "random valley s",
+   "published": 1.25,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a random graph with 27 edges is given with no seed or edge list"
+  },
+  {
+   "table": "II",
+   "cell": "random depth (single)",
+   "published": 0.0026,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a random graph with 27 edges is given with no seed or edge list"
+  },
+  {
+   "table": "II",
+   "cell": "random depth (multi)",
+   "published": 0.0014,
+   "recomputed": null,
+   "verdict": "NOT_DERIVABLE",
+   "note": "a random graph with 27 edges is given with no seed or edge list"
+  },
+  {
+   "table": "V",
+   "cell": "(0, 1) valley s",
+   "published": 1.496,
+   "recomputed": 1.496,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "V",
+   "cell": "(0, 1) prominence",
+   "published": 0.124449,
+   "recomputed": 0.12444891684573206,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "V",
+   "cell": "(1, 9) valley s",
+   "published": 0.311,
+   "recomputed": 0.311,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "V",
+   "cell": "(1, 9) prominence",
+   "published": 0.008856,
+   "recomputed": 0.008855740697295,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "V",
+   "cell": "(1, 4) valley s",
+   "published": 1.251,
+   "recomputed": 1.251,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "V",
+   "cell": "(1, 4) prominence",
+   "published": 0.061969,
+   "recomputed": 0.06196932048209092,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "CONTROL",
+   "cell": "corrupted expectation",
+   "published": 0.111111,
+   "recomputed": 0.999999,
+   "verdict": "DISAGREES",
+   "note": "must read DISAGREES"
+  }
+ ]
+}

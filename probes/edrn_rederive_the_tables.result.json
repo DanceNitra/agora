@@ -1,0 +1,385 @@
+{
+ "calibration_E0": 0.24673114075776617,
+ "counts": {
+  "REPRODUCED": 45,
+  "DISAGREES": 2
+ },
+ "cells": [
+  {
+   "table": "III",
+   "cell": "D_default(s=0.99)",
+   "published": 0.95327,
+   "recomputed": 0.9532699241787708,
+   "verdict": "REPRODUCED",
+   "note": "x3: paper tabulates the full dot product"
+  },
+  {
+   "table": "III",
+   "cell": "E_enhanced(s=0.99)",
+   "published": 0.164032,
+   "recomputed": 0.16403207451190624,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "III",
+   "cell": "D_default(s=1.0)",
+   "published": 0.95421,
+   "recomputed": 0.9309726395837925,
+   "verdict": "DISAGREES",
+   "note": "x3: paper tabulates the full dot product"
+  },
+  {
+   "table": "III",
+   "cell": "E_enhanced(s=1.0)",
+   "published": 0.159658,
+   "recomputed": 0.15965824381449778,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "III",
+   "cell": "D_default(s=1.01)",
+   "published": 0.940725,
+   "recomputed": 0.9407245998255653,
+   "verdict": "REPRODUCED",
+   "note": "x3: paper tabulates the full dot product"
+  },
+  {
+   "table": "III",
+   "cell": "E_enhanced(s=1.01)",
+   "published": 0.160451,
+   "recomputed": 0.16045118175558082,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 1) fine range",
+   "published": 0.176842,
+   "recomputed": 0.17684219257355502,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 1) valley s",
+   "published": 1.5,
+   "recomputed": 1.5,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 9) fine range",
+   "published": 0.078783,
+   "recomputed": 0.07878300416986089,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 9) valley s",
+   "published": 0.11,
+   "recomputed": 0.11,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 2) fine range",
+   "published": 0.083366,
+   "recomputed": 0.08336611479000228,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 2) valley s",
+   "published": 1.02,
+   "recomputed": 1.02,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 8) fine range",
+   "published": 0.065437,
+   "recomputed": 0.06543722568324578,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(0, 8) valley s",
+   "published": 0.86,
+   "recomputed": 0.86,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 9) fine range",
+   "published": 0.113332,
+   "recomputed": 0.11333187430359273,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 9) valley s",
+   "published": 0.31,
+   "recomputed": 0.31,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 4) fine range",
+   "published": 0.103002,
+   "recomputed": 0.10300162501996657,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 4) valley s",
+   "published": 1.25,
+   "recomputed": 1.25,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 8) fine range",
+   "published": 0.085229,
+   "recomputed": 0.08522899813636112,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 8) valley s",
+   "published": 0.72,
+   "recomputed": 0.72,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 6) fine range",
+   "published": 0.089372,
+   "recomputed": 0.08937243821924595,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(1, 6) valley s",
+   "published": 0.8,
+   "recomputed": 0.8,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 3) fine range",
+   "published": 0.085424,
+   "recomputed": 0.08542417921424428,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 3) valley s",
+   "published": 1.09,
+   "recomputed": 1.09,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 4) fine range",
+   "published": 0.077994,
+   "recomputed": 0.07799430235961335,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 4) valley s",
+   "published": 0.94,
+   "recomputed": 0.94,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 5) fine range",
+   "published": 0.119505,
+   "recomputed": 0.11950486458306,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(2, 5) valley s",
+   "published": 0.75,
+   "recomputed": 0.75,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(3, 4) fine range",
+   "published": 0.10084,
+   "recomputed": 0.10084039781720675,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(3, 4) valley s",
+   "published": 0.84,
+   "recomputed": 0.84,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(3, 5) fine range",
+   "published": 0.073179,
+   "recomputed": 0.07317899857679117,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(3, 5) valley s",
+   "published": 0.98,
+   "recomputed": 0.98,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(4, 5) fine range",
+   "published": 0.087107,
+   "recomputed": 0.08710677284288831,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(4, 5) valley s",
+   "published": 1.1,
+   "recomputed": 1.1,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(4, 6) fine range",
+   "published": 0.089948,
+   "recomputed": 0.08994817243412984,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(4, 6) valley s",
+   "published": 0.91,
+   "recomputed": 0.91,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(5, 6) fine range",
+   "published": 0.082213,
+   "recomputed": 0.08221323424334576,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(5, 6) valley s",
+   "published": 1.08,
+   "recomputed": 1.08,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(6, 7) fine range",
+   "published": 0.104364,
+   "recomputed": 0.10436434694753549,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(6, 7) valley s",
+   "published": 0.47,
+   "recomputed": 0.47,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(6, 8) fine range",
+   "published": 0.157596,
+   "recomputed": 0.1575957143182366,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(6, 8) valley s",
+   "published": 1.38,
+   "recomputed": 1.38,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(7, 8) fine range",
+   "published": 0.107895,
+   "recomputed": 0.10789502659281813,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(7, 8) valley s",
+   "published": 0.0,
+   "recomputed": 0.0,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(7, 9) fine range",
+   "published": 0.081416,
+   "recomputed": 0.08141558531079374,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "IV",
+   "cell": "(7, 9) valley s",
+   "published": 2.14,
+   "recomputed": 2.14,
+   "verdict": "REPRODUCED",
+   "note": ""
+  },
+  {
+   "table": "CONTROL",
+   "cell": "deliberately corrupted expectation",
+   "published": 0.123456,
+   "recomputed": 0.654321,
+   "verdict": "DISAGREES",
+   "note": "must read DISAGREES"
+  }
+ ]
+}
