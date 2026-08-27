@@ -1,19 +1,26 @@
 {
- "records": 243818,
+ "records": 243835,
  "source_pct": 90.47,
+ "addressable": 0,
+ "fetched": 0,
+ "fetch_attempts": 0,
+ "fetch_skipped_by_cap": 0,
  "recheckable": 0,
+ "recheckable_note": "deprecated alias, kept so older scripts still read: it equals addressable, which is what it always measured",
  "full_coverage_stores": 8,
  "full_coverage_records": 220417,
  "full_coverage_distinct_sources": 8,
  "full_coverage_ratio": 3.6e-05,
  "control": {
-  "records": 3,
-  "with_source": 3,
-  "recheckable": 2,
-  "distinct_sources": 3,
+  "records": 5,
+  "with_source": 5,
+  "addressable": 3,
+  "fetched": 2,
+  "recheckable": 3,
+  "distinct_sources": 5,
   "top": [
    [
-    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmpmqr7hspq\\runbook.md",
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmpq2dnzvto\\runbook.md",
     1
    ],
    [
@@ -27,10 +34,12 @@
  "unreadable": [],
  "per_store": [
   {
-   "records": 22110,
-   "with_source": 170,
+   "records": 22127,
+   "with_source": 171,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
-   "distinct_sources": 167,
+   "distinct_sources": 168,
    "top": [
     [
      "git:162de50e1702",
@@ -41,13 +50,15 @@
      2
     ]
    ],
-   "ratio_over_sourced": 0.982353,
-   "ratio_over_all": 0.007553,
+   "ratio_over_sourced": 0.982456,
+   "ratio_over_all": 0.007593,
    "store": ".inspeximus/coding_memory.json"
   },
   {
    "records": 917,
    "with_source": 0,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 0,
    "top": [],
@@ -58,6 +69,8 @@
   {
    "records": 374,
    "with_source": 0,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 0,
    "top": [],
@@ -68,6 +81,8 @@
   {
    "records": 27629,
    "with_source": 27629,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -83,6 +98,8 @@
   {
    "records": 27606,
    "with_source": 27606,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -98,6 +115,8 @@
   {
    "records": 27566,
    "with_source": 27566,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -113,6 +132,8 @@
   {
    "records": 27653,
    "with_source": 27653,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -128,6 +149,8 @@
   {
    "records": 27480,
    "with_source": 27480,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -143,6 +166,8 @@
   {
    "records": 27653,
    "with_source": 27653,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -158,6 +183,8 @@
   {
    "records": 27285,
    "with_source": 27285,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [
@@ -173,6 +200,8 @@
   {
    "records": 27545,
    "with_source": 27545,
+   "addressable": 0,
+   "fetched": 0,
    "recheckable": 0,
    "distinct_sources": 1,
    "top": [

@@ -184,8 +184,11 @@ def fetches(loc, timeout=5.0):
         return False
     if os.path.exists(loc):
         return True
-    req = urllib.request.Request(loc, method="GET", headers={"User-Agent": "provenance-probe"})
+    # Request() itself raises on a URL urlparse accepted, so it is INSIDE the try. Found by the
+    # mutation harness beside this file: one malformed locator in someone else's store would
+    # otherwise abort the whole scan, and this probe is one we invite other people to run.
     try:
+        req = urllib.request.Request(loc, method="GET", headers={"User-Agent": "provenance-probe"})
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return 200 <= getattr(r, "status", r.getcode()) < 300
     except Exception:                                            # noqa: BLE001
@@ -198,13 +201,47 @@ def recheckable(loc):
     return addressable(loc)
 
 
-def scan(path):
+class Fetcher:
+    """One GET per DISTINCT addressable locator, capped, and the cap is reported rather than silent.
+
+    Splitting the metric was only half of @perseus-computing's point, and the first attempt at that
+    fix got the half that is easy to see. It added `fetches()` and a control for it, and then left
+    the store scan calling `addressable()`. So the fetcher existed, passed its own test, and never
+    saw a single record of the real corpus. A check that never reaches its target reports whatever
+    the absence of a target looks like, which here is the headline itself.
+
+    The cap exists because a store holding 200,000 real URLs would otherwise become a crawl. It is
+    counted and printed, because a bound nobody is told about reads as full coverage.
+    """
+
+    def __init__(self, cap=200, timeout=5.0):
+        self.cap = cap
+        self.timeout = timeout
+        self.seen = {}
+        self.attempts = 0
+        self.skipped_by_cap = 0
+
+    def __call__(self, loc):
+        if not addressable(loc):
+            return False
+        if loc in self.seen:
+            return self.seen[loc]
+        if self.attempts >= self.cap:
+            self.skipped_by_cap += 1
+            return False
+        self.attempts += 1
+        ok = fetches(loc, self.timeout)
+        self.seen[loc] = ok
+        return ok
+
+
+def scan(path, fetcher):
     with open(path, encoding="utf-8") as fh:
         blob = json.load(fh)
     items = blob.get("items") if isinstance(blob, dict) else blob
     if not isinstance(items, list):
         return None
-    n = with_src = rech = 0
+    n = with_src = addr = got = 0
     vals = collections.Counter()
     for r in items:
         if not isinstance(r, dict):
@@ -214,38 +251,34 @@ def scan(path):
         if s:
             with_src += 1
             vals[s] += 1
-            if recheckable(s):
-                rech += 1
-    return {"records": n, "with_source": with_src, "recheckable": rech,
+            if addressable(s):
+                addr += 1
+                if fetcher(s):
+                    got += 1
+    return {"records": n, "with_source": with_src,
+            "addressable": addr, "fetched": got, "recheckable": addr,
             "distinct_sources": len(vals), "top": vals.most_common(2),
             "ratio_over_sourced": round(len(vals) / with_src, 6) if with_src else None,
             "ratio_over_all": round(len(vals) / n, 6) if n else None}
 
 
 def control():
-    d = tempfile.mkdtemp()
-    real = os.path.join(d, "runbook.md")
-    with open(real, "w", encoding="utf-8") as fh:
-        fh.write("host is db-old")
-    p = os.path.join(d, "c.json")
-    with open(p, "w", encoding="utf-8") as fh:
-        json.dump({"items": [{"text": "a", "source": real},
-                             {"text": "b", "source": "no-such-doc.md"},
-                             {"text": "c", "source": "https://example.org/three"}]}, fh)
-    return scan(p)
+    """ONE fixture, run through the SAME scan the corpus goes through, against a local server.
 
+    @perseus-computing asked for a local HTTP fixture and a known 404 so the resolver control is
+    deterministic and publishable. That is the right shape: a control that reaches a real site tests
+    that site, and on a machine with no network it fails for a reason unrelated to the code.
 
-def fetch_control():
-    """A LOCAL server, so the fetch state is checkable without the network or anyone's uptime.
+    Every state is two-sided, and each row can fail on its own:
 
-    @perseus-computing asked for exactly this on r/RAG: "a local HTTP fixture plus a known 404 would
-    make the resolver control deterministic and publishable." It is the right shape. A control that
-    reaches out to a real site tests that site, and on a machine with no network it fails for a
-    reason that has nothing to do with the code.
+        a real file on disk       addressable, fetched
+        a missing relative doc    neither
+        served /there             addressable, fetched
+        served /missing           addressable, NOT fetched  <- kills a yes-to-everything fetcher
+        the bare string https://  NOT addressable           <- the exact reported defect
 
-    Two-sided on purpose. A fetcher that returns True for everything passes a 200-only check, and a
-    fetcher that returns False for everything, which is precisely the bug this function was added
-    after, passes a 404-only check. Both are required.
+    The last row is a regression guard. The published version returned True for it: a scheme with no
+    host, which cannot be re-checked by anyone.
     """
     import threading
     from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -269,21 +302,29 @@ def fetch_control():
     try:
         srv = HTTPServer(("127.0.0.1", 0), H)
     except OSError as e:                                         # noqa: BLE001
-        return False, "could not bind a local server (%s)" % e
+        return None, "could not bind a local server (%s)" % e
     port = srv.server_address[1]
     threading.Thread(target=srv.serve_forever, daemon=True).start()
+
+    d = tempfile.mkdtemp()
+    real = os.path.join(d, "runbook.md")
+    with open(real, "w", encoding="utf-8") as fh:
+        fh.write("host is db-old")
+    p = os.path.join(d, "c.json")
+    with open(p, "w", encoding="utf-8") as fh:
+        json.dump({"items": [{"text": "a", "source": real},
+                             {"text": "b", "source": "no-such-doc.md"},
+                             {"text": "c", "source": "http://127.0.0.1:%d/there" % port},
+                             {"text": "d", "source": "http://127.0.0.1:%d/missing" % port},
+                             {"text": "e", "source": "https://"}]}, fh)
     try:
-        good = fetches("http://127.0.0.1:%d/there" % port)
-        bad = fetches("http://127.0.0.1:%d/missing" % port)
+        return scan(p, Fetcher()), ""
     finally:
         srv.shutdown()
-    if good and not bad:
-        return True, ""
-    if good and bad:
-        return False, "the 404 was counted as a fetch, so this fetcher says yes to anything"
-    if not good and not bad:
-        return False, "even the 200 did not fetch, so this fetcher says no to everything"
-    return False, "inverted: the 404 fetched and the 200 did not"
+
+
+CONTROL_EXPECT = {"records": 5, "with_source": 5, "distinct_sources": 5,
+                  "addressable": 3, "fetched": 2}
 
 
 def main() -> int:
@@ -292,27 +333,28 @@ def main() -> int:
     except Exception:
         pass
 
-    c = control()
-    ok_d = bool(c and c["records"] == 3 and c["distinct_sources"] == 3)
-    ok_r = bool(c and c["recheckable"] == 2)      # the real file, and the https URL
-    print("CONTROL  distinctness   3 distinct over 3 records  -> %d   %s"
-          % (c["distinct_sources"] if c else -1, "PASS" if ok_d else "FAIL"))
-    print("CONTROL  addressable    a real file + an https URL -> %d   %s"
-          % (c["recheckable"] if c else -1, "PASS" if ok_r else "FAIL"))
-    ok_f, f_why = fetch_control()
-    print("CONTROL  fetch          local 200 fetches, local 404 does not   %s   %s"
-          % ("PASS" if ok_f else "FAIL", f_why))
+    c, why = control()
+    if c is None:
+        print("ABORT -- could not build the control fixture: %s" % why)
+        return 1
+    ok_all = True
+    for k in ("records", "with_source", "distinct_sources", "addressable", "fetched"):
+        good = c[k] == CONTROL_EXPECT[k]
+        ok_all = ok_all and good
+        print("CONTROL  %-16s want %d  got %d   %s"
+              % (k, CONTROL_EXPECT[k], c[k], "PASS" if good else "FAIL"))
     print()
-    if not (ok_d and ok_r and ok_f):
+    if not ok_all:
         print("ABORT -- the instrument is broken, not the corpus. A resolver that cannot see a file")
         print("         it just wrote reports 0 over any store, which is exactly the headline.")
         return 1
 
+    fetcher = Fetcher()
     rows, unreadable = [], []
     for p in live_stores():
         rel = os.path.relpath(p, ROOT).replace("\\", "/")
         try:
-            r = scan(p)
+            r = scan(p, fetcher)
         except Exception as e:
             unreadable.append((rel, "%s: %s" % (type(e).__name__, e)))
             continue
@@ -331,23 +373,29 @@ def main() -> int:
         print("FAIL -- no stores read; nothing was measured")
         return 1
 
-    print("%-46s %8s %7s %8s %10s %10s %7s"
-          % ("store", "records", "src %", "distinct", "/sourced", "/all", "re-chk"))
+    print("%-46s %8s %7s %8s %10s %10s %6s %8s"
+          % ("store", "records", "src %", "distinct", "/sourced", "/all", "addr", "fetched"))
     for r in sorted(rows, key=lambda x: -x["records"]):
         pct = 100.0 * r["with_source"] / r["records"] if r["records"] else 0.0
-        print("%-46s %8d %6.2f%% %8d %10s %10s %7d"
+        print("%-46s %8d %6.2f%% %8d %10s %10s %6d %8d"
               % (r["store"], r["records"], pct, r["distinct_sources"],
-                 r["ratio_over_sourced"], r["ratio_over_all"], r["recheckable"]))
+                 r["ratio_over_sourced"], r["ratio_over_all"], r["addressable"], r["fetched"]))
 
     tot = sum(r["records"] for r in rows)
     src = sum(r["with_source"] for r in rows)
-    rec = sum(r["recheckable"] for r in rows)
+    adr = sum(r["addressable"] for r in rows)
+    got = sum(r["fetched"] for r in rows)
     full = [r for r in rows if r["records"] and r["with_source"] == r["records"]]
     fn = sum(r["records"] for r in full)
     fd = sum(r["distinct_sources"] for r in full)
 
     print("\n" + "=" * 100)
-    print("ALL STORES        %d records   source %.2f%%   RE-CHECKABLE %d" % (tot, 100.0 * src / tot, rec))
+    print("ALL STORES        %d records   source %.2f%%   ADDRESSABLE %d   FETCHED %d"
+          % (tot, 100.0 * src / tot, adr, got))
+    print("                  %d GET(s) issued; a request is only made for an addressable locator%s"
+          % (fetcher.attempts,
+             "" if not fetcher.skipped_by_cap
+             else ", and %d were NOT tried (cap %d)" % (fetcher.skipped_by_cap, fetcher.cap)))
     print("AT 100%% COVERAGE  %d records across %d stores   %d distinct values   ratio %.6f"
           % (fn, len(full), fd, fd / fn if fn else 0.0))
     for r in sorted(full, key=lambda x: -x["records"])[:3]:
@@ -355,11 +403,20 @@ def main() -> int:
     print("=" * 100)
     print("The ratio is column Distinctness (Deequ, Great Expectations, ydata-profiling), not a new")
     print("check, and it does not measure traceability -- a UUID per record scores 1.0 at zero.")
-    print("The number that can fail is RE-CHECKABLE, and the resolver control above proves it can.")
+    print("ADDRESSABLE is syntax: does the value name a place. FETCHED is one GET returning 2xx.")
+    print("They are separate columns because collapsing them is the defect @perseus-computing found")
+    print("on r/RAG: the published version called a prefix check re-checkable. Both can fail, and")
+    print("the control above makes each of them fail on its own before any store is read.")
 
     out = os.path.join(HERE, "a_provenance_field_at_100_percent_with_one_distinct_value.result.json")
     with open(out, "w", encoding="utf-8") as fh:
-        json.dump({"records": tot, "source_pct": round(100.0 * src / tot, 2), "recheckable": rec,
+        json.dump({"records": tot, "source_pct": round(100.0 * src / tot, 2),
+                   "addressable": adr, "fetched": got,
+                   "fetch_attempts": fetcher.attempts,
+                   "fetch_skipped_by_cap": fetcher.skipped_by_cap,
+                   "recheckable": adr,
+                   "recheckable_note": ("deprecated alias, kept so older scripts still read: it "
+                                        "equals addressable, which is what it always measured"),
                    "full_coverage_stores": len(full), "full_coverage_records": fn,
                    "full_coverage_distinct_sources": fd,
                    "full_coverage_ratio": round(fd / fn, 6) if fn else None,
