@@ -168,6 +168,15 @@ def test_a_new_issue_with_no_thread_is_normal():
 def test_a_thread_the_scout_ruled_on_is_recognised():
     """openclaw#7707 is in .scout.json — the ledger the first version forgot, which is what made it
     reject threads we had engaged with by hand."""
+    # .scout.json is runtime state and is not tracked, so a fresh checkout has no ledger for the
+    # reader to recognise anything from. The assertion is about the reader, not the environment.
+    #
+    # The path is server/.scout.json, which is where agent_activity._load resolves it. The first
+    # version of this skip asked ROOT, the repo root, which is one level up and never holds the
+    # file, so it skipped on this machine too and quietly cost a passing test. Ask the location the
+    # code under test actually reads.
+    if not (ROOT / "server" / ".scout.json").exists():
+        pytest.skip("no .scout.json in this environment; there is no ledger to read")
     known, why = _prov()("openclaw/openclaw", 7707)
     assert known is True and "Scout" in why
 

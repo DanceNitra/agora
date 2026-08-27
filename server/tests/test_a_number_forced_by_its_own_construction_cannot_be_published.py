@@ -194,8 +194,19 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
     is the only way the list ever shrinks.
     """
     data = json.loads((TOOLS / "construction_waivers.json").read_text(encoding="utf-8"))
+    foreign = []
     for path, w in data.items():
         if path.startswith("_"):
+            continue
+        # A WAIVER KEYED BY AN ABSOLUTE PATH LIVES IN THE WRONG FILE. Three entries point into
+        # sibling repositories (ramr-pub, inspeximus-repo), so `ROOT / path` resolves to nonsense in
+        # any checkout and this assertion could never hold off this one machine. They are counted
+        # rather than ignored: if a fourth appears, the count moves and this fails, which is the only
+        # thing keeping the exception from growing quietly. The real fix is to move them to those
+        # repositories' own waiver files, and that is a change to how publish_gate resolves
+        # cross-repo artifacts, not a test edit.
+        if len(path) > 1 and path[1] == ":":
+            foreign.append(path)
             continue
         p = ROOT / path
         assert p.exists(), f"waiver for {path} but the file is gone -- remove the waiver"
@@ -203,6 +214,10 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
         assert set(w["kinds"]) & kinds, (
             f"waiver for {path} lists {w['kinds']} but the audit now reports {sorted(kinds)} -- "
             "the waiver is stale, delete it")
+    assert len(foreign) == 3, (
+        f"{len(foreign)} waivers are keyed by an absolute path outside this repo, was 3 on "
+        f"2026-08-27: {sorted(foreign)}. A waiver nothing here can resolve is permission with no "
+        "check behind it, so the count is pinned until they move to their own repositories.")
 
 
 # ------------------------------------------------------------------------------ the wiring itself
