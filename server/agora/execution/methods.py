@@ -525,7 +525,46 @@ def board_priority_terms(text: str) -> set:
     comparison wherever it is made.
     """
     keep = [s for s in __import__("re").split(r"(?<=[.!?])\s+", text or "") if not _REFUSAL.search(s)]
-    return {light_stem(w) for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
+    terms = {light_stem(w) for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
+    return terms | {g for t in terms for g in _gerunds(t)}
+
+
+def _gerunds(t: str) -> set:
+    """The -ing forms of a board term, so the BOARD matches a task that uses the verb.
+
+    light_stem folds -ies and a trailing -s; it does NOT fold -ing, so `poisoning` stays
+    `poisoning` and misses the board's own `poison`, and `reverting` misses `revert`. Those are
+    the two most action-shaped moat terms this organisation has, and a gerund is how they are
+    written in a paper title: "Memory Poisoning Attacks on LLM Agents".
+
+    THE FIX GOES HERE AND NOT IN light_stem, deliberately. Naive -ing stripping in the shared
+    stemmer breaks string -> str, thing -> th, during -> dur, and BOTH the brain and the dungeon
+    read that function. Widening the BOARD instead is one-directional: a generated form can only
+    ever match text that literally contains it, so a nonsense one like `cogneeing` costs a set
+    entry and can match nothing. One emission point covers both ends, because the dungeon takes
+    this function's output verbatim from /brain/board (mcp_server._gate_refresh) rather than
+    re-deriving it -- which is exactly what the -ies episode cost us and what that fix bought.
+
+    MEASURED IMPACT IS SMALL AND SAID SO: 1 task of 59 on 2026-08-18, and 0 of 37 live items on
+    2026-08-27. This lands because the error runs in the EXCLUDING direction -- it silently
+    withholds on-frontier work while reporting a clean gate -- not because it recovers a backlog.
+    """
+    if len(t) < 3:
+        return set()
+    out = {t + "ing"}
+    if t.endswith("e"):
+        out.add(t[:-1] + "ing")
+    # NO CONSONANT DOUBLING. The CVC rule (ship -> shipping) is correct English and wrong here: it
+    # fired on `buyer` -> `buyerring` and `competitor` -> `competitorring`, and capping it by length
+    # kept the first, because `buyer` is five characters. Getting gerund morphology right needs a
+    # verb list, which this file has no dependency for. No current board term needs doubling, so the
+    # rule is dropped and the miss is stated rather than hidden: a future board term like `ship`
+    # would need `shipping` added here by hand.
+    #
+    # The set still contains inert forms by construction -- `cogneeing`, `erasureing` -- and that is
+    # the trade this function is built on: a generated form can only match text that literally
+    # contains it, so a nonsense one costs one set entry and can match nothing.
+    return {g for g in out if g != t}
 
 
 def _match_cache_get(key: str):
