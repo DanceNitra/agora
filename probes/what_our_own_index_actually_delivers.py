@@ -45,9 +45,28 @@ def true_text(path: str) -> str:
     return io.open(path, "rb").read().decode("utf-8")
 
 
+def split_lines(text: str) -> list:
+    """Lines, with the trailing newline treated as a TERMINATOR and not as a line.
+
+    @JhouCode's control on anthropics/claude-code#82056, 2026-08-27, and it found a defect here.
+    The two obvious primitives fail on disjoint populations: 0 counts newlines and is short by
+    one on a file with no trailing newline, while  yields a phantom empty element on
+    a file that has one. This probe used the second, MEMORY.md ends in a newline, so every line
+    figure it has ever produced was ONE TOO MANY -- 196 reported against a true 195.
+
+    The direction is the tolerable one of the two: over-reporting declares the index nearer the
+    200-line cap than it is, so it cries wolf rather than staying quiet on a real cut. It was still
+    wrong, and it was quoted.
+    """
+    out = text.split(chr(10))
+    if out and out[-1] == "":
+        out.pop()
+    return out
+
+
 def window(text: str) -> str:
     """The first LINE_CAP lines, cut at UNIT_CAP units, backed up to a line boundary."""
-    kept = chr(10).join(text.split(chr(10))[:LINE_CAP])
+    kept = chr(10).join(split_lines(text)[:LINE_CAP])
     if len(kept) <= UNIT_CAP:
         return kept
     c = kept.rfind(chr(10), 0, UNIT_CAP)
@@ -59,7 +78,7 @@ def main() -> int:
         raise SystemExit(f"REFUSED: {INDEX} is absent; every check below would pass vacuously")
     raw = io.open(INDEX, "rb").read()
     text = raw.decode("utf-8")
-    lines = text.split(chr(10))
+    lines = split_lines(text)
     win = window(text)
     seen = win.count(chr(10)) + 1
     in_win = list(dict.fromkeys(LINK.findall(win)))
