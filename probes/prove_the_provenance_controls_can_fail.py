@@ -21,6 +21,12 @@ exists to catch, and every mutation here is one we actually shipped or nearly sh
                                                    nothing resolves, while every sourced record in
                                                    the coding store carried meta.files paths that
                                                    do
+    8  git_pair_audit reads the working copy       "the file is on my disk now" standing in for
+                                                   "the file was in that commit", which is the same
+                                                   confusion the whole thread is about. The control
+                                                   passed this until a third row was added, because
+                                                   a path in HEAD is also on disk and a path absent
+                                                   everywhere is absent in both
 
 Run:  python -X utf8 probes/prove_the_provenance_controls_can_fail.py
 """
@@ -90,6 +96,56 @@ MUTATIONS = [
 ]
 
 
+def _working_copy_audit(items, repo=None, public_ref="origin/main"):
+    """git_pair_audit that ignores the sha and asks the working copy instead.
+
+    This is the mutation that matters most, because it is the SAME confusion the whole thread is
+    about, one level up: "the file is on my disk now" standing in for "the file was in that commit".
+    Until a third row was added, git_pair_control passed this: a path in HEAD is also on disk, and a
+    path absent everywhere is absent in both, so neither of the first two rows could separate them.
+    """
+    root = repo or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    pairs = ok = recs = full = 0
+    shas = set()
+    for r in items:
+        m = r.get("meta") if isinstance(r, dict) else None
+        if not isinstance(m, dict):
+            continue
+        files = m.get("files")
+        if isinstance(files, str):
+            files = [files]
+        if not (isinstance(m.get("sha"), str) and isinstance(files, list) and files):
+            continue
+        shas.add(m["sha"].strip())
+        recs += 1
+        hit = 0
+        for f in files:
+            pairs += 1
+            if os.path.exists(os.path.join(root, f)):
+                ok += 1
+                hit += 1
+        full += hit == len(files)
+    return {"records_with_pair": recs, "records_fully_resolved": full, "pairs": pairs,
+            "pairs_in_tree": ok, "distinct_shas": len(shas), "shas_are_commits": len(shas),
+            "shas_public": len(shas), "public_ref": public_ref}
+
+
+def git_pair_row():
+    """The git-pair control, checked in both directions like every other row here."""
+    clean_ok, clean_why = m.git_pair_control()
+    if clean_ok is None:
+        return None, "shipped: NOT ATTEMPTED (%s)" % clean_why
+    orig = m.git_pair_audit
+    try:
+        m.git_pair_audit = _working_copy_audit
+        mut_ok, mut_why = m.git_pair_control()
+    finally:
+        m.git_pair_audit = orig
+    if mut_ok is None:
+        return False, "mutated: NOT ATTEMPTED (%s), so nothing was tested" % mut_why
+    return (bool(clean_ok) and not mut_ok), "clean=%s mutated=%s %s" % (clean_ok, mut_ok, mut_why)
+
+
 def main() -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -108,6 +164,7 @@ def main() -> int:
     print("%-56s %-8s %s" % ("none (the shipped code)", "PASS", "-"))
 
     caught = 0
+    total_extra = [0]
     for label, patch in MUTATIONS:
         for name, fn in patch.items():
             setattr(m, name, fn)
@@ -120,9 +177,18 @@ def main() -> int:
         caught += hit
         print("%-56s %-8s %s" % (label, "caught" if hit else "MISSED", bad or why or "-"))
 
+    gok, gwhy = git_pair_row()
+    if gok is None:
+        print("%-56s %-8s %s" % ("git_pair_audit reads the working copy", "SKIP", gwhy))
+    else:
+        caught += bool(gok)
+        total_extra[0] = 1
+        print("%-56s %-8s %s"
+              % ("git_pair_audit reads the working copy", "caught" if gok else "MISSED", gwhy))
+
     print("-" * 116)
-    print("%d of %d mutations caught" % (caught, len(MUTATIONS)))
-    if caught != len(MUTATIONS):
+    print("%d of %d mutations caught" % (caught, len(MUTATIONS) + total_extra[0]))
+    if caught != len(MUTATIONS) + total_extra[0]:
         print("A mutation nothing caught means the control is decorative on that axis.")
         return 1
     return 0
