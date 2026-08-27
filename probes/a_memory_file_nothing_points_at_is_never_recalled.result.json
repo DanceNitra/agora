@@ -1,0 +1,22 @@
+{
+  "measured_at": "2026-08-27",
+  "store": "claude-code project memory for DanceNitra/agora",
+  "files": 453,
+  "named_by_index": 376,
+  "reachable": 453,
+  "orphans_after_fix": 0,
+  "orphans_before_fix": 16,
+  "dangling_total": 32,
+  "dangling_prose": 3,
+  "dangling_malformed": 0,
+  "dangling_phrases": 2,
+  "dangling_deliberate_backlog": 27,
+  "note": "dangling is a BACKLOG in this store by written convention, not a fault; reported apart from orphans",
+  "verdicts": {
+    "CONTROL_the_store_was_actually_read": true,
+    "CONTROL_a_directly_named_file_is_reached": true,
+    "CONTROL_the_walk_is_transitive_not_just_the_index": true,
+    "CONTROL_an_injected_orphan_is_counted": true,
+    "CONTROL_an_injected_dangling_link_is_counted": true
+  }
+}
