@@ -48,23 +48,28 @@ META = {
     },
     "provenance-field-one-value": {
         "slug": "provenance-field-one-value",
+        # CORRECTED 2026-08-28. The old title said the second store "resolves to nothing" and the
+        # old description said "0 records resolve to anything fetchable". Both were false, and the
+        # second one claimed a fetch the resolver never performed. The records in that store do
+        # resolve; the FIELD does not, and an audit scoped to the field read one as the other.
         "title": "Two stores, one product: a provenance field at 100% coverage with 8 distinct "
-                 "values, and another at 0.99 that resolves to nothing",
+                 "values, and another at 0.99 whose field resolves to nothing while the record "
+                 "does not",
         "title_sk": "Dva sklady, jeden produkt: provenance pole na 100 % pokrytí s 8 odlišnými "
-                    "hodnotami, a druhé na 0,99, ktoré nevedie nikam",
+                    "hodnotami, a druhé na 0,99, kde nevedie nikam pole, ale záznam áno",
         "desc": "Across 235,055 records in eleven live agent-memory stores, `source` is populated "
-                "on 92.63% and 0 records resolve to anything fetchable. Eight stores hold one "
-                "constant each -- the name of the writing process. A ninth holds 101 distinct "
-                "commit ids and is equally useless, which is why column Distinctness is a "
-                "detector and not a fix. W3C PROV separated wasAttributedTo from wasDerivedFrom "
-                "in 2013.",
+                "on 92.63% and not one value is a path or a URL, so nothing can be fetched from "
+                "it. Eight stores hold one constant each, the name of the writing process. "
+                "Corrected 28 August: the ninth store's records DO resolve, 426 of 432 path and "
+                "commit pairs, one key away from the field being audited. W3C PROV separated "
+                "wasAttributedTo from wasDerivedFrom in 2013.",
         "desc_sk": "Na 235 055 záznamoch v jedenástich živých skladoch agentskej pamäte je "
-                   "`source` vyplnené na 92,63 % a 0 záznamov vedie k niečomu stiahnuteľnému. "
-                   "Osem skladov drží po jednej konštante -- mene zapisujúceho procesu. Deviaty "
-                   "drží 101 odlišných commit id a je rovnako nanič, a preto je stĺpcová "
-                   "Distinctness detektor, nie oprava. W3C PROV oddelilo wasAttributedTo od "
-                   "wasDerivedFrom v 2013.",
-        "date": "2026-08-22", "modified": "2026-08-22",
+                   "`source` vyplnené na 92,63 % a ani jedna hodnota nie je cesta ani URL, takže "
+                   "z nej nie je čo stiahnuť. Osem skladov drží po jednej konštante, mene "
+                   "zapisujúceho procesu. Opravené 28. augusta: záznamy deviateho skladu sa "
+                   "rozložia, 426 zo 432 párov cesta a commit, o jeden kľúč vedľa auditovaného "
+                   "poľa. W3C PROV oddelilo wasAttributedTo od wasDerivedFrom v 2013.",
+        "date": "2026-08-22", "modified": "2026-08-28",
         "tags": "Agent memory · Provenance · Data quality · Measurement · RAG",
         "tags_sk": "Agentská pamäť · Provenance · Kvalita dát · Meranie · RAG",
         "kicker": "Measurement · self-audit", "kicker_sk": "Meranie · sebaaudit",

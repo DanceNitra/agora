@@ -1,4 +1,14 @@
-# Dva sklady v jednom produkte: jedno provenance pole má 8 odlišných hodnôt na 217 549 záznamov, druhé 101. Ani jedno nevedie nikam
+# Dva sklady v jednom produkte: jedno provenance pole má 8 odlišných hodnôt na 217 549 záznamov, druhé 101. Ani jedno POLE nevedie nikam
+
+**Oprava, 28. augusta 2026.** Posledná veta znela "Ani jedno nevedie nikam" a o coding sklade to
+bola nepravda. u/perseus-computing zistil, ze resolver za tymito cislami nikdy neposlal ziadnu
+poziadavku. Poriadna oprava znamenala pytat sa na cely zaznam namiesto jedneho pola, a odpoved sa
+zmenila: v tom sklade ma 168 zo 174 zdrojovanych zaznamov lokator, ktory sa naozaj nacita, a pary
+`meta.sha` + `meta.files` sa rozlozia v strome vlastneho commitu 426-krat zo 432. Provenancia tam
+bola. Sedela o jeden kluc vedla pola, ktore som auditoval, a audit zuzeny na to pole nad nou
+hlasil nulu. Stlpec nizsie s nazvom `dohladatelne` je premenovany na `adresovatelne`, co je to, co
+meral; jeho nuly sa nemenia. Osem agentskych skladov sa nemeni tiez: tam nevedie nikam nic ani na
+jednej urovni. Podrobnosti v update na konci.
 
 Robím pamäťovú vrstvu pre agentov. Má pole `source` a jeho pokrytie som už verejne citoval. Minulý
 týždeň som ho pred ďalším citovaním premeral a číslo sa posunulo, tak som sa išiel pozrieť prečo.
@@ -7,7 +17,7 @@ Jedenásť živých skladov, 235 055 záznamov, `source` vyplnené na 92,63 %. S
 zapisovacie cesty, ktoré zlyhávajú opačným smerom.
 
 ```
-skupina skladov        záznamov   src %  odlišné  odlišné/zdrojované  dohľadateľné
+skupina skladov        záznamov   src %  odlišné  odlišné/zdrojované  adresovateľné
 osem agentských        217 549  100,00%        8            0,000037             0
 jeden coding sklad      16 215    0,63%      101            0,990196             0
 ```
@@ -133,3 +143,44 @@ zlyhať.
 *Odlišnosť teraz hlási `check_sources()` v inspeximus 2.20.0, vedľa pokrytia aj vedľa počtu
 dohľadateľných, a je zdokumentovaná ako detektor jedného degenerovaného tvaru, nie ako miera
 dohľadateľnosti — práve kvôli tomu protipríkladu vyššie.*
+
+
+## Update, 28. augusta: resolver nikdy neposlal poziadavku a titulok bol nepravdivy
+
+u/perseus-computing pustil publikovany probe na `https://example.invalid/...` a vratilo sa to ako
+dohladatelne. Mal pravdu a funkcia bola horsia, nez pisal: prefixovy test plus `os.path.exists`,
+takze nikdy neposlala ziadnu poziadavku, a presiel jej aj holy retazec `https://`, schema bez hosta.
+
+Su z toho dve funkcie. `addressable` je syntax. `retrieves` otvori subor alebo posle jeden GET a
+uzna len 2xx. Kontrola je jeho navrh, lokalny server, ktory na jednej ceste odpoveda 200 a na inej
+404, a bezi cez tu istu fixture, ktorou prechadza korpus, nie cez samotnu funkciu.
+
+Prvy pokus o tu opravu je uzitocnejsia chyba. Pridal retriever, dal mu kontrolu a nechal sken volat
+staru funkciu, takze retriever presiel vlastnym testom bez toho, aby videl jediny zaznam korpusu.
+
+**Potom nepriatelsky prepocet mojich vlastnych cisel zabil titulok.** Audit bol zuzeny na pole
+`source` a ja som nulu nad tym polom precital ako nulu nad zaznamami. V coding sklade ma 168 zo 174
+zdrojovanych zaznamov lokator, ktory sa naozaj nacita. Pary `meta.sha` a `meta.files` sa rozlozia v
+strome vlastneho commitu 426-krat zo 432 a vsetkych 171 odlisnych shas su skutocne commity.
+Provenancia tam cely cas bola, o jeden kluc vedla pola, ktore som auditoval.
+
+Je tam vyhrada, ktoru som nasiel az spravnou otazkou. Z tych 171 commitov je 161 dosiahnutelnych z
+verejneho main. Desat nie, takze desat tych referencii vie overit len autor a nikto iny, co je pri
+tvrdeni publikovanom cudzim ludom ina nula.
+
+Co plati dalej: osem agentskych skladov, 220 417 zaznamov, osem odlisnych hodnot a nic, co by viedlo
+niekam, na ziadnej urovni. To je argument, ktory post robil, a ten sa nemeni. Co neplati: coding
+sklad ako druhy priklad. Jeho zaznamy boli protipriklad, ktorym som argumentoval, a tie sa rozlozia.
+
+Chyba bola v pristroji na oboch stranach, takze stoji za to pomenovat, co sa v nom zmenilo. Kontrolna
+fixture pouzivala stringove zdroje, kym kazdy zaznam v realnom korpuse je objekt, a mutacia citaca,
+ktora objekty ignoruje, znizi pokrytie z 90 % na 0,00 % pri stale zelenej kontrole. Strop na
+nacitania ratal aj otvorenia lokalnych suborov, takze zatal na 200 so 148 neskusanymi lokatormi a
+podcenene cislo vydal ako vysledok. Neadresovatelne retazce sa ratali ako sietove pokusy, 169 z nich
+pri behu, ktory neotvoril ziadny socket. A receipt teraz nesie `measured_at`, lebo pocet zaznamov sa
+v jednej relacii pohol styrikrat a zaznamova uroven isla v piatich minutach zo 167 na 168.
+
+Sprievodny subor lame probe siedmimi sposobmi a zlyha, ak niektora mutacia prezije, vratane chyby,
+ktoru nahlasil, a oboch smerov, ktorymi retriever zlyhava. Ano-na-vsetko prejde kontrolou len na 200.
+Nie-na-nic prejde kontrolou len na 404, a nie-na-nic nie je hypoteza: skorsia verzia ho mala a jej
+odpoved bola nula, co je zaroven titulok tohto postu.
