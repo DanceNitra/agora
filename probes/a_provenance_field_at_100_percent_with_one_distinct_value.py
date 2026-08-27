@@ -81,6 +81,8 @@ import json
 import os
 import sys
 import tempfile
+import urllib.parse
+import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -139,10 +141,61 @@ def raw_source(rec):
     return s if isinstance(s, str) and s.strip() else None
 
 
-def recheckable(loc):
-    if not isinstance(loc, str) or not loc:
+def addressable(loc):
+    """SYNTAX only: does this name a place, whether or not anything is there?
+
+    Renamed from `recheckable` and narrowed, after @perseus-computing reported on r/RAG that the
+    original returned True for `https://example.invalid/...` without making a request, so the
+    published metric was syntax-level addressability while the write-up called it re-checkable.
+    That is correct and it was worse than reported: the original also passed the bare string
+    `https://`, a scheme with no host at all.
+
+    The zero is unaffected, because `agent:scholar` and `git:162de50e1702` fail this too, but any
+    store holding real URLs would have been scored optimistically, and this is a probe other people
+    were invited to run. A metric that cannot tell a live URL from a dead one must not be named
+    after fetching.
+    """
+    if not isinstance(loc, str) or not loc.strip():
         return False
-    return loc.startswith("http://") or loc.startswith("https://") or os.path.exists(loc)
+    if os.path.exists(loc):
+        return True
+    # NOT a bare `except Exception`. The first version of this function wrapped the parse in one,
+    # and while the module was missing `import urllib.parse` the AttributeError was swallowed and
+    # every locator on earth came back False. That is not a safe default here: this probe's headline
+    # IS a zero, so a bug that returns zero for everyone is indistinguishable from the finding and
+    # would have confirmed it for every reader. Only a genuine parse failure is tolerated.
+    try:
+        u = urllib.parse.urlparse(loc)
+    except ValueError:
+        return False
+    return u.scheme in ("http", "https") and bool(u.netloc)
+
+
+def fetches(loc, timeout=5.0):
+    """ONE REQUEST. Returns True only on a 2xx, and it is opt-in for the obvious reasons.
+
+    @perseus-computing's separation, adopted: locator-present, syntax-valid and fetch-succeeded are
+    three different states and collapsing them is what produced the original defect. The two they
+    also named, snapshot-verified and claim-supported, are not implemented here because this probe
+    does not hold snapshots or claims, and naming a state it cannot measure would repeat the
+    mistake in a new place.
+    """
+    if not addressable(loc):
+        return False
+    if os.path.exists(loc):
+        return True
+    req = urllib.request.Request(loc, method="GET", headers={"User-Agent": "provenance-probe"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return 200 <= getattr(r, "status", r.getcode()) < 300
+    except Exception:                                            # noqa: BLE001
+        return False
+
+
+def recheckable(loc):
+    """Kept so anyone who scripted against the old name still gets an answer, and gets the honest
+    one: it now means addressable, which is what it always measured."""
+    return addressable(loc)
 
 
 def scan(path):
@@ -182,6 +235,57 @@ def control():
     return scan(p)
 
 
+def fetch_control():
+    """A LOCAL server, so the fetch state is checkable without the network or anyone's uptime.
+
+    @perseus-computing asked for exactly this on r/RAG: "a local HTTP fixture plus a known 404 would
+    make the resolver control deterministic and publishable." It is the right shape. A control that
+    reaches out to a real site tests that site, and on a machine with no network it fails for a
+    reason that has nothing to do with the code.
+
+    Two-sided on purpose. A fetcher that returns True for everything passes a 200-only check, and a
+    fetcher that returns False for everything, which is precisely the bug this function was added
+    after, passes a 404-only check. Both are required.
+    """
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            if self.path == "/there":
+                b = b"ok"
+                self.send_response(200)
+                self.send_header("content-length", str(len(b)))
+                self.end_headers()
+                self.wfile.write(b)
+            else:
+                self.send_response(404)
+                self.send_header("content-length", "0")
+                self.end_headers()
+
+    try:
+        srv = HTTPServer(("127.0.0.1", 0), H)
+    except OSError as e:                                         # noqa: BLE001
+        return False, "could not bind a local server (%s)" % e
+    port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        good = fetches("http://127.0.0.1:%d/there" % port)
+        bad = fetches("http://127.0.0.1:%d/missing" % port)
+    finally:
+        srv.shutdown()
+    if good and not bad:
+        return True, ""
+    if good and bad:
+        return False, "the 404 was counted as a fetch, so this fetcher says yes to anything"
+    if not good and not bad:
+        return False, "even the 200 did not fetch, so this fetcher says no to everything"
+    return False, "inverted: the 404 fetched and the 200 did not"
+
+
 def main() -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -193,10 +297,13 @@ def main() -> int:
     ok_r = bool(c and c["recheckable"] == 2)      # the real file, and the https URL
     print("CONTROL  distinctness   3 distinct over 3 records  -> %d   %s"
           % (c["distinct_sources"] if c else -1, "PASS" if ok_d else "FAIL"))
-    print("CONTROL  resolver       a real file + an https URL -> %d   %s"
+    print("CONTROL  addressable    a real file + an https URL -> %d   %s"
           % (c["recheckable"] if c else -1, "PASS" if ok_r else "FAIL"))
+    ok_f, f_why = fetch_control()
+    print("CONTROL  fetch          local 200 fetches, local 404 does not   %s   %s"
+          % ("PASS" if ok_f else "FAIL", f_why))
     print()
-    if not (ok_d and ok_r):
+    if not (ok_d and ok_r and ok_f):
         print("ABORT -- the instrument is broken, not the corpus. A resolver that cannot see a file")
         print("         it just wrote reports 0 over any store, which is exactly the headline.")
         return 1
