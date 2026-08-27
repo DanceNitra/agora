@@ -1,0 +1,65 @@
+# Probes had no CI at all. 204 files back published numbers and nothing ran them.
+#
+# This was found while deciding whether to accept an outside pull request against
+# probes/a_provenance_field_at_100_percent_with_one_distinct_value.py, after a reader found a real
+# defect in it. ci.yml filters on server/**, game/** and shell/**, so a patch to probes/ did not
+# even start a run: the artifacts behind our public figures were the least guarded thing here.
+#
+# What this can and cannot do. Most probes read live agent-memory stores or a running brain, so CI
+# cannot run them and pretending otherwise would produce a green tick over a skipped job. It runs
+# the ones that are self-contained: the mutation harness, which breaks the provenance probe four
+# ways and fails if any mutation goes uncaught, and a compile pass over every probe so a syntax
+# error cannot reach main.
+name: probes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'probes/**'
+      - '.github/workflows/probes.yml'
+  pull_request:
+    paths:
+      - 'probes/**'
+      - '.github/workflows/probes.yml'
+
+concurrency:
+  group: probes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Every probe compiles
+        run: python -m compileall -q probes
+
+      # The controls must be shown FAILING on the defects they exist to catch. A green control
+      # proves nothing on its own; this job fails if any of the four mutations survives.
+      - name: The provenance controls can fail
+        run: python -X utf8 probes/prove_the_provenance_controls_can_fail.py
+
+      # And the harness must not be able to pass vacuously. A harness that stopped running its
+      # mutations would still exit 0 while testing nothing, so the count is asserted here rather
+      # than pinned to a literal, which would only have to be edited every time one is added.
+      - name: The harness ran its mutations
+        run: |
+          python -X utf8 probes/prove_the_provenance_controls_can_fail.py | tee out.txt
+          python - <<'EOF'
+          import re, sys
+          m = re.search(r"^(\d+) of (\d+) mutations caught$", open("out.txt").read(), re.M)
+          if not m:
+              sys.exit("the harness printed no mutation count")
+          caught, total = int(m.group(1)), int(m.group(2))
+          if total < 5:
+              sys.exit("only %d mutations ran; this suite is not exercising the controls" % total)
+          if caught != total:
+              sys.exit("%d of %d mutations survived" % (total - caught, total))
+          print("%d of %d mutations caught" % (caught, total))
+          EOF
