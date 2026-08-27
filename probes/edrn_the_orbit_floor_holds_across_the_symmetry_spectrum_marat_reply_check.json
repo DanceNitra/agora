@@ -1,0 +1,23 @@
+{
+  "draft": "agora_output/drafts/reply_edrn_marat_real_vectors_are_forced.md",
+  "receipt": "probes/edrn_the_orbit_floor_holds_across_the_symmetry_spectrum.result.json",
+  "verdicts": {
+    "CONTROL_receipt_is_the_C15_ring": true,
+    "CONTROL_receipt_is_the_same_sz_sector": true,
+    "CONTROL_probe_verdicts_all_passed": true,
+    "draft_prints_real_vectors_min": true,
+    "draft_prints_real_vectors_max": true,
+    "draft_prints_exact_max_over_doublet": true,
+    "draft_prints_200_trials": true,
+    "draft_prints_the_spread": true,
+    "draft_prints_the_minimum": true,
+    "CLAIM_every_real_vector_gives_one_value": true,
+    "CLAIM_0_1310_is_the_manifold_MAXIMUM": true,
+    "CLAIM_the_other_end_is_the_symmetry_zero": true,
+    "CLAIM_the_draft_avoids_dynamical_language": true,
+    "CLAIM_probe_has_the_standing_wave_control": true,
+    "CONTROL_a_spreading_receipt_would_FAIL": true,
+    "CONTROL_a_non_maximal_receipt_would_FAIL": true,
+    "no_orphan_decimals": true
+  }
+}
