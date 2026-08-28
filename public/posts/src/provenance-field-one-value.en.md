@@ -191,3 +191,43 @@ A companion file breaks the probe seven ways and fails if any mutation survives,
 he reported and both directions a retriever fails in. Yes-to-everything passes a 200-only check.
 No-to-everything passes a 404-only check, and no-to-everything is not hypothetical: an earlier
 version had it, and its answer was zero, which is also this post's headline.
+
+
+## Update, 28 August, second correction: I made the post's own mistake inside its correction
+
+The correction above says the provenance was there and I had audited the wrong field. An adversarial
+re-run of that correction says it is too strong, in the same direction as the error it corrects.
+
+`meta.files` is `git show --name-only` of `meta.sha`. Measured: **450 of 450** cited paths are files
+that commit itself changed. So the pair records what the write PRODUCED, not the document the memory
+came from. In the vocabulary this post is built on, that is `wasGeneratedBy`, not `wasDerivedFrom`.
+The post's whole argument is that we recorded attribution and read it as derivation, and I did it
+again one layer down, while correcting it.
+
+Three more things the same pass found, all of which narrow the claim:
+
+The record-level number is my own artifact. `record_locators` reads eight keys, and every one of the
+170 records rides on a single one, `meta.files`, which I added to that list after looking at the
+data. Drop it and the count is 0. The seven others contribute nothing, and a store keeping its
+reference under `citation`, `origin` or `ref` scores zero here.
+
+The commit-specific check earns less than it looks. Resolving the pair inside its own commit gives
+444 of 450. Asking the sha-blind question, does this path exist in the repository today, gives 426 of
+450. The sha buys four percentage points.
+
+And the denominator was inflated. The finding covers 170 records in one store: 0.07% of the 243,985
+in the corpus, not a fact about eleven stores.
+
+There is prior art for the error and I should have cited it in the first correction rather than the
+second. Column completeness is named in Pipino, Lee and Wang, *Data Quality Assessment*, CACM 45(4),
+2002, alongside schema and population completeness; Scannapieco and Batini set out value, tuple,
+attribute and relation completeness in 2004. Measuring a column and reporting it as a property of the
+record is the textbook case, not a new failure mode. What is ours is only the specimen and the
+runnable probe.
+
+One more, and it is the worst of them, because it is in the artifact this post invites you to run.
+Point the probe at a store that is not shaped like ours and it prints seven green controls, then
+`no item list`, then `FAIL -- no stores read; nothing was measured`. A healthy-looking instrument
+that never reached its target, in the file whose subject is healthy-looking instruments that never
+reach their target. That is being fixed; until it is, the invitation only works for stores that
+already look like mine.

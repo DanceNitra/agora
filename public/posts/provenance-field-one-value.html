@@ -145,7 +145,7 @@ one coding store      16,215    0.63%      101          0.990196             0</
 
 <div class="foot"><span class="en">Distinctness is now reported by <code>check_sources()</code> in inspeximus 2.20.0, beside coverage and beside
 the re-checkable count, and documented as a detector for one degenerate shape rather than a measure of
-traceability — because of the counterexample above.*
+traceability — because of the counterexample above.<em>
 
 
 ## Update, 28 August: the resolver never made a request, and the headline was wrong
@@ -192,7 +192,47 @@ count moved four times in one session and the record-level figure went 167 to 16
 A companion file breaks the probe seven ways and fails if any mutation survives, including the defect
 he reported and both directions a retriever fails in. Yes-to-everything passes a 200-only check.
 No-to-everything passes a 404-only check, and no-to-everything is not hypothetical: an earlier
-version had it, and its answer was zero, which is also this post's headline.</span></div>
+version had it, and its answer was zero, which is also this post's headline.
+
+
+## Update, 28 August, second correction: I made the post's own mistake inside its correction
+
+The correction above says the provenance was there and I had audited the wrong field. An adversarial
+re-run of that correction says it is too strong, in the same direction as the error it corrects.
+
+<code>meta.files</code> is <code>git show --name-only</code> of <code>meta.sha</code>. Measured: <strong class="b">450 of 450</strong> cited paths are files
+that commit itself changed. So the pair records what the write PRODUCED, not the document the memory
+came from. In the vocabulary this post is built on, that is <code>wasGeneratedBy</code>, not <code>wasDerivedFrom</code>.
+The post's whole argument is that we recorded attribution and read it as derivation, and I did it
+again one layer down, while correcting it.
+
+Three more things the same pass found, all of which narrow the claim:
+
+The record-level number is my own artifact. <code>record_locators</code> reads eight keys, and every one of the
+170 records rides on a single one, <code>meta.files</code>, which I added to that list after looking at the
+data. Drop it and the count is 0. The seven others contribute nothing, and a store keeping its
+reference under <code>citation</code>, <code>origin</code> or <code>ref</code> scores zero here.
+
+The commit-specific check earns less than it looks. Resolving the pair inside its own commit gives
+444 of 450. Asking the sha-blind question, does this path exist in the repository today, gives 426 of
+450. The sha buys four percentage points.
+
+And the denominator was inflated. The finding covers 170 records in one store: 0.07% of the 243,985
+in the corpus, not a fact about eleven stores.
+
+There is prior art for the error and I should have cited it in the first correction rather than the
+second. Column completeness is named in Pipino, Lee and Wang, </em>Data Quality Assessment*, CACM 45(4),
+2002, alongside schema and population completeness; Scannapieco and Batini set out value, tuple,
+attribute and relation completeness in 2004. Measuring a column and reporting it as a property of the
+record is the textbook case, not a new failure mode. What is ours is only the specimen and the
+runnable probe.
+
+One more, and it is the worst of them, because it is in the artifact this post invites you to run.
+Point the probe at a store that is not shaped like ours and it prints seven green controls, then
+<code>no item list</code>, then <code>FAIL -- no stores read; nothing was measured</code>. A healthy-looking instrument
+that never reached its target, in the file whose subject is healthy-looking instruments that never
+reach their target. That is being fixed; until it is, the invitation only works for stores that
+already look like mine.</span></div>
 <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span></a>
 </article>
 <script>
