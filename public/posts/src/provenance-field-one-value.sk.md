@@ -187,3 +187,41 @@ Sprievodny subor lame probe siedmimi sposobmi a zlyha, ak niektora mutacia prezi
 ktoru nahlasil, a oboch smerov, ktorymi retriever zlyhava. Ano-na-vsetko prejde kontrolou len na 200.
 Nie-na-nic prejde kontrolou len na 404, a nie-na-nic nie je hypoteza: skorsia verzia ho mala a jej
 odpoved bola nula, co je zaroven titulok tohto postu.
+
+
+## Update, 28. augusta, druha oprava: v oprave som spravil chybu, o ktorej ten post je
+
+Oprava vyssie hovori, ze provenancia tam bola a ja som auditoval nespravne pole. Nepriatelsky
+prepocet tej opravy hovori, ze je prisilna, a to v tom istom smere ako chyba, ktoru opravuje.
+
+`meta.files` je `git show --name-only` toho `meta.sha`. Zmerane: **450 zo 450** citovanych ciest su
+subory, ktore ten commit sam zmenil. Ten par teda zaznamenava, co zapis VYPRODUKOVAL, nie dokument,
+z ktoreho pamat vznikla. V slovniku, na ktorom tento post stoji, je to `wasGeneratedBy`, nie
+`wasDerivedFrom`. Cely argument postu je, ze sme zaznamenali atribuciu a citali ju ako odvodenie, a
+ja som to urobil znova o poschodie nizsie, priamo pri jeho oprave.
+
+Tri dalsie veci z toho isteho prechodu, vsetky zuzuju tvrdenie:
+
+Zaznamove cislo je moj vlastny artefakt. `record_locators` cita osem klucov a vsetkych 170 zaznamov
+stoji na jedinom, `meta.files`, ktory som do toho zoznamu pridal az potom, co som videl data. Bez
+neho je pocet 0. Zvysnych sedem neprispieva nicim a sklad, ktory drzi referenciu pod `citation`,
+`origin` alebo `ref`, tu skoruje nulu.
+
+Kontrola viazana na commit prinasa menej, nez sa zda. Rozlozenie paru v jeho vlastnom commite da 444
+zo 450. Otazka slepa voci sha, teda ci ta cesta v repozitari dnes existuje, da 426 zo 450. Sha
+prinasa styri percentualne body.
+
+A menovatel bol nafuknuty. Nalez pokryva 170 zaznamov v jednom sklade: 0,07 % z 243 985 v korpuse,
+nie fakt o jedenastich skladoch.
+
+Na tu chybu existuje prior art a mal som ho citovat uz v prvej oprave, nie v druhej. Column
+completeness pomenovali Pipino, Lee a Wang v *Data Quality Assessment*, CACM 45(4), 2002, vedla
+schema a population completeness; Scannapieco a Batini v roku 2004 rozpisali completeness na urovni
+hodnoty, tuple, atributu a relacie. Merat stlpec a hlasit to ako vlastnost zaznamu je ucebnicovy
+pripad, nie novy druh zlyhania. Nase je len to, co sme zmerali, a spustitelny probe.
+
+A este jedna, najhorsia, lebo je v artefakte, ktory tento post ponuka na spustenie. Namierte ten
+probe na sklad, ktory nie je v nasom tvare, a vypise sedem zelenych kontrol, potom `no item list` a
+potom `FAIL -- no stores read; nothing was measured`. Zdravo vyzerajuci pristroj, ktory nikdy
+nedosiahol svoj ciel, v subore, ktoreho temou su zdravo vyzerajuce pristroje, ktore nikdy nedosiahnu
+svoj ciel. Opravuje sa to; dovtedy to pozvanie plati len pre sklady, ktore uz vyzeraju ako moj.
