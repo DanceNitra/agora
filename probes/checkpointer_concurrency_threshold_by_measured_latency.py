@@ -116,13 +116,20 @@ def main():
             all_d = []
             n_ovl = 0
             tot_thr = 0
+            seen_threads = set()
             for t in range(TRIALS):
                 log = run_once(dur, delay, "%s-%s-%d" % (dur, req_ms, t))
                 all_d.extend(log.durations_ms())
                 tot_thr += len(log.threads())
+                seen_threads |= log.threads()
                 if log.overlaps():
                     n_ovl += 1
-            assert MAIN_THREAD not in set(), ""
+            # REAL check on threads actually observed. The previous revision read
+            # `assert MAIN_THREAD not in set()` -- an empty-set literal, so it could
+            # never fail and the "main thread never appears" claim rode on nothing.
+            assert seen_threads, "no saver calls recorded: the probe never reached its target"
+            assert MAIN_THREAD not in seen_threads, (
+                "main thread %d appeared among saver threads %s" % (MAIN_THREAD, sorted(seen_threads)))
             print("  %-6s %-9.2f | %-10.4f %-10.4f %-10.4f | %-8.1f %d/%d"
                   % (dur, req_ms, sum(all_d) / len(all_d), min(all_d), max(all_d),
                      tot_thr / TRIALS, n_ovl, TRIALS))

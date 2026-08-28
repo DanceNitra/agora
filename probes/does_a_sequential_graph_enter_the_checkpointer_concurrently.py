@@ -154,13 +154,22 @@ def run_once(durability, delay_s, thread_id):
 
 # ----------------------------------------------------------------- controls
 def control_c2_sequential(log):
-    """max distinct task_ids per checkpoint_id, over put_writes only."""
+    """max distinct task_ids per checkpoint_id, over put_writes only.
+
+    Returns (status, worst) where status is "PASS", "FAIL" or "N/A". The N/A case
+    matters: durability="exit" produces no put_writes at all, and an earlier
+    revision let max(..., default=0) report PASS over an EMPTY set -- a control
+    that answers "sequential" about data it never saw. Verified to fire where it
+    does see data: a fan-out graph yields worst=2 and FAIL.
+    """
     per_ckpt = {}
     for c in log.calls:
         if c["method"] == "put_writes":
             per_ckpt.setdefault(c["checkpoint_id"], set()).add(c["task_id"])
-    worst = max((len(v) for v in per_ckpt.values()), default=0)
-    return worst <= 1, worst
+    if not per_ckpt:
+        return "N/A", 0
+    worst = max(len(v) for v in per_ckpt.values())
+    return ("PASS" if worst <= 1 else "FAIL"), worst
 
 
 def control_c1_target(log, durability):
@@ -235,10 +244,10 @@ def main():
             for t in range(TRIALS):
                 log = run_once(dur, delay, "%s-%s-%d" % (dur, lat_ms, t))
                 ok1, what = control_c1_target(log, dur)
-                ok2, worst = control_c2_sequential(log)
+                st2, worst = control_c2_sequential(log)
                 if not ok1:
                     void.append((dur, lat_ms, "C1 %s" % what))
-                if not ok2:
+                if st2 == "FAIL":
                     void.append((dur, lat_ms, "C2 tasks/ckpt=%d" % worst))
                 if log.overlaps():
                     n_trials_with_overlap += 1
@@ -259,7 +268,7 @@ def main():
         for v in void:
             print("  VOID cell: %s" % (v,))
     else:
-        print("  none -- C1 and C2 passed in every cell")
+        print("  none -- C1 passed in every cell; C2 passed wherever it had data (N/A for exit)")
 
     print("\n=== VERDICT ===")
     print("  Main thread NEVER appears in any cell: %s"
