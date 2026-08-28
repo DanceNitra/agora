@@ -43,6 +43,18 @@ class Rec:
         self.interleavings = 0
         self._seq = 0
         self.threads = set()
+        self.tasks_per_ckpt = {}
+
+    def note_write(self, ckpt_id, task_id):
+        self.tasks_per_ckpt.setdefault(ckpt_id, set()).add(task_id)
+
+    def max_tasks_per_ckpt(self):
+        """C2: 1 means every superstep had a single task, i.e. genuinely sequential.
+        Returns None when there is nothing to judge, so an EMPTY set can never be
+        reported as PASS -- the defect this control had in its first revision."""
+        if not self.tasks_per_ckpt:
+            return None
+        return max(len(v) for v in self.tasks_per_ckpt.values())
 
     def enter(self, method):
         self._seq += 1
@@ -78,6 +90,7 @@ class AtomicSaver(InMemorySaver):
 
     async def aput_writes(self, config, writes, task_id, task_path=""):
         s = self._rec.enter("aput_writes")
+        self._rec.note_write(config["configurable"].get("checkpoint_id"), task_id)
         try:
             time.sleep(self._work)
             return super().put_writes(config, writes, task_id, task_path)
@@ -103,6 +116,7 @@ class AwaitingSaver(InMemorySaver):
 
     async def aput_writes(self, config, writes, task_id, task_path=""):
         s = self._rec.enter("aput_writes")
+        self._rec.note_write(config["configurable"].get("checkpoint_id"), task_id)
         try:
             await asyncio.sleep(self._work)
             return super().put_writes(config, writes, task_id, task_path)
@@ -146,6 +160,9 @@ async def run_case(name, cls, durability):
         methods = {m for (_, m, _) in rec.events}
         if not ({"aput", "aput_writes"} <= methods) and durability != "exit":
             c1_fail += 1
+        worst = rec.max_tasks_per_ckpt()
+        if worst is not None and worst > 1:
+            c2_fail += 1
         if rec.interleavings:
             n_inter_trials += 1
         tot_depth += rec.max_depth
@@ -154,7 +171,8 @@ async def run_case(name, cls, durability):
     print("  %-14s %-6s | %-6.1f %-10.2f %-9d %-9s %s"
           % (name, durability, tot_calls / TRIALS, tot_depth / TRIALS,
              len(threads), "%d/%d" % (n_inter_trials, TRIALS),
-             "C1 fails=%d" % c1_fail if c1_fail else "C1 ok"))
+             ("C1 fails=%d " % c1_fail if c1_fail else "C1 ok ") +
+             ("C2 fails=%d" % c2_fail if c2_fail else "C2 ok")))
     sys.stdout.flush()
     return n_inter_trials
 
