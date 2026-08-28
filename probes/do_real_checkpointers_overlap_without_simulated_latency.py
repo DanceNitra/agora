@@ -31,6 +31,7 @@ sys.path.insert(0, r"C:\Users\Danculus\inspeximus-repo")
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
+MAIN_THREAD = threading.get_ident()
 TRIALS = 40
 
 
@@ -50,6 +51,9 @@ class Rec:
 
     def threads(self):
         return {c["th"] for c in self.calls}
+
+    def main_thread_used(self):
+        return MAIN_THREAD in self.threads()
 
     def durs_ms(self):
         return [(c["t1"] - c["t0"]) * 1000.0 for c in self.calls]
@@ -122,6 +126,8 @@ def run_case(name, make_saver, durability):
     n_failed_runs = 0
     all_d = []
     tot_thr = 0
+    main_used = 0
+    seen_threads = set()
     for t in range(TRIALS):
         trial_rec = Rec()
         try:
@@ -137,14 +143,19 @@ def run_case(name, make_saver, durability):
             trial_rec.err("invoke", e)
         all_d.extend(trial_rec.durs_ms())
         tot_thr += len(trial_rec.threads())
+        seen_threads |= trial_rec.threads()
+        if trial_rec.main_thread_used():
+            main_used += 1
         if trial_rec.overlaps():
             n_overlap_trials += 1
         rec.errors.extend(trial_rec.errors)
     mean = sum(all_d) / len(all_d) if all_d else 0.0
-    print("  %-16s %-6s | %-9.4f %-9.4f | %-7.1f %-8s %-8s %s"
+    # A real check, not an assertion in prose: how many trials touched the MAIN thread.
+    assert seen_threads, "no saver calls recorded: the probe never reached its target"
+    print("  %-16s %-6s | %-9.4f %-9.4f | %-7.1f %-8s %-8s %-8s %s"
           % (name, durability, mean, max(all_d) if all_d else 0.0,
              tot_thr / TRIALS, "%d/%d" % (n_overlap_trials, TRIALS),
-             n_failed_runs, len(rec.errors)))
+             "%d/%d" % (main_used, TRIALS), n_failed_runs, len(rec.errors)))
     sys.stdout.flush()
     return rec, n_overlap_trials, n_failed_runs
 
@@ -155,9 +166,10 @@ def main():
     print("  langgraph %s | trials per cell %d" % (md.version("langgraph"), TRIALS))
     print("  graph: START -> A -> B -> END (no fan-out, no Send)")
     print()
-    print("  %-16s %-6s | %-9s %-9s | %-7s %-8s %-8s %s"
-          % ("saver", "durab", "dur_mean", "dur_max", "threads", "ovl_trls", "failed", "errors"))
-    print("  " + "-" * 92)
+    print("  %-16s %-6s | %-9s %-9s | %-7s %-8s %-8s %-8s %s"
+          % ("saver", "durab", "dur_mean", "dur_max", "threads", "ovl_trls",
+             "main_thr", "failed", "errors"))
+    print("  " + "-" * 104)
 
     tmp = tempfile.mkdtemp(prefix="lgreal_")
     cases = []
