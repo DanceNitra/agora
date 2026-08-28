@@ -180,13 +180,69 @@ def record_locators(rec):
         out += [v for v in s.values() if isinstance(v, str)]
     m = rec.get("meta")
     if isinstance(m, dict):
-        for k in ("files", "file", "path", "paths", "uri", "url", "href", "doc"):
-            v = m.get(k)
-            if isinstance(v, str):
-                out.append(v)
-            elif isinstance(v, list):
-                out += [x for x in v if isinstance(x, str)]
+        out += _strings(m)
+    prov = rec.get("provenance")
+    if isinstance(prov, (dict, list)):
+        out += _strings(prov)
     return [x.strip() for x in out if isinstance(x, str) and x.strip()]
+
+
+def _strings(node, depth=0):
+    """Every string anywhere under this node, to a shallow depth.
+
+    THE KEY LIST WAS THE FINDING'S OWN ARTIFACT. This used to read eight named keys, and an
+    adversarial pass measured what that was worth: all 170 record-level hits in our store rode on
+    exactly one of them, `meta.files`, which was added to the list AFTER looking at our data. Remove
+    it and the count is zero; the other seven contributed nothing. A store keeping its reference
+    under `citation`, `origin` or `ref` therefore scored zero here for no reason but our vocabulary.
+
+    So it no longer guesses names. It takes every string in the record's metadata and lets
+    `addressable` decide, which is a property of the VALUE rather than of what we thought to call
+    it. Depth is capped because a memory store is not a place to recurse without a bound.
+    """
+    out = []
+    if depth > 3:
+        return out
+    if isinstance(node, str):
+        return [node]
+    if isinstance(node, dict):
+        for v in node.values():
+            out += _strings(v, depth + 1)
+    elif isinstance(node, list):
+        for v in node[:200]:
+            out += _strings(v, depth + 1)
+    return out
+
+
+# The shapes real stores come in. Ours is `items`; nobody else's has to be.
+LIST_KEYS = ("items", "memories", "records", "data", "entries", "documents", "docs",
+             "memory", "rows", "results", "nodes", "facts")
+
+
+def record_list(blob):
+    """The list of records, whatever the file calls it. None when there is genuinely no list.
+
+    Measured 2026-08-28, from the raw GitHub URL into an empty directory, against a store shaped
+    `{"memories": [...]}`: seven controls PASSED, then `no item list`, then `FAIL -- nothing was
+    measured`. A healthy-looking instrument that never reached its target, inside the probe whose
+    subject is healthy-looking instruments that never reach their target, and it is the artifact the
+    write-up invites strangers to run.
+    """
+    if isinstance(blob, list):
+        return blob
+    if not isinstance(blob, dict):
+        return None
+    for k in LIST_KEYS:
+        v = blob.get(k)
+        if isinstance(v, list):
+            return v
+    # Last resort: the longest list of dicts at the top level, so an unguessed name still works.
+    best = None
+    for v in blob.values():
+        if isinstance(v, list) and v and isinstance(v[0], dict):
+            if best is None or len(v) > len(best):
+                best = v
+    return best
 
 
 def addressable(loc, bases=()):
@@ -274,7 +330,13 @@ class Fetcher:
     the output. It now returns a third value and the printout carries it.
     """
 
-    def __init__(self, cap=200, timeout=5.0):
+    def __init__(self, cap=200, timeout=5.0, network=False):
+        # NETWORK IS OPT-IN. Run from the raw URL against a foreign store, this probe issued a live
+        # GET to a host named in that store's own data. Nobody pointing an auditing tool at their
+        # memory store expects it to start contacting the addresses inside it, and a scan that
+        # phones out is not one you can run on anything sensitive. Local files are still opened;
+        # `--fetch` turns requests back on.
+        self.network = network
         self.cap = cap
         self.timeout = timeout
         self.seen = {}
@@ -305,6 +367,9 @@ class Fetcher:
         if self._is_local(loc, bases):
             self.local_reads += 1
         else:
+            if not self.network:
+                self.untried.add(loc)
+                return NOT_TRIED
             if self.attempts >= self.cap:
                 self.untried.add(loc)
                 return NOT_TRIED
@@ -317,8 +382,8 @@ class Fetcher:
 def scan(path, fetcher, bases=None):
     with open(path, encoding="utf-8") as fh:
         blob = json.load(fh)
-    items = blob.get("items") if isinstance(blob, dict) else blob
-    if not isinstance(items, list):
+    items = record_list(blob)
+    if items is None:
         return None
     if bases is None:
         bases = (ROOT, os.path.dirname(os.path.abspath(path)))
@@ -431,7 +496,7 @@ def control():
             {"text": "g", "source": {"doc": "agent:scholar", "uri": u + "/there2"}},
         ]}, fh)
     try:
-        return scan(p, Fetcher(), bases=(d,)), ""
+        return scan(p, Fetcher(network=True), bases=(d,)), ""
     finally:
         srv.shutdown()
 
@@ -604,10 +669,12 @@ def print_footer():
     print("the same question of the WHOLE record.")
     print("The first two are separate because collapsing them is the defect @perseus-computing")
     print("reported on r/RAG: the published version called a prefix check re-checkable.")
-    print("The third is here because the published headline was wrong. Every sourced record in the")
-    print("coding store carries meta.files, and most of those repo-relative paths exist on disk, so")
-    print("the provenance was real and sat one key away from the field named `source`. The count is")
-    print("in the receipt rather than in this sentence, because it moves.")
+    print("The third is here because the published headline was wrong: a field-scoped audit reported")
+    print("zero while the records carried a resolving path elsewhere. Do not read it as more than")
+    print("that. In our own store the pair is `git show --name-only` of the writing commit, 450 of")
+    print("450, so it records what the write PRODUCED, not what the memory came from -- generation,")
+    print("not derivation. Column completeness is Pipino, Lee and Wang, CACM 45(4) 2002; measuring a")
+    print("column and reporting it as a property of the record is the textbook case, not news.")
     print("All three can fail, and the control makes each fail on its own before a store is read.")
 
 
@@ -641,7 +708,8 @@ def main() -> int:
         print("         it just wrote reports 0 over any store, which is exactly the headline.")
         return 1
 
-    fetcher = Fetcher()
+    want_net = any(a in ("--fetch", "-f") for a in sys.argv[1:])
+    fetcher = Fetcher(network=want_net)
     rows, unreadable = [], []
     for p in live_stores():
         rel = os.path.relpath(p, ROOT).replace("\\", "/")
@@ -703,11 +771,14 @@ def main() -> int:
           % (rad, rgot))
     print("                  the record, not only in `source`. This is the column the published")
     print("                  post did not have, and it is the reason its headline was wrong.")
-    print("                  %d network retrieval(s) attempted, %d local file(s) opened%s"
-          % (fetcher.attempts, fetcher.local_reads,
-             "" if not fetcher.untried
-             else "; %d distinct remote locators NOT tried (cap %d)"
-                  % (len(fetcher.untried), fetcher.cap)))
+    print("                  %d network retrieval(s) attempted, %d local file(s) opened"
+          % (fetcher.attempts, fetcher.local_reads))
+    if fetcher.untried:
+        why = ("network is OFF; pass --fetch to allow requests" if not fetcher.network
+               else "cap %d reached" % fetcher.cap)
+        print("                  %d distinct remote locator(s) NOT tried (%s). They are reported,"
+              % (len(fetcher.untried), why))
+        print("                  never counted as failures, because nothing was asked of them.")
     if not fetcher.attempts and not fetcher.local_reads:
         print("                  FETCHED is 0 BY ENTAILMENT, not by observation: nothing was")
         print("                  addressable, so no retrieval was attempted. The retriever was")
