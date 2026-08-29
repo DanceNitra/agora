@@ -121,7 +121,7 @@ def _embed(text: str) -> list | None:
     try:
         body = json.dumps({"model": "nomic-embed-text",
                            "prompt": "search_document: " + text[:2000]}).encode()
-        req = urllib.request.Request("http://localhost:11434/api/embeddings", data=body,
+        req = urllib.request.Request("http://127.0.0.1:11434/api/embeddings", data=body,
                                      headers={"Content-Type": "application/json"})
         return json.loads(urllib.request.urlopen(req, timeout=20).read()).get("embedding") or None
     except Exception:

@@ -618,7 +618,7 @@ _AGENT_MEM_CHATTER_CHARS = 300
 # embedding is kept OFF the hot path: writes stay fast (the vec is filled later by a throttled
 # background worker) and recall query-embeds are cached. AGENT_SEMANTIC=0 -> pure lexical (original).
 _SEMANTIC = os.environ.get("AGENT_SEMANTIC", "1") != "0"
-_EMB_URL = os.environ.get("AGENT_EMBED_URL", "http://localhost:11434/api/embeddings")
+_EMB_URL = os.environ.get("AGENT_EMBED_URL", "http://127.0.0.1:11434/api/embeddings")
 _EMB_MODEL = os.environ.get("AGENT_EMBED_MODEL", "nomic-embed-text")
 _emb_cache: dict = {}                       # text[:512] -> vec; FIFO-capped (query + write reuse)
 _EMB_CACHE_MAX = 4000

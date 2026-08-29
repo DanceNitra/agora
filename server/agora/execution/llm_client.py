@@ -83,7 +83,11 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
 # rate-limited cloud. This is what keeps the whole agent system producing when the cloud is capped.
 import urllib.request as _urllib_request
 
-_LOCAL_OLLAMA = "http://localhost:11434/api/chat"
+# 127.0.0.1, NEVER localhost. Measured 2026-08-29 on this machine: the same call to the same
+# daemon takes 3.03 s by name and 0.74 s by address, and /api/embed 2.117 s against 0.081 s.
+# The name resolves to ::1 first and the connect has to fail over to IPv4 before any request is
+# sent, so the penalty is paid per call and is invisible in every server-side timing.
+_LOCAL_OLLAMA = "http://127.0.0.1:11434/api/chat"
 _LOCAL_MODEL = "qwen3-coder:30b"
 _LOCAL_STICKY_SECONDS = 600.0
 _local_until = 0.0                  # while now < this, skip the capped cloud and use local directly

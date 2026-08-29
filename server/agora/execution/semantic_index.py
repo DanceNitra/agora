@@ -16,7 +16,9 @@ from pathlib import Path
 
 import numpy as np
 
-OLLAMA_EMBED = "http://localhost:11434/api/embed"
+# 127.0.0.1 rather than localhost: measured 2.117 s against 0.081 s per call on this endpoint,
+# because the name tries ::1 first. This runs on every semantic query.
+OLLAMA_EMBED = "http://127.0.0.1:11434/api/embed"
 MODEL = "nomic-embed-text"
 CACHE = Path(__file__).resolve().parents[2] / ".semantic_cache"   # server/.semantic_cache
 SKIP = (".git", ".obsidian", ".meta", "_vault_quarantine")
