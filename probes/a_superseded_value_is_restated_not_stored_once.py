@@ -171,14 +171,20 @@ def main() -> int:
         return 1
 
     def stats(v):
+        # TRUE median, not the upper-middle element. `s[len(s)//2]` is median_high, and printed with
+        # %d it reported 6 for the twelve current values where the median is 5.5. That number was
+        # cited publicly; anyone recomputing it from the rows in this receipt would have got 5.5 and
+        # concluded our arithmetic was wrong. Even n needs the mean of the two middle values.
         s = sorted(v)
-        return (sum(s) / len(s), s[len(s) // 2], max(s), sum(1 for x in s if x > 1) / len(s))
+        mid = len(s) // 2
+        med = s[mid] if len(s) % 2 else (s[mid - 1] + s[mid]) / 2.0
+        return (sum(s) / len(s), med, max(s), sum(1 for x in s if x > 1) / len(s))
 
     ms, meds, mxs, sh = stats(stale)
     mc, medc, mxc, ch_ = stats(curr) if curr else (0, 0, 0, 0)
-    print("superseded values: n=%d  mean %.2f restatements  median %d  max %d  "
+    print("superseded values: n=%d  mean %.2f restatements  median %.1f  max %d  "
           "%.0f%% appear more than once" % (len(stale), ms, meds, mxs, 100 * sh))
-    print("current    values: n=%d  mean %.2f restatements  median %d  max %d  "
+    print("current    values: n=%d  mean %.2f restatements  median %.1f  max %d  "
           "%.0f%% appear more than once" % (len(curr), mc, medc, mxc, 100 * ch_))
     if ms <= 1.0 and mc <= 1.0:
         print("\nFAIL -- both read 1.0; the matcher is broken, not the corpus tidy")

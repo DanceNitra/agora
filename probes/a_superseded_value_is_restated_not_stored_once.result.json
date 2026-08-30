@@ -77,14 +77,14 @@
  "superseded": {
   "n": 36,
   "mean": 4.25,
-  "median": 4,
+  "median": 4.0,
   "max": 10,
   "share_gt_1": 0.806
  },
  "current": {
   "n": 12,
   "mean": 4.417,
-  "median": 6,
+  "median": 5.5,
   "max": 8,
   "share_gt_1": 0.75
  },
