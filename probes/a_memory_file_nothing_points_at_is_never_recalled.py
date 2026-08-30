@@ -85,7 +85,11 @@ def survey(store):
 
     pointed = {t for n in reach for t in targets(read(os.path.join(store, n + ".md")))}
     pointed |= seeds
-    dangling = pointed - files
+    # The index files are excluded from `files` so the walk does not treat them as notes, but a
+    # pointer AT one of them is a real link to a real file. Counting them as dangling was an
+    # artefact of my own exclusion, and it inflated the backlog figure.
+    on_disk = {f[:-3] for f in os.listdir(store) if f.endswith(".md")}
+    dangling = pointed - on_disk
     # prose about linking, not links; and pointers that name an existing file the wrong way
     PROSE = {"wikilink", "wikilinks", "link"}
     malformed = {d for d in dangling if d.endswith(".md") and d[:-3] in files}
@@ -113,17 +117,43 @@ def main():
     only_via_link = (s["reach"] - s["named"])
     v["CONTROL_the_walk_is_transitive_not_just_the_index"] = bool(only_via_link)
 
-    # injected orphan: a name nothing points at
-    fake = set(s["files"]) | {"__injected_orphan__"}
-    v["CONTROL_an_injected_orphan_is_counted"] = (
-        len(fake - s["reach"]) == len(s["orphans"]) + 1)
+    # THE TWO INJECTION CONTROLS WRITE A FILE AND RE-WALK. The first version of both did set
+    # arithmetic on the already-computed result: add a novel string to a set, subtract a set that
+    # cannot contain it, assert the difference grew by one. That is a tautology, not a control, and
+    # it would have passed against a walk that never ran. Each now mutates the store, re-runs
+    # survey() over it, compares, and removes what it wrote.
+    import tempfile, shutil
+    work = tempfile.mkdtemp(prefix="reach_control_")
+    try:
+        for f in os.listdir(store):
+            if f.endswith(".md"):
+                shutil.copy(os.path.join(store, f), os.path.join(work, f))
+        base = survey(work)
 
-    # injected dangling: a pointer to a name that does not exist
-    fake_pointed = {t for n in s["reach"]
-                    for t in targets(read(os.path.join(store, n + ".md")))}
-    fake_pointed |= {"__injected_dangling__"}
-    v["CONTROL_an_injected_dangling_link_is_counted"] = (
-        len(fake_pointed - s["files"]) >= 1)
+        io.open(os.path.join(work, "__injected_orphan__.md"), "w",
+                encoding="utf-8").write("a file nothing points at" + chr(10))
+        after = survey(work)
+        v["CONTROL_a_written_orphan_raises_the_count_by_one"] = (
+            len(after["orphans"]) == len(base["orphans"]) + 1
+            and "__injected_orphan__" in after["orphans"])
+        os.remove(os.path.join(work, "__injected_orphan__.md"))
+
+        seed = sorted(base["reach"])[0]
+        p = os.path.join(work, seed + ".md")
+        original = io.open(p, encoding="utf-8", errors="replace").read()
+        io.open(p, "w", encoding="utf-8").write(
+            original + chr(10) + "[[__injected_dangling__]]" + chr(10))
+        after2 = survey(work)
+        v["CONTROL_a_written_dangling_link_raises_the_count_by_one"] = (
+            len(after2["dangling"]) == len(base["dangling"]) + 1
+            and "__injected_dangling__" in after2["dangling"])
+        io.open(p, "w", encoding="utf-8").write(original)
+
+        v["CONTROL_removing_the_injections_restores_the_baseline"] = (
+            survey(work)["orphans"] == base["orphans"]
+            and survey(work)["dangling"] == base["dangling"])
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
 
     print("store: %s" % store)
     print("  markdown files            %5d" % len(s["files"]))
