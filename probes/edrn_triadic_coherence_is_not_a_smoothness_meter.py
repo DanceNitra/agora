@@ -141,6 +141,7 @@ def main():
             "max": float(vals.max()),
             "frac_ge_0977": float((vals >= 0.977).mean()),
             "frac_ge_0924": float((vals >= 0.924).mean()),
+            "frac_ge_0853": float((vals >= 0.853).mean()),
         }
 
     # -- the same nulls, but with the monotone structure a real sweep has ----------------------
@@ -163,6 +164,7 @@ def main():
                 "max": float(vals.max()),
                 "frac_ge_0977": float((vals >= 0.977).mean()),
                 "frac_ge_0924": float((vals >= 0.924).mean()),
+            "frac_ge_0853": float((vals >= 0.853).mean()),
             }
 
     # -- print -----------------------------------------------------------------------------------
