@@ -1,0 +1,64 @@
+# Watch the inspeximus transparency log from a different repository.
+#
+# THIS WITNESS IS OPERATED BY THE SAME OWNER AS THE LOG, AND THAT IS STATED WHEREVER ITS SIGNATURE
+# APPEARS. It is not independent and must never be presented as though it were. A reader who wants
+# evidence against equivocation needs a witness run by somebody who is not us; the template for that
+# is deploy/witness-template.yml in the inspeximus repository, and running one is the most useful
+# thing an outsider can do here.
+#
+# WHAT IT IS STILL WORTH. It is a tripwire on our own publishing pipeline. If the transparency
+# directory is ever force-pushed, rewritten by a bad publish, or restored from a stale copy, this job
+# fails the next morning. Its memory lives in THIS repository's git history rather than beside the
+# log, so a rewrite of the log alone cannot also rewrite what was remembered about it. That catches a
+# mistake, which is the failure we are actually likely to have. It does not catch a deliberate
+# operator, because the same hands hold both repositories.
+#
+# A FAILURE HERE IS THE PRODUCT WORKING. Do not "fix" it by clearing the state file: that is exactly
+# the move that turns a witness into a rubber stamp. Find out why the history changed first.
+
+name: witness
+
+on:
+  schedule:
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  LOG_URL: https://dancenitra.github.io/inspeximus/transparency
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install cryptography
+
+      - name: Fetch the witness and the library it needs
+        run: |
+          curl -sSfO https://raw.githubusercontent.com/DanceNitra/inspeximus/main/tools/witness_static_log.py
+          pip install inspeximus
+
+      - name: Look at the log and refuse it if the history changed
+        env:
+          INSPEXIMUS_WITNESS_SECRET: ${{ secrets.INSPEXIMUS_WITNESS_SECRET }}
+        run: |
+          python witness_static_log.py \
+            --url "$LOG_URL" \
+            --state witness/state.json \
+            --out witness/cosignatures \
+            --name "agora CI (SAME OWNER as the log, not an independent witness)"
+
+      - name: Commit what this witness saw
+        run: |
+          git config user.name  "agora-witness"
+          git config user.email "agora-witness@users.noreply.github.com"
+          git add witness/
+          git diff --staged --quiet || git commit -m "witness: inspeximus log at $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
