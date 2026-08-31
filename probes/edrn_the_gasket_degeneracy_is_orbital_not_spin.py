@@ -175,3 +175,76 @@ for _ in range(50):
             cs = [zz(v, a, b) for (a, b) in orb]
             worst = max(worst, float(np.var(cs)))
 print("\n  50 random re-mixings: LARGEST single-vector within-orbit variance = %.3e" % worst)
+
+# ---------------------------------------------------------------------------------------------
+# WHICH IRREP, and how the fourfold splits by S_z sector.
+#
+# Added 2026-08-31 because the letter to Guanghao makes both claims and neither had a receipt here.
+# "Orbital" was asserted from the S = 1/2 content alone, which does not distinguish a genuine
+# two-dimensional irrep from an accidental pair of one-dimensional ones. The character does.
+#
+# For D3 the E irrep has characters 2 on the identity, -1 on the two three-fold rotations and 0 on
+# the three reflections. The ground manifold is spin (2) tensor orbital, so on a fourfold manifold
+# the expected characters are 4, -2 and 0. An accidental A1 + A2 pair would give +4 on the rotations,
+# so this test can fail.
+print("\n-- which irrep does the ground manifold carry --")
+_order = {}
+for p in autos:
+    q, k = list(p), 1
+    while q != list(range(N)):
+        q = [p[i] for i in q]
+        k += 1
+    _order.setdefault(k, []).append(p)
+chars = {}
+for k in sorted(_order):
+    vals = []
+    for p in _order[k]:
+        idx = perm_state_map(p)
+        UV = np.zeros_like(Vg)
+        UV[idx, :] = Vg
+        vals.append(float(np.trace(Vg.T @ UV)))
+    chars[k] = (len(_order[k]), float(np.mean(vals)), float(np.std(vals)))
+    print("  order %d (%d elements): character = %+.6f  (spread %.2e)"
+          % (k, len(_order[k]), chars[k][1], chars[k][2]))
+_is_E = (abs(chars.get(1, (0, 0, 0))[1] - 4.0) < 1e-6
+         and abs(chars.get(3, (0, 0, 0))[1] + 2.0) < 1e-6
+         and abs(chars.get(2, (0, 0, 0))[1]) < 1e-6)
+print("  -> %s" % ("spin doublet TENSOR the E irrep of D3, so the extra twofold is ORBITAL"
+                   if _is_E else "NOT the E pattern; the orbital claim does not hold as stated"))
+
+# The other half of the same claim: the fourfold is two per S_z sector, not four in one.
+print("\n-- the fourfold resolved by S_z sector --")
+from itertools import combinations
+_sec = {}
+for n_up in range(N + 1):
+    basis = [c for c in combinations(range(N), n_up)]
+    if not basis:
+        continue
+    idx = {c: i for i, c in enumerate(basis)}
+    rows, cols, vals = [], [], []
+    for c, k in idx.items():
+        st = set(c)
+        diag = 0.0
+        for (a, b) in EDGES:
+            diag += 0.25 if ((a in st) == (b in st)) else -0.25
+            if (a in st) != (b in st):
+                other = tuple(sorted(st - {a} | {b})) if a in st else tuple(sorted(st - {b} | {a}))
+                rows.append(k); cols.append(idx[other]); vals.append(0.5)
+        rows.append(k); cols.append(k); vals.append(diag)
+    Hs = csr_matrix(coo_matrix((vals, (rows, cols)), shape=(len(basis), len(basis))))
+    if len(basis) < 40:
+        ws = np.linalg.eigvalsh(Hs.toarray())
+    else:
+        ws = eigsh(Hs, k=min(6, len(basis) - 2), which="SA", return_eigenvectors=False)[::-1]
+        ws = np.sort(ws)
+    _sec[n_up] = (float(ws[0]), int(np.sum(np.abs(ws - ws[0]) < 1e-9)))
+_E0 = min(v[0] for v in _sec.values())
+_carry = {k: v for k, v in _sec.items() if abs(v[0] - _E0) < 1e-9}
+for k, v in sorted(_sec.items()):
+    if abs(v[0] - _E0) < 1e-6:
+        print("  n_up=%2d  S_z=%+.1f  E0=%.8f  in-sector degeneracy %d" % (k, k - N / 2.0, v[0], v[1]))
+print("  sectors carrying the ground level: %s, each %s-fold"
+      % (sorted(_carry), sorted({v[1] for v in _carry.values()})))
+print("  -> %d in the full space" % sum(v[1] for v in _carry.values()))
+if sum(v[1] for v in _carry.values()) != deg:
+    print("  CONTROL FAILED: the sector sum disagrees with the full-space degeneracy above")
