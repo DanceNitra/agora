@@ -1,0 +1,58 @@
+{
+ "lieb_mattis_rank": "2S+1 = |nA - nB| + 1 on a connected bipartite AF Heisenberg graph",
+ "by_N": {
+  "7": {
+   "star_rank": 6,
+   "n_nonisomorphic_trees": 11,
+   "n_non_star_trees_at_star_rank": 0,
+   "degree_sequences_of_those": [],
+   "rank_histogram": {
+    "2": 7,
+    "4": 3,
+    "6": 1
+   },
+   "max_rank_among_non_star_trees": 4
+  },
+  "8": {
+   "star_rank": 7,
+   "n_nonisomorphic_trees": 23,
+   "n_non_star_trees_at_star_rank": 0,
+   "degree_sequences_of_those": [],
+   "rank_histogram": {
+    "1": 9,
+    "3": 10,
+    "5": 3,
+    "7": 1
+   },
+   "max_rank_among_non_star_trees": 5
+  },
+  "9": {
+   "star_rank": 8,
+   "n_nonisomorphic_trees": 47,
+   "n_non_star_trees_at_star_rank": 0,
+   "degree_sequences_of_those": [],
+   "rank_histogram": {
+    "2": 28,
+    "4": 14,
+    "6": 4,
+    "8": 1
+   },
+   "max_rank_among_non_star_trees": 6
+  },
+  "10": {
+   "star_rank": 9,
+   "n_nonisomorphic_trees": 106,
+   "n_non_star_trees_at_star_rank": 0,
+   "degree_sequences_of_those": [],
+   "rank_histogram": {
+    "1": 37,
+    "3": 45,
+    "5": 19,
+    "7": 4,
+    "9": 1
+   },
+   "max_rank_among_non_star_trees": 7
+  }
+ },
+ "a_discriminating_control_exists_among_trees": false
+}
