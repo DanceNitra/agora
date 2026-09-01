@@ -245,3 +245,46 @@ probes/an_index_that_fits_the_window.candidate.md
 
 # pinned copies of the PRIVATE auto-memory index; the probes need them, the public repo must not have them
 probes/fixtures/
+
+# Timestamped and labelled backups. `*.json.bak` (above) does NOT match `.json.bak-20260817`
+# or `.replications.json.bak-a1d88c-retraction`, which is the same defect already noted for
+# `*.db.bak*`: the suffix carries a date or a label, so the pattern has to end open.
+*.bak-*
+*.bak.*
+
+# Rotated and salvaged process logs. The dungeon rotates its stderr under a dated suffix and
+# sometimes gzips it; none of that is source.
+*.rotated-*
+_dungeon*.err
+_dungeon*.err.*
+*.starvation-*.gz
+
+# LaTeX build directories for the EDRN manuscript. Regenerated from the sources beside them.
+agora_output/edrn_final/build_*/
+
+# Scratch left in the repository root by ad-hoc investigations: saved web pages, one-off
+# search scripts and their dumps. Named individually rather than with `/*.html`, because the
+# root legitimately carries `index.html` and the Google Search Console verification file, and
+# a blanket rule would hide the next real one.
+/aip.html
+/ar.html
+/bing1.html
+/iso_survey.html
+/moj.html
+/out.html
+/out.txt
+/out_*.html
+/sec2022174.html
+/bsearch.py
+/msearch.py
+/neg.jsonl
+/c1591.json
+
+# Gate receipts. Each one is keyed to the sha256 of a draft in `agora_output/drafts/`, and that
+# directory is itself ignored above, so a committed receipt would attest content this repository
+# does not contain. They are local gate state, like the inspeximus working memory: useful while a
+# draft is in flight, meaningless to a reader who clones this.
+agora_output/humanizer_receipts/
+
+# Numbered log rotations (`_brain.log.1`). The `_dungeon*.err*` rules above do not reach these.
+*.log.[0-9]*
