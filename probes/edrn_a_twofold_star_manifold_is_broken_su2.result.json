@@ -1,0 +1,800 @@
+{
+ "star_isotropic": {
+  "0.3": {
+   "E0": -7.229586832149441,
+   "deg": 6,
+   "sectors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  },
+  "0.7": {
+   "E0": -7.62958683214944,
+   "deg": 6,
+   "sectors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  },
+  "1.0": {
+   "E0": -8.000000000000004,
+   "deg": 6,
+   "sectors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  },
+  "1.5": {
+   "E0": -8.7449979983984,
+   "deg": 6,
+   "sectors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  },
+  "2.0": {
+   "E0": -9.633249580710809,
+   "deg": 6,
+   "sectors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
+  }
+ },
+ "star_anisotropy": {
+  "isotropic": {
+   "0.3": {
+    "deg": 6,
+    "sectors": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   },
+   "0.7": {
+    "deg": 6,
+    "sectors": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   },
+   "1.0": {
+    "deg": 6,
+    "sectors": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   },
+   "1.5": {
+    "deg": 6,
+    "sectors": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   },
+   "2.0": {
+    "deg": 6,
+    "sectors": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   }
+  },
+  "off_diag_J_not_2J": {
+   "0.3": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "0.7": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "1.0": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "1.5": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "2.0": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   }
+  },
+  "ising_only": {
+   "0.3": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "0.7": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "1.0": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "1.5": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   },
+   "2.0": {
+    "deg": 2,
+    "sectors": [
+     1,
+     6
+    ]
+   }
+  }
+ },
+ "star_easy_plane_anisotropy": {
+  "2.001": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "2.1": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "2.5": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "3.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "5.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "10.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "100.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  }
+ },
+ "star_anisotropy_near_isotropic": {
+  "1.999": {
+   "0.3": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ]
+  },
+  "1.99": {
+   "0.3": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ]
+  },
+  "1.9": {
+   "0.3": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ]
+  },
+  "1.5": {
+   "0.3": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ]
+  },
+  "0.5": {
+   "0.3": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     1,
+     6
+    ]
+   ]
+  }
+ },
+ "n_scan": {
+  "7": {
+   "bipartition_gap": 5,
+   "predicted": 6,
+   "isotropic": 6,
+   "anisotropic": 2
+  },
+  "8": {
+   "bipartition_gap": 6,
+   "predicted": 7,
+   "isotropic": 7,
+   "anisotropic": 2
+  },
+  "9": {
+   "bipartition_gap": 7,
+   "predicted": 8,
+   "isotropic": 8,
+   "anisotropic": 2
+  }
+ },
+ "rank_at_the_turn": {
+  "0.0": 10,
+  "0.005": 6,
+  "0.01": 6,
+  "0.05": 6
+ },
+ "four_against_three_sz": {
+  "0.3": [
+   2,
+   [
+    3,
+    4
+   ]
+  ],
+  "0.7": [
+   2,
+   [
+    3,
+    4
+   ]
+  ],
+  "1.0": [
+   2,
+   [
+    3,
+    4
+   ]
+  ],
+  "1.5": [
+   2,
+   [
+    3,
+    4
+   ]
+  ],
+  "2.0": [
+   2,
+   [
+    3,
+    4
+   ]
+  ]
+ },
+ "sharp_turn_theta1_vs_s001": {
+  "honest_1e-9": 0.0016442631009096818,
+  "honest_0": 0.0016442630508090705,
+  "falsy_zero_is_s1": 0.16580381616888581,
+  "his_reported": 0.819
+ },
+ "principal_angle_spread": {
+  "1e-9_vs_0.01": [
+   0.0016442628863278068,
+   0.0016442628863953279,
+   0.00164426288653037,
+   0.0016442628973337375,
+   0.0016442629150917728,
+   0.0016442631009096818
+  ],
+  "1.0_vs_0.01": [
+   0.16580381616888448,
+   0.16580381616888448,
+   0.16580381616888448,
+   0.16580381616888581,
+   0.16580381616888581,
+   0.16580381616888581
+  ]
+ },
+ "not_bipartite_but_twofold": {
+  "ring_C7": {
+   "bipartition_gap": null,
+   "ground_deg": {
+    "0.3": 2,
+    "0.7": 2,
+    "1.0": 4,
+    "1.5": 2,
+    "2.0": 2
+   }
+  },
+  "triangle_with_pendants": {
+   "bipartition_gap": null,
+   "ground_deg": {
+    "0.3": 2,
+    "0.7": 2,
+    "1.0": 2,
+    "1.5": 2,
+    "2.0": 2
+   }
+  }
+ },
+ "sign_flipped_star_deg": {
+  "0.3": 8,
+  "0.7": 8,
+  "1.0": 8,
+  "1.5": 8,
+  "2.0": 8
+ },
+ "star_deg_at_s0": 10,
+ "verdicts": [
+  {
+   "name": "star is sixfold at every s tested, one state per sector",
+   "ok": true,
+   "detail": "S_z = +5/2..-5/2, a single S=5/2 multiplet (Lieb-Mattis 1962, |nA-nB|=5)"
+  },
+  {
+   "name": "no single sector can return 2 from this Hamiltonian",
+   "ok": true,
+   "detail": "every sector's ground state is non-degenerate, so no threshold yields 2"
+  },
+  {
+   "name": "a genuine star goes TWOFOLD when the off-diagonal is written J not 2J",
+   "ok": true,
+   "detail": "deg 2 in sectors S_z = +2.5 and -2.5, at every s tested"
+  },
+  {
+   "name": "and Ising-only does the same, on the same correct graph",
+   "ok": true,
+   "detail": "so twofold is a statement about the Hamiltonian, not about the graph"
+  },
+  {
+   "name": "a GENUINE star under easy-plane anisotropy also sits at S_z = +/-1/2",
+   "ok": true,
+   "detail": "35 of 35 configurations give deg 2 in sectors S_z = +0.5 and -0.5, so S_z does NOT separate a broken operator from a wrong graph"
+  },
+  {
+   "name": "the S_z discriminator sent on 30 August is therefore RETRACTED",
+   "ok": true,
+   "detail": "easy-axis puts a broken star at +/-5/2 and easy-plane puts it at +/-1/2, so the sector alone is not a test; the degeneracy across N below is the one that works"
+  },
+  {
+   "name": "twofold appears immediately below isotropy, not only far from it",
+   "ok": true,
+   "detail": "xy = 1.999 down to 0.5 all give deg 2 in sectors [1,6]; xy = 2.0 exactly still gives 6, so a builder that returned 2 for every xy would fail this"
+  },
+  {
+   "name": "N=8 and N=9 separate the two causes on his own controls",
+   "ok": true,
+   "detail": "isotropic gives N=7:6, N=8:7, N=9:8; anisotropic gives 2 at every N"
+  },
+  {
+   "name": "the s=0 -> 0.01 turn he reports is a RANK CHANGE",
+   "ok": true,
+   "detail": "deg 10 at s=0 (S=5/2 + S=3/2, the leaf detaches) and 6 immediately after"
+  },
+  {
+   "name": "a 4-against-3 graph really does put its twofold at S_z = +/-1/2",
+   "ok": true,
+   "detail": "chain deg 2 in sectors n_up 3 and 4, i.e. S_z = +0.5 and -0.5, at all five s"
+  },
+  {
+   "name": "an HONEST s -> 0 produces no sharp turn in our manifold",
+   "ok": true,
+   "detail": "theta1 = 0.0016 rad between s = 1e-9 and s = 0.01"
+  },
+  {
+   "name": "the falsy zero DOES produce a turn, about 100x larger",
+   "ok": true,
+   "detail": "theta1 = 0.1658 rad if s=0 is silently rebuilt as 1.0"
+  },
+  {
+   "name": "but it does NOT reach his 0.819, so it is not the whole story",
+   "ok": true,
+   "detail": "0.1658 against his 0.819; the gap is left open rather than explained away"
+  },
+  {
+   "name": "our sixfold manifold rotates RIGIDLY: all six angles equal",
+   "ok": true,
+   "detail": "spread across the six angles is 2.15e-10 and 1.33e-15, so theta1 equals the largest"
+  },
+  {
+   "name": "theta1 = Omega forces every other angle to zero, which rigid rotation forbids",
+   "ok": true,
+   "detail": "his chain 0.065/0.046 = 1.413 = sqrt(2), two equal angles; his star theta1 = Omega = 0.819, so one angle is 0.819 and the rest are zero"
+  },
+  {
+   "name": "RETRACTED twofold does NOT imply |nA - nB| = 1",
+   "ok": true,
+   "detail": "C_7 is not bipartite and is twofold at 4 of 5 s"
+  },
+  {
+   "name": "and a connected non-bipartite graph does it at every s",
+   "ok": true,
+   "detail": "triangle with pendants: not bipartite, twofold at all five"
+  },
+  {
+   "name": "REFUTED an opposite exchange sign does not explain his 2",
+   "ok": true,
+   "detail": "sign-flipped star is EIGHTfold (S = 7/2), not twofold"
+  },
+  {
+   "name": "CONTROL a CONNECTED mis-built star is caught",
+   "ok": true,
+   "detail": "one leaf re-hung: |nA-nB| = 3 and deg = 4, both differ from the star; the old control only caught DISCONNECTED graphs and would have passed this"
+  },
+  {
+   "name": "CONTROL the isotropic arm reproduces the theorem it cites",
+   "ok": true,
+   "detail": "deg = |nA-nB| + 1 on both bipartite graphs; a builder with the wrong sign fails here"
+  },
+  {
+   "name": "CONTROL s=0 detaches the edge and is excluded on purpose",
+   "ok": true,
+   "detail": "at s=0 the degeneracy is 10, not 6, which is why the grid starts above it"
+  }
+ ],
+ "all_passed": true
+}
