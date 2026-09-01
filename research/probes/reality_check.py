@@ -22,7 +22,20 @@ Bring your own scores (lists of per-item metric values for method / baseline / p
 MIT. Part of Agora / inspeximus. See the four worked receipts in this folder.
 Run the self-demo:  python research/probes/reality_check.py
 """
+import sys
 import random, math, json, os
+
+# This probe prints non-ASCII (en dashes, a Unicode minus, Cyrillic and CJK samples) and the
+# console here is cp1250, so it died with UnicodeEncodeError before reaching its own result.
+# CLAUDE.md rule 11 already requires this reconfigure; it was applied in the servers and not
+# in the probes. errors='replace' rather than a crash: a mangled character is a better outcome
+# than losing the measurement.
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 
 
 def bootstrap_ci(deltas, iters=10000, alpha=0.05, seed=17):

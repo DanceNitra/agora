@@ -1,0 +1,215 @@
+{
+  "chromadb_version": "1.1.1",
+  "measured_utc": "2026-08-30T17:43:22Z",
+  "arms": {
+    "before_delete": {
+      "findings": [
+        {
+          "kind": "LIVE",
+          "table": "embedding_metadata",
+          "column": "string_value",
+          "rows": 1
+        },
+        {
+          "kind": "LIVE",
+          "table": "embedding_fulltext_search",
+          "column": "string_value",
+          "rows": 1
+        },
+        {
+          "kind": "LIVE",
+          "table": "embedding_fulltext_search_content",
+          "column": "c0",
+          "rows": 1
+        },
+        {
+          "kind": "LIVE",
+          "table": "embeddings_queue",
+          "column": "metadata",
+          "rows": 1
+        }
+      ]
+    },
+    "after_delete": {
+      "findings": [
+        {
+          "kind": "LIVE",
+          "table": "embeddings_queue",
+          "column": "metadata",
+          "rows": 1
+        }
+      ]
+    },
+    "what_survives": {
+      "columns": [
+        "seq_id",
+        "created_at",
+        "operation",
+        "topic",
+        "id",
+        "vector",
+        "encoding",
+        "metadata"
+      ],
+      "rows": [
+        {
+          "seq_id": 1,
+          "operation": 0,
+          "id": "doc-1",
+          "carries_sentinel_in": {
+            "metadata": "{\"chroma:document\":\"Zoltan-Kovacs-1974-03-11-patient-QX7K2M9V\"}"
+          }
+        },
+        {
+          "seq_id": 2,
+          "operation": 3,
+          "id": "doc-1",
+          "carries_sentinel_in": {}
+        }
+      ]
+    },
+    "after_one_more_write": {
+      "findings": [
+        {
+          "kind": "LIVE",
+          "table": "embeddings_queue",
+          "column": "metadata",
+          "rows": 1
+        }
+      ]
+    },
+    "after_ten_more_writes": {
+      "findings": [
+        {
+          "kind": "LIVE",
+          "table": "embeddings_queue",
+          "column": "metadata",
+          "rows": 1
+        }
+      ]
+    },
+    "after_reopen_and_write": {
+      "findings": [
+        {
+          "kind": "LIVE",
+          "table": "embeddings_queue",
+          "column": "metadata",
+          "rows": 1
+        }
+      ]
+    },
+    "queue_at_end": {
+      "columns": [
+        "seq_id",
+        "created_at",
+        "operation",
+        "topic",
+        "id",
+        "vector",
+        "encoding",
+        "metadata"
+      ],
+      "rows": [
+        {
+          "seq_id": 1,
+          "operation": 0,
+          "id": "doc-1",
+          "carries_sentinel_in": {
+            "metadata": "{\"chroma:document\":\"Zoltan-Kovacs-1974-03-11-patient-QX7K2M9V\"}"
+          }
+        },
+        {
+          "seq_id": 2,
+          "operation": 3,
+          "id": "doc-1",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 3,
+          "operation": 0,
+          "id": "doc-2",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 4,
+          "operation": 0,
+          "id": "bulk-0",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 5,
+          "operation": 0,
+          "id": "bulk-1",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 6,
+          "operation": 0,
+          "id": "bulk-2",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 7,
+          "operation": 0,
+          "id": "bulk-3",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 8,
+          "operation": 0,
+          "id": "bulk-4",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 9,
+          "operation": 0,
+          "id": "bulk-5",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 10,
+          "operation": 0,
+          "id": "bulk-6",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 11,
+          "operation": 0,
+          "id": "bulk-7",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 12,
+          "operation": 0,
+          "id": "bulk-8",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 13,
+          "operation": 0,
+          "id": "bulk-9",
+          "carries_sentinel_in": {}
+        },
+        {
+          "seq_id": 14,
+          "operation": 0,
+          "id": "after-reopen",
+          "carries_sentinel_in": {}
+        }
+      ]
+    }
+  },
+  "automatically_purge": "unread (AttributeError)",
+  "verdict": "SURVIVES_EVERYTHING",
+  "surviving_rows": [
+    {
+      "seq_id": 1,
+      "operation": 0,
+      "id": "doc-1",
+      "carries_sentinel_in": {
+        "metadata": "{\"chroma:document\":\"Zoltan-Kovacs-1974-03-11-patient-QX7K2M9V\"}"
+      }
+    }
+  ],
+  "reader_note": "A row whose operation is the ADD and which still carries the document is retention of the deleted content. A row that is only the DELETE tombstone is not, and must not be reported as such."
+}

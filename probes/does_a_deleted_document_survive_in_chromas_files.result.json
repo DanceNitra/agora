@@ -1,0 +1,105 @@
+{
+  "chromadb_version": "1.1.1",
+  "python": "3.12.10",
+  "measured_utc": "2026-08-30T17:31:28Z",
+  "sentinel_length": 41,
+  "steps": {
+    "api_reports_deleted": true,
+    "while_client_open": {
+      "found": true,
+      "kinds": {
+        "LIVE": [
+          {
+            "path": "chroma.sqlite3",
+            "table": "embeddings_queue",
+            "column": "metadata",
+            "rows": 1
+          }
+        ]
+      }
+    },
+    "after_client_closed": {
+      "found": true,
+      "kinds": {
+        "LIVE": [
+          {
+            "path": "chroma.sqlite3",
+            "table": "embeddings_queue",
+            "column": "metadata",
+            "rows": 1
+          }
+        ]
+      },
+      "checked_files": 5,
+      "ok": false
+    }
+  },
+  "controls": {
+    "positive_before_delete": {
+      "found": true,
+      "kinds": {
+        "LIVE": [
+          {
+            "path": "chroma.sqlite3",
+            "table": "embedding_metadata",
+            "column": "string_value",
+            "rows": 1
+          },
+          {
+            "path": "chroma.sqlite3",
+            "table": "embedding_fulltext_search",
+            "column": "string_value",
+            "rows": 1
+          },
+          {
+            "path": "chroma.sqlite3",
+            "table": "embedding_fulltext_search_content",
+            "column": "c0",
+            "rows": 1
+          },
+          {
+            "path": "chroma.sqlite3",
+            "table": "embeddings_queue",
+            "column": "metadata",
+            "rows": 1
+          }
+        ]
+      },
+      "checked_files": 5
+    },
+    "negative_never_inserted": {
+      "found": false
+    },
+    "vacuum_arm": {
+      "vacuumed": [
+        "chroma.sqlite3"
+      ],
+      "found": true,
+      "kinds": {
+        "LIVE": [
+          {
+            "path": "chroma.sqlite3",
+            "table": "embeddings_queue",
+            "column": "metadata",
+            "rows": 1
+          }
+        ]
+      }
+    }
+  },
+  "problems": [],
+  "verdict": "RETAINED_IN_LIVE_ROWS",
+  "summary": {
+    "live_rows": [
+      {
+        "path": "chroma.sqlite3",
+        "table": "embeddings_queue",
+        "column": "metadata",
+        "rows": 1
+      }
+    ],
+    "plain_files": [],
+    "unreclaimed": [],
+    "survives_vacuum": true
+  }
+}

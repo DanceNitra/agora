@@ -21,7 +21,21 @@ RBAC gates the actor, IFC gates the data, membership-cost gates the identity —
 and membership-cost meet, and where the cold-start tail becomes irreducible. Zero-dependency, deterministic
 (seeded). MIT. This probe IS the graded-IFC + earned-standing-declassifier prototype for inspeximus.
 Run: python research/probes/bseries_ifc_frontier_declassify.py"""
+import sys
+
+# This probe prints non-ASCII (en dashes, a Unicode minus, Cyrillic and CJK samples) and the
+# console here is cp1250, so it died with UnicodeEncodeError before reaching its own result.
+# CLAUDE.md rule 11 already requires this reconfigure; it was applied in the servers and not
+# in the probes. errors='replace' rather than a crash: a mangled character is a better outcome
+# than losing the measurement.
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 import json, os, random
+
 
 _SEED = int(os.environ.get('IFC_SEED', '20260703'))
 random.seed(_SEED)
@@ -147,5 +161,5 @@ out = {"scenario": "graded_ifc_frontier_and_declassifier", "self_check": "passed
                       "Roots: Biba 1977, Myers&Liskov DLM, CaMeL (2503.18813), Douceur Sybil 2002.",
        "verdict": verdict}
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "bseries_ifc_frontier_declassify_result.json"),
-                    "w"), ensure_ascii=False, indent=1)
+                    "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("saved: research/probes/bseries_ifc_frontier_declassify_result.json")

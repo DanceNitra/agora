@@ -27,9 +27,14 @@ SIGN of the couplings and the connectivity, never their magnitudes, so the weigh
 not move it for any s > 0. A twofold manifold on that same graph therefore means the Hamiltonian is
 not isotropic Heisenberg, or that only part of the spectrum is being seen.
 
-THE DISCRIMINATOR, which costs him one line and settles it without exchanging files: report the S_z
-of the two ground states. S_z = +/-5/2 is a genuine star whose SU(2) is broken, or a calculation that
-only sees the extremal sectors. S_z = +/-1/2 is an object with a 4-against-3 bipartition.
+THE DISCRIMINATOR IS THE DEGENERACY ACROSS N, not the S_z sector. An isotropic star must give
+2S+1 = |nA-nB|+1, so 6, 7 and 8 at N = 7, 8 and 9; a broken-SU(2) operator gives 2 at all three.
+
+An earlier version of this file offered S_z instead, and that was wrong. It said S_z = +/-5/2 means a
+genuine star with SU(2) broken and S_z = +/-1/2 means a 4-against-3 bipartition. The scan behind it
+stopped at xy = 2.0, so it only ever saw easy-AXIS anisotropy. Under easy-PLANE anisotropy a genuine
+star is twofold at S_z = +/-1/2, in 35 of 35 configurations measured here. The claim was sent to a
+collaborator on 30 August; the retraction is checked in section 2 rather than only written here.
 
 HONEST LIMIT. We have not read his code. Every cause named here is a candidate consistent with his
 numbers, not a verdict on his work.
@@ -190,9 +195,28 @@ check("a genuine star goes TWOFOLD when the off-diagonal is written J not 2J",
 check("and Ising-only does the same, on the same correct graph",
       all(v["deg"] == 2 and v["sectors"] == [1, 6] for v in aniso["ising_only"].values()),
       "so twofold is a statement about the Hamiltonian, not about the graph")
-check("the two cases are told apart by S_z, which costs him one line",
-      sz_of(1) == 2.5 and abs(sz_of(4) - (-0.5)) < 1e-12,
-      "star with broken SU(2) -> S_z = +/-5/2; a 4-against-3 bipartition -> S_z = +/-1/2")
+# RETRACTED 2026-08-31, and the retraction is the point of this block.
+# This check used to read "the two cases are told apart by S_z, which costs him one line", and it
+# passed, because it only ever compared S_z = +/-5/2 against S_z = +/-1/2 on the two cases it had
+# already built. It never asked whether a GENUINE star can also sit at +/-1/2. It can. The scan
+# above stops at xy = 2.0, so every anisotropy it tested was easy-AXIS. Easy-PLANE is xy > 2.0 and
+# was never run. Measured below: a genuine K_{1,6} under easy-plane anisotropy is twofold at
+# S_z = +/-1/2, which is exactly the signature the retracted check assigned to a 4-against-3
+# bipartition. The discriminator was sent to a collaborator on 30 August and is corrected here.
+easy_plane = {}
+for xy in (2.001, 2.1, 2.5, 3.0, 5.0, 10.0, 100.0):
+    easy_plane[str(xy)] = {str(s_): ground(STAR, s_, xy=xy)[1:] for s_ in S_GRID}
+res["star_easy_plane_anisotropy"] = easy_plane
+_ep = [v for row in easy_plane.values() for v in row.values()]
+check("a GENUINE star under easy-plane anisotropy also sits at S_z = +/-1/2",
+      all(v[0] == 2 and v[1] == [3, 4] for v in _ep),
+      "%d of %d configurations give deg 2 in sectors S_z = %+.1f and %+.1f, so S_z does NOT "
+      "separate a broken operator from a wrong graph" % (len(_ep), len(_ep), sz_of(3), sz_of(4)))
+check("the S_z discriminator sent on 30 August is therefore RETRACTED",
+      all(v[1] == [3, 4] for v in _ep) and all(
+          v["sectors"] == [1, 6] for v in aniso["off_diag_J_not_2J"].values()),
+      "easy-axis puts a broken star at +/-5/2 and easy-plane puts it at +/-1/2, so the sector "
+      "alone is not a test; the degeneracy across N below is the one that works")
 
 # 2a. "THE MOMENT SU(2) IS BROKEN" IS A CLAIM ABOUT THE NEIGHBOURHOOD OF ISOTROPY, and the arm above
 # only held xy = 1.0 and 0.0, which are 50% and 100% away from it. A verdict that never approaches

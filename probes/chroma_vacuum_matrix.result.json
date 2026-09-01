@@ -1,0 +1,104 @@
+{
+  "measured_utc": "2026-08-30T17:53:47Z",
+  "rows": [
+    {
+      "chromadb_version": "1.0.15",
+      "measured_utc": "2026-08-30T17:51:48Z",
+      "arm_a_writes": {
+        "0": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "arm_b_remedy": {
+        "ran": true,
+        "exit": 0,
+        "stdout": "\n\nChroma Vacuum\n\n\nPurging the log...\n\nVacuuming (this may take a while)...\n\n🧼 Vacuum complete!\nDatabase size reduced by 0.0B (⬇️0%)\n\n",
+        "stderr": "",
+        "before": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ],
+        "after": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "problems": [],
+      "verdict": "SURVIVES_THE_DOCUMENTED_REMEDY",
+      "install_seconds": 80.3
+    },
+    {
+      "chromadb_version": "1.1.1",
+      "measured_utc": "2026-08-30T17:52:54Z",
+      "arm_a_writes": {
+        "0": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "arm_b_remedy": {
+        "ran": true,
+        "exit": 0,
+        "stdout": "\n\nChroma Vacuum\n\n\nPurging the log...\n\nVacuuming (this may take a while)...\n\n🧼 Vacuum complete!\nDatabase size reduced by 0.0B (⬇️0%)\n\n",
+        "stderr": "",
+        "before": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ],
+        "after": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "problems": [],
+      "verdict": "SURVIVES_THE_DOCUMENTED_REMEDY",
+      "install_seconds": 65.9
+    },
+    {
+      "chromadb_version": "1.5.9",
+      "measured_utc": "2026-08-30T17:53:46Z",
+      "arm_a_writes": {
+        "0": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "arm_b_remedy": {
+        "ran": true,
+        "exit": 0,
+        "stdout": "\n\nChroma Vacuum\n\n\nPurging the log...\n\nVacuuming (this may take a while)...\n\n🧼 Vacuum complete!\nDatabase size reduced by 0.0B (⬇️0%)\n\n",
+        "stderr": "",
+        "before": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ],
+        "after": [
+          {
+            "table": "embeddings_queue",
+            "column": "metadata"
+          }
+        ]
+      },
+      "problems": [],
+      "verdict": "SURVIVES_THE_DOCUMENTED_REMEDY",
+      "install_seconds": 50.2
+    }
+  ]
+}

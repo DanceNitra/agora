@@ -76,10 +76,10 @@ def _demo():
     # primary fact (keyed) with a source
     fid = m.remember("The billing API authenticates with API keys.",
                      key="billing-api::auth-method", mtype="semantic",
-                     source={"channel": "doc", "principal": "runbook#auth"})
+                     source={"doc": "runbook#auth", "channel": "doc", "principal": "runbook#auth"})
     # a second, independent corroborating record, linked to the primary
     cid = m.remember("Billing API auth is done via API keys per the KMS rotation job.",
-                     mtype="semantic", source={"channel": "tool", "principal": "kms:rotate-job"})
+                     mtype="semantic", source={"doc": "kms:rotate-job", "channel": "tool", "principal": "kms:rotate-job"})
     primary = next(r for r in m.items if r["id"] == fid)
     primary["links"] = [cid]                                        # corroboration link (what consolidate() would set)
 

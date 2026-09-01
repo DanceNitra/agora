@@ -95,7 +95,13 @@ def main() -> int:
               f"({len(ids_plain)} hits)")
         extra = set().union(*[set(h) for h in tiered]) - set().union(*[set(h) for h in plain]) \
             if plain and tiered else set()
-        check(f"only adds the 'warrant' key for {q!r}", sorted(extra), ["warrant"])
+        # The tier now reports the two CHANNELS separately as well (2.3.0, no-silent-masking), so the
+        # added set is the warrant family -- not `warrant` alone. This assertion was written against the
+        # pre-2.3.0 shape and kept passing in my head, not in the run: I changed the behaviour and did
+        # not re-run the probe that pins it. The contract is ADDITIVE, which is about what is REMOVED
+        # and REORDERED, not about the count of fields added.
+        check(f"adds only the warrant family for {q!r}", sorted(extra),
+              ["warrant", "warrant_corroborated", "warrant_earned", "warrant_sources"])
         missing = [h for h in tiered if "warrant" not in h]
         check(f"every hit carries a tier for {q!r}", missing, [])
 

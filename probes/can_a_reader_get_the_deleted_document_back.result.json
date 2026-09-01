@@ -1,0 +1,26 @@
+{
+  "chromadb_version": "1.1.1",
+  "measured_utc": "2026-08-30T18:04:27Z",
+  "paths": {
+    "api_get_by_id": false,
+    "api_get_all": false,
+    "full_text_search": false,
+    "bytes_in_a_directory_copy": [
+      {
+        "kind": "LIVE",
+        "table": "embeddings_queue",
+        "column": "metadata"
+      }
+    ],
+    "plain_sql_read_of_the_log": [
+      "{\"chroma:document\":\"Zoltan-Kovacs-1974-03-11-patient-QX7K2M9V\"}"
+    ]
+  },
+  "controls": {
+    "kept_is_returned_by_get_all": true,
+    "kept_is_found_by_search": true
+  },
+  "problems": [],
+  "verdict": "NOT_REACHABLE_BY_API_BUT_READABLE_FROM_THE_FILE",
+  "reader_note": "REACHABLE_THROUGH_THE_API would mean the delete did not take effect for a reader, which is a far larger claim than bytes at rest. NOT_REACHABLE_BY_API_BUT_READABLE_FROM_THE_FILE is the honest middle: the API is correct, and anybody holding the directory -- a backup, a snapshot, a copied laptop -- reads the text with one SQL statement and no credentials."
+}

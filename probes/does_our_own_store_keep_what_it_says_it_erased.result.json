@@ -1,0 +1,79 @@
+{
+  "measured_utc": "2026-08-30T18:12:52Z",
+  "steps": {
+    "forget_by_key": {
+      "reported": {
+        "forgotten": 2,
+        "ids": [
+          "2c113e93a9",
+          "cce3f9b6f0"
+        ],
+        "scrubbed_links": 0,
+        "tombstones": 2,
+        "coverage": {
+          "store": true,
+          "external_targets": 0,
+          "confirmed": 0,
+          "complete": false,
+          "unregistered": true,
+          "note": "no external erasure target is registered, so this covers THIS store only -- any copy the application embedded elsewhere (vector index, prompt logs, backups) is untouched and unaccounted for. Register targets with register_erasure_target() to erase across them and get a verifiable receipt."
+        },
+        "residue_in_store": {
+          "ok": true,
+          "checked_records": 2,
+          "searched_values": 3,
+          "findings": [],
+          "problems": [],
+          "method": "substring match on text/object -- a paraphrase is NOT caught, so a clean result is evidence and not proof"
+        }
+      },
+      "residue": []
+    },
+    "forget_subject": {
+      "reported": {
+        "erased": 1,
+        "ids": [
+          "f85fc5649b"
+        ],
+        "request_id": null,
+        "tombstones": 1,
+        "residue_in_store": {
+          "ok": true,
+          "checked_records": 1,
+          "searched_values": 1,
+          "findings": [],
+          "problems": [],
+          "method": "substring match on text/object -- a paraphrase is NOT caught, so a clean result is evidence and not proof"
+        },
+        "coverage": {
+          "store": true,
+          "external_targets": 0,
+          "confirmed": 0,
+          "complete": false,
+          "unregistered": true,
+          "note": "no external erasure target is registered, so this covers THIS store only -- any copy the application embedded elsewhere (vector index, prompt logs, backups) is untouched and unaccounted for. Register targets with register_erasure_target() to erase across them and get a verifiable receipt."
+        }
+      },
+      "residue": []
+    },
+    "directory_copy": {
+      "erased_by_key": [],
+      "erased_subject": []
+    }
+  },
+  "controls": {
+    "positive_before_erasure": [
+      {
+        "kind": "PLAIN",
+        "path": "memory.json",
+        "table": null,
+        "column": null
+      }
+    ],
+    "kept_is_still_there": true,
+    "never_written_is_absent": true
+  },
+  "problems": [],
+  "verdict": "GONE_FROM_DISK",
+  "reader_note": "GONE_FROM_DISK is the only result that supports selling an erasure certificate without a caveat. UNRECLAIMED_ONLY means the record is logically gone and its bytes linger in space the file format has not reused, which is the same class we reported about somebody else and must be disclosed in the same words. Anything LIVE is retention and is ours to fix before we describe erasure anywhere."
+}

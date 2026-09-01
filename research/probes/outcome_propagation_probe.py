@@ -23,6 +23,12 @@ TWO measurements:
 RUN: python research/probes/outcome_propagation_probe.py
 """
 import os, sys, tempfile, json
+
+# This runs for about four minutes and printed nothing at all until it was done, which
+# is indistinguishable from a hang. Measured alone on a 12-core desktop; under parallel
+# load it is several times slower.
+print("COST: about 225s on a 12-core desktop. No network, no GPU.", flush=True)
+
 sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
@@ -101,7 +107,13 @@ def main():
                                 "params": {"scored": 0.6, "manual": 0.3}},
            "poison_earn_pct": {mode: round(poison_earn(mode)*100, 1)
                                for mode in ("full_set", "driving_only", "explicit")}}
-    json.dump(out, open("research/probes/outcome_propagation_probe_result.json", "w"), indent=2)
+    # Was `open("research/probes/outcome_propagation_probe_result.json", "w")` -- a path relative
+    # to the CALLER, so running this from its own directory threw away 225 seconds of
+    # completed work on the very last line with a FileNotFoundError. Relative to this file
+    # instead, which is where the receipt belongs however you invoke it.
+    _out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "outcome_propagation_probe_result.json")
+    json.dump(out, open(_out, "w", encoding="utf-8"), indent=2)
     print("\n-> research/probes/outcome_propagation_probe_result.json")
 
 if __name__ == "__main__":

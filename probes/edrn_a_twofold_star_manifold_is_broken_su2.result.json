@@ -194,6 +194,267 @@
    }
   }
  },
+ "star_easy_plane_anisotropy": {
+  "2.001": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "2.1": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "2.5": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "3.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "5.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "10.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  },
+  "100.0": {
+   "0.3": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "0.7": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "1.5": [
+    2,
+    [
+     3,
+     4
+    ]
+   ],
+   "2.0": [
+    2,
+    [
+     3,
+     4
+    ]
+   ]
+  }
+ },
  "star_anisotropy_near_isotropic": {
   "1.999": {
    "0.3": [
@@ -450,9 +711,14 @@
    "detail": "so twofold is a statement about the Hamiltonian, not about the graph"
   },
   {
-   "name": "the two cases are told apart by S_z, which costs him one line",
+   "name": "a GENUINE star under easy-plane anisotropy also sits at S_z = +/-1/2",
    "ok": true,
-   "detail": "star with broken SU(2) -> S_z = +/-5/2; a 4-against-3 bipartition -> S_z = +/-1/2"
+   "detail": "35 of 35 configurations give deg 2 in sectors S_z = +0.5 and -0.5, so S_z does NOT separate a broken operator from a wrong graph"
+  },
+  {
+   "name": "the S_z discriminator sent on 30 August is therefore RETRACTED",
+   "ok": true,
+   "detail": "easy-axis puts a broken star at +/-5/2 and easy-plane puts it at +/-1/2, so the sector alone is not a test; the degeneracy across N below is the one that works"
   },
   {
    "name": "twofold appears immediately below isotropy, not only far from it",

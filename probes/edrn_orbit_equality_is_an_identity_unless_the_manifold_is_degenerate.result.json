@@ -1,0 +1,68 @@
+{
+  "graph": "K_{1,6}",
+  "n": 7,
+  "degeneracy": 6,
+  "within_orbit_variance_full_projector": 8.217301096052206e-33,
+  "within_orbit_variance_single_vector_max": 4.2242063446893375e-32,
+  "within_orbit_variance_single_vector_all": [
+    4.2242063446893375e-32,
+    6.804952470168234e-33,
+    1.232595164407831e-32,
+    2.7219809880672935e-32,
+    1.3866695599588098e-32,
+    0.0
+  ],
+  "chain_control": {
+    "degeneracy": 2,
+    "projector": 8.011868568650901e-32,
+    "single_vector": 1.9721522630525295e-31
+  },
+  "verdicts": [
+    {
+      "name": "the star is sixfold, so it can witness the distinction at all",
+      "pass": true,
+      "detail": "degeneracy 6, gap to the next level 2.000e+00 (Lieb-Mattis |nA-nB|=5, 2S+1=6)"
+    },
+    {
+      "name": "with the FULL manifold projector, one orbit gives one number",
+      "pass": true,
+      "detail": "within-orbit variance 8.217e-33 over the six edges"
+    },
+    {
+      "name": "that projector really is invariant under a leaf swap",
+      "pass": true,
+      "detail": "max |U rho U^T - rho| = 8.846e-17"
+    },
+    {
+      "name": "and the Hamiltonian is invariant too, so the premise is not vacuous",
+      "pass": true,
+      "detail": "max |U H U^T - H| = 0.000e+00"
+    },
+    {
+      "name": "REFUTED a single ground vector does NOT break it here, and that is the finding",
+      "pass": true,
+      "detail": "largest within-orbit variance over the six vectors: 4.224e-32, i.e. zero"
+    },
+    {
+      "name": "because every single vector IS invariant, one per S_z sector",
+      "pass": true,
+      "detail": "max |U rho1 U^T - rho1| = 4.930e-32 over the worst of the six"
+    },
+    {
+      "name": "CONTROL on a FRUSTRATED triangle a single vector does break it",
+      "pass": true,
+      "detail": "degeneracy 4; worst single-vector orbit variance 2.222e-01, worst non-invariance 5.742e-01"
+    },
+    {
+      "name": "CONTROL and the triangle's PROJECTOR restores equality, so the theorem still holds",
+      "pass": true,
+      "detail": "projector orbit variance 3.081e-33 on the same frustrated graph"
+    },
+    {
+      "name": "CONTROL on a chain orbit both arms agree, so the gap is not an artefact of the method",
+      "pass": true,
+      "detail": "chain degeneracy 2; projector 8.012e-32, single vector 1.972e-31"
+    }
+  ],
+  "claim": "orbit equality follows from invariance of rho, which a degenerate manifold gives only to the full projector, never to one solver-returned vector"
+}
