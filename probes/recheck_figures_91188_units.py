@@ -171,6 +171,27 @@ def main() -> int:
     chk("CONTROL: the author split is real, not one blob", "",
         asked not in by_pm25 and asked not in body,
         "the question text appears in tonydzi's comment only")
+    # Two density figures are quoted back at their authors. Verify catches attribution errors
+    # only if the check knows who said what, so these are keyed to the comment author, with a
+    # control that fails if the two authors' bodies were ever concatenated into one blob.
+    chk("138.0 is pm25coder's own figure", "Your 138.0 and",
+        "138.0" in by_pm25 and "138.0" not in by_tonydzi,
+        "138.0 appears in pm25coder's comment and not in tonydzi's")
+    # NOT "only tonydzi says it": pm25coder quotes the same number back at him, which is why a
+    # presence-and-absence test failed here and was right to. The claim is about ORIGIN, so
+    # check that tonydzi published it and that pm25coder attributes it to him rather than
+    # claiming it.
+    chk("117.6 originates with tonydzi, and pm25coder credits him for it",
+        "@tonydzi's 117.6",
+        "117.6" in by_tonydzi and "your Russian index at 117.6" in by_pm25,
+        "tonydzi published it; pm25coder quotes it back as \"your\" index")
+    chk("CONTROL: the two figures are not interchangeable", "",
+        "138.0" not in by_tonydzi,
+        "the other density appears in neither of tonydzi's comments")
+    chk("the newest comment was read before sending", "you now both hold second-hand from us",
+        "second-hand from here too" in by_pm25,
+        "pm25coder's 18:13 comment says he holds the routing point second-hand as well")
+
     chk("niels-roest already published the 70 per cent himself, so we credit it",
         "the ~70% you read off it", "(~70% of the cap)" in body,
         "his issue body already states the ratio the draft derives")
