@@ -1,0 +1,156 @@
+{
+ "n_real_curves": 7,
+ "best_acceptance_at_5pct_fp": 5,
+ "frontier": [
+  {
+   "rel_bar": 0.05,
+   "k": 2,
+   "false_positive": 0.5658333333333333,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.05,
+   "k": 4,
+   "false_positive": 0.2325,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.05,
+   "k": 6,
+   "false_positive": 0.06416666666666666,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.05,
+   "k": 8,
+   "false_positive": 0.013333333333333334,
+   "accepted": 2
+  },
+  {
+   "rel_bar": 0.05,
+   "k": 12,
+   "false_positive": 0.0,
+   "accepted": 0
+  },
+  {
+   "rel_bar": 0.1,
+   "k": 2,
+   "false_positive": 0.41,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.1,
+   "k": 4,
+   "false_positive": 0.225,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.1,
+   "k": 6,
+   "false_positive": 0.06416666666666666,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.1,
+   "k": 8,
+   "false_positive": 0.013333333333333334,
+   "accepted": 2
+  },
+  {
+   "rel_bar": 0.1,
+   "k": 12,
+   "false_positive": 0.0,
+   "accepted": 0
+  },
+  {
+   "rel_bar": 0.15,
+   "k": 2,
+   "false_positive": 0.20833333333333334,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.15,
+   "k": 4,
+   "false_positive": 0.17166666666666666,
+   "accepted": 6
+  },
+  {
+   "rel_bar": 0.15,
+   "k": 6,
+   "false_positive": 0.06333333333333334,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.15,
+   "k": 8,
+   "false_positive": 0.013333333333333334,
+   "accepted": 2
+  },
+  {
+   "rel_bar": 0.15,
+   "k": 12,
+   "false_positive": 0.0,
+   "accepted": 0
+  },
+  {
+   "rel_bar": 0.2,
+   "k": 2,
+   "false_positive": 0.08166666666666667,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.2,
+   "k": 4,
+   "false_positive": 0.07833333333333334,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.2,
+   "k": 6,
+   "false_positive": 0.04416666666666667,
+   "accepted": 5
+  },
+  {
+   "rel_bar": 0.2,
+   "k": 8,
+   "false_positive": 0.010833333333333334,
+   "accepted": 2
+  },
+  {
+   "rel_bar": 0.2,
+   "k": 12,
+   "false_positive": 0.0,
+   "accepted": 0
+  },
+  {
+   "rel_bar": 0.25,
+   "k": 2,
+   "false_positive": 0.034166666666666665,
+   "accepted": 3
+  },
+  {
+   "rel_bar": 0.25,
+   "k": 4,
+   "false_positive": 0.034166666666666665,
+   "accepted": 3
+  },
+  {
+   "rel_bar": 0.25,
+   "k": 6,
+   "false_positive": 0.025,
+   "accepted": 3
+  },
+  {
+   "rel_bar": 0.25,
+   "k": 8,
+   "false_positive": 0.005833333333333334,
+   "accepted": 2
+  },
+  {
+   "rel_bar": 0.25,
+   "k": 12,
+   "false_positive": 0.0,
+   "accepted": 0
+  }
+ ]
+}

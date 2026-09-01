@@ -216,6 +216,17 @@ def main():
             moved = True
         prev = m
     print(f"   the probe CAN see movement when the symmetry is broken: {moved}")
+
+    # ---- recorded run ------------------------------------------------------------
+    # Cited by name in a letter to a collaborator while it recorded nothing. Nothing
+    # below changes a measurement; it serialises what the run already computed.
+    import json as _json, os as _os
+    _rep = {"N": N, "control_probe_can_see_movement": bool(moved),
+            "scan": [float(x) for x in scan]}
+    _out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+    with open(_out, "w", encoding="utf-8") as _fh:
+        _json.dump(_rep, _fh, indent=1)
+    print("wrote", _os.path.basename(_out))
     quantisation_and_robustness()
     if not moved:
         print("   ...it cannot, so the flat lines above measure nothing and must not be cited.")
