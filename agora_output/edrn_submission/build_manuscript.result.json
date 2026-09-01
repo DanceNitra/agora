@@ -1,0 +1,27 @@
+{
+ "script": "build_manuscript.py",
+ "when_utc": "2026-09-01T16:53:55Z",
+ "source": "manuscript_2026-08-29_asreceived.tex",
+ "output": "manuscript.tex",
+ "output_bytes": 38414,
+ "abstract_words": 248,
+ "body_words_source": 4446,
+ "body_words_output": 4588,
+ "figures_converted": 4,
+ "dois_added": 6,
+ "owner_placeholders_remaining": 0,
+ "submittable": true,
+ "removed_duplicate_data_availability_chars": 231,
+ "fixed_hardcoded_table_reference": true,
+ "dropped_contribution_sentences_from_acknowledgements": true,
+ "prior_studies_added": 4,
+ "controls": {
+  "anchors_unique": true,
+  "abstract_within_limit": true,
+  "every_number_in_his_body_survives": true,
+  "abstract_keeps_every_stated_result": true,
+  "body_word_drift_pct": 3.19,
+  "orbit_arithmetic_applied": true,
+  "ai_disclosure_in_method_section": true
+ }
+}

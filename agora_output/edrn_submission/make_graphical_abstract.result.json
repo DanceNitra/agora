@@ -1,0 +1,19 @@
+{
+ "script": "make_graphical_abstract.py",
+ "when_utc": "2026-09-01T16:31:16Z",
+ "output": "graphical_abstract.png",
+ "bytes": 21866,
+ "pixels": [
+  480,
+  262
+ ],
+ "ratio": 1.8321,
+ "points_from_manuscript": 9,
+ "valley_at_s": 1.0,
+ "minimum_is_interior": true,
+ "controls": {
+  "points_parsed_from_the_manuscript": true,
+  "minimum_is_interior_and_rises_on_both_sides": true,
+  "geometry_verified_by_reopening_the_file": true
+ }
+}
