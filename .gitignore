@@ -288,3 +288,5 @@ agora_output/humanizer_receipts/
 
 # Numbered log rotations (`_brain.log.1`). The `_dungeon*.err*` rules above do not reach these.
 *.log.[0-9]*
+/SCHEMA_1591.md
+/locomo_retrieval_map_result.json
