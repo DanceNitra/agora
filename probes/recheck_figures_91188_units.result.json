@@ -1,10 +1,10 @@
 {
  "probe": "recheck_figures_91188_units.py",
- "when_utc": "2026-09-01T19:08:04Z",
+ "when_utc": "2026-09-01T19:11:49Z",
  "draft": "drafts/91188_reply_units.md",
- "draft_bytes": 4331,
+ "draft_bytes": 4749,
  "cli_version": "2.1.257 (Claude Code)",
- "checks": 40,
+ "checks": 44,
  "failed": 0,
  "rows": [
   {
@@ -186,6 +186,30 @@
    "phrase_in_draft": true,
    "verified": true,
    "source": "the question text appears in tonydzi's comment only"
+  },
+  {
+   "claim": "138.0 is pm25coder's own figure",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "138.0 appears in pm25coder's comment and not in tonydzi's"
+  },
+  {
+   "claim": "117.6 originates with tonydzi, and pm25coder credits him for it",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "tonydzi published it; pm25coder quotes it back as \"your\" index"
+  },
+  {
+   "claim": "CONTROL: the two figures are not interchangeable",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the other density appears in neither of tonydzi's comments"
+  },
+  {
+   "claim": "the newest comment was read before sending",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "pm25coder's 18:13 comment says he holds the routing point second-hand as well"
   },
   {
    "claim": "niels-roest already published the 70 per cent himself, so we credit it",
