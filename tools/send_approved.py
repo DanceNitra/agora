@@ -487,7 +487,9 @@ def main(argv=None):
             print(psc.check(body, a.thread)[1])
         # Record that this hash was DISPLAYED, so `post` can require that a person spoke
         # The record holds a time, never a verdict.
-        osp.record_shown(now)
+        # No state file any more: the anchor is the harness's own record of the line above.
+        # A file this session writes was forgeable, and an audit showed backdating one line
+        # satisfied the check for every hash at once.
         print("\nShow the owner this draft together with the hash above, and pass it back as --sha.")
         return 0
 

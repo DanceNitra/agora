@@ -1,49 +1,60 @@
-"""Did the owner actually say something after we showed him the hash?
+"""Did the owner actually speak after we showed him this hash?
 
-WHY. `send_approved.py` binds the bytes to a digest, which closed the "approved one thing, sent
-another" hole. It does not close the one underneath: the digest is computed by me, printed by me,
-and passed back by me. Every artefact in that chain is mine. "The owner approved this" has been an
-assertion of mine wearing a hash.
+WHY. `send_approved.py` binds the bytes to a digest, which closed "approved one thing, sent another".
+It does not close the layer under it: I compute the digest, print it, and pass it back. Every
+artefact in that chain is mine, so "the owner approved this" was my own assertion wearing a hash.
 
-WHAT THIS ADDS, and it is narrower than it sounds. It cannot know that a message means yes, and any
-keyword list for that would be brittle and gameable. It establishes one fact I cannot author: after
-the moment the hash was displayed, a REAL message from the owner arrived in the session transcript,
-which the harness writes and I do not.
+WHAT THIS ESTABLISHES, and it is narrower than it sounds. It cannot know that a message means yes,
+and a keyword list for that would be brittle and gameable. It establishes one fact I cannot author:
+between the moment the harness recorded this hash being displayed and now, a message whose ORIGIN
+the harness marked `human` arrived in that same session.
 
-THE TRAP THAT SHAPES THE FILTER. Task notifications, hook output and system reminders are all
-recorded with `role: user`. A run that counted those would treat a background job finishing as
-consent, which is worse than no check: the standing session rule says the opposite, in those words.
-So every message whose text begins with one of the machine markers is excluded, and the module
-refuses rather than passes when it cannot tell.
+THE FIRST VERSION FAILED OPEN, AND AN ADVERSARIAL PASS MEASURED IT. Two defects, both fatal:
 
-FAILS CLOSED. No transcript, no readable record, no qualifying message: refuse. A guard that waves
-the send through when it cannot see is the failure this repository keeps paying for.
+  * It excluded machine messages by matching text PREFIXES. Measured across 20 transcripts and
+    24,679 `role: user` records: 229 machine-authored records passed that filter, recall 80.6%. The
+    largest group, 94 of them, reads `Base directory for this skill: ...` and is injected whenever
+    the assistant calls the Skill tool. **One Skill call satisfied the guard.** Also leaking:
+    compaction summaries, skill re-invocations, and a `/loop` prompt whose text says "owner asleep".
+    The harness marks every record's `origin`: 1,571 `human`, 931 `task-notification`, one
+    `auto-continuation`. Keyed on that field the same corpus admits all 1,571 humans and rejects all
+    229 leaks. Read the field the harness writes, not the words it happens to contain.
+
+  * The anchor was a JSON file this session writes. Backdating one line made every human message
+    already on disk satisfy the check, for any hash, unconditionally. The anchor is now the
+    harness's own record of `show` printing `sha256 : <hash>` to stdout: 77 such records exist here.
+    That is an event this session can CAUSE but cannot RE-TIME, which is the whole difference.
+
+STILL TRUE AND WORTH SAYING: an active session produces a human message every few minutes, so this
+proves the owner was present and speaking, not that he read the draft. It is a floor, not a proof.
 """
 from __future__ import annotations
 
+import datetime as _dt
 import glob
 import io
 import json
 import os
-import time
+import re
 
-# Recorded by `show`, read by `post`. It holds only WHEN a hash was displayed, never whether anyone
-# agreed with it, so forging it buys nothing on its own: the message still has to exist.
-STATE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                     "agora_output", "gate", "shown_hashes.json")
-
-# A `role: user` entry starting with any of these was written by the machine, not by a person.
-MACHINE_PREFIXES = (
-    "<task-notification>", "<system-reminder>", "<local-command-stdout>",
-    "[inspeximus]", "caveat: the messages below", "<command-name>", "<command-message>",
-    "<user-prompt-submit-hook>", "preToolUse", "PostToolUse", "tool_use_error",
-)
+SHOW_LINE = re.compile(r"sha256 : ([0-9a-f]{64})")
 
 
 def _transcripts(project_dir: str | None = None) -> list[str]:
     d = project_dir or os.path.expanduser(
         os.path.join("~", ".claude", "projects", "C--Users-Danculus-agora"))
     return sorted(glob.glob(os.path.join(d, "*.jsonl")), key=os.path.getmtime)
+
+
+def _ts(s):
+    """Parse a transcript timestamp, or None. Comparing ISO strings with `>` looks right and is not:
+    a local-offset stamp an hour BEFORE the anchor sorts after it as text."""
+    if not isinstance(s, str) or not s:
+        return None
+    try:
+        return _dt.datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(_dt.timezone.utc)
+    except Exception:
+        return None
 
 
 def _text_of(msg: dict) -> str:
@@ -56,67 +67,69 @@ def _text_of(msg: dict) -> str:
     return ""
 
 
-def owner_messages(path: str) -> list[tuple[str, str]]:
-    """(timestamp, text) for every message a PERSON sent, machine entries excluded."""
-    out = []
+def _origin_kind(rec: dict):
+    o = rec.get("origin")
+    if isinstance(o, dict):
+        return o.get("kind")
+    return o if isinstance(o, str) else None
+
+
+def scan(path: str):
+    """(shows, humans) for one transcript. shows: [(time, sha)]. humans: [(time, text)]."""
+    shows, humans = [], []
     with io.open(path, encoding="utf-8", errors="replace") as fh:
         for line in fh:
-            if '"role"' not in line:
+            if '"role"' not in line and "sha256 : " not in line:
                 continue
             try:
                 r = json.loads(line)
             except Exception:
                 continue
-            m = r.get("message") or {}
-            if m.get("role") != "user":
+            t = _ts(r.get("timestamp"))
+            if t is None:
                 continue
-            t = " ".join(_text_of(m).split())
-            if not t:
-                continue
-            low = t.lower()
-            if any(low.startswith(p.lower()) for p in MACHINE_PREFIXES):
-                continue
-            ts = r.get("timestamp")
-            if ts:
-                out.append((ts, t))
-    return out
+            tur = r.get("toolUseResult")
+            out = tur.get("stdout") if isinstance(tur, dict) else (tur if isinstance(tur, str) else "")
+            m = SHOW_LINE.search(out or "")
+            if m:
+                shows.append((t, m.group(1)))
+            msg = r.get("message") or {}
+            if msg.get("role") == "user" and _origin_kind(r) == "human":
+                txt = " ".join(_text_of(msg).split())
+                if txt:
+                    humans.append((t, txt))
+    return shows, humans
 
 
-def record_shown(sha: str) -> None:
-    os.makedirs(os.path.dirname(STATE), exist_ok=True)
-    try:
-        d = json.load(io.open(STATE, encoding="utf-8"))
-    except Exception:
-        d = {}
-    d[sha] = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime())
-    # Keep the file small; only recent hashes can be in play.
-    if len(d) > 200:
-        d = dict(sorted(d.items(), key=lambda kv: kv[1])[-200:])
-    json.dump(d, io.open(STATE, "w", encoding="utf-8"), indent=1)
-
-
-def check(sha: str, project_dir: str | None = None, state: str | None = None) -> tuple[bool, str]:
-    """(ok, why). ok is True only when a person spoke after this hash was displayed."""
-    st = state or STATE
-    try:
-        shown = json.load(io.open(st, encoding="utf-8"))
-    except Exception as e:
-        return False, ("no record that this hash was ever shown (%s: %r). Run `show` first, paste "
-                       "the draft to the owner with the hash, and post only after he answers." % (st, e))
-    when = shown.get(sha)
-    if not when:
-        return False, ("this hash was never displayed by `show`, so nobody can have approved it. "
-                       "%d other hashes are on record." % len(shown))
+def check(sha: str, project_dir: str | None = None) -> tuple[bool, str]:
+    """(ok, why). True only when the harness recorded a human speaking after this hash was shown."""
     paths = _transcripts(project_dir)
     if not paths:
         return False, "no session transcript found, so no owner message can be established"
-    msgs = [m for p in paths for m in owner_messages(p)]
-    if not msgs:
-        return False, ("the transcript holds no messages from a person at all, only machine "
-                       "entries. Refusing rather than treating a notification as consent.")
-    after = [m for m in msgs if m[0] > when]
-    if not after:
-        return False, ("the hash was shown at %s and no message from a person has arrived since. "
-                       "The last one was at %s: %r" % (when, msgs[-1][0], msgs[-1][1][:60]))
-    return True, ("owner spoke %d time(s) after the hash was shown at %s; first was %s: %r"
-                  % (len(after), when, after[0][0], after[0][1][:60]))
+
+    # Only the transcript that actually contains the show matters: a human message in ANOTHER
+    # session is not an answer to a hash displayed in this one.
+    for p in reversed(paths):
+        shows, humans = scan(p)
+        mine = [t for t, h in shows if h == sha.lower()]
+        if not mine:
+            continue
+        anchor = max(mine)
+        after = [(t, x) for t, x in humans if t > anchor]
+        if not after:
+            last = max([t for t, _ in humans], default=None)
+            return False, ("the hash was shown at %s and the harness has recorded no human message "
+                           "since. Last human message: %s"
+                           % (anchor.isoformat(), last.isoformat() if last else "none in this session"))
+        # TWO DRAFTS IN FLIGHT. If another hash was displayed between this anchor and the answer,
+        # one "ok" would unlock both and there is no way to tell which one it meant.
+        between = sorted({h for t, h in shows if anchor < t < after[0][0] and h != sha.lower()})
+        if between:
+            return False, ("another draft's hash (%s) was shown between this one and the reply, so "
+                           "the reply cannot be attributed to this draft. Show this draft again and "
+                           "get a fresh answer." % between[0][:16])
+        return True, ("shown %s, human replied %s: %r"
+                      % (anchor.isoformat(), after[0][0].isoformat(), after[0][1][:60]))
+
+    return False, ("no transcript records `show` printing this hash, so nobody can have been asked "
+                   "about it. Run `show` on this exact file first.")

@@ -82,13 +82,20 @@ def check(path: str, quiet: bool = False, skill: str = "humanizer") -> int:
         return 1
     r = json.load(io.open(p, encoding="utf-8"))
     if not quiet:
-        thin = (r.get("evidence") or {}).get("transcript_empty")
+        evd = r.get("evidence") or {}
+        thin = evd.get("transcript_empty")
+        rep = evd.get("agent_report")
         print(f"  {skill} receipt OK  {os.path.basename(path)}  "
               f"{r.get('before_words')} -> {r.get('after_words')} words, {r.get('iso')}")
-        if thin:
-            # Never let a thin receipt read the same as a full one.
-            print(f"    EVIDENCE THIN: the run's transcript was empty, so this receipt rests on "
-                  f"the recorded findings alone.")
+        # Never let one tier of evidence read like another. Three states, said plainly.
+        if thin and rep:
+            print(f"    rests on the AGENT'S OWN report: {os.path.basename(rep.get('path',''))} "
+                  f"({rep.get('bytes')} B, sha {str(rep.get('sha256'))[:12]}) because the harness "
+                  f"left the transcript empty")
+        elif thin:
+            # Pre-dates the --report requirement. Say so rather than letting it pass as equal.
+            print(f"    EVIDENCE THIN: the transcript was empty and no agent report was recorded, "
+                  f"so this receipt rests on findings the main session wrote about itself.")
         print(f"    found: {r.get('found')}")
     return 0
 
@@ -104,6 +111,11 @@ def main() -> int:
     ap.add_argument("--evidence", default="",
                     help="path to an artifact the skill run produced (its output/transcript "
                          "file). Required for `record`: a receipt must point at something.")
+    ap.add_argument("--report", default="",
+                    help="the file the SUBAGENT wrote, named in its brief and ending "
+                         ".report.md. Required when the transcript is empty, because then "
+                         "every other field here is written by the session claiming the "
+                         "skill ran.")
     a = ap.parse_args()
 
     if a.action == "status":
@@ -199,6 +211,55 @@ def main() -> int:
             "found. Got %d characters; 200 minimum. Summarise the run's real findings, "
             "not merely that it ran."
             % (ev, len(a.found.strip())))
+
+    # THE AGENT'S OWN WORDS, because --found is mine.
+    #
+    # Measured on this machine: 40 of 40 subagent output files are ZERO bytes, against 1 of 20 for
+    # background shell jobs. So on the empty path every field in this receipt was written by the
+    # main session, and "an adversarial pass ran and found X" rested on the same session's prose
+    # about itself. That is the house failure one level up: the evidence and the claim share an
+    # author.
+    #
+    # The brief now tells the agent to write its report to a file (enforced in
+    # .claude/hooks/subagent_boundary.py), so when the transcript is empty that file is the
+    # evidence. It cannot prove who typed it, and does not claim to. It removes the case where no
+    # artefact outside this session's narration exists at all.
+    report = (a.report or "").strip()
+    rep_meta = None
+    if EV_EMPTY:
+        if not report:
+            raise SystemExit(
+                "REFUSED: the transcript is empty, so --report is required.\n"
+                "  Pass the file the agent wrote, named in its brief and ending .report.md.\n"
+                "  Without it every word in this receipt is written by the session that is\n"
+                "  claiming the skill ran, which is what the receipt exists to rule out.")
+        rl = report.replace("\\", "/").lower()
+        if not rl.endswith(".report.md"):
+            raise SystemExit("REFUSED: --report %s does not end .report.md, which is the name the "
+                             "brief instructs the agent to use." % report)
+        if "/scratchpad/" in rl:
+            raise SystemExit("REFUSED: --report %s is in the scratchpad, where THIS session's own "
+                             "scripts write. The agent writes under the tasks directory." % report)
+        if not os.path.isfile(report):
+            raise SystemExit("REFUSED: --report %s does not exist, so the agent did not write it. "
+                             "That is a finding about the run, not a formality." % report)
+        rb = os.path.getsize(report)
+        if rb < 1000:
+            raise SystemExit("REFUSED: --report %s is %d bytes. A real pass produces more than a "
+                             "stub; a short file is the shape a placeholder takes." % (report, rb))
+        rage = (time.time() - os.path.getmtime(report)) / 3600.0
+        if rage > 12:
+            raise SystemExit("REFUSED: --report %s was written %.1f hours ago, so it belongs to an "
+                             "older run than this draft." % (report, rage))
+        rtxt = io.open(report, encoding="utf-8", errors="replace").read()
+        if " ".join(a.found.split()) in " ".join(rtxt.split()) and len(a.found.strip()) > 200:
+            # --found being a verbatim slice of the report means one of them was copied from the
+            # other, and the receipt then carries one voice wearing two labels.
+            raise SystemExit("REFUSED: --found appears verbatim inside --report. Summarise in your "
+                             "own words, or the two fields are one source counted twice.")
+        rep_meta = {"path": report.replace(os.sep, "/"), "bytes": rb,
+                    "sha256": hashlib.sha256(io.open(report, "rb").read()).hexdigest(),
+                    "age_hours_at_record": round(rage, 2)}
     age_h = (time.time() - os.path.getmtime(ev)) / 3600.0
     if age_h > 12:
         raise SystemExit(
@@ -214,7 +275,12 @@ def main() -> int:
                "content_sha256": d, "found": a.found.strip(),
                "evidence": {"path": ev.replace(os.sep, "/"), "bytes": ev_bytes,
                             "sha256": ev_sha, "age_hours_at_record": round(age_h, 2),
-                            "transcript_empty": EV_EMPTY},
+                            "transcript_empty": EV_EMPTY,
+                            # Which artefact this receipt actually rests on. "agent_report" means a
+                            # file the agent wrote; "transcript" means the harness kept one. There
+                            # is no tier for "the session's own summary", which is the point.
+                            "tier": "transcript" if not EV_EMPTY else "agent_report",
+                            "agent_report": rep_meta},
                "before_words": a.before or len(body.split()),
                "after_words": a.after or len(body.split()),
                "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
