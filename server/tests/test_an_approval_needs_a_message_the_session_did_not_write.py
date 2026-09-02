@@ -209,6 +209,50 @@ def test_a_short_draft_is_still_checked_rather_than_waved_through(tmp_path):
     assert not ow.check(SHA_A, project_dir=d, draft=str(f))[0]
 
 
+LONG = " ".join("Sentence number %d says something substantial about the measurement here." % i
+                for i in range(60))
+
+
+def test_an_instant_reply_to_a_wall_of_new_text_is_an_acknowledgement(tmp_path):
+    """Not a comprehension test. 1,000 words a minute is a rate nobody achieves, and the two real
+    approvals this was calibrated against ran at 33 and 122."""
+    f = tmp_path / "d.md"
+    f.write_text(LONG, encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:00:01.000Z", LONG),
+                         _msg("2026-09-02T10:00:02.000Z", "ok", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert not ok and "words a minute" in why
+
+
+def test_the_same_text_with_time_to_read_it_passes(tmp_path):
+    """The control on the control: the rule must be the RATE, not the length."""
+    f = tmp_path / "d.md"
+    f.write_text(LONG, encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:00:01.000Z", LONG),
+                         _msg("2026-09-02T10:04:00.000Z", "ok", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert ok, why
+
+
+def test_only_material_new_since_his_last_message_is_charged_to_the_reply(tmp_path):
+    """A second round shows what changed. Charging the reply for the whole draft would fail both
+    real sends, since he had already seen most of the text in an earlier turn."""
+    f = tmp_path / "d.md"
+    f.write_text(LONG + " One short new sentence was added in the second round here.",
+                 encoding="utf-8")
+    d = _tree(tmp_path, [
+        _asst("2026-09-02T09:00:00.000Z", LONG),                  # read in an earlier turn
+        _msg("2026-09-02T09:30:00.000Z", "pokracuj", "human"),    # he spoke after reading it
+        _show("2026-09-02T10:00:00.000Z", SHA_A),
+        _asst("2026-09-02T10:00:01.000Z", "One short new sentence was added in the second round here."),
+        _msg("2026-09-02T10:00:06.000Z", "posli", "human"),
+    ])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert ok, why
+
+
 def test_the_live_project_is_readable_so_these_fixtures_are_not_the_only_thing_that_runs():
     """CONTROL. Every test above uses a fixture. If the real reader were broken, they would all still
     pass, so assert the module can parse the transcripts it ships against."""

@@ -25,8 +25,23 @@ THE FIRST VERSION FAILED OPEN, AND AN ADVERSARIAL PASS MEASURED IT. Two defects,
     harness's own record of `show` printing `sha256 : <hash>` to stdout: 77 such records exist here.
     That is an event this session can CAUSE but cannot RE-TIME, which is the whole difference.
 
-STILL TRUE AND WORTH SAYING: an active session produces a human message every few minutes, so this
-proves the owner was present and speaking, not that he read the draft. It is a floor, not a proof.
+WHAT IT CHECKS NOW, in the order the conditions have to hold:
+
+  1. the harness recorded `show` printing THIS hash;
+  2. a record the harness marked `origin.kind == "human"` arrived after that;
+  3. no other draft's hash was displayed in between, so the reply is attributable;
+  4. every sentence of the CURRENT bytes appeared in a message to him before that reply;
+  5. the new material could physically have been read in the time available.
+
+WHAT IT STILL CANNOT DO, and this is the honest boundary rather than a caveat. It cannot know he
+read it, or that his message means yes. Nothing in a transcript carries either. Condition 5 is a
+NECESSARY condition, not evidence of comprehension: it fires when 1,000 words a minute would have
+been required, which is a rate nobody achieves, and stays silent on everything slower. Measured on
+the two comments actually sent on 2026-09-01: 188 new words over 344 s (33 wpm) and 121 over 60 s
+(122 wpm), so both real approvals sit 8x and 30x under the bar.
+
+The guard's claim is therefore: he was shown this exact text, he answered afterwards, and he had
+time to read what was new. Not that he agreed, and not that he read it.
 """
 from __future__ import annotations
 
@@ -230,9 +245,41 @@ def check(sha: str, project_dir: str | None = None, draft: str | None = None) ->
                                "put in front of him before it, so he answered about a hash rather "
                                "than the text. First missing: %r"
                                % (reply_at.isoformat(), len(missing), len(want), missing[0]))
-            return True, ("shown %s, all %d lines displayed across %d message(s), human replied "
-                          "%s: %r" % (anchor.isoformat(), len(want), len(carriers),
-                                      reply_at.isoformat(), after[0][1][:50]))
+
+            # COULD HE HAVE READ IT? Not whether he did, which no transcript can say.
+            #
+            # Only content that is NEW to him counts. Measured on the two comments sent 2026-09-01:
+            # 188 new words over 344 s (33 wpm) and 121 over 60 s (122 wpm). A second round shows a
+            # changed paragraph, so charging the reply for the whole draft would fail both.
+            #
+            # The ceiling is deliberately absurd rather than merely fast. Skim rates for technical
+            # prose are argued about; nobody argues about 1,000 words a minute. Both real approvals
+            # sit 8x and 30x under it, so this fires on an instant "ok" after a large new block and
+            # on nothing else. A necessary condition, and the docstring says so.
+            prev_msgs = [t for t, _ in humans if t < reply_at]
+            since = max(prev_msgs) if prev_msgs else None
+            shown_at = {}
+            for s in want:
+                hits = [t for t, txt in assistant_texts(p) if _tight(s) in _tight(txt)]
+                if hits:
+                    shown_at[s] = min(hits)
+            fresh = [s for s, t in shown_at.items() if since is None or t > since]
+            if fresh:
+                last_new = max(shown_at[s] for s in fresh)
+                secs = (reply_at - last_new).total_seconds()
+                words = sum(len(s.split()) for s in fresh)
+                wpm = words / (secs / 60.0) if secs > 0 else float("inf")
+                if wpm > 1000:
+                    return False, ("%d new words were put in front of him and the reply came %.1f s "
+                                   "later, which is %.0f words a minute. Nobody reads at that rate, "
+                                   "so this is an acknowledgement rather than an answer about the "
+                                   "text." % (words, secs, wpm))
+                rate = "%.0f wpm over %d new word(s)" % (wpm, words)
+            else:
+                rate = "no content new since his previous message"
+            return True, ("shown %s, all %d lines displayed across %d message(s), %s, human "
+                          "replied %s: %r" % (anchor.isoformat(), len(want), len(carriers),
+                                              rate, reply_at.isoformat(), after[0][1][:50]))
 
         return True, ("shown %s, human replied %s: %r  (TEXT NOT CHECKED: no draft path given)"
                       % (anchor.isoformat(), after[0][0].isoformat(), after[0][1][:60]))
