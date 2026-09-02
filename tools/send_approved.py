@@ -436,6 +436,8 @@ def _thread_moved_gate(path, cmd, thread, acked):
 
 
 def main(argv=None):
+    import owner_spoke as osp   # lives beside this file
+
     _survive_a_narrow_console()
     ap = argparse.ArgumentParser()
     ap.add_argument("action", choices=("show", "post"))
@@ -483,6 +485,9 @@ def main(argv=None):
         if a.thread:
             print("")
             print(psc.check(body, a.thread)[1])
+        # Record that this hash was DISPLAYED, so `post` can require that a person spoke
+        # The record holds a time, never a verdict.
+        osp.record_shown(now)
         print("\nShow the owner this draft together with the hash above, and pass it back as --sha.")
         return 0
 
@@ -496,6 +501,19 @@ def main(argv=None):
         print("  Re-show the draft and get approval on the new hash. An edit after approval is the")
         print("  exact failure this exists to stop, so it cannot be waived here.")
         return 1
+
+    # THE DIGEST IS MINE. I compute it, print it and pass it back, so "the owner approved
+    # this" has been my own assertion wearing a hash. This establishes the one fact I cannot
+    # author: after the hash was displayed, a real message from a person arrived in the
+    # harness-written transcript. It cannot know the message means yes. It can prove that
+    # nobody said anything at all.
+    spoke_ok, spoke_why = osp.check(now)
+    if not spoke_ok:
+        print("REFUSED: no owner message follows the moment this hash was shown.")
+        print("  " + spoke_why)
+        print("  A task notification is recorded as a user message and is not consent.")
+        return 1
+    print("owner-spoke check: " + spoke_why)
 
     cmd = list(a.rest)
     if not cmd:

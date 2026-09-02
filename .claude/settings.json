@@ -48,6 +48,15 @@
             "command": "python -m inspeximus.claude_code"
           }
         ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/subagent_boundary.py\""
+          }
+        ]
       }
     ]
   }
