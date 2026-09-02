@@ -122,9 +122,15 @@ LEDGERS = {
     ".scout_box.json": dict(
         # live counts 2026-07-31: taken 28 / no_fit 19 / done 8. "taken" is work picked up, not a
         # decision. Owner's vocabulary for this organ is drafted / no_fit.
+        # Re-counted 2026-09-02: no_fit 46 / taken 70 / done 6 / drafted 48 / open 23 /
+        # closed_upstream 7. `box_mark` writes that last one when thread_is_open() is False before
+        # we act: the Scout found the lead and took it, then the thread closed upstream, so no
+        # ruling of his exists. Inconclusive, for the reason `off-board` is: counting it decisive
+        # pays for a verdict nobody reached. Unknown to BOTH vocabularies, those 7 records vanished
+        # from his row instead of failing, which is exactly what this file exists to prevent.
         verdict_fields=("status", "outcome", "verdict"), primary="status",
         decisive=("drafted", "no_fit", "done", "posted", "declined"),
-        inconclusive=("taken", "new", "open", "queued", "pending"),
+        inconclusive=("taken", "new", "open", "queued", "pending", "closed_upstream"),
         # `ruled_ts` FIRST: it is when the Scout DECIDED, which is the work being measured. `found_ts`
         # is when the lead was collected and can be a day older, so a ruling made this cycle on an
         # older lead would otherwise fall outside the window and read as no work at all.

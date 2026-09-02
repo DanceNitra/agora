@@ -304,7 +304,14 @@ _CORRECTIVE: tuple[str, ...] = ("failed", "killed", "kill", "retired", "revised"
 _INCONCLUSIVE_ANY = ("hypothesized", "charted", "queued", "pending", "open")
 _INCONCLUSIVE: dict[str, tuple[str, ...]] = {
     ".canon.json": ("deferred", "escalated"),
-    ".scout_box.json": ("taken",),   # 28 records: found and picked up, not yet ruled on
+    # 70 records "taken": found and picked up, not yet ruled on. And "closed_upstream", 7 records,
+    # written by box_mark when thread_is_open() returns False before we act: the Scout found the
+    # lead and took it, then the world closed the thread, so no ruling of ours exists. Counting it
+    # decisive would pay for a verdict nobody reached; leaving it unknown to both vocabularies made
+    # those 7 records VANISH from his row rather than fail, which is the same defect this file was
+    # written for and which recurred here with a new word. Taken from a Counter over the live store
+    # on 2026-09-02, not from memory.
+    ".scout_box.json": ("taken", "closed_upstream"),
     ".press.json": ("draft",),       # 1 record: written, not shipped
     # folklore.py: "A VERDICT THAT CANNOT SAY 'I DO NOT KNOW' IS DECORATION." INCONCLUSIVE is the
     # assayer's honest cell, so it must not be counted as a ruling -- otherwise the organ can never
