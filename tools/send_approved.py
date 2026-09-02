@@ -509,9 +509,11 @@ def main(argv=None):
     # author: after the hash was displayed, a real message from a person arrived in the
     # harness-written transcript. It cannot know the message means yes. It can prove that
     # nobody said anything at all.
-    spoke_ok, spoke_why = osp.check(now)
+    # `a.file` so the check can require the TEXT was displayed, not only the digest. A hash
+    # goes to a tool result nobody reads aloud; the draft is what he answers about.
+    spoke_ok, spoke_why = osp.check(now, draft=a.file)
     if not spoke_ok:
-        print("REFUSED: no owner message follows the moment this hash was shown.")
+        print("REFUSED: this draft is not established as approved.")
         print("  " + spoke_why)
         print("  A task notification is recorded as a user message and is not consent.")
         return 1

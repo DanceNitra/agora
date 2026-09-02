@@ -131,6 +131,84 @@ def test_no_transcripts_at_all_fails_closed(tmp_path):
     assert not ok and "no session transcript" in why
 
 
+def _asst(ts, text):
+    return {"timestamp": ts, "message": {"role": "assistant",
+                                         "content": [{"type": "text", "text": text}]}}
+
+
+DRAFT = ("The reminder fires when the largest fraction reaches 0.8 and targets 0.7 of the cap.\n"
+         "Six of the eight prompts are false-identity pretexts, which is the part that matters.\n")
+
+
+def test_showing_the_hash_without_the_text_is_not_an_approval(tmp_path):
+    """A hash goes to a tool result nobody reads aloud. The draft is what he answers about."""
+    f = tmp_path / "d.md"
+    f.write_text(DRAFT, encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert not ok and "never put in front of him" in why
+
+
+def test_the_text_displayed_before_the_reply_is_what_lets_it_through(tmp_path):
+    f = tmp_path / "d.md"
+    f.write_text(DRAFT, encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:01:00.000Z", "Here it is:\n\n" + DRAFT),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert ok, why
+
+
+def test_a_sentence_added_after_the_display_fails(tmp_path):
+    """The case measured on a real send: a line appended after the last full paste, approved on a
+    hash that covered it, and never displayed."""
+    f = tmp_path / "d.md"
+    f.write_text(DRAFT + "And a sentence appended afterwards that nobody was ever shown at all.\n",
+                 encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:01:00.000Z", DRAFT),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    assert not ow.check(SHA_A, project_dir=d, draft=str(f))[0]
+
+
+def test_the_text_may_be_displayed_across_more_than_one_message(tmp_path):
+    """A second round shows what changed, not the whole piece again, so per-message is wrong."""
+    a, b = DRAFT.splitlines()
+    f = tmp_path / "d.md"
+    f.write_text(DRAFT, encoding="utf-8")
+    d = _tree(tmp_path, [_asst("2026-09-02T09:50:00.000Z", a),
+                         _show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:01:00.000Z", "changed one line: " + b),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert ok, why
+
+
+def test_rewrapping_the_same_text_is_not_a_different_text(tmp_path):
+    """A draft is hard-wrapped; a chat paste breaks elsewhere, and inside CJK a break is not even a
+    space. Comparing on collapsed whitespace reported three shown lines as never shown."""
+    body = "Prve tvrdenie o rozpore je presne toto. A cinsky retazec 8条标签完全一致，但每条都在同一个方向上 patri k nemu."
+    f = tmp_path / "d.md"
+    f.write_text(body, encoding="utf-8")
+    rewrapped = ("Prve tvrdenie o rozpore\nje presne toto. A cinsky retazec 8条标签完全一致，但每条都在同一个\n"
+                 "方向上 patri k nemu.")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _asst("2026-09-02T10:01:00.000Z", rewrapped),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
+    assert ok, why
+
+
+def test_a_short_draft_is_still_checked_rather_than_waved_through(tmp_path):
+    """No sentence clears the length floor, and 'nothing to check' must not read as a pass."""
+    f = tmp_path / "d.md"
+    f.write_text("too short to sample\n", encoding="utf-8")
+    d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
+                         _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
+    assert not ow.check(SHA_A, project_dir=d, draft=str(f))[0]
+
+
 def test_the_live_project_is_readable_so_these_fixtures_are_not_the_only_thing_that_runs():
     """CONTROL. Every test above uses a fixture. If the real reader were broken, they would all still
     pass, so assert the module can parse the transcripts it ships against."""

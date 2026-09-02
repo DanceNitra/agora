@@ -101,8 +101,80 @@ def scan(path: str):
     return shows, humans
 
 
-def check(sha: str, project_dir: str | None = None) -> tuple[bool, str]:
-    """(ok, why). True only when the harness recorded a human speaking after this hash was shown."""
+def _norm(s: str) -> str:
+    return " ".join((s or "").split())
+
+
+def _tight(s: str) -> str:
+    """Whitespace removed entirely, for comparing text against the same text re-wrapped.
+
+    Collapsing runs of whitespace is not enough. A chat client wrapped a CJK string mid-run and the
+    normaliser turned that break into a SPACE, so the file's 8条标签完全一致，但每条都在同一个方向上
+    and the displayed 同一个 方向上 compared unequal. Between CJK characters a line break is not a
+    space, and at 45 characters or more two different sentences do not collide once spacing is gone.
+    """
+    return "".join((s or "").split())
+
+
+def _samples(body: str, floor: int = 45) -> list[str]:
+    """Every substantial SENTENCE of the draft, whitespace-normalised.
+
+    Two earlier grains were both wrong, and each was wrong in a way only a measurement showed.
+
+    Contiguous windows of the assembled body failed a comment that had genuinely been shown: the
+    full draft went out at 18:45 and a rewritten paragraph at 19:12, both before the reply, so every
+    word was displayed and no single window matched, because the final text never existed
+    contiguously in one message. A second round shows what changed, not the whole piece again.
+
+    FILE LINES then failed on wrapping. A draft is hard-wrapped at about 100 characters and the same
+    text pasted into chat breaks in different places, so three of 51 lines read as never shown when
+    all three were on screen. That is the instrument disagreeing with itself, not a finding.
+
+    Sentences survive both, because a sentence is the same string wherever it is wrapped.
+    """
+    b = _norm(body)
+    out, seen = [], set()
+    for s in re.split(r"(?<=[.!?:])\s+", b):
+        s = s.strip()
+        if len(s) >= floor and s not in seen:
+            seen.add(s)
+            out.append(s)
+    return out
+
+
+def assistant_texts(path: str) -> list:
+    out = []
+    with io.open(path, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if '"assistant"' not in line:
+                continue
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            m = r.get("message") or {}
+            if m.get("role") != "assistant":
+                continue
+            t = _ts(r.get("timestamp"))
+            txt = _norm(_text_of(m))
+            if t and txt:
+                out.append((t, txt))
+    return out
+
+
+def check(sha: str, project_dir: str | None = None, draft: str | None = None) -> tuple[bool, str]:
+    """(ok, why). True only when the harness recorded a human speaking after this hash was shown.
+
+    With `draft`, it also requires the TEXT to have been put in front of him. A hash is not a draft:
+    `show` prints the digest to a tool result nobody reads aloud, so the first version of this proved
+    only that a number had been computed. Measured against the two comments actually sent on
+    2026-09-01: for both, the body appears in an assistant message before the reply, once 25 seconds
+    after the show and once 27 minutes before it. So the rule is "pasted before the reply", not
+    "pasted after the show" -- the order I assumed, and the measurement corrected.
+
+    The samples come from the CURRENT bytes, so a paste of an older revision does not satisfy it.
+    That is the property worth having: what he saw and what gets sent are the same text.
+    """
     paths = _transcripts(project_dir)
     if not paths:
         return False, "no session transcript found, so no owner message can be established"
@@ -128,7 +200,41 @@ def check(sha: str, project_dir: str | None = None) -> tuple[bool, str]:
             return False, ("another draft's hash (%s) was shown between this one and the reply, so "
                            "the reply cannot be attributed to this draft. Show this draft again and "
                            "get a fresh answer." % between[0][:16])
-        return True, ("shown %s, human replied %s: %r"
+
+        # WAS THE TEXT ITSELF PUT IN FRONT OF HIM, not just its digest?
+        if draft:
+            try:
+                body = io.open(draft, encoding="utf-8").read()
+            except Exception as e:
+                return False, "could not read the draft to check it was shown: %r" % e
+            want = _samples(body)
+            if not want:
+                # No sentence clears the length floor. A short draft is still a draft, so fall back
+                # to the whole body rather than reporting "nothing to check", which reads as a pass
+                # and is how a guard quietly stops guarding the smallest cases.
+                whole = _norm(body)
+                if not whole:
+                    return False, "the draft file is empty, so there is nothing that could be shown"
+                want = [whole]
+            reply_at = after[0][0]
+            said = [_tight(txt) for t, txt in assistant_texts(p) if t < reply_at]
+            carriers, missing = set(), []
+            for s in want:
+                hit = [i for i, txt in enumerate(said) if _tight(s) in txt]
+                if not hit:
+                    missing.append(s[:40])
+                else:
+                    carriers.add(hit[-1])
+            if missing:
+                return False, ("the reply came at %s but %d of %d lines of THIS draft were never "
+                               "put in front of him before it, so he answered about a hash rather "
+                               "than the text. First missing: %r"
+                               % (reply_at.isoformat(), len(missing), len(want), missing[0]))
+            return True, ("shown %s, all %d lines displayed across %d message(s), human replied "
+                          "%s: %r" % (anchor.isoformat(), len(want), len(carriers),
+                                      reply_at.isoformat(), after[0][1][:50]))
+
+        return True, ("shown %s, human replied %s: %r  (TEXT NOT CHECKED: no draft path given)"
                       % (anchor.isoformat(), after[0][0].isoformat(), after[0][1][:60]))
 
     return False, ("no transcript records `show` printing this hash, so nobody can have been asked "
