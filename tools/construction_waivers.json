@@ -56,5 +56,19 @@
   ],
   "reason": "OPENAI_API_KEY is a credential and cannot change a measured value; the probe exits 2 without it. Every knob that CAN move the number is pinned and printed beside it: judge_model gpt-4o-mini, judge_temperature 0.0, n 20, runs 30, and the fixture is committed in the file. The whole point of the probe is that the remaining variation is the model's own non-determinism, so there is no unswept parameter left to blame.",
   "dated": "2026-08-22"
+ },
+ "agora_output/edrn_submission/regenerate_table2.py": {
+  "kinds": [
+   "DEAD-COUNTER-GUARD"
+  ],
+  "reason": "The guard is `d_std <= CAL['tol'] or d_thy <= CAL['tol']`, and the gate flags CAL['tol'] for never advancing. It is a tolerance: the constant side is what a tolerance is, and the moving side is d_std and d_thy, both computed from the run and both printed. The guard does fire: pointing the calibration at a wrong expected value makes it refuse, which is how the identical guard in regenerate_edge_8_14.py was exercised, and that file passes the gate clean with the same shape. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
+  "dated": "2026-09-03"
+ },
+ "probes/the_definitive_decomposition_of_the_8_14_disagreement.py": {
+  "kinds": [
+   "DEAD-COUNTER-GUARD"
+  ],
+  "reason": "The gate flags CONTROL['expected'] and CONTROL['tol'] for never advancing. Both are the constant side of a tolerance comparison; the moving side is the manifold-average depth computed by the run. The control was proved able to fire rather than argued: a copy with expected set to 0.077000000 instead of the agreed 0.058909125 REFUSED with exit 2 and the message 'control cell his sector gives 0.058909125 against the agreed 0.077000000'. Same shape and same reasoning as the waiver already recorded for agora_output/edrn_submission/regenerate_table2.py. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
+  "dated": "2026-09-03"
  }
 }

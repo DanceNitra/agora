@@ -1,0 +1,645 @@
+{
+ "script": "which_edges_have_an_ill_defined_baseline.py",
+ "when_utc": "2026-09-03T19:39:22Z",
+ "sector_n_up": 7,
+ "workers": 4,
+ "rows": [
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    7
+   ],
+   "endpoint_degrees": [
+    2,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 2,
+   "baseline_gap": 1.6697754290362354e-13
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    11
+   ],
+   "endpoint_degrees": [
+    2,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.60083134555979
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    6
+   ],
+   "endpoint_degrees": [
+    3,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.4459696878349781
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    12
+   ],
+   "endpoint_degrees": [
+    3,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.4459696878350705
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "endpoint_degrees": [
+    3,
+    3
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.4751833723255814
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    3
+   ],
+   "endpoint_degrees": [
+    2,
+    3
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 2.011182217945155
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    11
+   ],
+   "endpoint_degrees": [
+    2,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.32842168184922826
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    4
+   ],
+   "endpoint_degrees": [
+    3,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.4932204654585597
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    9
+   ],
+   "endpoint_degrees": [
+    3,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.2849367613513287
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    4,
+    8
+   ],
+   "endpoint_degrees": [
+    2,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 2,
+   "baseline_gap": 7.105427357601002e-15
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    5,
+    10
+   ],
+   "endpoint_degrees": [
+    1,
+    3
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 2,
+   "baseline_gap": 4.618527782440651e-14
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    10,
+    11
+   ],
+   "endpoint_degrees": [
+    3,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.6294452067662277
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    11,
+    14
+   ],
+   "endpoint_degrees": [
+    4,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.600831345559687
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    13,
+    14
+   ],
+   "endpoint_degrees": [
+    1,
+    2
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 2,
+   "baseline_gap": 5.684341886080802e-14
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    11
+   ],
+   "endpoint_degrees": [
+    5,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.32404908391459486
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    6
+   ],
+   "endpoint_degrees": [
+    5,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.8108324611036011
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    1
+   ],
+   "endpoint_degrees": [
+    5,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.1429794494804355
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    8
+   ],
+   "endpoint_degrees": [
+    5,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.22545344346353602
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    12
+   ],
+   "endpoint_degrees": [
+    5,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.45518696582568907
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    10
+   ],
+   "endpoint_degrees": [
+    5,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.2809001588822184
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    11
+   ],
+   "endpoint_degrees": [
+    5,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.6889637757801452
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    9
+   ],
+   "endpoint_degrees": [
+    5,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.51263439341054
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    6
+   ],
+   "endpoint_degrees": [
+    5,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.3436672140604884
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    3
+   ],
+   "endpoint_degrees": [
+    2,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.34622142022784885
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    12
+   ],
+   "endpoint_degrees": [
+    2,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.6168619377957256
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    4
+   ],
+   "endpoint_degrees": [
+    4,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.21634359301795314
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    11
+   ],
+   "endpoint_degrees": [
+    4,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.9437602847387048
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    7
+   ],
+   "endpoint_degrees": [
+    4,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.1405269415020989
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    9
+   ],
+   "endpoint_degrees": [
+    4,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 1.5244386924847468
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    5
+   ],
+   "endpoint_degrees": [
+    4,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.3619707744882099
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    12
+   ],
+   "endpoint_degrees": [
+    4,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.1538148693630248
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    12
+   ],
+   "endpoint_degrees": [
+    4,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.7709988280755802
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    13
+   ],
+   "endpoint_degrees": [
+    4,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.43280287556562413
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    9
+   ],
+   "endpoint_degrees": [
+    4,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.1003368812396559
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    8
+   ],
+   "endpoint_degrees": [
+    4,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.03861602914455631
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    11
+   ],
+   "endpoint_degrees": [
+    4,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.7244705206851947
+  },
+  {
+   "graph": "random",
+   "edge": [
+    7,
+    8
+   ],
+   "endpoint_degrees": [
+    2,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.30901707412749246
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "endpoint_degrees": [
+    5,
+    1
+   ],
+   "isolates_a_node": true,
+   "baseline_degeneracy": 2,
+   "baseline_gap": 1.8474111129762605e-13
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    9
+   ],
+   "endpoint_degrees": [
+    5,
+    4
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.14659561201194293
+  },
+  {
+   "graph": "random",
+   "edge": [
+    10,
+    11
+   ],
+   "endpoint_degrees": [
+    2,
+    5
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.7206533492630207
+  },
+  {
+   "graph": "random",
+   "edge": [
+    12,
+    13
+   ],
+   "endpoint_degrees": [
+    5,
+    2
+   ],
+   "isolates_a_node": false,
+   "baseline_degeneracy": 1,
+   "baseline_gap": 0.06029316538324281
+  }
+ ],
+ "degenerate_baseline": {
+  "tree": [
+   [
+    0,
+    7
+   ],
+   [
+    4,
+    8
+   ],
+   [
+    5,
+    10
+   ],
+   [
+    13,
+    14
+   ]
+  ],
+  "random": [
+   [
+    8,
+    14
+   ]
+  ]
+ },
+ "overlap_with_negative_depth": [],
+ "not_already_excluded": [
+  [
+   8,
+   14
+  ]
+ ],
+ "table2_tree_edge_affected": false,
+ "signals_disagree_on": [
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    6
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    12
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    9
+   ]
+  }
+ ],
+ "controls": {
+  "two_independent_signals_compared": true,
+  "pinned_cases_match_the_twelve_seed_measurement": true,
+  "null_can_fire": true,
+  "overlap_with_known_ineligible_measured": true
+ }
+}

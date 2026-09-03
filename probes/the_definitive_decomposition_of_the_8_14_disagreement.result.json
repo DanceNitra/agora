@@ -1,0 +1,240 @@
+{
+ "script": "the_definitive_decomposition_of_the_8_14_disagreement.py",
+ "when_utc": "2026-09-03T20:16:00Z",
+ "grid": "linspace(0,2,41)",
+ "his_sector": 7,
+ "workers": 4,
+ "cells": [
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "mode": "his sector",
+   "sectors": [
+    7
+   ],
+   "valley_s": 1.2000000000000002,
+   "manifold_average_depth": 0.05083726121936935,
+   "single_vector_depth_interval": [
+    -0.0262389082156142,
+    0.10501336612635073
+   ],
+   "interval_is_exact": true,
+   "degenerate_grid_points": [
+    0.0
+   ],
+   "E0_average": 0.27523591486485327,
+   "E0_interval": [
+    0.2300842654751622,
+    0.3294120197718346
+   ],
+   "Evalley_average": 0.22439865364548392,
+   "Evalley_interval": [
+    0.22439865364548386,
+    0.22439865364548386
+   ]
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "mode": "all sectors",
+   "sectors": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "valley_s": 0.9,
+   "manifold_average_depth": 0.010162936692612368,
+   "single_vector_depth_interval": [
+    -0.024912007171846107,
+    -0.001524065785504236
+   ],
+   "interval_is_exact": true,
+   "degenerate_grid_points": [
+    0.0,
+    0.05,
+    0.1,
+    0.15000000000000002,
+    0.2,
+    0.25,
+    0.30000000000000004,
+    0.35000000000000003,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6000000000000001,
+    0.65,
+    0.7000000000000001,
+    0.75,
+    0.8,
+    0.8500000000000001,
+    0.9,
+    0.9500000000000001,
+    1.0,
+    1.05,
+    1.1,
+    1.1500000000000001,
+    1.2000000000000002,
+    1.25,
+    1.3,
+    1.35,
+    1.4000000000000001,
+    1.4500000000000002,
+    1.5,
+    1.55,
+    1.6,
+    1.6500000000000001,
+    1.7000000000000002,
+    1.75,
+    1.8,
+    1.85,
+    1.9000000000000001,
+    1.9500000000000002,
+    2.0
+   ],
+   "E0_average": 0.2738441605432982,
+   "E0_interval": [
+    0.29157522831647953,
+    0.29157522831647953
+   ],
+   "Evalley_average": 0.2636812238506858,
+   "Evalley_interval": [
+    0.31164105089739624,
+    0.31164105089739624
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "mode": "his sector",
+   "sectors": [
+    7
+   ],
+   "valley_s": 1.9000000000000001,
+   "manifold_average_depth": 0.05890912504450485,
+   "single_vector_depth_interval": [
+    0.0016627041524538422,
+    0.05890912504450471
+   ],
+   "interval_is_exact": true,
+   "degenerate_grid_points": [],
+   "E0_average": 0.29031598331958225,
+   "E0_interval": [
+    0.29031598331958225,
+    0.29031598331958225
+   ],
+   "Evalley_average": 0.2314068582750774,
+   "Evalley_interval": [
+    0.23140685827507754,
+    0.23140685827507754
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "mode": "all sectors",
+   "sectors": [
+    7,
+    8
+   ],
+   "valley_s": 1.9000000000000001,
+   "manifold_average_depth": 0.05890912504450546,
+   "single_vector_depth_interval": [
+    0.0016627041524538422,
+    0.05890912504450471
+   ],
+   "interval_is_exact": true,
+   "degenerate_grid_points": [
+    0.0,
+    0.05,
+    0.1,
+    0.15000000000000002,
+    0.2,
+    0.25,
+    0.30000000000000004,
+    0.35000000000000003,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6000000000000001,
+    0.65,
+    0.7000000000000001,
+    0.75,
+    0.8,
+    0.8500000000000001,
+    0.9,
+    0.9500000000000001,
+    1.0,
+    1.05,
+    1.1,
+    1.1500000000000001,
+    1.2000000000000002,
+    1.25,
+    1.3,
+    1.35,
+    1.4000000000000001,
+    1.4500000000000002,
+    1.5,
+    1.55,
+    1.6,
+    1.6500000000000001,
+    1.7000000000000002,
+    1.75,
+    1.8,
+    1.85,
+    1.9000000000000001,
+    1.9500000000000002,
+    2.0
+   ],
+   "E0_average": 0.2903159833195829,
+   "E0_interval": [
+    0.29031598331958225,
+    0.29031598331958225
+   ],
+   "Evalley_average": 0.23140685827507745,
+   "Evalley_interval": [
+    0.23140685827507754,
+    0.23140685827507754
+   ]
+  }
+ ],
+ "numbers_on_record": {
+  "his Table 2, seed 0": 0.104966,
+  "his three-seed mean": 0.073017,
+  "his repaired CSV": 0.050837
+ },
+ "located": {
+  "his Table 2, seed 0": [
+   "his sector, inside the single-vector interval"
+  ],
+  "his three-seed mean": [
+   "his sector, inside the single-vector interval"
+  ],
+  "his repaired CSV": [
+   "his sector, inside the single-vector interval",
+   "his sector, IS the manifold average"
+  ]
+ },
+ "not_located": [],
+ "controls": {
+  "explicit_v0_on_every_solve": true,
+  "manifold_average_checked_against_a_second_start_vector": true,
+  "non_degenerate_positive_control_collapsed": true,
+  "interval_exact_for_a_two_fold_level": true,
+  "records_located_or_reported_unlocated": true
+ }
+}

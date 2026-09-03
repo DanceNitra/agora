@@ -1,0 +1,63 @@
+{
+ "script": "the_grid_that_produced_table_2_is_not_the_one_we_named.py",
+ "verdict": "MEASURED",
+ "table2_numbers_sought": [
+  "0.0750",
+  "0.0750",
+  "0.1050",
+  "0.0730"
+ ],
+ "per_folder": {
+  "生成论文表II所需的 N=15 树图和随机图（全新定义）": {
+   "grids": [],
+   "carries": []
+  },
+  "生成论文表II所需的树图和随机图完整数据": {
+   "grids": [
+    [
+     0.0,
+     3.0,
+     61
+    ]
+   ],
+   "carries": [
+    "0.0750",
+    "0.0750",
+    "0.1050",
+    "0.0730"
+   ]
+  },
+  "生成论文表II所需的树图和随机图谷深度数据（修复版）": {
+   "grids": [
+    [
+     0.0,
+     2.0,
+     41
+    ]
+   ],
+   "carries": []
+  }
+ },
+ "source_of_table2": "生成论文表II所需的树图和随机图完整数据",
+ "grid_that_produced_table2": [
+  [
+   0.0,
+   3.0,
+   61
+  ]
+ ],
+ "manuscript_section_4_5_states": {
+  "range": "0,3",
+  "points": 13
+ },
+ "unresolved": {
+  "ring_row_not_in_this_file": true,
+  "note": "Table 2 has a Ring row; check whether the winning data file covers it."
+ },
+ "controls": {
+  "every_target_asserted_to_exist_and_parse": true,
+  "candidates_declare_different_grids": true,
+  "mutated_expectation_failed": true,
+  "correction_target_located_in_manuscript": true
+ }
+}

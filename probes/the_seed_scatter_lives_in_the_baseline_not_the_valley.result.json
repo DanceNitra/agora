@@ -1,0 +1,70 @@
+{
+ "script": "the_seed_scatter_lives_in_the_baseline_not_the_valley.py",
+ "when_utc": "2026-09-03T19:37:55Z",
+ "sector_n_up": 7,
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11
+ ],
+ "workers": 4,
+ "graph_facts": {
+  "random": {
+   "edge": [
+    8,
+    14
+   ],
+   "endpoint_degrees": [
+    5,
+    1
+   ],
+   "components_after_removal": 2,
+   "isolated_after_removal": [
+    14
+   ],
+   "degeneracy_at_zero": 2,
+   "gap_at_zero": 7.815970093361102e-14,
+   "degeneracy_at_valley": 1,
+   "gap_at_valley": 0.6238133944844293
+  },
+  "tree": {
+   "edge": [
+    1,
+    10
+   ],
+   "endpoint_degrees": [
+    3,
+    3
+   ],
+   "components_after_removal": 2,
+   "isolated_after_removal": [],
+   "degeneracy_at_zero": 1,
+   "gap_at_zero": 1.475183372325521,
+   "degeneracy_at_valley": 1,
+   "gap_at_valley": 1.482670824066794
+  }
+ },
+ "spreads": {
+  "random E(0) baseline": 0.09522482476132188,
+  "random E(valley)": 2.8033131371785203e-15,
+  "tree E(0) baseline": 1.3877787807814457e-15,
+  "tree E(valley)": 1.0269562977782698e-15
+ },
+ "verdict": "SCATTER_IS_ENTIRELY_IN_THE_BASELINE",
+ "controls": {
+  "graph_fact_computed_from_the_generator": true,
+  "degeneracy_measured_at_both_points": true,
+  "both_terms_measured_over_the_same_seeds": true,
+  "tree_negative_control_flat": true,
+  "three_outcomes_reachable": true
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "script": "his_own_file_splits_an_orbit_by_the_baseline.py",
+ "his_tolerance": 1e-09,
+ "orbits": [
+  {
+   "members": [
+    [
+     0,
+     7
+    ],
+    [
+     13,
+     14
+    ]
+   ],
+   "depths": [
+    0.047192,
+    0.045783
+   ],
+   "spread": 0.0014090000000000005,
+   "members_with_degenerate_baseline": [
+    [
+     0,
+     7
+    ],
+    [
+     13,
+     14
+    ]
+   ]
+  },
+  {
+   "members": [
+    [
+     0,
+     11
+    ],
+    [
+     11,
+     14
+    ]
+   ],
+   "depths": [
+    0.060727,
+    0.060727
+   ],
+   "spread": 0.0,
+   "members_with_degenerate_baseline": []
+  },
+  {
+   "members": [
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     12
+    ]
+   ],
+   "depths": [
+    0.055889,
+    0.055889
+   ],
+   "spread": 0.0,
+   "members_with_degenerate_baseline": []
+  }
+ ],
+ "orbits_that_split": 1,
+ "orbits_that_agree": 2,
+ "split_orbits_are_all_degenerate_baseline": true,
+ "agreeing_orbits_are_all_clean_baseline": true,
+ "controls": {
+  "orbits_computed_from_the_generator": true,
+  "control_orbits_reported": true,
+  "baseline_status_read_from_a_separate_receipt": true,
+  "null_can_fire": true
+ }
+}

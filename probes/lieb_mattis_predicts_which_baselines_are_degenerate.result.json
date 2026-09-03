@@ -1,0 +1,460 @@
+{
+ "script": "lieb_mattis_predicts_which_baselines_are_degenerate.py",
+ "sector_n_up": 7,
+ "rule": "each connected component after removal is bipartite, so its ground total spin is half its SUBLATTICE imbalance (Lieb-Mattis 1962, which needs isotropic Heisenberg couplings, J >= 0 between sublattices, no site-dependent field, and no intra-sublattice coupling for equality rather than a bound); the sector degeneracy is the number of tuples (M_i), |M_i| <= S_i, summing to n_up - N/2",
+ "citation": "E. H. Lieb and D. C. Mattis, Ordering energy levels of interacting spin systems, J. Math. Phys. 3, 749-751 (1962), doi:10.1063/1.1724276",
+ "rows": [
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    7
+   ],
+   "predicted": 2,
+   "measured": 2,
+   "agree": true,
+   "component_spins": [
+    1.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    11
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    6
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    12
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    3
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.5,
+    0.0
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    11
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    4
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.5,
+    0.0
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    9
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    4,
+    8
+   ],
+   "predicted": 2,
+   "measured": 2,
+   "agree": true,
+   "component_spins": [
+    1.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    5,
+    10
+   ],
+   "predicted": 2,
+   "measured": 2,
+   "agree": true,
+   "component_spins": [
+    1.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    10,
+    11
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.0,
+    0.5
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    11,
+    14
+   ],
+   "predicted": 1,
+   "measured": 1,
+   "agree": true,
+   "component_spins": [
+    0.5,
+    0.0
+   ]
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    13,
+    14
+   ],
+   "predicted": 2,
+   "measured": 2,
+   "agree": true,
+   "component_spins": [
+    1.0,
+    0.5
+   ]
+  }
+ ],
+ "out_of_scope": [
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    1
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    6
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    8
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    11
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    12
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    6
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    9
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    10
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    11
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    3
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    12
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    4
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    7
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    11
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    5
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    9
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    12
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    9
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    12
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    13
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    8
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    11
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    7,
+    8
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    9
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "measured": 2,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    10,
+    11
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  },
+  {
+   "graph": "random",
+   "edge": [
+    12,
+    13
+   ],
+   "measured": 1,
+   "why": "a component is not bipartite"
+  }
+ ],
+ "hits": 14,
+ "total_in_scope": 14,
+ "misses": [],
+ "base_rate_all_simple_would_score": 10,
+ "controls": {
+  "predictions_computed_before_receipt_was_read": true,
+  "scored_on_every_edge_not_only_pendant_ones": true,
+  "predicts_the_count_not_a_flag": true,
+  "base_rate_reported": true,
+  "null_can_fire": true
+ }
+}

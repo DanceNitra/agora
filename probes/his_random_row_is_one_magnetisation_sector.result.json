@@ -1,0 +1,188 @@
+{
+ "script": "his_random_row_is_one_magnetisation_sector.py",
+ "when_utc": "2026-09-03T19:26:45Z",
+ "grid": "linspace(0,3,61)",
+ "workers": 4,
+ "his_published_value": {
+  "depth": 0.104966,
+  "s": 1.2
+ },
+ "arms": {
+  "A_control_tree_his_sector": {
+   "label": "A_control_tree_his_sector",
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "sectors": [
+    7
+   ],
+   "standard": true,
+   "our_rule": {
+    "E0": 0.2903159833195827,
+    "valley_s": 1.9000000000000001,
+    "E_min": 0.23140685827507693,
+    "depth": 0.05890912504450577,
+    "degeneracy_at_valley": 1
+   },
+   "his_rule": {
+    "s": 1.9000000000000001,
+    "depth": 0.05890912504450577,
+    "internal": true
+   },
+   "E_at_zero": 0.2903159833195827,
+   "degeneracy_seen": [
+    1
+   ]
+  },
+  "A_target_random_his_sector": {
+   "label": "A_target_random_his_sector",
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "sectors": [
+    7
+   ],
+   "standard": true,
+   "our_rule": {
+    "E0": 0.310851941400446,
+    "valley_s": 1.2000000000000002,
+    "E_min": 0.22439865364548328,
+    "depth": 0.0864532877549627,
+    "degeneracy_at_valley": 1
+   },
+   "his_rule": {
+    "s": 1.2000000000000002,
+    "depth": 0.0864532877549627,
+    "internal": true
+   },
+   "E_at_zero": 0.310851941400446,
+   "degeneracy_seen": [
+    1,
+    2
+   ]
+  },
+  "B_target_random_all_sectors_single_state": {
+   "label": "B_target_random_all_sectors_single_state",
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "sectors": null,
+   "standard": true,
+   "our_rule": {
+    "E0": 0.29157522831648014,
+    "valley_s": 0.05,
+    "E_min": 0.2930992941019831,
+    "depth": -0.0015240657855029593,
+    "degeneracy_at_valley": 4
+   },
+   "his_rule": {
+    "s": null,
+    "depth": null,
+    "internal": false
+   },
+   "E_at_zero": 0.29157522831648014,
+   "degeneracy_seen": [
+    4,
+    6
+   ]
+  },
+  "B_target_random_all_sectors_projection": {
+   "label": "B_target_random_all_sectors_projection",
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "sectors": null,
+   "standard": false,
+   "our_rule": {
+    "E0": 0.2738441605432984,
+    "valley_s": 0.9,
+    "E_min": 0.2636812238506865,
+    "depth": 0.010162936692611924,
+    "degeneracy_at_valley": 4
+   },
+   "his_rule": {
+    "s": 0.9,
+    "depth": 0.010162936692611924,
+    "internal": true
+   },
+   "E_at_zero": 0.2738441605432984,
+   "degeneracy_seen": [
+    4,
+    6
+   ]
+  },
+  "C_sensitivity_random_sector_6": {
+   "label": "C_sensitivity_random_sector_6",
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "sectors": [
+    6
+   ],
+   "standard": true,
+   "our_rule": {
+    "E0": 0.291575228316479,
+    "valley_s": 0.05,
+    "E_min": 0.29309929410198243,
+    "depth": -0.001524065785503459,
+    "degeneracy_at_valley": 1
+   },
+   "his_rule": {
+    "s": null,
+    "depth": null,
+    "internal": false
+   },
+   "E_at_zero": 0.291575228316479,
+   "degeneracy_seen": [
+    1
+   ]
+  },
+  "C_sensitivity_random_sector_8": {
+   "label": "C_sensitivity_random_sector_8",
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "sectors": [
+    8
+   ],
+   "standard": true,
+   "our_rule": {
+    "E0": 0.2535329849226703,
+    "valley_s": 1.2000000000000002,
+    "E_min": 0.22439865364548378,
+    "depth": 0.02913433127718651,
+    "degeneracy_at_valley": 1
+   },
+   "his_rule": {
+    "s": 1.2000000000000002,
+    "depth": 0.02913433127718651,
+    "internal": true
+   },
+   "E_at_zero": 0.2535329849226703,
+   "degeneracy_seen": [
+    1,
+    2
+   ]
+  }
+ },
+ "verdict": "NOT_EXPLAINED_BY_THE_SECTOR",
+ "controls": {
+  "positive_control_on_the_agreed_value_passed": true,
+  "one_code_path_only_the_sector_changes": true,
+  "both_valley_rules_reported": true,
+  "sensitivity_arm_can_refute": true,
+  "sector_changes_the_depth": true
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "script": "our_solver_returns_a_different_vector_every_call.py",
+ "when_utc": "2026-09-03T20:19:03Z",
+ "sector_n_up": 7,
+ "grid": "linspace(0,2,41)",
+ "degeneracy_at_zero": 2,
+ "gap_at_zero": 6.039613253960852e-14,
+ "degeneracy_at_valley": 1,
+ "gap_at_valley": 0.15595334862112242,
+ "repeated_calls_degenerate": [
+  0.23025318557426075,
+  0.2437379775533994,
+  0.3198193214061018
+ ],
+ "repeated_calls_simple": [
+  0.22439865364548464,
+  0.22439865364548447,
+  0.2243986536454828
+ ],
+ "spread_from_the_missing_v0": 0.08956613583184106,
+ "his_csv_target": {
+  "edge": [
+   8,
+   14
+  ],
+  "depth": 0.050837
+ },
+ "manifold_average_depth_8_14": 0.050837261219369406,
+ "manifold_average_valley_s": 1.2000000000000002,
+ "orbit_pair_manifold_average": {
+  "(0, 7)": [
+   0.013914957850683751,
+   0.1
+  ],
+  "(13, 14)": [
+   0.013914957850684473,
+   0.1
+  ]
+ },
+ "orbit_pair_single_vector": {
+  "(0, 7)": [
+   0.04719211843678178,
+   0.1
+  ],
+  "(13, 14)": [
+   0.04578324693633756,
+   0.1
+  ]
+ },
+ "within_orbit_difference_average": 7.216449660063518e-16,
+ "within_orbit_difference_single_vector": 0.0014088715004442198,
+ "controls": {
+  "non_degenerate_control_did_not_move": true,
+  "degeneracy_verified_at_the_scatter_point": true,
+  "orbit_check_is_two_sided": true,
+  "his_published_value_was_the_target": true,
+  "null_can_fire": true
+ }
+}

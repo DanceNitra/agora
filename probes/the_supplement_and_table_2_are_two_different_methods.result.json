@@ -1,0 +1,53 @@
+{
+ "script": "the_supplement_and_table_2_are_two_different_methods.py",
+ "supplement_rows": {
+  "tree": 14,
+  "random": 27
+ },
+ "candidate_sources_differ_on": 4,
+ "of_comparable": 36,
+ "supplement_vs_full_data": {
+  "hits": 32,
+  "rows_that_file_covers": 36
+ },
+ "supplement_vs_repaired_csv": {
+  "hits": 38,
+  "rows_that_file_covers": 38
+ },
+ "head_to_head_on_rows_both_cover": {
+  "rows": 36,
+  "full_data": 32,
+  "repaired_csv": 36
+ },
+ "mutation_control_match": 37,
+ "supplement_origin": "repaired CSV (the projection average in his sector)",
+ "table2": {
+  "tree": {
+   "position": "1.70",
+   "single": 0.075
+  },
+  "random": {
+   "position": "1.20 (unstable)",
+   "single": 0.105
+  }
+ },
+ "deepest_in_full_data": {
+  "tree": 0.074977,
+  "random": 0.104966
+ },
+ "deepest_in_repaired_csv": {
+  "tree": 0.07497728126356876,
+  "random": 0.06415343152003936
+ },
+ "supplement_depth_for_8_14": 0.050837261219369934,
+ "table2_and_supplement_disagree_on_8_14": true,
+ "supplement_claims_to_be_table2_data": false,
+ "supplement_declares_its_method": true,
+ "controls": {
+  "shapes_asserted": true,
+  "candidates_proved_distinguishable": true,
+  "every_row_scored": true,
+  "mutation_control_fired": true,
+  "unidentified_is_reachable": true
+ }
+}
