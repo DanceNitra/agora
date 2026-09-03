@@ -1,0 +1,18 @@
+{
+ "probe": "build_supplementary.py",
+ "when_utc": "2026-09-03T20:46:22Z",
+ "archive": "edrn_supplementary_source_2026-09-02.zip",
+ "tree_edges": 14,
+ "random_edges": 27,
+ "tree_scan_rows": 14,
+ "random_scan_rows": 27,
+ "pdf_bytes": 70145,
+ "worst_within_orbit_spread": 1.6930901125533637e-15,
+ "controls": {
+  "generators_reproduce_the_published_edge_lists": true,
+  "within_orbit_depths_agree_to_machine_precision": true,
+  "source": "repaired CSV, not the superseded .txt",
+  "edge_counts_match_the_manuscript": true,
+  "networkx": "3.6.1"
+ }
+}
