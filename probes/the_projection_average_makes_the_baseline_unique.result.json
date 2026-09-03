@@ -1,6 +1,6 @@
 {
  "script": "the_projection_average_makes_the_baseline_unique.py",
- "when_utc": "2026-09-03T19:40:30Z",
+ "when_utc": "2026-09-03T21:13:34Z",
  "edge": [
   8,
   14
@@ -10,29 +10,29 @@
  "cases": {
   "baseline s=0": {
    "degeneracy": 2,
-   "gap": 0.6639073169761929,
+   "gap": 0.6639073169763421,
    "single_vector": {
-    "min": 0.23008555892001395,
-    "max": 0.3294056785377331,
-    "spread": 0.09932011961771917
+    "min": 0.23017545441922538,
+    "max": 0.3293612867833792,
+    "spread": 0.09918583236415385
    },
    "manifold_average": {
-    "min": 0.2752359148648524,
-    "max": 0.27523591486485266,
-    "spread": 2.7755575615628914e-16
+    "min": 0.2752359148648533,
+    "max": 0.27523591486485366,
+    "spread": 3.3306690738754696e-16
    }
   },
   "valley s=1.20": {
    "degeneracy": 1,
-   "gap": 0.6238133944845003,
+   "gap": 0.6238133944844293,
    "single_vector": {
-    "min": 0.22439865364548356,
-    "max": 0.22439865364548356,
+    "min": 0.2243986536454839,
+    "max": 0.2243986536454839,
     "spread": 0.0
    },
    "manifold_average": {
-    "min": 0.22439865364548356,
-    "max": 0.22439865364548356,
+    "min": 0.2243986536454839,
+    "max": 0.2243986536454839,
     "spread": 0.0
    }
   }
@@ -41,7 +41,7 @@
   0.234140129,
   0.329364953
  ],
- "rotation_range_covers_the_seed_range": true,
+ "rotation_range_covers_the_seed_range": false,
  "verdict": "MANIFOLD_AVERAGE_IS_BASIS_INDEPENDENT",
  "controls": {
   "single_vector_arm_scattered": true,

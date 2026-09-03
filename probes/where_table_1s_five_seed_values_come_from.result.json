@@ -1,0 +1,4 @@
+{
+ "verdict": "REFUSED",
+ "why": "superseded on 2026-09-03. The ground manifold's reachable diagnoses form the closed interval [0.110269137, 0.159658244], not the single point this probe's premise assumed, and all five of Table 1's values lie inside it. Use probes/the_manifold_reachable_set_is_an_interval_and_real_rotations_cannot_see_it.py."
+}
