@@ -290,3 +290,32 @@ agora_output/humanizer_receipts/
 *.log.[0-9]*
 /SCHEMA_1591.md
 /locomo_retrieval_map_result.json
+
+# A CO-AUTHOR'S UNPUBLISHED WORK, IN A PUBLIC REPOSITORY'S WORKING TREE.
+# github.com/DanceNitra/agora is PUBLIC. The EPJ B submission package holds Li Guanghao's manuscript
+# before submission, his raw scan archive, and a checklist quoting numbers he has not published. None
+# of it was ignored, and none of it is ours to publish: one `git add -A` in this directory would put
+# an unsubmitted paper on the internet under our account. Measured 2026-09-03 with
+# `git status --porcelain -uall`, which listed every file of it as untracked and therefore addable.
+# The build SCRIPTS stay tracked, because they are ours and they are what makes the package
+# reproducible; the package they emit does not.
+agora_output/edrn_submission/guanghao_archive_*/
+agora_output/edrn_submission/manuscript*.tex
+agora_output/edrn_submission/manuscript*.pdf
+agora_output/edrn_submission/supplementary*.tex
+agora_output/edrn_submission/supplementary*.pdf
+agora_output/edrn_submission/supplementary_source/
+agora_output/edrn_submission/abstract.tex
+agora_output/edrn_submission/cover_letter.md
+agora_output/edrn_submission/SUBMISSION_CHECKLIST.md
+agora_output/edrn_submission/Fig*.pdf
+agora_output/edrn_submission/figures/
+agora_output/edrn_submission/graphical_abstract.png
+agora_output/edrn_submission/*.aux
+agora_output/edrn_submission/*.log
+agora_output/edrn_submission/*.out
+agora_output/edrn_submission/bst/
+agora_output/edrn_submission/sn-jnl.cls
+
+# Gated drafts. Nothing here has the owner's approval to leave the machine.
+drafts/
