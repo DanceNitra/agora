@@ -140,10 +140,24 @@ def _board_tokens() -> set:
 
     Empty means "do not constrain": a board that fails to load must never silence belief revision,
     it must only stop steering it.
+
+    THE ONE DEFINITION, since 2026-09-04. This used to call `_tokens`, a local tokenizer, while
+    every other gate in the system reads `methods.board_priority_terms`. That function exists
+    precisely to end separate derivations, and this module had never been converted, so the two
+    disagreed on 57 of 78 words. Worse, the local set carried the owner's REFUSALS: `finance`,
+    `cloud`, `generic`, `deprioritize` and `dead` were all in the whitelist, which is the defect
+    measured on 2026-07-31, when the dungeon's own copy admitted all five deprioritized subjects on
+    the very word used to exclude them.
+
+    The visible cost was the belief-challenge sweep. This module ranked by its own overlap and
+    returned eight candidates; the dungeon applies the canonical terms and refused seven of them,
+    logging "all 8 candidates refused by the board gate -- nothing queued" every 47 minutes. An
+    organ that can never queue anything is not idle, it is broken.
     """
     try:
         from agora.execution.board import priorities_text
-        return _tokens(priorities_text())
+        from agora.execution.methods import board_priority_terms
+        return board_priority_terms(priorities_text())
     except Exception:
         return set()
 

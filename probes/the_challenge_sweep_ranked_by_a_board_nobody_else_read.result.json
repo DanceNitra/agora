@@ -1,0 +1,30 @@
+{
+ "script": "the_challenge_sweep_ranked_by_a_board_nobody_else_read.py",
+ "canonical_terms": 53,
+ "local_terms": 78,
+ "symmetric_difference": 89,
+ "refusal_words_in_whitelist": [],
+ "candidates": 8,
+ "passing_canonical": 8,
+ "passing_local_tokenizer": 1,
+ "titles": [
+  "Reliability router — SELF-CORRECTION: the cheap-signal effect sizes are underpow",
+  "Hypothesis: stationary trust audits mis-read memory adaptation as poisoning (imm",
+  "Hypothesis: a corroboration/influence memory gate is a regressive tax on knowled",
+  "Insight: earned-trust memory unifies the owner's epistemics with the measured po",
+  "Optimal forgetting is mis-read as miscalibration: in a drifting world perfect-me",
+  "Our grounding-drop firewall is adaptively defeatable: it beats confidence on non",
+  "Insight: Memory consolidation is critical-window load balancing (immune-cognitiv",
+  "Insight: A finance-watching agent's edge is causal identification of your counte"
+ ],
+ "declared_derivers": [
+  "methods.board_priority_terms",
+  "seminar._board_vocab"
+ ],
+ "controls": {
+  "one_definition": true,
+  "off_board_still_refused": true,
+  "tokenizers_differ": true,
+  "mutation_reproduces_failure": true
+ }
+}
