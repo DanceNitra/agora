@@ -34,8 +34,30 @@ class MemoryAgent:
         source: str = "experience",
         related_npc_id: Optional[str] = None,
     ) -> int:
-        """Store a new memory. Returns memory ID."""
+        """Store a new memory, or refresh the identical one this agent already holds.
+
+        REPEATING A MEMORY IS NOT REMEMBERING IT HARDER. Measured 2026-09-04: `agent_memories` held
+        40,205 rows of which 37,755 were one string, the vault gate's rejection notice, and 27,100
+        of those belonged to a single agent. The comment at the call site said a strong episodic
+        memory would teach the agent to stop resubmitting; the remedy was never measured, and the
+        agent resubmitted for 63 days. The writing did taper off (27,841 in July, 9,912 in August,
+        2 in September), so this is not the live burn it looks like, but 94% of the swarm's memory
+        was one sentence and nothing in the write path could have prevented that.
+
+        An exact repeat now bumps importance a little and refreshes recency, which is what "this
+        keeps happening to me" should mean, and returns the existing row.
+        """
         importance = max(0.0, min(1.0, importance))
+        dupe = await (await self.db.execute(
+            "SELECT id, importance FROM agent_memories WHERE npc_id=? AND content=? "
+            "ORDER BY id DESC LIMIT 1", (self.npc_id, content))).fetchone()
+        if dupe is not None:
+            await self.db.execute(
+                "UPDATE agent_memories SET importance=?, decay_factor=1.0, "
+                "last_recalled_at=datetime('now') WHERE id=?",
+                (min(1.0, max(importance, (dupe["importance"] or 0.0)) + 0.02), dupe["id"]))
+            await self.db.commit()
+            return int(dupe["id"])
         cursor = await self.db.execute(
             "INSERT INTO agent_memories (npc_id, memory_type, content, importance, "
             "emotional_tag, source, related_npc_id, decay_factor, last_recalled_at) "
@@ -181,6 +203,30 @@ class MemoryAgent:
                 "AND importance < ? ORDER BY last_recalled_at ASC LIMIT ?"
                 ")",
                 (self.npc_id, memory_type, self.IMPORTANCE_THRESHOLD, prune_count),
+            )
+            cursor = await self.db.execute(
+                "SELECT COUNT(*) as c FROM agent_memories WHERE npc_id=? AND memory_type=?",
+                (self.npc_id, memory_type))
+            row = await cursor.fetchone()
+            total = row["c"] if row else total
+
+        # A CAP THAT CANNOT BE ENFORCED IS NOT A CAP. The clause above only ever deletes rows below
+        # IMPORTANCE_THRESHOLD, so a memory written AT the threshold is immortal, and once every
+        # ordinary experience has been evicted to make room for it there is nothing left to delete.
+        # Measured 2026-09-04: MAX_EPISODIC is 100, one agent held 27,456 episodic memories, and
+        # across the swarm 40,105 of 40,205 rows sat at 0.80 or above with exactly 100 prunable. The
+        # eviction had been discarding the agents' real experiences to preserve 37,755 copies of one
+        # rejection notice, which had been written at 0.8 by hand.
+        #
+        # So the cap is now enforced against everything, keeping the most important and most
+        # recently recalled. Importance still decides WHO survives; it no longer decides WHETHER the
+        # limit applies.
+        if total > max_count:
+            await self.db.execute(
+                "DELETE FROM agent_memories WHERE id IN ("
+                "SELECT id FROM agent_memories WHERE npc_id=? AND memory_type=? "
+                "ORDER BY importance DESC, last_recalled_at DESC LIMIT -1 OFFSET ?)",
+                (self.npc_id, memory_type, max_count),
             )
             await self.db.commit()
 

@@ -60,6 +60,10 @@ AUTO_TASKS = [
      "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Sergeant Voss"},
 ]
 
+import os
+
+_AUTO_TASKS = os.getenv("AGORA_AUTO_TASKS", "0").strip().lower() in ("1", "on", "true", "yes")
+
 RESOURCE_REWARDS_BY_TYPE = {
     "analysis": 1,    # crystal_shards
     "writing": 2,     # herbs
@@ -84,7 +88,18 @@ class TaskExecutor:
         db = self.db
 
         # 1. POST a new task periodically (every 3 ticks average)
-        if self._posted_count == 0 or random.random() < 0.33:
+        # OFF BY DEFAULT since 2026-09-04. This generator cycles 17 hardcoded fantasy strings
+        # ("Smelt iron ingots and forge replacement blades") into the same `tasks` table the
+        # research system uses. Measured over 84 days: 71,733 task rows from 17 distinct
+        # descriptions, 47,519 artifacts from 833 distinct titles, 62 MB of a 325 MB database,
+        # and roughly 900 new rows a day. It costs no model tokens, so this is bloat rather
+        # than spend, but it is also why `tasks` and `artifacts` are 99% fiction.
+        #
+        # It defeated our own retention policy. That policy prunes artifacts by TYPE and keeps
+        # 'research', 'writing' and 'analysis' -- and this generator stamps its output with
+        # exactly those types, so the rule meant to preserve research was preserving 'Decode the
+        # rune tablet' 4,227 times. Set AGORA_AUTO_TASKS=1 to run the simulated economy again.
+        if _AUTO_TASKS and (self._posted_count == 0 or random.random() < 0.33):
             task = await self._post_new_task(db)
             if task:
                 self._posted_count += 1

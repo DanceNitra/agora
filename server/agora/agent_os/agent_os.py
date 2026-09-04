@@ -906,7 +906,12 @@ class AgentOS:
                     try:
                         from agora.agent_os.memory_agent import MemoryAgent
                         mem = MemoryAgent(self.db, npc_id)
-                        await mem.store_memory(mem_text, "episodic", 0.8, "reflective", "action")
+                        # 0.6, NOT 0.8. IMPORTANCE_THRESHOLD is 0.8 and the memory prune only ever
+                        # deletes rows BELOW it, so this notice was born immortal and 37,755 copies
+                        # accumulated over 63 days, 27,100 of them for one agent. Below the
+                        # threshold it decays and is evicted like any other disappointment, and
+                        # store_memory now refreshes a repeat rather than adding a row.
+                        await mem.store_memory(mem_text, "episodic", 0.6, "reflective", "action")
                     except Exception:
                         pass
             except Exception as e:

@@ -1,0 +1,23 @@
+{
+ "script": "an_identical_memory_refreshes_instead_of_multiplying.py",
+ "id1": 1462366,
+ "id2": 1462366,
+ "n1": 1,
+ "n2": 1,
+ "importance": 0.52,
+ "decay": 1.0,
+ "other": 1462367,
+ "n_other": 1,
+ "idb": 1462368,
+ "n_b": 1,
+ "episodic_before": 27456,
+ "episodic": 100,
+ "cap": 100,
+ "kept": 1,
+ "dropped": 0,
+ "controls": {
+  "distinct_memory_still_stored": true,
+  "scoped_per_agent": true,
+  "salience_recorded": true
+ }
+}

@@ -38,8 +38,17 @@ _PRUNE = [
     ("agent_conflicts", "created_at", ""),
     ("checkpoints", "created_at", ""),
     ("state_snapshots", "created_at", ""),
-    # artifacts: prune only ephemeral game-social/movement types; keep research/writing/analysis
-    ("artifacts", "created_at", " AND artifact_type IN ('interaction','exploration')"),
+    # artifacts: prune ephemeral game-social/movement types, AND anything the auto-task generator
+    # minted. Keeping by TYPE alone was unsound: that generator stamps its output 'research',
+    # 'writing' and 'analysis', so the clause meant to preserve research preserved 42,866 fantasy
+    # artifacts, among them "Decode the rune tablet" 4,227 times. `storage_path` is the honest
+    # discriminator because only `task_executor._complete_task` writes that prefix.
+    ("artifacts", "created_at",
+     " AND (artifact_type IN ('interaction','exploration') OR storage_path LIKE 'tasks/task-%')"),
+    # tasks + events were never pruned at all, so both held every row back to 2026-06-12: 71,733
+    # task rows from 17 distinct fantasy descriptions (25.6 MB) and 71,444 event rows (17.5 MB).
+    ("tasks", "created_at", ""),
+    ("events", "occurred_at", ""),
 ]
 
 
