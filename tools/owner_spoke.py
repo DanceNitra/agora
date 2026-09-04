@@ -231,20 +231,36 @@ def check(sha: str, project_dir: str | None = None, draft: str | None = None) ->
                 if not whole:
                     return False, "the draft file is empty, so there is nothing that could be shown"
                 want = [whole]
-            reply_at = after[0][0]
-            said = [_tight(txt) for t, txt in assistant_texts(p) if t < reply_at]
-            carriers, missing = set(), []
+            # THE QUALIFYING REPLY IS THE ONE THAT POSTDATES THE TEXT, not the first one after the
+            # hash. Measured on a real send: the hash went up at 07:42:30, the owner said "ano
+            # schvalujem" at 07:43:35, the letter itself was written out at 07:44:34, and "ok posli"
+            # came at 07:50:20. Reading `after[0]` failed a send whose text HAD been displayed
+            # before the approval that counts.
+            #
+            # This is stricter, not looser. An answer given before seeing the text is not an
+            # approval of that text, so it does not qualify; only a message that comes after every
+            # line has been shown does, and if none exists the send is still refused.
+            asst = assistant_texts(p)
+            first_shown, missing = {}, []
             for s in want:
-                hit = [i for i, txt in enumerate(said) if _tight(s) in txt]
-                if not hit:
-                    missing.append(s[:40])
+                hits = [t for t, txt in asst if _tight(s) in _tight(txt)]
+                if hits:
+                    first_shown[s] = min(hits)
                 else:
-                    carriers.add(hit[-1])
+                    missing.append(s[:40])
             if missing:
-                return False, ("the reply came at %s but %d of %d lines of THIS draft were never "
-                               "put in front of him before it, so he answered about a hash rather "
-                               "than the text. First missing: %r"
-                               % (reply_at.isoformat(), len(missing), len(want), missing[0]))
+                return False, ("%d of %d lines of THIS draft have never been put in front of him, "
+                               "so no message of his can be an answer about the text. First "
+                               "missing: %r" % (len(missing), len(want), missing[0]))
+            complete = max(first_shown.values())
+            qualifying = [(t, x) for t, x in after if t > complete]
+            if not qualifying:
+                return False, ("the whole draft was on screen at %s and he has not spoken since. "
+                               "His last message, %s, came before the text was complete."
+                               % (complete.isoformat(), after[-1][0].isoformat()))
+            reply_at, reply_txt = qualifying[0]
+            carriers = {t for t in first_shown.values()}
+            after = [(reply_at, reply_txt)]
 
             # COULD HE HAVE READ IT? Not whether he did, which no transcript can say.
             #

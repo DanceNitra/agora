@@ -38,7 +38,11 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 
 SUBAGENT_TOOLS = ("Task", "Agent")
 BUDGET_RE = re.compile(r"BUDGET:\s*(?P<body>[^\n]*)", re.I)
-QUOTE_RE = re.compile(r'Owner approved:\s*"(?P<quote>[^"]{4,300})"', re.I)
+# Two characters, not four. The owner approves with "ok" more often than with a sentence, and a
+# four-character floor blocked a launch he had just authorised. What makes a short quote safe is not
+# its length: it is the ORDER check below, which requires the words to arrive after the assistant
+# message that named the cost. A long invented quote fails; a two-letter real one passes.
+QUOTE_RE = re.compile(r'Owner approved:\s*"(?P<quote>[^"]{2,300})"', re.I)
 
 TEMPLATE = (
     'BUDGET: <n> agents, ~<tokens> tokens total, <what it buys>. '
@@ -71,6 +75,15 @@ def approval_for(quote, transcript=None):
         return False, "no session transcript found, so no approval can be verified"
 
     want = _norm(quote)
+    # Newest first, and NEVER give up on the first transcript that merely contains the words. A short
+    # approval ("ano sprav to") matches old sessions too, and returning early on one of those blocked
+    # a launch the owner had actually approved -- the guard's own false negative, caught on its first
+    # live use. Evaluate every transcript and fail only when none satisfies BOTH conditions.
+    try:
+        paths = sorted(paths, key=lambda q: os.path.getmtime(q), reverse=True)
+    except Exception:                                # noqa: BLE001
+        pass
+    reasons = []
     for p in paths:
         # When did I last state a budget?
         stated = [t for t, txt in assistant_texts(p) if "budget:" in (txt or "").lower()]
@@ -92,15 +105,15 @@ def approval_for(quote, transcript=None):
         if not hits:
             continue
         if not stated:
-            return False, ("the quote is in the transcript, but no assistant message in this "
-                           "session ever stated a BUDGET, so he approved something he was not shown")
+            reasons.append("a transcript has the words but never stated a BUDGET")
+            continue
         first_budget = min(stated)
-        after = [t for t, _ in hits if t and first_budget and t > first_budget]
-        if after:
+        if any(t and first_budget and t > first_budget for t, _ in hits):
             return True, "approved after the cost was stated"
-        return False, ("the quoted words appear only BEFORE the budget was stated, so they are "
-                       "not consent to this spend")
-    return False, "no human message in this session contains those words"
+        reasons.append("the words appear only BEFORE the budget was stated there")
+    if reasons:
+        return False, "; ".join(sorted(set(reasons)))
+    return False, "no human message in any session transcript contains those words"
 
 
 def main():
