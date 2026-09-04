@@ -1,0 +1,51 @@
+{
+ "script": "the_ring_row_was_measured_outside_the_sector.py",
+ "grid": "linspace(0,3,61)",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "workers": 4,
+ "published": {
+  "ring_single": 0.0891,
+  "ring_multi_std": 0.0286,
+  "tree_single": 0.075
+ },
+ "control_tree_depth": 0.07497728126356959,
+ "control_tree_s": 1.7000000000000002,
+ "ring": {
+  "sector n_up=7": {
+   "single_mean": 0.07707215481219577,
+   "single_std": 1.2430694842326752e-15,
+   "single_min": 0.07707215481219429,
+   "single_max": 0.07707215481219729,
+   "average_mean": 0.20805150967841893,
+   "average_std": 6.358086939692479e-16,
+   "position": [
+    1.0
+   ]
+  },
+  "all sectors": {
+   "single_mean": 0.09407424912861995,
+   "single_std": 0.022490401392926688,
+   "single_min": 0.07707493596938458,
+   "single_max": 0.13157910131680134,
+   "average_mean": 0.20805150967841896,
+   "average_std": 3.1062693092164517e-16,
+   "position": [
+    1.0
+   ]
+  }
+ },
+ "published_inside_unrestricted_range": true,
+ "spread_opened_up": true,
+ "verdict": "SECTOR_EXPLAINS_THE_RING_ROW",
+ "controls": {
+  "positive_control_tree_reproduces": true,
+  "negative_control_in_sector_spread_is_zero": true,
+  "hypothesis_could_have_failed": true
+ }
+}

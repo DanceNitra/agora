@@ -1,0 +1,60 @@
+{
+ "script": "is_the_s0_baseline_the_same_system.py",
+ "N": 15,
+ "sector_n_up": 7,
+ "rows": {
+  "random (8,14)": {
+   "components": [
+    14,
+    1
+   ],
+   "deg_at_0": 2,
+   "deg_at_valley": 1,
+   "depth_from_0": 0.050837261219369434,
+   "depth_from_005": 0.0319245200451877,
+   "change_pct": -37.20251783936743
+  },
+  "random (7,8)": {
+   "components": [
+    15
+   ],
+   "deg_at_0": 1,
+   "deg_at_valley": 1,
+   "depth_from_0": 0.06415343152003247,
+   "depth_from_005": 0.06369338248381581,
+   "change_pct": -0.7171074489959346
+  },
+  "tree (2,3)": {
+   "components": [
+    11,
+    4
+   ],
+   "deg_at_0": 1,
+   "deg_at_valley": 1,
+   "depth_from_0": 0.07497728126356895,
+   "depth_from_005": 0.07300858789530001,
+   "change_pct": -2.6257198648592692
+  }
+ },
+ "seed_study": {
+  "edge": [
+   7,
+   8
+  ],
+  "mean": 0.06415343152004113,
+  "spread": 2.3564483697668948e-14,
+  "values": [
+   0.06415343152003247,
+   0.0641534315200436,
+   0.06415343152003697,
+   0.06415343152005604,
+   0.06415343152003661
+  ]
+ },
+ "verdict": "REMOVING_A_VERTEX_SEVERING_EDGE_CHANGES_THE_BASELINE",
+ "controls": {
+  "bridge_that_is_fine_included": "tree (2,3), 11+4 split, degeneracy 1",
+  "non_bridge_bound": "random (7,8), 0.7 percent",
+  "seed_spread_reported_not_asserted": true
+ }
+}

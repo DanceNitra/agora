@@ -1,0 +1,125 @@
+{
+ "script": "the_matched_null_lives_on_his_own_graph.py",
+ "graph": "watts_strogatz(10,4,0.1,seed=42)",
+ "sector_n_up": 5,
+ "grid": "linspace(0,3,21)",
+ "pairs_scanned": 190,
+ "control_his_pair": 0.04997721399502706,
+ "his_published": 0.04997721400862463,
+ "band": {
+  "min": 0.006919378868457325,
+  "median": 0.02665887190495482,
+  "max": 0.05220172916463607,
+  "frac_min": 0.04542172658453552,
+  "frac_median": 0.18288925355539348,
+  "frac_max": 0.549542269633344
+ },
+ "his_pair_percentile": 97.89473684210526,
+ "pairs_below_his": 186,
+ "his_five": [
+  {
+   "pair": [
+    [
+     0,
+     1
+    ],
+    [
+     6,
+     8
+    ]
+   ],
+   "distance": 2,
+   "his_percent": 24.5,
+   "our_fraction_percent": 23.82286377757687,
+   "mean_abs": 0.04997721399502706,
+   "percentile_in_population": 97.36842105263158
+  },
+  {
+   "pair": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     4
+    ]
+   ],
+   "distance": 1,
+   "his_percent": 17.4,
+   "our_fraction_percent": 16.140342707321842,
+   "mean_abs": 0.032136199609117976,
+   "percentile_in_population": 72.63157894736842
+  },
+  {
+   "pair": [
+    [
+     0,
+     1
+    ],
+    [
+     7,
+     9
+    ]
+   ],
+   "distance": 2,
+   "his_percent": 19.1,
+   "our_fraction_percent": 19.08053593503591,
+   "mean_abs": 0.037524264526666615,
+   "percentile_in_population": 87.89473684210526
+  },
+  {
+   "pair": [
+    [
+     6,
+     8
+    ],
+    [
+     1,
+     8
+    ]
+   ],
+   "distance": 1,
+   "his_percent": 24.2,
+   "our_fraction_percent": 22.269386694564076,
+   "mean_abs": 0.03715163243539895,
+   "percentile_in_population": 87.36842105263158
+  },
+  {
+   "pair": [
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   "distance": 1,
+   "his_percent": 28.0,
+   "our_fraction_percent": 27.099117896486373,
+   "mean_abs": 0.034391522943450104,
+   "percentile_in_population": 78.94736842105263
+  }
+ ],
+ "permutation": {
+  "r": 0.0,
+  "p": 1.0,
+  "arrangements": 120,
+  "max_abs_r_reachable": 0.8660254037844386,
+  "smallest_reachable_two_sided_p": 0.2,
+  "arrangements_giving_r_zero": 24,
+  "distinct_distance_values": [
+   1,
+   2
+  ]
+ },
+ "controls": {
+  "positive_control_reproduces_his_number": true,
+  "population_varies": 0.009177692845751895,
+  "his_five_located": 5,
+  "permutation_floor_computed": true
+ },
+ "seconds": 1423.2602348327637
+}

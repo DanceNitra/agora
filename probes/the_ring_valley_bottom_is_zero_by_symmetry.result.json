@@ -1,0 +1,48 @@
+{
+ "script": "the_ring_valley_bottom_is_zero_by_symmetry.py",
+ "graph": "15-cycle",
+ "contradiction_edge": [
+  8,
+  9
+ ],
+ "sector_n_up": 7,
+ "rows": {
+  "0.0": {
+   "degeneracy": 1,
+   "E_single": 0.20805150967842007,
+   "E_manifold": 0.20805150967842007,
+   "corr_spread": 0.8943703432156482
+  },
+  "0.5": {
+   "degeneracy": 1,
+   "E_single": 0.18045293520391967,
+   "E_manifold": 0.18045293520391967,
+   "corr_spread": 0.7060192384637087
+  },
+  "1.0": {
+   "degeneracy": 2,
+   "E_single": 0.13097935486622278,
+   "E_manifold": 1.2168638615344807e-15,
+   "corr_spread": 3.774758283725532e-15
+  },
+  "1.5": {
+   "degeneracy": 1,
+   "E_single": 0.17254135214662303,
+   "E_manifold": 0.17254135214662303,
+   "corr_spread": 0.5732487219542259
+  },
+  "3.0": {
+   "degeneracy": 1,
+   "E_single": 0.22240358752429612,
+   "E_manifold": 0.22240358752429612,
+   "corr_spread": 0.8032680725589695
+  }
+ },
+ "manifold_depth": 0.20805150967841884,
+ "verdict": "THE_BOTTOM_IS_ZERO_BY_SYMMETRY_AT_THE_UNIFORM_POINT",
+ "controls": {
+  "s1_correlators_identical": true,
+  "s1_degenerate": true,
+  "E_manifold_nonzero_away_from_s1": true
+ }
+}

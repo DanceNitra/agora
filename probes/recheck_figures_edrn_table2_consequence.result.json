@@ -1,0 +1,335 @@
+{
+ "script": "recheck_figures_edrn_table2_consequence.py",
+ "draft": "drafts\\edrn_table2_consequence.md",
+ "checks": [
+  {
+   "label": "his CSV depth at (7,8)",
+   "expected": 0.064153,
+   "found": 0.06415343152003936,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "his repaired CSV"
+  },
+  {
+   "label": "his published random single",
+   "expected": 0.105,
+   "found": 0.105,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "manuscript"
+  },
+  {
+   "label": "his published random multi",
+   "expected": 0.073,
+   "found": 0.073,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "manuscript"
+  },
+  {
+   "label": "his published random multi std",
+   "expected": 0.0548,
+   "found": 0.0548,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "manuscript"
+  },
+  {
+   "label": "his ring multi (in the withdrawal)",
+   "expected": 0.0993,
+   "found": 0.0993,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "manuscript"
+  },
+  {
+   "label": "his ring multi std",
+   "expected": 0.0286,
+   "found": 0.0286,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "manuscript"
+  },
+  {
+   "label": "our (7,8) manifold depth",
+   "expected": 0.064153,
+   "found": 0.06415343152004382,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "table2 receipt"
+  },
+  {
+   "label": "(7,8) depth as rounded in the text",
+   "expected": 0.0642,
+   "found": 0.06415343152004382,
+   "tol": 5e-05,
+   "ok": true,
+   "source": "table2 receipt"
+  },
+  {
+   "label": "(7,8) seed mean",
+   "expected": 0.064153432,
+   "found": 0.06415343152004113,
+   "tol": 5e-09,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "(7,8) seed spread",
+   "expected": 2.4e-14,
+   "found": 2.3564483697668948e-14,
+   "tol": 5e-15,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (8,14) depth from s=0",
+   "expected": 0.050837,
+   "found": 0.050837261219369434,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (8,14) depth from s=0.05",
+   "expected": 0.031925,
+   "found": 0.0319245200451877,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (8,14) change percent",
+   "expected": -37.2,
+   "found": -37.20251783936743,
+   "tol": 0.06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (7,8) depth from s=0",
+   "expected": 0.064153,
+   "found": 0.06415343152003247,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (7,8) depth from s=0.05",
+   "expected": 0.063693,
+   "found": 0.06369338248381581,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "random (7,8) change percent",
+   "expected": -0.7,
+   "found": -0.7171074489959346,
+   "tol": 0.06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "tree (2,3) depth from s=0",
+   "expected": 0.074977,
+   "found": 0.07497728126356895,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "tree (2,3) depth from s=0.05",
+   "expected": 0.073009,
+   "found": 0.07300858789530001,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "tree (2,3) change percent",
+   "expected": -2.6,
+   "found": -2.6257198648592692,
+   "tol": 0.06,
+   "ok": true,
+   "source": "baseline receipt"
+  },
+  {
+   "label": "null: separable mean_abs",
+   "expected": 0.051416,
+   "found": 0.051415947226000236,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "null receipt"
+  },
+  {
+   "label": "null: his connected mean_abs",
+   "expected": 0.049977,
+   "found": 0.04997721399502706,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "null receipt"
+  },
+  {
+   "label": "null: separability drift",
+   "expected": 0.0,
+   "found": 0.0,
+   "tol": 1e-12,
+   "ok": true,
+   "source": "null receipt"
+  },
+  {
+   "label": "null: coupled twin fires at",
+   "expected": 0.39,
+   "found": 0.3918119121119781,
+   "tol": 0.005,
+   "ok": true,
+   "source": "null receipt"
+  },
+  {
+   "label": "matched null, min",
+   "expected": 0.006919,
+   "found": 0.006919378868457325,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "matched null, median",
+   "expected": 0.026659,
+   "found": 0.02665887190495482,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "matched null, max",
+   "expected": 0.052202,
+   "found": 0.05220172916463607,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "matched null, min fraction",
+   "expected": 4.5,
+   "found": 4.542172658453552,
+   "tol": 0.05,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "matched null, median fraction",
+   "expected": 18.3,
+   "found": 18.288925355539348,
+   "tol": 0.05,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "matched null, max fraction",
+   "expected": 55.0,
+   "found": 54.9542269633344,
+   "tol": 0.05,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "his pair percentile",
+   "expected": 98.0,
+   "found": 97.89473684210526,
+   "tol": 0.6,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "pairs below his",
+   "expected": 186.0,
+   "found": 186.0,
+   "tol": 0,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "the separable arm we are retracting",
+   "expected": 18.9,
+   "found": 18.887158084995715,
+   "tol": 0.05,
+   "ok": true,
+   "source": "null receipt"
+  },
+  {
+   "label": "largest reachable |r|",
+   "expected": 0.866,
+   "found": 0.8660254037844386,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "smallest reachable two-sided p",
+   "expected": 0.2,
+   "found": 0.2,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "Spearman r",
+   "expected": 0.0,
+   "found": 0.0,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "computed from his table"
+  },
+  {
+   "label": "Spearman p",
+   "expected": 1.0,
+   "found": 1.0,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "computed from his table"
+  },
+  {
+   "label": "his pairs, minimum",
+   "expected": 17.4,
+   "found": 17.4,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
+   "label": "his pairs, maximum",
+   "expected": 28.0,
+   "found": 28.0,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
+   "label": "(7,8) E(0)",
+   "expected": 0.193039,
+   "found": 0.19303854650745195,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "RECOMPUTED here"
+  },
+  {
+   "label": "(7,8) E(3)",
+   "expected": 0.300934,
+   "found": 0.3009335731002695,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "RECOMPUTED here"
+  }
+ ],
+ "failed": 0,
+ "distinct_figures_in_draft": 26,
+ "unclaimed": [],
+ "controls": {
+  "mutation_rejected": true,
+  "coverage_enforced": true,
+  "withdrawals_verified_against_his_files": true
+ },
+ "verdict": "PASS"
+}
