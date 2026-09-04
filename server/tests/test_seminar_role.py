@@ -82,6 +82,14 @@ async def test_tick_hands_the_seminar_rows_that_carry_role(npc_db, monkeypatch):
                 "role_missing": []}
 
     monkeypatch.setattr(seminar, "run_group_seminar", _fake_seminar)
+    # ENABLE THE ORGAN UNDER TEST. Since 2026-09-04 the tick reads AGORA_SEMINAR and the seminar is
+    # off by default, because it was the brain's largest spender. This test is about WHAT the tick
+    # hands the seminar when it runs, so it asks for the organ rather than asserting the default.
+    # Setting the input, not accepting the outcome: without this the run produces no rows at all and
+    # the assertion below reports "the seminar never ran", which is a true statement about the
+    # configuration and says nothing about the SELECT this file exists to guard.
+    monkeypatch.setenv("AGORA_SEMINAR", "1")
+
     # Force the seminar branch by swapping the module attribute the tick reads, not the global
     # `random` module (which every other test in the process shares).
     monkeypatch.setattr(agora_main, "random",
@@ -166,3 +174,47 @@ async def test_missing_role_is_reported_not_silently_swallowed(monkeypatch, caps
     # ...and it warns once per agent, not once per round (a round fires every 20 ticks).
     seminar._run_group_seminar_inner(npcs, "/vault")
     assert "DEGRADED" not in capsys.readouterr().out
+
+
+@pytest.mark.asyncio
+async def test_the_seminar_stays_off_unless_it_is_asked_for(npc_db, monkeypatch):
+    """The default-off decision needs cover, because the organ it guards is the biggest spender.
+
+    On 2026-09-04 the seminar was switched off by default: 66% of the brain's metered calls, 3,514
+    contributions, none cited downstream. Nothing tested that. A change that flipped the default
+    back would have passed every test in this repository, including the one above, which only ever
+    ran because it now asks for the organ explicitly.
+
+    So this asserts the pair. The absence half is worthless without the presence half: a tick that
+    never runs a seminar under ANY setting would satisfy "off by default" and mean nothing.
+    """
+    import types
+
+    from agora import main as agora_main
+    from agora.execution import seminar
+
+    captured = []
+    monkeypatch.setattr(seminar, "run_group_seminar",
+                        lambda *a, **k: captured.append(a) or {"ok": True})
+    monkeypatch.setattr(agora_main, "random",
+                        types.SimpleNamespace(random=lambda: 0.0, choice=lambda seq: seq[0]))
+
+    async def tick_once():
+        app = types.SimpleNamespace(state=types.SimpleNamespace(
+            db=_FakeDB(npc_db), agent_os=object(), tick_count=20, event_bus=None))
+        await agora_main._brain_ecosystem_tick(app)
+        spawned = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+        if spawned:
+            await asyncio.wait(spawned, timeout=60)
+
+    monkeypatch.delenv("AGORA_SEMINAR", raising=False)
+    await tick_once()
+    assert not captured, ("the seminar ran with AGORA_SEMINAR unset. It is the brain's largest "
+                          "spender and it is meant to be opt-in.")
+
+    # THE CONTROL. Without this, a tick broken so that it never seminars at all would pass.
+    monkeypatch.setenv("AGORA_SEMINAR", "1")
+    await tick_once()
+    assert captured, ("the seminar did not run with AGORA_SEMINAR=1 either, so the assertion above "
+                      "measured a dead tick rather than the default")
+

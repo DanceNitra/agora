@@ -242,6 +242,15 @@ def main() -> int:
         print("\n  dry run. Pass --write to apply.")
         return 0
 
+    # BACK UP THE STATE BEING REPLACED, because a trim is a deletion and the file it deletes is a
+    # data point. Measured 2026-09-04: this tool cut 224 lines to 190 and kept no copy, so the only
+    # record of the pre-trim state was a scratchpad file that dies with the session. Every OTHER
+    # writer of this index leaves a `MEMORY.md.bak-*`, which is what makes the 25-snapshot series
+    # measurable at all; this one was the gap in it.
+    import shutil as _shutil
+    stamp = __import__("datetime").datetime.now().strftime("%Y%m%d-%H%M%S")
+    _shutil.copy2(INDEX, os.path.join(MEM, "MEMORY.md.bak-%s-pretrim" % stamp))
+
     io.open(ARCHIVE, "w", encoding="utf-8", newline="").write(arch_new)
     io.open(INDEX, "wb").write(new.encode("utf-8"))   # `new` already carries its terminators
     print("\n  written. Re-measure with the same command to confirm.")
