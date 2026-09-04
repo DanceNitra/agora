@@ -7,18 +7,28 @@ descriptors he could not.
 
 He is right about the mechanism. The reminder builds its three numbers from ONE of two branches:
 
-    byte:  sizeDesc: Ut(e.sizeBytes)     capDesc: Ut(e.byteCap)     targetDesc: Ut(floor(byteCap*ezn))
-    line:  sizeDesc: `${e.lineCount}`    capDesc: `${e.lineCap}`    targetDesc: `${floor(lineCap*ezn)}`
+    byte:  sizeDesc: Ut(e.sizeBytes)          capDesc: Ut(e.byteCap)
+           targetDesc: Ut(Math.floor(e.byteCap*ezn))
+    line:  sizeDesc: `${e.lineCount} lines`   capDesc: `${e.lineCap}-line`
+           targetDesc: `${Math.floor(e.lineCap*ezn)} lines`
 
-`Ut` divides by 1024 and writes KB, and on the personal path `sizeBytes` is `String.length`, so the
-byte branch does print UTF-16 code units under a KB label. `ezn` is 0.7, read from the binary.
+`Ut` writes bytes, KB, MB or GB by size, so in this range it divides by 1024 and writes KB. On the
+personal path `sizeBytes` is `String.length`, so the byte branch does print UTF-16 code units under a
+KB label. `ezn` is 0.7. The line branch, note, labels its unit correctly.
 
-WHAT HE COULD NOT SEE, and it bounds his own argument. The reminder keeps the LARGEST fraction across
-the dimensions it was handed, so the byte branch only speaks when units/25000 exceeds lines/200. That
-is a single threshold: 125 units per line. Below it the advice is a plain line count and his unit
-mismatch never reaches the user; above it, it does.
+THREE THINGS AN EARLIER VERSION OF THIS PROBE GOT WRONG, each caught by a verification pass:
+  1. It quoted the line branch without its ` lines` and `-line` suffixes, which is the half that
+     shows the labelling is only wrong on one side.
+  2. It resolved a tie to lines. The reducer is `reduce((d,p)=>p.frac>d.frac?p:d)` with NO initial
+     value, so it starts at the first entry and only a STRICT `>` displaces it. Bytes are pushed
+     first, so BYTES win at exactly 125 and the crossover is >=, not >.
+  3. It ignored the 0.8 fire gate entirely, so it printed advice for fixtures that would have seen a
+     silent tool.
 
-Neither measured index is above it. His is 113.7 units per line, ours 123.6. Both get line advice.
+THE BOUND, and it is narrower than it looks. The byte branch speaks when units/25000 >= lines/200:
+125 units per line. But the threshold was named in that thread by @tonydzi and @pm25coder before us,
+so it is not ours to present as a finding. What this probe adds is that the same comparison also
+picks the DESCRIPTOR SET, so the KB label appears only on the byte side.
 
 CONTROLS, because a threshold is the easiest thing to assert and never test:
   * BOTH BRANCHES MUST BE REACHED. The probe evaluates fixtures on each side of 125 and refuses
@@ -51,10 +61,22 @@ def refuse(why):
     raise SystemExit(2)
 
 
+FIRE = 0.8          # I6o: below this the reminder returns null and says nothing at all
+
+
 def branch(units, lines, byte_cap, line_cap):
-    """Which descriptor set speaks. The reminder keeps the largest fraction."""
+    """Which descriptor set speaks, or none.
+
+    The reducer is `reduce((d,p)=>p.frac>d.frac?p:d)` with NO initial value, so it starts at the
+    FIRST entry and a later entry replaces it only on a STRICT >. Bytes are pushed first, so bytes
+    win a tie. An earlier version of this probe had that backwards and reported a crossover of 126.
+
+    And nothing is shown at all below FIRE. The first version omitted that gate entirely and printed
+    advice for three fixtures that would have seen a silent tool.
+    """
     fu, fl = units / byte_cap, lines / line_cap
-    return ("bytes" if fu > fl else "lines"), fu, fl
+    winner = "bytes" if fu >= fl else "lines"
+    return (winner if max(fu, fl) >= FIRE else "silent"), fu, fl
 
 
 def main():
@@ -73,10 +95,21 @@ def main():
     if not m:
         refuse("could not read ezn (the target multiplier) from the binary")
     ezn = float(m.group(1))
-    caps = sorted(set(int(x) for x in re.findall(rb"\b(25000|200)\b", blob)))
-    if 25000 not in caps or 200 not in caps:
-        refuse("the caps 25000 and 200 are not both present in the binary: found %s" % caps)
-    BYTE_CAP, LINE_CAP = 25000, 200
+    # The caps must come from their ASSIGNMENT sites. A bare substring search for "25000" over a
+    # 219 MB bundle cannot fail, and a control that cannot fail certifies nothing. The first version
+    # of this probe used exactly that and a verification pass caught it.
+    def assigned(pattern, label):
+        mm = re.search(pattern, blob)
+        if not mm:
+            refuse("could not read %s from an assignment in the binary" % label)
+        return int(mm.group(1))
+
+    BYTE_CAP = assigned(rb"n1\s*=\s*(25000)\b", "the byte cap (n1)")
+    LINE_CAP = assigned(rb"\$M\s*=\s*(200)\b", "the line cap ($M)")
+    mf = re.search(rb"I6o\s*=\s*([0-9.]+)", blob)
+    if not mf or abs(float(mf.group(1)) - FIRE) > 1e-9:
+        refuse("the fire threshold in the binary is %s, not the %s this probe applies"
+               % (mf.group(1).decode() if mf else "absent", FIRE))
 
     crossover = BYTE_CAP / LINE_CAP
 
@@ -94,24 +127,44 @@ def main():
         refuse("algebraic crossover %.1f disagrees with the scanned %d" % (crossover, scan))
 
     # CONTROL: both branches must actually be produced.
+    def _live_index():
+        ip = os.path.join(os.path.expanduser("~"), ".claude", "projects",
+                          "C--Users-Danculus-agora", "memory", "MEMORY.md")
+        raw = io.open(ip, "rb").read().decode("utf-8")
+        t = raw.replace(chr(13) + chr(10), chr(10)).strip()
+        return len(t.encode("utf-16-le")) // 2, t.count(chr(10)) + 1
+
+    live_u, live_l = _live_index()
     seen = set()
     fixtures = {}
     for name, units, lines in (
-            ("his index (Cyrillic-heavy)", 8188, 72),
-            ("our index", 26336, 213),
-            ("synthetic, just under", int((crossover - 5) * 100), 100),
-            ("synthetic, just over", int((crossover + 5) * 100), 100)):
+            # Only figures their authors actually published. @pm25coder gave a RATIO, 138.0 units
+            # per line, and no counts, so he appears below as a ratio at a line count chosen to
+            # clear the fire gate -- labelled, because inventing his line count would be putting
+            # numbers in his mouth. An earlier version did exactly that.
+            ("tonydzi index (his counts)", 8188, 72),
+            ("pm25coder ratio at 200 lines", int(138.0 * 200), 200),
+            ("our index (live)", live_u, live_l),
+            # The synthetics must clear the 0.8 gate as well as the crossover, or they are silent
+            # and the byte branch is never produced. The first version put them at 100 lines, where
+            # both fractions sit near 0.5, and the probe correctly refused its own run.
+            ("synthetic, just under 125", int((crossover - 5) * 200), 200),
+            ("synthetic, just over 125", int((crossover + 5) * 200), 200)):
         b, fu, fl = branch(units, lines, BYTE_CAP, LINE_CAP)
         seen.add(b)
-        advice = ("%.1fKB" % (BYTE_CAP * ezn / 1024) if b == "bytes"
-                  else "%d lines" % int(LINE_CAP * ezn))
+        advice = {"bytes": "%.1fKB" % (BYTE_CAP * ezn / 1024),
+                  "lines": "%d lines" % int(LINE_CAP * ezn),
+                  "silent": "(nothing: under the 0.8 gate)"}[b]
         fixtures[name] = {"units": units, "lines": lines,
                           "units_per_line": round(units / lines, 1),
                           "frac_units": round(fu, 4), "frac_lines": round(fl, 4),
                           "branch": b, "advice_the_user_reads": advice}
-    if seen != {"bytes", "lines"}:
-        refuse("only the %s branch was produced, so the switch this probe is about was never "
-               "exercised" % ", ".join(seen))
+    if not {"bytes", "lines"} <= seen:
+        refuse("both descriptor sets must be produced by some fixture; this run saw only %s, so the "
+               "switch is untested" % ", ".join(sorted(seen)))
+    if "silent" not in seen:
+        refuse("no fixture fell under the 0.8 gate, so the gate is untested and the advice column "
+               "would be claiming a message for cases that see none")
 
     print("  constants read from the binary: byteCap %d, lineCap %d, target multiplier %s"
           % (BYTE_CAP, LINE_CAP, ezn))
@@ -121,9 +174,11 @@ def main():
         print("  %-28s %8d %6d %8.1f  %-6s %s"
               % (n, f["units"], f["lines"], f["units_per_line"], f["branch"],
                  f["advice_the_user_reads"]))
-    real = [f["branch"] for n, f in fixtures.items() if "synthetic" not in n]
-    print("  -> both real indexes get %s advice, so the unit mismatch never reaches either user"
-          % ("/".join(sorted(set(real)))))
+    real = {n: f["branch"] for n, f in fixtures.items() if "synthetic" not in n}
+    print("  -> real indexes: %s" % ", ".join("%s=%s" % (n.split()[0], b) for n, b in real.items()))
+    if len(set(real.values())) == 1:
+        print("     all three land on the same branch here; that is a fact about these three files, "
+              "not about the tool")
 
     json.dump({"probe": os.path.basename(__file__),
                "byte_cap": BYTE_CAP, "line_cap": LINE_CAP, "target_multiplier": ezn,

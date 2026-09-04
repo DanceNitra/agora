@@ -45,6 +45,21 @@ def true_text(path: str) -> str:
     return io.open(path, "rb").read().decode("utf-8")
 
 
+def u16(text: str) -> int:
+    """UTF-16 code units, which is what the loader counts and NOT what len() returns.
+
+    THIS FILE CALLED len() A UTF-16 COUNT AND WAS RIGHT ONLY BY LUCK. Python's len() counts CODE
+    POINTS. JavaScript's String.length, which is what the loader compares against the cap, counts
+    UTF-16 CODE UNITS. The two agree for everything in the Basic Multilingual Plane, so they agree
+    on Latin, Cyrillic and ordinary CJK, and they diverge by one per ASTRAL character: an emoji or
+    a mathematical alphanumeric is 1 code point and 2 code units. Measured on this index today:
+    0 astral characters, so the old count happened to be exact. A fixture that never leaves the
+    alphabet where two units coincide cannot detect that it picked the wrong one, which is the same
+    trap @tonydzi described on anthropics/claude-code#91188 for bytes against units.
+    """
+    return len(text.encode("utf-16-le")) // 2
+
+
 def split_lines(text: str) -> list:
     """Lines, with the trailing newline treated as a TERMINATOR and not as a line.
 
@@ -67,7 +82,7 @@ def split_lines(text: str) -> list:
 def window(text: str) -> str:
     """The first LINE_CAP lines, cut at UNIT_CAP units, backed up to a line boundary."""
     kept = chr(10).join(split_lines(text)[:LINE_CAP])
-    if len(kept) <= UNIT_CAP:
+    if u16(kept) <= UNIT_CAP:
         return kept
     c = kept.rfind(chr(10), 0, UNIT_CAP)
     return kept[:c if c > 0 else UNIT_CAP]
@@ -87,25 +102,32 @@ def main() -> int:
     crlf = raw.count(b"\r\n")
     naive = len(io.open(INDEX, encoding="utf-8").read())
 
-    print(f"  file        : {len(lines):,} lines, {len(text):,} UTF-16 units, "
-          f"{len(text) / len(lines):.1f} per line")
-    print(f"  regime      : {'BYTE-bound' if len(text) / len(lines) > UNIT_CAP / LINE_CAP else 'LINE-bound'}"
+    print(f"  file        : {len(lines):,} lines, {u16(text):,} UTF-16 units, "
+          f"{u16(text) / len(lines):.1f} per line")
+    print(f"  regime      : {'UNIT-bound' if u16(text) / len(lines) > UNIT_CAP / LINE_CAP else 'LINE-bound'}"
           f"  (the two caps cross at {UNIT_CAP // LINE_CAP} units per line)")
-    print(f"  a session sees: {seen:,} lines, {len(win):,} units, {len(in_win)} pointers")
-    print(f"  headroom    : {UNIT_CAP - len(win):,} units, {LINE_CAP - seen} lines")
+    print(f"  a session sees: {seen:,} lines, {u16(win):,} units, {len(in_win)} pointers")
+    print(f"  headroom    : {UNIT_CAP - u16(win):,} units, {LINE_CAP - seen} lines")
     print(f"  invisible   : {len(lines) - seen} lines, {len(out_win)} pointers "
           f"(on disk and greppable, costing nothing)")
 
     v: dict = {}
     v["the_window_is_not_empty"] = seen > 1 and bool(in_win)
     v["the_window_respects_the_line_cap"] = seen <= LINE_CAP
-    v["the_window_respects_the_unit_cap"] = len(win) <= UNIT_CAP
+    v["the_window_respects_the_unit_cap"] = u16(win) <= UNIT_CAP
     # THE CONTROL THIS FILE EXISTS FOR. A text-mode read normalises CRLF away. If the file has
     # carriage returns, the naive count MUST be short by exactly that many, and if it is not, this
     # probe is reading something other than what the loader reads.
     v["CONTROL_a_text_mode_read_would_have_undercounted"] = (
         (crlf > 0 and len(text) - naive == crlf) or (crlf == 0 and len(text) == naive))
     v["and_the_carriage_returns_are_counted_here"] = len(text) == len(raw.decode("utf-8"))
+    # THE CONTROL THE UNIT FIX NEEDS. Code points and UTF-16 units agree on this index today
+    # because it holds no astral characters, so the two counters cannot be told apart by running
+    # them on it. Record the divergence and the astral count, so a future index that acquires an
+    # emoji makes the difference visible instead of silently shifting the cap by one per character.
+    astral = sum(1 for ch in text if ord(ch) > 0xFFFF)
+    v["code_points_and_utf16_units_agree_only_because_there_are_no_astral_chars"] = (
+        (astral == 0) == (u16(text) == len(text)))
     # Every pointer must resolve, or the window is spending units on nothing.
     missing = [p for p in all_ptr if not os.path.exists(os.path.join(MEM, p))]
     v["every_pointer_in_the_index_resolves"] = not missing
@@ -127,9 +149,11 @@ def main() -> int:
             print("   ", p)
 
     json.dump({"probe": os.path.basename(__file__), "verdicts": v,
-               "lines": len(lines), "units": len(text),
+               "lines": len(lines), "units": u16(text), "code_points": len(text),
+               "astral_chars": sum(1 for ch in text if ord(ch) > 0xFFFF),
+               "utf8_bytes": len(raw),
                "units_a_text_mode_read_reports": naive, "crlf_terminators": crlf,
-               "lines_seen": seen, "units_seen": len(win),
+               "lines_seen": seen, "units_seen": u16(win),
                "pointers_seen": len(in_win), "pointers_outside": len(out_win),
                "headroom_units": UNIT_CAP - len(win), "headroom_lines": LINE_CAP - seen,
                "dead_pointers": missing, "outside": out_win,

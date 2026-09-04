@@ -4,48 +4,58 @@
  "line_cap": 200,
  "target_multiplier": 0.7,
  "crossover_units_per_line_algebraic": 125.0,
- "crossover_units_per_line_scanned": 126,
+ "crossover_units_per_line_scanned": 125,
  "fixtures": {
-  "his index (Cyrillic-heavy)": {
+  "tonydzi index (his counts)": {
    "units": 8188,
    "lines": 72,
    "units_per_line": 113.7,
    "frac_units": 0.3275,
    "frac_lines": 0.36,
+   "branch": "silent",
+   "advice_the_user_reads": "(nothing: under the 0.8 gate)"
+  },
+  "pm25coder ratio at 200 lines": {
+   "units": 27600,
+   "lines": 200,
+   "units_per_line": 138.0,
+   "frac_units": 1.104,
+   "frac_lines": 1.0,
+   "branch": "bytes",
+   "advice_the_user_reads": "17.1KB"
+  },
+  "our index (live)": {
+   "units": 26553,
+   "lines": 214,
+   "units_per_line": 124.1,
+   "frac_units": 1.0621,
+   "frac_lines": 1.07,
    "branch": "lines",
    "advice_the_user_reads": "140 lines"
   },
-  "our index": {
-   "units": 26336,
-   "lines": 213,
-   "units_per_line": 123.6,
-   "frac_units": 1.0534,
-   "frac_lines": 1.065,
-   "branch": "lines",
-   "advice_the_user_reads": "140 lines"
-  },
-  "synthetic, just under": {
-   "units": 12000,
-   "lines": 100,
+  "synthetic, just under 125": {
+   "units": 24000,
+   "lines": 200,
    "units_per_line": 120.0,
-   "frac_units": 0.48,
-   "frac_lines": 0.5,
+   "frac_units": 0.96,
+   "frac_lines": 1.0,
    "branch": "lines",
    "advice_the_user_reads": "140 lines"
   },
-  "synthetic, just over": {
-   "units": 13000,
-   "lines": 100,
+  "synthetic, just over 125": {
+   "units": 26000,
+   "lines": 200,
    "units_per_line": 130.0,
-   "frac_units": 0.52,
-   "frac_lines": 0.5,
+   "frac_units": 1.04,
+   "frac_lines": 1.0,
    "branch": "bytes",
    "advice_the_user_reads": "17.1KB"
   }
  },
  "both_branches_exercised": [
   "bytes",
-  "lines"
+  "lines",
+  "silent"
  ],
  "controls": {
   "constants_read_from_the_binary_not_typed": true,
