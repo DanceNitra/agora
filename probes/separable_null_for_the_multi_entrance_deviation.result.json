@@ -1,6 +1,6 @@
 {
- "script": "his_nonlinearity_statistic_needs_a_separable_null.py",
- "when_utc": "2026-09-04T06:30:07Z",
+ "script": "separable_null_for_the_multi_entrance_deviation.py",
+ "when_utc": "2026-09-04T07:12:54Z",
  "grid": "linspace(0,3,21)",
  "his_published": {
   "mean_abs": 0.04997721400862463,
@@ -15,11 +15,16 @@
   "E_max": 0.3928700465447921
  },
  "arm_separable": {
-  "mean_abs": 0.00011429481433928639,
-  "max_abs": 0.0014001114756542754,
-  "E_min": 0.3999999999999996,
-  "E_max": 0.4286307319181085,
-  "separability_drift": 0.0
+  "mean_abs": 0.051415947226000236,
+  "max_abs": 0.11056759763528329,
+  "E_min": 0.013414736931312454,
+  "E_max": 0.2856417548586202,
+  "marginal_ranges": [
+   0.1933618173764004,
+   0.1933618173764004
+  ],
+  "separability_drift": 0.0,
+  "coupled_twin_drift": 0.3918119121119781
  },
  "arm_cut_his_graph": {
   "mean_abs": 0.004607426129151806,
@@ -73,11 +78,11 @@
  },
  "fraction_of_range": {
   "connected": 0.2382286377757687,
-  "separable": 0.003992032570672596,
+  "separable": 0.18887158084995714,
   "cut_his_graph": 0.03402418266677425
  },
- "verdict": "PARTLY_DISCRIMINATES",
- "seconds": 9.064894676208496,
+ "verdict": "STATISTIC_DOES_NOT_DISCRIMINATE",
+ "seconds": 9.420584678649902,
  "controls": {
   "positive_control_reproduced_his_numbers": true,
   "separability_asserted_numerically": true,

@@ -1,6 +1,6 @@
 {
  "script": "two_reads_of_his_own_package_that_do_not_match_its_text.py",
- "when_utc": "2026-09-04T06:31:20Z",
+ "when_utc": "2026-09-04T06:45:18Z",
  "claim_1_field_name": {
   "at_valley": 0.1849481700007527,
   "s_valley": 1.5,
@@ -15,16 +15,16 @@
   "smallworld": {
    "aut": 1,
    "degeneracy": 1,
-   "gap": 0.7738106522401402
+   "gap": 0.7738106522401189
   },
   "gasket": {
    "aut": 6,
    "degeneracy": 2,
-   "gap": 0.18570872484909273
+   "gap": 0.1857087248491638
   },
   "discriminates": true
  },
- "seconds": 1.4104294776916504,
+ "seconds": 1.3624043464660645,
  "controls": {
   "identity_checked_against_his_own_stored_curve": true,
   "degeneracy_test_carries_a_counterexample": true,

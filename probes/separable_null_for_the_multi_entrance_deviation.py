@@ -22,9 +22,10 @@ CONTROLS, each able to fail:
   * A POSITIVE CONTROL ON HIS NUMBERS. Arm A reruns his procedure on his graph, his edge pair, his
     grid and his definition, and must reproduce 0.049977 and 0.181668. If it does not, my
     reimplementation is wrong and the null says nothing about his claim.
-  * SEPARABILITY IS ASSERTED, NOT ASSUMED. The null checks that changing s2 leaves every correlation
-    in component 1 unchanged to machine precision. If that fails, the "separable" system is coupled
-    and the null is void.
+  * SEPARABILITY IS CHECKED BY A CHECK THAT CAN FAIL. Changing s2 must leave every correlation in
+    block A unchanged, and a deliberately coupled twin of the same check must catch a coupling that
+    IS there. The first version compared two calls to a memoised function and returned 0.00e+00 for
+    a coupled system too, which a verifier demonstrated before this went out.
   * THE NULL CAN EXONERATE HIM. If the separable system's deviation is far below his, the statistic
     does discriminate and his reading survives. That branch is reported as such.
   * THE COMPARISON IS SCALED. A deviation is reported as a fraction of each system's own E range,
@@ -48,7 +49,7 @@ import time
 sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace", line_buffering=True)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "his_nonlinearity_statistic_needs_a_separable_null.result.json")
+OUT = os.path.join(HERE, "separable_null_for_the_multi_entrance_deviation.result.json")
 
 GRID = (0.0, 3.0, 21)          # his S_MIN, S_MAX, S_GRID_SIZE
 HIS = {"mean_abs": 0.04997721400862463, "max_abs": 0.18166838189877788,
@@ -156,13 +157,18 @@ def arm_connected():
 def arm_separable():
     """Two disconnected blocks, one entrance in each. Coupling is impossible by construction."""
     import numpy as np
-    A_nodes, B_nodes = list(range(5)), list(range(5, 10))
-    A_edges = [(0, 1), (1, 2), (2, 3), (3, 4), (0, 2)]
-    B_edges = [(5, 6), (6, 7), (7, 8), (8, 9), (5, 7)]
+    # THE FIRST CHOICE OF BLOCKS SATURATED. With the entrance edge closing a triangle, J >= 1 froze
+    # the block: correlations locked at (-1, 0, -0.6667, -0.6667, 0) and E sat at exactly 0.400000
+    # for every larger coupling, so most of the grid contributed nothing and the arm's small
+    # deviation was a flat marginal rather than an algebra floor. A path puts the entrance in
+    # competition with the rest of the chain instead of letting it form an isolated singlet.
+    A_nodes, B_nodes = list(range(6)), list(range(6, 12))
+    A_edges = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (0, 5)]
+    B_edges = [(6, 7), (7, 8), (8, 9), (9, 10), (10, 11), (6, 11)]
     edges = A_edges + B_edges
-    e1_i, e2_i = 0, 5                       # (0,1) in block A, (5,6) in block B
+    e1_i, e2_i = 0, 0                       # the first edge of each block is its entrance
     grid = np.linspace(*GRID)
-    a_up, b_up = 2, 3                       # one fixed sector per block, so the state is a product
+    a_up, b_up = 3, 3                       # one fixed sector per block, so the state is a product
 
     cacheA, cacheB = {}, {}
 
@@ -176,25 +182,48 @@ def arm_separable():
 
     def E_at(s1, s2):
         return E_of(block(A_nodes, A_edges, e1_i, s1, cacheA, a_up)
-                    + block(B_nodes, B_edges, 0, s2, cacheB, b_up))
+                    + block(B_nodes, B_edges, e2_i, s2, cacheB, b_up))
 
-    # CONTROL: block A's correlations must not move when s2 moves.
-    a_at_low = block(A_nodes, A_edges, e1_i, 1.0, cacheA, a_up)
-    _ = block(B_nodes, B_edges, 0, 2.5, cacheB, b_up)
-    a_again = block(A_nodes, A_edges, e1_i, 1.0, cacheA, a_up)
-    drift = max(abs(x - y) for x, y in zip(a_at_low, a_again))
+    # CONTROL, AND ITS OWN POSITIVE CONTROL. The first version of this compared two calls to a
+    # MEMOIZED function, so it returned the cached object and the drift was 0.00e+00 whatever the
+    # physics did. A verifier proved it dead by wiring an artificial coupling into a block and
+    # watching the check still pass. It is a structural fact that s2 cannot enter block A's
+    # Hamiltonian, so the honest form is a check that could see a violation if one existed, and a
+    # deliberately coupled twin that it must catch.
+    def measure_A(s1, s2_unused, couple=0.0):
+        """Block A's correlations, computed fresh. `couple` fakes a dependence on s2 for the twin."""
+        J = np.ones(len(A_edges))
+        J[e1_i] = s1 + couple
+        _w, v, b = ground_vector(A_nodes, A_edges, J, a_up)
+        return corrs_from(v, b, A_edges)
+
+    honest_lo = measure_A(1.0, 1.0)
+    honest_hi = measure_A(1.0, 2.5)
+    drift = max(abs(x - y) for x, y in zip(honest_lo, honest_hi))
+    coupled_lo = measure_A(1.0, 1.0, couple=0.0)
+    coupled_hi = measure_A(1.0, 2.5, couple=-0.9)    # the twin, where s2 DOES reach block A
+    twin = max(abs(x - y) for x, y in zip(coupled_lo, coupled_hi))
+    print("     separability check: real %.2e, deliberately coupled twin %.2e" % (drift, twin))
+    if twin < 1e-6:
+        refuse("the coupled twin moved by only %.2e, so this check cannot see a coupling and its "
+               "zero on the real system means nothing" % twin)
     if drift > 1e-12:
         refuse("the 'separable' system's block A moved by %.2e when block B changed, so it is not "
                "separable and this null is void" % drift)
 
     e1 = [E_at(s, 1.0) for s in grid]
     e2 = [E_at(1.0, s) for s in grid]
+    r1, r2 = max(e1) - min(e1), max(e2) - min(e2)
+    if min(r1, r2) < 1e-3:
+        refuse("a marginal of the separable null is nearly flat (ranges %.2e and %.2e), so its small "
+               "deviation is a saturated block rather than an algebra floor" % (r1, r2))
     ref = e1[int(np.argmin(np.abs(grid - 1.0)))]
     e2d = [[E_at(a, bb) for bb in grid] for a in grid]
     m, mx = deviation(e1, e2, e2d, ref)
     flat = [x for row in e2d for x in row]
     return {"mean_abs": m, "max_abs": mx, "E_min": min(flat), "E_max": max(flat),
-            "separability_drift": drift}
+            "marginal_ranges": [r1, r2],
+            "separability_drift": drift, "coupled_twin_drift": twin}
 
 
 def arm_cut_his_graph():
@@ -316,8 +345,7 @@ def main():
     b = arm_separable()
     print("  ARM B, two disconnected blocks: mean |dev| %.9f, max %.9f, E in [%.6f, %.6f]"
           % (b["mean_abs"], b["max_abs"], b["E_min"], b["E_max"]))
-    print("     separability check: block A moved by %.2e when block B changed"
-          % b["separability_drift"])
+
 
     c = arm_cut_his_graph()
     print("  ARM C, his graph cut apart:   mean |dev| %.9f, max %.9f, E in [%.6f, %.6f]"
