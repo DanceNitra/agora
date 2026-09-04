@@ -12,19 +12,43 @@ never fell. The same limit applies to the specification's own confidentiality ve
 
 NONE OF THIS IS NEW, AND THE FILE SHIPPED WITH NO CITATIONS AT ALL. Credit where it belongs:
 
-  Ippolito et al., "Preventing Generation of Verbatim Memorization in Language Models Gives a False
-  Sense of Privacy", INLG 2023 (2023.inlg-main.3) -- verbatim matching is not sufficient, and
-  anticipating transforms is "an innumerable problem".
-  Shu, Yao et al., CODASPY 2015 -- "none of the existing techniques is adequate for detecting
-  transformed data leaks", in a storage setting closer to ours.
-  NIST SP 800-88r1 (WITHDRAWN, superseded by r2, Sept 2025), sec. 4.7.3 -- already ranks
-  compare-before-and-after above string search; r2 drops content inspection entirely.
-  Garg, Goldwasser, Vasudevan, EUROCRYPT 2020 -- "perfect deletion-compliance", Def 2.2, which is
-  the formal version of what this file gropes toward, and is STRICTLY STRONGER: it compares
-  present-then-deleted against never-present, where this compares two different secrets and so
-  cannot see residue that is identical for every secret yet still reveals that a deletion occurred.
-  Naor and Teague, STOC 2001 -- history independence, the structural twin.
-  Thudi et al., USENIX Security 2022 -- absence cannot be proven; only algorithmic definitions audit.
+  Ippolito, Tramer, Nasr, Zhang, Jagielski, Lee, Choquette-Choo, Carlini, "Preventing Generation of
+  Verbatim Memorization in Language Models Gives a False Sense of Privacy", INLG 2023, 2023.inlg-main.3.
+  Sec. 6: anticipating styles to defend against "is an innumerable problem", and verbatim definitions
+  are "insufficient to capture more subtle forms" of memorization. NOTE, because the first draft of
+  this paragraph overstated it: the same section keeps verbatim matching as "an efficient way to test
+  for obvious and undeniable memorization". Insufficient alone; not to be abandoned. That is exactly
+  the position this file ends up in.
+
+  Shu, Zhang, Yao, Feng, "Rapid Screening of Transformed Data Leaks with Efficient Algorithms and
+  Parallel Computing", CODASPY 2015, 10.1145/2699026.2699130, sec. 1: "none of the existing techniques
+  is adequate for detecting transformed data leaks". The full title matters -- Shu and Yao co-authored
+  two CODASPY 2015 papers and "Shu, Yao et al." names neither.
+
+  NIST SP 800-88 Rev. 1, sec. 4.7.3, p. 21, WITHDRAWN 26 Sept 2025, superseded by Rev. 2 (Sept 2025).
+  Rev. 1 called reading locations before and after "likely the most effective verification technique"
+  and string search "another option" -- SCOPED TO CRYPTOGRAPHIC ERASE, not sanitization generally,
+  which the first draft of this paragraph got wrong. Rev. 2 sec. 4.5.1 drops content inspection: no
+  string search and no before/after comparison appear in it at all.
+
+  Garg, Goldwasser, Vasudevan, "Formalizing Data Deletion in the Context of the Right to be Forgotten",
+  EUROCRYPT 2020 (ePrint 2020/254). Definition 2.2 is STATISTICAL deletion-compliance; perfect
+  deletion-compliance is its epsilon = 0 case, not the definition's name. Sec. 1.1: deletion must have
+  "the same effect as if the deleted data was never sent to X to begin with" -- present-then-deleted
+  against NEVER-PRESENT, which is strictly stronger than the A-against-B comparison below, because it
+  sees residue that is identical for every secret yet still reveals a deletion happened.
+
+  Micciancio, "Oblivious Data Structures: Applications to Cryptography", STOC 1997, first to treat
+  history independence explicitly; Naor and Teague, "Anti-Persistence: History Independent Data
+  Structures", STOC 2001, named and strengthened it (their Def. 2.1 is today's WEAK history
+  independence, Def. 2.2 the strong form). Calling it the structural twin of deletion
+  indistinguishability is OUR reading, nineteen years after the fact, and not something either paper
+  claims.
+
+  Thudi, Jia, Shumailov, Papernot, "On the Necessity of Auditable Algorithmic Definitions for Machine
+  Unlearning", USENIX Security 2022: "one cannot formally prove the absence of certain data points",
+  so unlearning "is only well-defined at the algorithmic level". The cleanest statement of why seven
+  attempts at black-box erasure verification kept failing here.
 
 THE TEST THAT DOES WORK asks a different question. Not "is the value there?", which requires
 recognising it, but "does the store's state DEPEND on it?", which does not.
