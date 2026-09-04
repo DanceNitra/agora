@@ -9,10 +9,12 @@ This is a two-sided manipulation check, run on a COPY. The live database is neve
   * INTENDED CHANGE: auto-task artifacts, task rows and event rows older than the window are gone.
   * NO UNINTENDED CHANGE: every knowledge table keeps its exact row count, and a REAL artifact
     older than the window survives.
-  * THE CONTROL CAN FIRE: a synthetic real artifact is planted beyond the window before the run.
-    If the prune took it, the policy is over-broad and this probe must fail. Without the plant, a
-    policy that deleted everything would still pass the knowledge-table check, because artifacts
-    are not a knowledge table.
+  * BOTH SIDES ARE PLANTED, so the verdict does not depend on the live database being dirty. A
+    real artifact and an auto-task artifact are both written beyond the window before the run: the
+    real one must survive, the auto-task one must go. An earlier version planted only the real one
+    and read the live rows for the other half, so once the live prune had actually been run this
+    probe refused, saying the intended change had not landed. It had; there was simply nothing old
+    left to remove. A check whose subject can disappear is a check that reports on the fixture.
 """
 from __future__ import annotations
 
@@ -60,11 +62,14 @@ def counts(db):
         "or storage_path is null").fetchone()[0]
     out["planted_control"] = c.execute(
         "select count(*) from artifacts where id=?", (PLANT,)).fetchone()[0]
+    out["planted_fiction"] = c.execute(
+        "select count(*) from artifacts where id=?", (PLANT_FICTION,)).fetchone()[0]
     c.close()
     return out
 
 
-PLANT = "probe_control_" + uuid.uuid4().hex[:12]
+PLANT = "probe_control_" + uuid.uuid4().hex[:12]      # a REAL artifact: must survive
+PLANT_FICTION = "probe_fiction_" + uuid.uuid4().hex[:12]   # an AUTO-TASK artifact: must go
 
 
 def main():
@@ -76,19 +81,22 @@ def main():
 
     # Plant the control: a REAL artifact, far older than the window, that must survive.
     c = sqlite3.connect(tmp)
-    c.execute("insert into artifacts (id, agent_id, title, artifact_type, storage_path, "
-              "mime_type, size_bytes, content, metadata, created_at) values "
-              "(?,?,?,?,?,?,?,?,?, '2026-01-01 00:00:00')",
-              (PLANT, "probe", "a real research artifact from long ago", "research",
-               "vault/notes/real-note.md", "text/markdown", 10, "x", "{}"))
+    ins = ("insert into artifacts (id, agent_id, title, artifact_type, storage_path, "
+           "mime_type, size_bytes, content, metadata, created_at) values "
+           "(?,?,?,?,?,?,?,?,?, '2026-01-01 00:00:00')")
+    c.execute(ins, (PLANT, "probe", "a real research artifact from long ago", "research",
+                    "vault/notes/real-note.md", "text/markdown", 10, "x", "{}"))
+    # The fiction twin: SAME artifact_type, different storage_path. That pairing is the whole test.
+    # Typing alone cannot separate them, which is why the old rule kept 42,866 fantasy artifacts.
+    c.execute(ins, (PLANT_FICTION, "probe", "Decode the rune tablet", "research",
+                    "tasks/task-999999", "text/markdown", 10, "x", "{}"))
     c.commit()
     c.close()
 
     before = counts(tmp)
-    if not before["artifacts_from_tasks"]:
-        refuse("the copy contains no auto-task artifacts, so the intended change cannot be observed")
-    if not before["planted_control"]:
-        refuse("the control artifact was not planted, so an over-broad prune would go unnoticed")
+    if not before["planted_control"] or not before["planted_fiction"]:
+        refuse("a planted artifact is missing (real=%s, fiction=%s), so this run would grade an "
+               "empty fixture" % (before["planted_control"], before["planted_fiction"]))
 
     from agora.execution import db_retention
     from pathlib import Path
@@ -121,10 +129,13 @@ def main():
                "over-broad and would delete real work")
     print("  CONTROL: the planted real artifact, dated 2026-01-01, SURVIVED the prune")
 
+    if after["planted_fiction"] != 0:
+        refuse("the planted auto-task artifact SURVIVED. It is dated 2026-01-01 and typed "
+               "'research', exactly like the real one, so the policy is still separating them by "
+               "type and would keep the fiction")
+    print("  INTENDED: the planted auto-task artifact, typed 'research' like its twin, was removed")
     removed_fiction = before["artifacts_from_tasks"] - after["artifacts_from_tasks"]
-    if removed_fiction <= 0:
-        refuse("no auto-task artifact was removed, so the intended change did not land")
-    print("  INTENDED: %d auto-task artifacts, %d task rows and %d event rows removed"
+    print("  totals: %d auto-task artifacts, %d task rows and %d event rows removed"
           % (removed_fiction, before["tasks"] - after["tasks"], before["events"] - after["events"]))
 
     size_before = os.path.getsize(tmp)

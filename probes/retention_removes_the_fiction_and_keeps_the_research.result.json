@@ -6,12 +6,13 @@
   "agent_memories": 40205,
   "quests": 3401,
   "agent_identities": 13,
-  "tasks": 71733,
-  "events": 71444,
-  "artifacts": 47520,
-  "artifacts_from_tasks": 42398,
-  "artifacts_real": 5122,
-  "planted_control": 1
+  "tasks": 2306,
+  "events": 2307,
+  "artifacts": 7319,
+  "artifacts_from_tasks": 2295,
+  "artifacts_real": 5024,
+  "planted_control": 1,
+  "planted_fiction": 1
  },
  "after": {
   "collective_knowledge": 51473,
@@ -24,35 +25,36 @@
   "artifacts": 7318,
   "artifacts_from_tasks": 2294,
   "artifacts_real": 5024,
-  "planted_control": 1
+  "planted_control": 1,
+  "planted_fiction": 0
  },
  "prune_result": {
   "byzantine_violation": 0,
-  "event_store": 774,
-  "agent_help_requests": 402,
-  "trade_history": 296,
-  "trade_offers": 297,
+  "event_store": 0,
+  "agent_help_requests": 0,
+  "trade_history": 0,
+  "trade_offers": 0,
   "stigmergy_traces": 0,
   "interaction_log": 0,
-  "agent_thoughts": 3548,
-  "agent_dreams": 93,
-  "agent_diaries": 76,
+  "agent_thoughts": 0,
+  "agent_dreams": 0,
+  "agent_diaries": 0,
   "agent_conversations": 0,
   "agent_brainstorm_ideas": 0,
   "agent_brainstorm_sessions": 0,
-  "agent_conflicts": 50,
-  "checkpoints": 1,
-  "state_snapshots": 7,
-  "artifacts": 40202,
-  "tasks": 69427,
-  "events": 69137,
-  "_total_deleted": 184310
+  "agent_conflicts": 0,
+  "checkpoints": 0,
+  "state_snapshots": 0,
+  "artifacts": 1,
+  "tasks": 0,
+  "events": 0,
+  "_total_deleted": 1
  },
- "live_mb": 310.6,
+ "live_mb": 136.3,
  "pruned_vacuumed_mb": 136.3,
  "controls": {
   "knowledge_tables_unchanged": true,
   "real_artifact_survived": true,
-  "fiction_actually_removed": 40104
+  "fiction_actually_removed": 1
  }
 }
