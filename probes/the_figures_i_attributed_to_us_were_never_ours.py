@@ -1,27 +1,65 @@
-"""Every measurement of "our index" we published on claude-code#91188, against the file itself.
+"""VOID. The premise of this probe was false: those five comments were never ours.
 
-WHAT HAPPENED. Between 1 and 4 September we posted five measurements of our own memory index to
-anthropics/claude-code#91188, as pm25coder. They form a coherent series, 15 lines to 20 to 21, each
-introduced as a fresh measurement ("Re-measured on our side just now", "Measured ours this
-afternoon"). None of them describes the file we keep, which held 208 to 221 lines and 26,000 to
-28,384 bytes across the same days.
+CORRECTED 2026-09-04, and the correction is the reason the file is kept rather than deleted.
 
-The series also contradicts itself. On 1 September the index was "nearly ASCII but not pure (10
-non-ASCII characters)" at 1.010 bytes per unit. On 3 September the same index was "CJK-flavored"
-and by 4 September 1.269 bytes per unit, with an explicit claim that nothing structural had
-changed. Our real index is 1.005.
+This probe shipped as `five_published_measurements_of_an_index_we_do_not_have.py` and opened with
+"Between 1 and 4 September we posted five measurements of our own memory index to
+anthropics/claude-code#91188, as pm25coder." Every word after "we" is wrong.
 
-WHY THIS FILE EXISTS. A correction naming five errors has to enumerate them from the live comments
-rather than from anyone's account of them, and it has to compare each with a measurement of the
-file taken now. Otherwise the correction is one more assertion in the same series.
+Resolved from the live GitHub API, unauthenticated, and from `gh auth status` on this host:
 
-CONTROLS:
-  * EVERY PUBLISHED FIGURE IS FETCHED FROM ITS COMMENT. If a quoted figure is not in the comment
-    the correction attributes it to, the run refuses.
-  * THE GROUND TRUTH COMES FROM DATED BACKUPS that bracket each claim, so "the real file was
-    different" is anchored in time and not only in today's state.
-  * THE SEARCH THAT FINDS NOTHING MUST FIND SOMETHING. It has to locate the current index by its
-    own byte and line count before any "no file matches" verdict counts.
+    comment      author       date
+    5495840695   pm25coder    2026-09-01
+    5498341230   pm25coder    2026-09-01
+    5522927403   pm25coder    2026-09-03
+    5533605446   pm25coder    2026-09-03
+    5538716005   pm25coder    2026-09-04
+
+`gh` on this host holds exactly one token, `DanceNitra`. Our comments on that thread are exactly
+two, 5499087276 and 5521637024, and neither carries any of the disputed figures. `pm25coder` is a
+different person: account created 2014-01-16, against DanceNitra's 2018-07-26.
+
+WHAT SURVIVES. The figures do not describe any file on this machine. That was always true and is
+uninteresting, because they were never claims about our file. The comparison this probe performs
+has no subject.
+
+WHAT DOES NOT SURVIVE. The verdict in the sibling `.result.json`, and the correction that was built
+on top of it. Both dead drafts are parked in `drafts/` with a `.DEAD-false-premise-` suffix.
+
+WHY THE FILE STAYS. Commit 5de6b50 cites it by its old name and states the false premise in its own
+message. Deleting the file would leave that message unanswerable. See
+`probes/who_actually_posted_it_resolved_from_the_live_api.py`, which is the check that would have
+caught this before the first draft, and which now runs on every figure we attribute to ourselves.
+
+The original docstring follows, unedited, because a correction that hides what it corrects is worth
+less than the error.
+
+ORIGINAL, FALSE:
+
+    Every measurement of "our index" we published on claude-code#91188, against the file itself.
+
+    WHAT HAPPENED. Between 1 and 4 September we posted five measurements of our own memory index to
+    anthropics/claude-code#91188, as pm25coder. They form a coherent series, 15 lines to 20 to 21, each
+    introduced as a fresh measurement ("Re-measured on our side just now", "Measured ours this
+    afternoon"). None of them describes the file we keep, which held 208 to 221 lines and 26,000 to
+    28,384 bytes across the same days.
+
+    The series also contradicts itself. On 1 September the index was "nearly ASCII but not pure (10
+    non-ASCII characters)" at 1.010 bytes per unit. On 3 September the same index was "CJK-flavored"
+    and by 4 September 1.269 bytes per unit, with an explicit claim that nothing structural had
+    changed. Our real index is 1.005.
+
+    WHY THIS FILE EXISTS. A correction naming five errors has to enumerate them from the live comments
+    rather than from anyone's account of them, and it has to compare each with a measurement of the
+    file taken now. Otherwise the correction is one more assertion in the same series.
+
+    CONTROLS:
+      * EVERY PUBLISHED FIGURE IS FETCHED FROM ITS COMMENT. If a quoted figure is not in the comment
+        the correction attributes it to, the run refuses.
+      * THE GROUND TRUTH COMES FROM DATED BACKUPS that bracket each claim, so "the real file was
+        different" is anchored in time and not only in today's state.
+      * THE SEARCH THAT FINDS NOTHING MUST FIND SOMETHING. It has to locate the current index by its
+        own byte and line count before any "no file matches" verdict counts.
 """
 from __future__ import annotations
 

@@ -1,38 +1,65 @@
-"""Which file did our published 417.8 units per line describe?
+"""VOID. 417.8 units per line was never our figure, so there was nothing to retract.
 
-WHAT WE PUBLISHED. anthropics/claude-code#91188, comment 5538716005, 2026-09-04 09:48 UTC:
+CORRECTED 2026-09-04. This probe shipped as `our_published_units_per_line_belongs_to_no_file_here.py`
+and opened with "WHAT WE PUBLISHED. anthropics/claude-code#91188, comment 5538716005". Comment
+5538716005 was posted by `pm25coder`, resolved from the live GitHub API. It is not our account:
+`gh auth status` on this host holds exactly one token, `DanceNitra`.
 
-    MEMORY.md, English/CJK index, right now
-      21 lines
-      11,132 UTF-8 bytes
-       8,774 UTF-16 units   (0 astral)
-       1.269 bytes per unit
-      417.8 units per line
-      21 CRLF pairs / 0 LF-only
+So the question the file asks, "which file did OUR published 417.8 units per line describe", has a
+false subject. The answer "no file on this machine" is trivially true of another person's
+measurement of another person's file.
 
-and the conclusion drawn from it: "At 417.8 u/l our unit cap binds at ~line 60 and the line cap is
-decoration; no newline convention moves us across 125, so our binding dimension is stable by two
-orders of margin."
+WHAT SURVIVES, and it is the useful half. The measurement of our own index is sound and was run
+against dated backups: 221 lines, 28,384 bytes, 28,233 UTF-16 units, 127.8 units per line on
+2026-09-04, and 25 snapshots from 17 August spanning 80.2 to 163.6 units per line. That series is
+real and re-runnable. Our index sits near the 125 crossover; it is not immune to it.
 
-WHY IT MATTERS. The other participant is building an argument on that contrast, that his file sits
-in an unstable band near the 125 crossover while ours is immune. If our index is also in that band,
-the contrast is not there, and our own data supports his claim instead of bounding it.
+WHAT DOES NOT SURVIVE. The framing, the sibling `.result.json` verdict, and the retraction built on
+top of them, which is parked as `drafts/91188_correction.md.DEAD-false-premise-pm25coder-is-not-us`.
 
-WHAT THIS MEASURES, and it is deliberately narrow:
-  1. The agora memory index now, raw and with newlines collapsed, because the thread's whole
-     subject is that those differ.
-  2. Every archived copy of it, which gives a time series rather than the two points he has.
-  3. A search of every file named memory*.md under the profile for the published figures.
+WHY THE FILE STAYS. Commit ff71101 cites it by its old name and repeats the false premise in its own
+message. See `probes/who_actually_posted_it_resolved_from_the_live_api.py` for the check that makes
+this class of error non-repeatable.
 
-THE FIGURES ARE THE CLAIM, so the search has to be able to find a match if one exists. Its control
-is that the SAME search finds the current file by its own figures. Without that, "no file matches"
-would be indistinguishable from a broken search, which is the failure this repository keeps paying
-for.
+The original docstring follows, unedited.
 
-  * CONTROL A: searching for the current file's own byte count must return the current file.
-  * CONTROL B: the archived copies must actually differ from each other, or the "time series" is
-    one measurement repeated and says nothing about drift.
-  * CONTROL C: the crossover arithmetic is recomputed here, not quoted: 25000 / 200 = 125.
+ORIGINAL, FALSE:
+
+    Which file did our published 417.8 units per line describe?
+
+    WHAT WE PUBLISHED. anthropics/claude-code#91188, comment 5538716005, 2026-09-04 09:48 UTC:
+
+        MEMORY.md, English/CJK index, right now
+          21 lines
+          11,132 UTF-8 bytes
+           8,774 UTF-16 units   (0 astral)
+           1.269 bytes per unit
+          417.8 units per line
+          21 CRLF pairs / 0 LF-only
+
+    and the conclusion drawn from it: "At 417.8 u/l our unit cap binds at ~line 60 and the line cap is
+    decoration; no newline convention moves us across 125, so our binding dimension is stable by two
+    orders of margin."
+
+    WHY IT MATTERS. The other participant is building an argument on that contrast, that his file sits
+    in an unstable band near the 125 crossover while ours is immune. If our index is also in that band,
+    the contrast is not there, and our own data supports his claim instead of bounding it.
+
+    WHAT THIS MEASURES, and it is deliberately narrow:
+      1. The agora memory index now, raw and with newlines collapsed, because the thread's whole
+         subject is that those differ.
+      2. Every archived copy of it, which gives a time series rather than the two points he has.
+      3. A search of every file named memory*.md under the profile for the published figures.
+
+    THE FIGURES ARE THE CLAIM, so the search has to be able to find a match if one exists. Its control
+    is that the SAME search finds the current file by its own figures. Without that, "no file matches"
+    would be indistinguishable from a broken search, which is the failure this repository keeps paying
+    for.
+
+      * CONTROL A: searching for the current file's own byte count must return the current file.
+      * CONTROL B: the archived copies must actually differ from each other, or the "time series" is
+        one measurement repeated and says nothing about drift.
+      * CONTROL C: the crossover arithmetic is recomputed here, not quoted: 25000 / 200 = 125.
 """
 from __future__ import annotations
 

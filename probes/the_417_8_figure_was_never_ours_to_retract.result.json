@@ -1,4 +1,8 @@
 {
+ "VOID": true,
+ "void_reason": "Comment 5538716005 was posted by pm25coder, not by us. Resolved from the live GitHub API on 2026-09-04. The measurements of OUR OWN index in this receipt stand; the attribution of the 417.8 figure to us does not, and neither does the retraction built on it.",
+ "voided": "2026-09-04",
+ "voided_by": "probes/who_actually_posted_it_resolved_from_the_live_api.py",
  "script": "our_published_units_per_line_belongs_to_no_file_here.py",
  "published": {
   "lines": 21,

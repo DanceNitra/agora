@@ -1,21 +1,45 @@
-"""Re-derive every number in drafts/91188_correction.md, which is a public retraction.
+"""VOID. This gates a retraction that must never ship, because its premise was false.
 
-THIS IS ONE CHECK INSIDE VALIDATE. It is not the gate.
+CORRECTED 2026-09-04. Every figure this file reads back "from our own comment" lives in a comment
+posted by `pm25coder`, resolved from the live GitHub API. That is not our account; `gh` on this
+host holds one token, `DanceNitra`. Our two comments on anthropics/claude-code#91188 are
+5499087276 and 5521637024, and neither carries any withdrawn figure. There is nothing to retract.
 
-WHY IT IS STRICTER THAN USUAL. The draft says a number we published six hours ago was wrong and
-belongs to no file on this machine. A retraction carrying its own error is worse than the error it
-retracts, so every figure here is either recomputed from the live file or read from the receipt of
-the run that searched for it, and the published figures we are withdrawing are read back from the
-comment itself rather than retyped.
+The draft this gated is parked as
+`drafts/91188_correction.md.DEAD-false-premise-pm25coder-is-not-us`. Do not revive it.
 
-CONTROLS:
-  * THE WITHDRAWN FIGURES COME FROM THE LIVE COMMENT. If comment 5538716005 does not contain them,
-    the draft is retracting something we did not say.
-  * THE SEARCH THAT FOUND NOTHING MUST HAVE BEEN ABLE TO FIND SOMETHING. The measurement probe
-    asserts it locates the current index by its own figures; this refuses if that control is absent
-    from its receipt.
-  * COVERAGE over every decimal, every ordinal and every magnitude word in the draft.
-  * A MUTATION: a perturbed expectation must fail.
+WHAT THIS FILE STILL DEMONSTRATES, and the reason it is kept. It passed. It ran 48 checks over 42
+figures with zero unclaimed, a mutation control, and a check written specially for a retraction:
+every figure the draft attributes to a comment is fetched from that comment and must be in it.
+Every one of those checks was satisfied, on a draft whose central claim was false, because not one
+of them asked WHO wrote the comment. A gate that verifies each figure and never verifies the
+subject is the failure shape in `a-check-with-no-subject-passed-two-wrong-attributions`, and this
+is the cleanest specimen of it we hold.
+
+The check that closes the hole is `probes/who_actually_posted_it_resolved_from_the_live_api.py`.
+
+The original docstring follows, unedited.
+
+ORIGINAL, FALSE:
+
+    Re-derive every number in drafts/91188_correction.md, which is a public retraction.
+
+    THIS IS ONE CHECK INSIDE VALIDATE. It is not the gate.
+
+    WHY IT IS STRICTER THAN USUAL. The draft says a number we published six hours ago was wrong and
+    belongs to no file on this machine. A retraction carrying its own error is worse than the error it
+    retracts, so every figure here is either recomputed from the live file or read from the receipt of
+    the run that searched for it, and the published figures we are withdrawing are read back from the
+    comment itself rather than retyped.
+
+    CONTROLS:
+      * THE WITHDRAWN FIGURES COME FROM THE LIVE COMMENT. If comment 5538716005 does not contain them,
+        the draft is retracting something we did not say.
+      * THE SEARCH THAT FOUND NOTHING MUST HAVE BEEN ABLE TO FIND SOMETHING. The measurement probe
+        asserts it locates the current index by its own figures; this refuses if that control is absent
+        from its receipt.
+      * COVERAGE over every decimal, every ordinal and every magnitude word in the draft.
+      * A MUTATION: a perturbed expectation must fail.
 """
 from __future__ import annotations
 

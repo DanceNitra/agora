@@ -7,16 +7,18 @@ posts. Both were escapable. The inspeximus hook names its own escape: prefix
 checks nothing about the SHAPE of the command it then lets through, and the sender is a tool a
 session has to choose to invoke.
 
-It happened three times on anthropics/claude-code#91188. Comments 5493443058, 5522927403 and
-5538716005 were posted with a body of `@tmp/<file>.md`, the literal string, because `--body` takes
-text and only `--body-file` reads a file. Each was edited afterwards, one 15 hours later, so all
-eight live bodies read correctly today and the defect leaves no trace on the page. Notification
-emails are not editable.
+CORRECTED 2026-09-04. This used to read "It happened three times on anthropics/claude-code#91188",
+with those three comment ids attributed to us. Comments 5493443058, 5522927403 and 5538716005 were
+posted by `pm25coder`, resolved from the live GitHub API; our `gh` holds one token, `DanceNitra`.
+See `probes/who_actually_posted_it_resolved_from_the_live_api.py`. The failure mode is real and
+belongs to the tool: `--body` takes text and only `--body-file` reads a file, so `--body @path.md`
+posts the literal path, and a later edit repairs the page while the notification emails keep the
+original. What is corrected is who hit it. The checks below are unchanged.
 
 WHAT THIS CHECKS, by running the hook the way the harness runs it, on stdin, reading its exit code:
   1. EVERY WRITING FORM IS BLOCKED, including under `AGORA_OUTREACH_APPROVED=1`, because owner
      approval is not a claim about the command's shape.
-  2. THE EXACT COMMAND THAT CAUSED THIS is blocked, verbatim.
+  2. THE EXACT COMMAND SHAPE THAT CAUSED IT is blocked, verbatim.
   3. `gh api` with a writing method or field flag against a human-facing path is blocked. It is the
      back door: the same POST with none of the subcommand's shape.
   4. A WRAPPER IS UNWRAPPED: `bash -c "gh issue comment ..."` is blocked.

@@ -6,16 +6,24 @@ It requires the owner to have spoken after the draft was on screen. All of that 
 of it is OPT-IN: a session that calls `gh issue comment` directly meets none of it, and nothing
 stops that.
 
-It happened three times on anthropics/claude-code#91188. Comments 5493443058, 5522927403 and
-5538716005 were posted with a body of `@tmp/<file>.md`, the literal string, because `--body` takes
-text and only `--body-file` reads a file. Each was edited to the real content afterwards, one of
-them 15 hours later, so the web page reads correctly and the defect is invisible there. The
-notification emails are not editable: every subscriber to an Anthropic issue received a comment
-from us whose entire body was a path on this machine.
+CORRECTED 2026-09-04. This header used to say the failure was ours: "It happened three times on
+anthropics/claude-code#91188. Comments 5493443058, 5522927403 and 5538716005 were posted with a
+body of `@tmp/<file>.md` ... every subscriber received a comment from us whose entire body was a
+path on this machine." All three comments were posted by `pm25coder`, resolved from the live
+GitHub API. That is not our account. `gh` on this host holds exactly one token, `DanceNitra`, and
+our only two comments on that thread, 5499087276 and 5521637024, both carry `created_at` equal to
+`updated_at`. Neither was ever edited, so neither can have been repaired after a bad send. The
+incident was somebody else's, and we watched it.
+
+The observation that produced this hook is still worth acting on. `--body` takes text and only
+`--body-file` reads a file, so `--body @path.md` posts the literal string, and a later edit repairs
+the web page while the notification emails keep the original. That is a real failure mode of the
+tool we use, whoever hits it first.
 
 So the class is not "the wrong flag". The class is that our outbound gate is a tool we have to
 remember to use, on a machine where forgetting is the documented failure mode. This makes the gate
-the only door.
+the only door. The hook is unchanged by this correction: it was never justified by the incident
+alone, and it blocks the same commands it blocked before.
 
 WHAT IT BLOCKS. A Bash command that posts, edits or opens anything on a repository: `gh issue
 comment`, `gh pr comment`, `gh pr review`, `gh issue create`, `gh pr create`, `gh release create`,

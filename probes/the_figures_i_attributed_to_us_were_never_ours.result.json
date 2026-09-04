@@ -1,4 +1,8 @@
 {
+ "VOID": true,
+ "void_reason": "The five comments audited here were posted by pm25coder, not by us. Resolved from the live GitHub API on 2026-09-04. gh on this host holds one token, DanceNitra. Our comments on claude-code#91188 are 5499087276 and 5521637024 only. The comparison in this receipt has no subject and its verdict must not be cited.",
+ "voided": "2026-09-04",
+ "voided_by": "probes/who_actually_posted_it_resolved_from_the_live_api.py",
  "script": "five_published_measurements_of_an_index_we_do_not_have.py",
  "now": {
   "lines": 221,

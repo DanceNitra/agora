@@ -1,4 +1,8 @@
 {
+ "VOID": true,
+ "void_reason": "Gates a retraction whose premise was false. The figures it verified were published by pm25coder, not by us; resolved from the live GitHub API on 2026-09-04. Every check passed and none of them asked who wrote the comment.",
+ "voided": "2026-09-04",
+ "voided_by": "probes/who_actually_posted_it_resolved_from_the_live_api.py",
  "script": "recheck_figures_91188_correction.py",
  "draft": "drafts\\91188_correction.md",
  "checks": [

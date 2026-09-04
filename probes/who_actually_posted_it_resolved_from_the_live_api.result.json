@@ -1,0 +1,70 @@
+{
+ "verdict": "MISATTRIBUTED",
+ "repo": "anthropics/claude-code",
+ "issue": 91188,
+ "local_gh_identities": [
+  "DanceNitra"
+ ],
+ "comments_on_thread": 16,
+ "authors": [
+  "DanceNitra",
+  "pm25coder",
+  "tonydzi"
+ ],
+ "our_comments_on_this_thread": [
+  "5499087276",
+  "5521637024"
+ ],
+ "claimed_as_ours_but_are_not": [
+  "5493443058",
+  "5495840695",
+  "5498341230",
+  "5522927403",
+  "5533605446",
+  "5538716005"
+ ],
+ "per_claim": [
+  {
+   "comment": "5493443058",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  },
+  {
+   "comment": "5495840695",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  },
+  {
+   "comment": "5498341230",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  },
+  {
+   "comment": "5522927403",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  },
+  {
+   "comment": "5533605446",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  },
+  {
+   "comment": "5538716005",
+   "author": "pm25coder",
+   "claimed_as_ours": true,
+   "actually_ours": false
+  }
+ ],
+ "controls": {
+  "positive_control_id": "5499087276",
+  "positive_control_author": "DanceNitra",
+  "negative_control_id": "5538716005",
+  "negative_control_author": "pm25coder"
+ }
+}
