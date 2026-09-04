@@ -1,0 +1,11 @@
+{
+ "script": "the_outbound_gate_is_a_door_not_an_option.py",
+ "blocked": 13,
+ "allowed": 9,
+ "fails_closed": true,
+ "wired_for_bash": true,
+ "approval_env_var_does_not_bypass": true,
+ "wrapper_unwrapped": true,
+ "mention_is_not_an_invocation": true,
+ "verbatim_incident_command_blocked": "gh issue comment 91188 -R anthropics/claude-code --body \"@tmp/r112_91188_tonydzi_reply.md\""
+}
