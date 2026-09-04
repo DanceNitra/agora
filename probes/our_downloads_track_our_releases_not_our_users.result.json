@@ -1,0 +1,52 @@
+{
+ "verdict": "DOWNLOADS_TRACK_OUR_RELEASES",
+ "us": {
+  "package": "inspeximus",
+  "measurable": true,
+  "releases_in_window": 15,
+  "median_on_release_day": 375,
+  "median_on_quiet_day": 111,
+  "spike": 3.38,
+  "daily_median": 245.0,
+  "quietest_day": 17
+ },
+ "controls": [
+  {
+   "package": "mem0ai",
+   "measurable": true,
+   "releases_in_window": 4,
+   "median_on_release_day": 157548.0,
+   "median_on_quiet_day": 100857.0,
+   "spike": 1.56,
+   "daily_median": 104363.5,
+   "quietest_day": 38294
+  },
+  {
+   "package": "zep-cloud",
+   "measurable": true,
+   "releases_in_window": 3,
+   "median_on_release_day": 7631,
+   "median_on_quiet_day": 10837,
+   "spike": 0.7,
+   "daily_median": 10625.5,
+   "quietest_day": 4828
+  },
+  {
+   "package": "chromadb",
+   "measurable": false,
+   "why": "the window holds 0 release days and 30 quiet days; a ratio needs both"
+  },
+  {
+   "package": "langchain-core",
+   "measurable": true,
+   "releases_in_window": 5,
+   "median_on_release_day": 6194363,
+   "median_on_quiet_day": 5284388,
+   "spike": 1.17,
+   "daily_median": 5331924.5,
+   "quietest_day": 3868734
+  }
+ ],
+ "adopted_max_declared_before_reading": 2.0,
+ "highest_control_spike": 1.56
+}
