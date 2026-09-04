@@ -40,28 +40,56 @@ LINE_CAP, UNIT_CAP = 200, 25000
 NL = chr(10)
 CR = chr(13)
 
-# Slugs demoted out of "Recent / open". Named by slug, not by line number, so re-running after an
-# edit cannot demote whatever happens to sit at that offset.
+# Slugs demoted out of the index. Named by slug, not by line number, so re-running after an
+# edit cannot demote whatever happens to sit at that offset. One slug per LINE is enough: a line
+# carrying two pointers moves whole, and both land in the archive.
+#
+# 2026-09-04 list. The 2026-08-26 list is gone from the index, so the tool refused with all 19
+# targets missing, which is the check working. The criterion is unchanged: a ONE-OFF domain result
+# leaves, a cross-cutting working rule stays.
+#
+# WHAT THE CUT WAS COSTING TODAY. At 224 lines the loader delivered 189, so the whole
+# "Collaborations / projects" and "Infra / ops" sections never reached a session, including the
+# live Marat and EDRN pointers and `claude-inbox-pending-field`, the .pending gotcha CLAUDE.md
+# calls out by name. Eleven "Benchmarks / laws" lines were already outside the window, so moving
+# those to the archive costs nothing that was arriving.
 DEMOTE = [
-    "the-gate-turned-my-finding-into-a-retraction",
-    "we-built-the-answer-and-linked-it-from-nowhere",
-    "the-report-template-cannot-hold-an-auditor-side-report",
-    "a-degeneracy-splits-a-result-in-half",
-    "a-cherry-pick-from-a-behind-branch-reverts-the-page",
-    "a-warning-that-cannot-fire-and-a-report-not-bound-to-its-population",
-    "a-size-is-not-a-consequence-twelve-ignored-warnings",
-    "the-second-anthropic-gap-hunt-also-found-nothing",
-    "a-true-boolean-whose-truth-expires",
-    "an-ensemble-member-that-is-the-degenerate-endpoint",
-    "pairwise-interval-overlap-is-not-a-trend-test",
-    "one-realisation-cannot-establish-a-trend",
-    "real-vector-sampling-cannot-see-a-degeneracy",
-    "a-revert-leaves-the-abandoned-value-active",
-    "the-question-type-not-the-control-set-the-ceiling",
-    "a-reason-invented-on-someones-behalf",
-    "a-literature-panel-cannot-catch-a-wrong-measurement",
-    "a-store-that-accepts-a-malformed-write-and-says-ok",
-    "our-orcid-and-publication-affiliation",
+    # Recent / open: settled one-off results. The EDRN and TAT rules that still bind live in the
+    # Collaborations section and in the files themselves.
+    "the-threshold-that-made-a-notice-immortal",
+    "the-biggest-spender-was-scoring-itself",
+    "a-real-rotation-cannot-reach-a-complex-manifold",
+    "the-file-we-dismissed-was-the-correct-method",
+    "the-grid-we-told-him-to-use-produced-none-of-his-numbers",
+    "awesome-ai-agents-merged-limitations-were-the-reason",
+    "i-burned-a-session-on-agents-instead-of-asking-for-a-file",
+    "the-registry-did-not-contain-the-field-the-task-assumed",
+    "meta-sha-is-wasgeneratedby-not-wasderivedfrom",
+    "a-hung-xdist-worker-has-no-pytest-in-its-name",
+    "erasure-verification-is-a-market-someone-already-sells",
+    "a-gate-can-measure-the-machine-not-the-code",
+    "zero-of-24-surfaces-demonstrated",
+    "our-pypi-downloads-are-not-people",
+    # Benchmarks / laws: every one of these was already past the cut and reaching nobody.
+    "prediction-ledger-is-reliably-worse-than-chance",
+    "ramr-integrity-conditioned-recall-metric",
+    "adversarial-conflict-the-real-inspeximus-moat",
+    "separability-ceiling-synthesis",
+    "scarce-memory-eviction-regime-law",
+    "replication-prediction-program",
+    "two-channel-freshness-poison-pareto",
+    "layer2-veracity-frontier-to-bedrock",
+    "grounding-meter-capstone",
+    "cascade-fidelity-B-killed-at-gate",
+    "match-organ-is-cost-of-rigor-not-leak",
+    # Collaborations: stale project pointers. Marat, EDRN, HOTRG and the arXiv rule stay.
+    "kgai-converged-on-our-design-and-has-the-two-things-we-lack",
+    "adk-docs-open-but-maturity-gated",
+    "folklore-index-hf-published",
+    "agent-memory-observatory-frontier",
+    "ramr-outreach-candidates",
+    "github-pages-root-robots-and-indexing",
+    "agora-idea-forge",
 ]
 
 HEADER = [
@@ -89,8 +117,25 @@ def as_written(lines: list) -> str:
     return EOL.join(lines) + EOL
 
 
+# CORRECTED 2026-09-04. This used to read `[a-z0-9\-]+`, which is blind to any slug carrying an
+# uppercase letter: `cascade-fidelity-B-killed-at-gate.md` and
+# `competitors-CAN-erase-revert-inspeximus-moat-is-determinism.md` were both invisible to it. The
+# pointer-set comparison is the one check that makes this tool safe to run, so a reader that cannot
+# see a pointer would have passed a trim that deleted it. Caught by the check refusing its own run.
+POINTER = re.compile(r"\(([A-Za-z0-9._\-]+\.md)\)")
+
+
 def pointers(t: str) -> set:
-    return set(re.findall(r"\(([a-z0-9\-]+\.md)\)", t))
+    return set(POINTER.findall(t))
+
+
+def _reader_control() -> None:
+    """The pointer reader must see a mixed-case pointer, or every set comparison below is void."""
+    probe = "- [x](a-lower-case.md) and [y](cascade-fidelity-B-killed-at-gate.md)"
+    seen = pointers(probe)
+    if seen != {"a-lower-case.md", "cascade-fidelity-B-killed-at-gate.md"}:
+        raise SystemExit("REFUSED: the pointer reader saw %r, so it cannot see every pointer and "
+                         "NO_POINTER_WAS_LOST would pass a trim that lost one" % sorted(seen))
 
 
 def window(lines: list) -> int:
@@ -109,6 +154,7 @@ def window(lines: list) -> int:
 
 def main() -> int:
     global EOL
+    _reader_control()
     raw = io.open(INDEX, "rb").read().decode("utf-8")     # binary: text mode eats the CRs
     crlf = CR + NL in raw
     EOL = (CR + NL) if crlf else NL
@@ -156,7 +202,7 @@ def main() -> int:
 
     # --- 4. append the demoted entries to the archive ----------------------------------------------
     arch = io.open(ARCHIVE, "rb").read().decode("utf-8") if os.path.exists(ARCHIVE) else ""
-    add = (NL + "## Demoted from the index 2026-08-26, to fit the loader window" + NL + NL
+    add = (NL + "## Demoted from the index 2026-09-04, to fit the loader window" + NL + NL
            + NL.join(demoted) + NL)
     arch_new = arch.rstrip(NL) + NL + add
 
