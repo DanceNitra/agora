@@ -1,0 +1,232 @@
+{
+ "script": "recheck_figures_91188_correction.py",
+ "draft": "drafts\\91188_correction.md",
+ "checks": [
+  {
+   "label": "our lines now",
+   "expected": 221.0,
+   "found": 221.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "our bytes now",
+   "expected": 28384.0,
+   "found": 28384.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "our units now",
+   "expected": 28233.0,
+   "found": 28233.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "our bytes per unit",
+   "expected": 1.005,
+   "found": 1.0053483512202033,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "our units per line",
+   "expected": 127.8,
+   "found": 127.75113122171946,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "our CRLF pairs",
+   "expected": 221.0,
+   "found": 221.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "astral characters",
+   "expected": 0.0,
+   "found": 0.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "margin above the crossover",
+   "expected": 2.8,
+   "found": 2.7511312217194615,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "unit cap binds at line",
+   "expected": 195.7,
+   "found": 195.6929833882336,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "files searched",
+   "expected": 97.0,
+   "found": 97.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "snapshots",
+   "expected": 25.0,
+   "found": 25.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "range low",
+   "expected": 80.2,
+   "found": 80.20161290322581,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "range high",
+   "expected": 163.6,
+   "found": 163.61157024793388,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "within 10 of the crossover",
+   "expected": 22.0,
+   "found": 22.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-21 lines",
+   "expected": 200.0,
+   "found": 200.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-21 u/l",
+   "expected": 118.8,
+   "found": 118.825,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-21 margin",
+   "expected": -6.2,
+   "found": -6.174999999999997,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-22 lines",
+   "expected": 207.0,
+   "found": 207.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-22 u/l",
+   "expected": 124.5,
+   "found": 124.512077294686,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-22 margin",
+   "expected": -0.5,
+   "found": -0.4879227053140056,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-26 lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-26 u/l",
+   "expected": 129.6,
+   "found": 129.63636363636363,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-26 margin",
+   "expected": 4.6,
+   "found": 4.636363636363626,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-21 second snapshot margin",
+   "expected": -4.1,
+   "found": -4.135000000000005,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "2026-08-21 second snapshot u/l",
+   "expected": 120.9,
+   "found": 120.865,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "withdrawn lines",
+   "expected": 21.0,
+   "found": 21.0,
+   "ok": true,
+   "source": "our own comment"
+  },
+  {
+   "label": "withdrawn bytes",
+   "expected": 11132.0,
+   "found": 11132.0,
+   "ok": true,
+   "source": "our own comment"
+  },
+  {
+   "label": "withdrawn units",
+   "expected": 8774.0,
+   "found": 8774.0,
+   "ok": true,
+   "source": "our own comment"
+  },
+  {
+   "label": "withdrawn bytes per unit",
+   "expected": 1.269,
+   "found": 1.269,
+   "ok": true,
+   "source": "our own comment"
+  },
+  {
+   "label": "withdrawn units per line",
+   "expected": 417.8,
+   "found": 417.8,
+   "ok": true,
+   "source": "our own comment"
+  },
+  {
+   "label": "the crossover",
+   "expected": 125.0,
+   "found": 125.0,
+   "ok": true,
+   "source": "recomputed, 25000/200"
+  }
+ ],
+ "failed": 0,
+ "figures": 26,
+ "controls": {
+  "withdrawn_figures_read_from_the_live_comment": true,
+  "search_control_present": true,
+  "mutation_rejected": true,
+  "coverage_enforced": true
+ },
+ "verdict": "PASS"
+}

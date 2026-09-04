@@ -54,6 +54,11 @@ PROBES = os.path.join(ROOT, "probes")
 # not. Four significant digits is where a coincidence stops being plausible.
 NUM = re.compile(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])")
 
+# A YEAR IS NOT A FINGERPRINT. The first live run flagged two claims as already said because
+# "2026" appears in the other party's comments, which it does in every comment anyone dates.
+# Four-digit integers in the calendar range carry no identity, so they are dropped.
+YEARISH = re.compile(r"^(1[89]\d\d|20\d\d|21\d\d)$")
+
 SELF_CLAIM = re.compile(r"\b(i (?:told|answered|said|sent|wrote|replied|showed)|"
                         r"as i (?:said|wrote|showed)|my (?:earlier|previous) (?:comment|reply))\b",
                         re.I)
@@ -64,7 +69,8 @@ RANK_WORD = re.compile(r"\b(percentile|\d+(?:st|nd|rd|th)\b|rank(?:ed|s|ing)?|me
 # cleared the very sentence the check exists for. And a loose `of the <word>` clause cleared "the
 # 97th percentile OF THE 190-pair population", where "of the population" says which set was ranked
 # and nothing at all about what it was ranked on. Only these phrasings name an axis.
-UNIT_WORD = re.compile(r"(ranked (?:on|by)|as a fraction of|in absolute terms|"
+UNIT_WORD = re.compile(r"(units? per line|bytes? per unit|u/l|b/u|per line|per unit|"
+                       r"ranked (?:on|by)|as a fraction of|in absolute terms|"
                        r"absolute (?:deviation|value|terms)|raw (?:deviation|value|score)|"
                        r"normalis(?:ed|ing) by|normaliz(?:ed|ing) by|per unit|"
                        r"divided by|relative to (?:its|each|the) own)", re.I)
@@ -179,7 +185,7 @@ def check(claims, thread, archive, receipts, ours):
     print()
     results = []
     for c in claims:
-        nums = sorted(set(NUM.findall(c)))
+        nums = sorted(n for n in set(NUM.findall(c)) if not YEARISH.match(n))
         w = words(c)
         hits = []
         for cid, who, when, body in thread:

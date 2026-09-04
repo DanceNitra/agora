@@ -1,0 +1,103 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#91188",
+ "claims": 8,
+ "worth_writing": 8,
+ "blocked": 0,
+ "numbers_examined": [
+  "11132",
+  "28233",
+  "28384",
+  "5538716005"
+ ],
+ "results": [
+  {
+   "claim": "Our comment 5538716005 published 417.8 units per line for a 21-line, 11132-byte MEMORY.md, and no file named memory*.md on this machine carries those figures.",
+   "verdict": "NEW",
+   "numbers": [
+    "11132",
+    "5538716005"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": [
+    "5538716005"
+   ]
+  },
+  {
+   "claim": "The agora memory index measures 221 lines, 28384 bytes, 28233 UTF-16 units, 127.8 units per line, and 221 CRLF pairs.",
+   "verdict": "NEW",
+   "numbers": [
+    "28233",
+    "28384"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "At 127.8 units per line our index sits 2.8 units above the 125 crossover, not two orders of magnitude from it.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Twenty-four archived copies plus the live file give 25 snapshots from 2026-08-17 to 2026-09-04, ranging from 80.2 to 163.6 units per line, and 22 of the 25 sit within 10 units of the 125 crossover.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our index was at 129.6 units per line on 2026-08-26 and 127.8 today, so it has stayed inside the flip band for at least nine days.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "At 127.8 units per line the unit cap binds at line 195.7 and the line cap at line 200, so on our file the unit cap binds first by 4.3 lines.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The conclusion we drew, that our binding dimension is stable by two orders of margin, is false for the file we actually keep.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our own data therefore supports the drift argument rather than bounding it, because we have twenty-five snapshots and they move.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
