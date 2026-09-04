@@ -1675,7 +1675,14 @@ async def _brain_ecosystem_tick(app: FastAPI):
     # genuinely can, the rest pass (honestly logged). A rapporteur synthesizes one grounded
     # Contribution from the multi-agent exchange. Replaces the old dungeon-fiction pairwise chat
     # that burned ~2.36M tokens for zero captured value.
-    if len(npcs) >= 2 and random.random() < 0.5:
+    # OFF BY DEFAULT since 2026-09-04. The seminar is the brain's largest spender (66% of metered
+    # model calls) and, measured over its first 79 days, produced 3,514 contributions that NO other
+    # organ has ever cited: zero contribution ids appear in .canon, .flywheel, .methods, .press or
+    # any other ledger, against a positive control where lab ids appear in 20 of them. It stays off
+    # until a consumer exists, because paying for claims nobody reads is the whole defect.
+    # Set AGORA_SEMINAR=1 to run it again.
+    _seminar_on = os.getenv("AGORA_SEMINAR", "0").strip().lower() in ("1", "on", "true", "yes")
+    if _seminar_on and len(npcs) >= 2 and random.random() < 0.5:
         async def _run_seminar():
             try:
                 from agora.execution import seminar

@@ -680,11 +680,58 @@ def verify_contributions(limit: int = 500) -> dict:
             "total_verified": sum(1 for c in contribs if c.get("verified")), "total": len(contribs)}
 
 
+# Ledgers where a contribution has to LAND before it counts as value. Anything the seminar writes
+# itself is excluded on purpose: .contributions.json and .topics.json are the seminar's own output,
+# and a score read from them is the talk grading the talk.
+_DOWNSTREAM = ("canon", "flywheel", "hypotheses", "predictions", "replications", "press",
+               "methods", "theory", "analogies", "ideation", "cartography", "claude_inbox",
+               "programs", "oracle", "campaigns", "actions")
+
+_consumed_cache: dict = {"key": None, "ids": frozenset()}
+
+
+def _consumed_ids() -> frozenset:
+    """Contribution ids that some OTHER organ has cited. Cached on the ledgers' mtimes."""
+    paths = [_SERVER / (".%s.json" % n) for n in _DOWNSTREAM]
+    key = tuple((p.name, p.stat().st_mtime_ns if p.exists() else 0) for p in paths)
+    if _consumed_cache["key"] == key:
+        return _consumed_cache["ids"]
+    ids = {str(c.get("id")) for c in _load(_CONTRIB, []) if c.get("id")}
+    ids = {i for i in ids if len(i) >= 6}
+    found = set()
+    for p in paths:
+        if not p.exists():
+            continue
+        try:
+            txt = p.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+        found |= {i for i in ids if i in txt}
+    _consumed_cache["key"], _consumed_cache["ids"] = key, frozenset(found)
+    return _consumed_cache["ids"]
+
+
 def value_points() -> float:
-    """Seminar value for the Metabolism: 1 per grounded contribution, +2 if later verified."""
-    contribs = _load(_CONTRIB, [])
-    return float(sum(1 for c in contribs if c.get("grounded"))
-                 + 2 * sum(1 for c in contribs if c.get("verified")))
+    """Seminar value for the Metabolism: contributions ANOTHER organ actually used.
+
+    WHY IT IS NOT A COUNT OF CONTRIBUTIONS. It was, for three months, and that is why every fix to
+    the seminar failed. The metric read 1 per grounded claim and 2 per verified one straight out of
+    `.contributions.json`, which the seminar writes. Talking therefore raised the seminar's own ROI,
+    the churn detector saw a healthy organ, and nothing ever flagged it.
+
+    Measured 2026-09-04 on 79 days of output: 3,514 contributions, 98% grounded, 78% verified,
+    100% textually distinct, scoring 8,914 points under the old formula. Contribution ids cited by
+    any other ledger: ZERO. The positive control matters here, because the same search over lab ids
+    (also short hex) finds them in 20 files including .canon.json and .methods.json, so the search
+    can see a reference when one exists. Under this definition the same 79 days score 0.0, which is
+    the honest number and lets the churn detector do its job.
+
+    A contribution earns 3 points once another organ cites its id. Grounding and verification are
+    entry requirements, not value: they are judged by the same run that produced the claim.
+    """
+    consumed = _consumed_ids()
+    by_id = {str(c.get("id")): c for c in _load(_CONTRIB, [])}
+    return float(3 * sum(1 for i in consumed if by_id.get(i)))
 
 
 def seminar_stats() -> dict:

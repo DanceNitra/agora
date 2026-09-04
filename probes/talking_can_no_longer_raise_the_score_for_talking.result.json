@@ -1,0 +1,26 @@
+{
+ "script": "talking_can_no_longer_raise_the_score_for_talking.py",
+ "live_contributions": 3514,
+ "live_score": 0.0,
+ "live_consumed": 0,
+ "retired_formula_on_same_file": 8914.0,
+ "check_1_talk_gain": 0.0,
+ "check_1_retired_formula_gain": 1500.0,
+ "check_2_citation_gain": 3.0,
+ "control_lab_ids_found_in": [
+  "canon",
+  "predictions",
+  "replications",
+  "press",
+  "methods",
+  "theory",
+  "analogies",
+  "ideation",
+  "cartography",
+  "claude_inbox",
+  "programs",
+  "oracle",
+  "campaigns"
+ ],
+ "verdict": "SELF_SCORING_REMOVED"
+}
