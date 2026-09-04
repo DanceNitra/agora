@@ -1,0 +1,273 @@
+{
+ "verdict": "PASS",
+ "checks": 38,
+ "failed": [],
+ "results": [
+  {
+   "check": "pretrim lines",
+   "expected": 224,
+   "actual": 224,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "pretrim units",
+   "expected": 28908,
+   "actual": 28908,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "pretrim u/l",
+   "expected": 129.05,
+   "actual": 129.05357142857142,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "pretrim margin",
+   "expected": 4.05,
+   "actual": 4.053571428571416,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "live lines",
+   "expected": 192,
+   "actual": 192,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "live units",
+   "expected": 23911,
+   "actual": 23911,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "live u/l",
+   "expected": 124.54,
+   "actual": 124.53645833333333,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "live margin",
+   "expected": -0.46,
+   "actual": -0.4635416666666714,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "rows removed",
+   "expected": 32,
+   "actual": 32,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "the move, in units per line",
+   "expected": 4.5,
+   "actual": 4.517113095238088,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "snapshots",
+   "expected": 26,
+   "actual": 26,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "within 10 of the crossover",
+   "expected": 23,
+   "actual": 23,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "unit cap",
+   "expected": 25000,
+   "actual": 25000,
+   "ok": true,
+   "source": "loader constant, re-derived in the probe"
+  },
+  {
+   "check": "snapshots at or above 195 lines",
+   "expected": 23,
+   "actual": 23,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "snapshots in the 19-21 Aug window",
+   "expected": 21,
+   "actual": 21,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "snapshots on 20 Aug alone",
+   "expected": 14,
+   "actual": 14,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "most-repeated state count",
+   "expected": 3,
+   "actual": 3,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "near-crossover points from that window",
+   "expected": 19,
+   "actual": 19,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "transitions in the series",
+   "expected": 25,
+   "actual": 25,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "rank of today's move",
+   "expected": 6,
+   "actual": 6,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "largest transition",
+   "expected": 83,
+   "actual": 83.40149293521728,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "second largest",
+   "expected": 43,
+   "actual": 43.20645161290324,
+   "ok": true,
+   "source": "computed"
+  },
+  {
+   "check": "the crossover",
+   "expected": 125,
+   "actual": 125.0,
+   "ok": true,
+   "source": "receipt, recomputed from the caps"
+  },
+  {
+   "check": "the within-band percentage the draft declines to lead with",
+   "expected": 88,
+   "actual": 88,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "the line cap",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "source": "loader constant"
+  },
+  {
+   "check": "the at-the-cap threshold used above",
+   "expected": 195,
+   "actual": 195,
+   "ok": true,
+   "source": "stated in the draft"
+  },
+  {
+   "check": "trim tool's unstripped unit count",
+   "expected": 28910,
+   "actual": 28910,
+   "ok": true,
+   "source": "the file, unstripped"
+  },
+  {
+   "check": "lines the loader was dropping",
+   "expected": 35,
+   "actual": 35,
+   "ok": true,
+   "source": "the loader algorithm, re-implemented"
+  },
+  {
+   "check": "late-August u/l is around 118",
+   "expected": 118,
+   "actual": 119,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "u/l on 26 Aug",
+   "expected": 129,
+   "actual": 129.6267942583732,
+   "ok": true,
+   "source": "receipt"
+  },
+  {
+   "check": "comments using removal vocabulary",
+   "expected": 9,
+   "actual": 9,
+   "ok": true,
+   "source": "live API"
+  },
+  {
+   "check": "sentences tying removal to the ratio",
+   "expected": 0,
+   "actual": 0,
+   "ok": true,
+   "source": "live API, the subject check"
+  },
+  {
+   "check": "Azure quote present verbatim at its URL",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "source": "https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-flapping"
+  },
+  {
+   "check": "Microsoft's own words for the remedy are quoted",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "source": "https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-flapping"
+  },
+  {
+   "check": "'deadband' is NOT Microsoft's word",
+   "expected": 0,
+   "actual": 0,
+   "ok": true,
+   "source": "https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-flapping"
+  },
+  {
+   "check": "'hysteresis' is NOT Microsoft's word",
+   "expected": 0,
+   "actual": 0,
+   "ok": true,
+   "source": "https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-flapping"
+  },
+  {
+   "check": "no unclaimed figures in the draft",
+   "expected": [],
+   "actual": [],
+   "ok": true,
+   "source": "draft"
+  },
+  {
+   "check": "CONTROL: a mutated figure is detectable",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "source": "mutation"
+  }
+ ]
+}

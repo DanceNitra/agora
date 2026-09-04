@@ -6,7 +6,7 @@
  "backups_on_disk": 25,
  "live_file_included": true,
  "first": "2026-08-17 19:26",
- "last": "2026-09-04 20:30",
+ "last": "2026-09-04 20:43",
  "upl_min": 80.19354838709677,
  "upl_max": 163.59504132231405,
  "within_band": 23,
@@ -14,6 +14,7 @@
  "below_crossover": 22,
  "live": {
   "path": "MEMORY.md",
+  "sha256": "28b5b7e2be0b75a8",
   "mtime": "2026-09-04 20:30",
   "lines": 192,
   "bytes": 24042,
@@ -28,6 +29,7 @@
  "series": [
   {
    "path": "MEMORY.md.bak-20260817",
+   "sha256": "cf93701ed6dfbcec",
    "mtime": "2026-08-17 19:26",
    "lines": 146,
    "bytes": 24013,
@@ -41,6 +43,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-precrowdfix",
+   "sha256": "fdd5ee7dad37b11c",
    "mtime": "2026-08-19 14:26",
    "lines": 121,
    "bytes": 20018,
@@ -54,6 +57,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewrittenlines",
+   "sha256": "0176e709cca296c0",
    "mtime": "2026-08-19 21:54",
    "lines": 248,
    "bytes": 19988,
@@ -67,6 +71,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit",
+   "sha256": "4b718968d7ea2734",
    "mtime": "2026-08-19 22:30",
    "lines": 200,
    "bytes": 24921,
@@ -80,6 +85,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-secondpass",
+   "sha256": "1a4a796be3ea1100",
    "mtime": "2026-08-19 22:30",
    "lines": 201,
    "bytes": 25137,
@@ -93,6 +99,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-2",
+   "sha256": "cf6fd7de7b0db19e",
    "mtime": "2026-08-19 23:06",
    "lines": 200,
    "bytes": 23977,
@@ -106,6 +113,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-3",
+   "sha256": "031e52003d9a866e",
    "mtime": "2026-08-20 06:55",
    "lines": 201,
    "bytes": 24201,
@@ -119,6 +127,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-4",
+   "sha256": "668ea9f16826a23c",
    "mtime": "2026-08-20 07:38",
    "lines": 201,
    "bytes": 24254,
@@ -132,6 +141,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-5",
+   "sha256": "89b290737f8f2696",
    "mtime": "2026-08-20 08:02",
    "lines": 201,
    "bytes": 24142,
@@ -145,6 +155,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-6",
+   "sha256": "0410264248e34f76",
    "mtime": "2026-08-20 08:02",
    "lines": 200,
    "bytes": 23881,
@@ -158,6 +169,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-7",
+   "sha256": "0410264248e34f76",
    "mtime": "2026-08-20 08:37",
    "lines": 200,
    "bytes": 23881,
@@ -171,6 +183,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-8",
+   "sha256": "1d081112a1636301",
    "mtime": "2026-08-20 09:29",
    "lines": 201,
    "bytes": 24117,
@@ -184,6 +197,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-9",
+   "sha256": "9682506f46f147f3",
    "mtime": "2026-08-20 09:29",
    "lines": 200,
    "bytes": 23906,
@@ -197,6 +211,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260820-prewindowdrop",
+   "sha256": "0410264248e34f76",
    "mtime": "2026-08-20 09:29",
    "lines": 200,
    "bytes": 23881,
@@ -210,6 +225,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-10",
+   "sha256": "0f7ec3a48017b73f",
    "mtime": "2026-08-20 09:44",
    "lines": 200,
    "bytes": 23943,
@@ -223,6 +239,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-11",
+   "sha256": "51b58693a8235fbf",
    "mtime": "2026-08-20 10:06",
    "lines": 201,
    "bytes": 24161,
@@ -236,6 +253,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-12",
+   "sha256": "55184778e1ce1055",
    "mtime": "2026-08-20 10:06",
    "lines": 200,
    "bytes": 23884,
@@ -249,6 +267,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-13",
+   "sha256": "37abc707c674c5bd",
    "mtime": "2026-08-20 10:22",
    "lines": 200,
    "bytes": 23919,
@@ -262,6 +281,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-14",
+   "sha256": "63846839b8b79232",
    "mtime": "2026-08-20 11:44",
    "lines": 201,
    "bytes": 24184,
@@ -275,6 +295,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-15",
+   "sha256": "d604a260115b0f5f",
    "mtime": "2026-08-20 17:25",
    "lines": 201,
    "bytes": 24009,
@@ -288,6 +309,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260821-prewindowlaw",
+   "sha256": "ccf40389dbdd5769",
    "mtime": "2026-08-21 05:12",
    "lines": 200,
    "bytes": 23973,
@@ -301,6 +323,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260819-prewindowfit-16",
+   "sha256": "aea90bbde94b9d24",
    "mtime": "2026-08-21 09:08",
    "lines": 200,
    "bytes": 24387,
@@ -314,6 +337,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260822-preindextrim",
+   "sha256": "e0aa70aa79219dcf",
    "mtime": "2026-08-22 21:37",
    "lines": 207,
    "bytes": 25999,
@@ -327,6 +351,7 @@
   },
   {
    "path": "MEMORY.md.bak-20260826-084608",
+   "sha256": "755155048557b1c2",
    "mtime": "2026-08-26 08:46",
    "lines": 209,
    "bytes": 27317,
@@ -339,21 +364,8 @@
    "margin": 4.626794258373195
   },
   {
-   "path": "MEMORY.md.bak-20260904-pretrim",
-   "mtime": "2026-09-04 19:25",
-   "lines": 224,
-   "bytes": 29059,
-   "units": 28908,
-   "units_lf": 28685,
-   "crlf": 223,
-   "astral": 0,
-   "non_ascii": 105,
-   "upl": 129.05357142857142,
-   "margin": 4.053571428571416,
-   "mtime_is_copy_time": true
-  },
-  {
    "path": "MEMORY.md (live)",
+   "sha256": "28b5b7e2be0b75a8",
    "mtime": "2026-09-04 20:30",
    "lines": 192,
    "bytes": 24042,
@@ -364,6 +376,23 @@
    "non_ascii": 87,
    "upl": 124.53645833333333,
    "margin": -0.4635416666666714
+  },
+  {
+   "path": "MEMORY.md.bak-20260904-pretrim",
+   "sha256": "3cbf2ed5036fd09f",
+   "mtime": "2026-09-04 20:43",
+   "lines": 224,
+   "bytes": 29059,
+   "units": 28908,
+   "units_lf": 28685,
+   "crlf": 223,
+   "astral": 0,
+   "non_ascii": 105,
+   "upl": 129.05357142857142,
+   "margin": 4.053571428571416,
+   "reconstructed": true,
+   "mtime_is_when_the_file_was_restored": true,
+   "corroborated_by": "sha256 identical to the working copy; trim_memory_index.py printed 224 lines / 28,910 units unstripped at run time"
   }
  ]
 }
