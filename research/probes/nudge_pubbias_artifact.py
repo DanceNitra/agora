@@ -75,8 +75,8 @@ def main():
     control = mean_ratio(OTHER_N)   # equal n both domains -> symmetric bias -> ratio ~1.0
 
     print(f"True between-domain ratio      = 1.00   (identical true effect d={TRUE_D} in every domain)")
-    print(f"Pooled 'food'  effect (n=30)   = {food_pooled:.2f}   (true 0.20, inflated by the filter)")
-    print(f"Pooled 'other' effect (n=300)  = {other_pooled:.2f}   (true 0.20, barely inflated)")
+    print(f"Pooled 'food'  effect (n=30)   = {food_pooled:.2f}   (true {TRUE_D}, inflated by the filter)")
+    print(f"Pooled 'other' effect (n=300)  = {other_pooled:.2f}   (true {TRUE_D}, barely inflated)")
     print(f"Observed food/other ratio      = {main_ratio:.2f}x  (food n=30 vs other n=300, ~10x asymmetry)")
     print(f"CONTROL (equal n=300 both)     = {control:.2f}   (expect ~1.0 -> the artifact is the SIZE gap)")
 

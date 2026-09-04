@@ -1,0 +1,49 @@
+{
+ "probe": "extract_figures.py",
+ "when_utc": "2026-09-01T17:09:29Z",
+ "source": "manuscript_2026-08-29_asreceived.tex",
+ "figures": [
+  {
+   "figure": "Fig1",
+   "label": "fig:l2_valley",
+   "source_line": 115,
+   "compiled": true,
+   "pdf_bytes": 36774,
+   "sha256": "6e8b89087a1e323b",
+   "suspiciously_small": false
+  },
+  {
+   "figure": "Fig2",
+   "label": "fig:focused",
+   "source_line": 166,
+   "compiled": true,
+   "pdf_bytes": 38111,
+   "sha256": "eedddc3c81d8eb41",
+   "suspiciously_small": false
+  },
+  {
+   "figure": "Fig3",
+   "label": "fig:gap",
+   "source_line": 194,
+   "compiled": true,
+   "pdf_bytes": 27421,
+   "sha256": "27aab5c64a9be106",
+   "suspiciously_small": false
+  },
+  {
+   "figure": "Fig4",
+   "label": "fig:default_control",
+   "source_line": 273,
+   "compiled": true,
+   "pdf_bytes": 45487,
+   "sha256": "374a214128294840",
+   "suspiciously_small": false
+  }
+ ],
+ "controls": {
+  "every_tikz_is_inside_a_figure_environment": true,
+  "every_figure_compiled": true,
+  "all_figures_distinct": true,
+  "suspiciously_small_pdfs": []
+ }
+}

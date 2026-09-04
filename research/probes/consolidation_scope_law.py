@@ -20,6 +20,13 @@ Run: python research/probes/consolidation_scope_law.py    MIT. Part of Agora / i
 from collections import deque
 import numpy as np
 
+# A reader who starts this sees NOTHING for 172 seconds on the machine it was written on,
+# which is indistinguishable from a hang. Measured alone, not under parallel load, where it
+# runs several times slower. Printed before any work so the cost arrives in the first
+# second rather than after the result.
+print("COST: about 172s on a 12-core desktop (13 change-point sweeps x 3 arms). No network, no GPU.", flush=True)
+
+
 T, SEEDS, BURN = 1500, 25, 60
 ALPHAS = [0.02, 0.05, 0.1, 0.2, 0.4, 0.7]
 

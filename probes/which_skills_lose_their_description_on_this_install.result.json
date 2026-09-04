@@ -1,0 +1,276 @@
+{
+ "probe": "which_skills_lose_their_description_on_this_install.py",
+ "when_utc": "2026-09-01T14:43:14Z",
+ "claude_version": "2.1.252 (Claude Code)",
+ "platform": "win32",
+ "method": "ANTHROPIC_BASE_URL -> local recorder; the listing is read from the request body; zero completions bought",
+ "design": "2x2 as written, 2x1 as executed: the MCP axis landed, the model axis did not; arms E and F repeat the MCP comparison at a budget where drops actually occur",
+ "boundary_arms": {
+  "budget": 26500,
+  "mcp_off_dropped": 7,
+  "mcp_on_dropped": 7,
+  "mcp_off_names": [
+   "security-review",
+   "stitch-design:manage-design-system",
+   "stitch-design:upload-to-stitch",
+   "stitch-utilities:design-md",
+   "stitch-utilities:enhance-prompt",
+   "stitch-utilities:stitch-loop",
+   "stitch-utilities:taste-design"
+  ],
+  "mcp_on_names": [
+   "security-review",
+   "stitch-design:manage-design-system",
+   "stitch-design:upload-to-stitch",
+   "stitch-utilities:design-md",
+   "stitch-utilities:enhance-prompt",
+   "stitch-utilities:stitch-loop",
+   "stitch-utilities:taste-design"
+  ],
+  "identical": true,
+  "tool_count_off": 27,
+  "tool_count_on": 103
+ },
+ "arms": [
+  {
+   "n": 77,
+   "kept": 77,
+   "dropped": 0,
+   "dropped_names": [],
+   "listed_desc_chars": 26066,
+   "arm": "A mcp-off default",
+   "mcp": false,
+   "model_asked": "",
+   "budget": 0,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 27,
+   "tool_chars": 78023,
+   "system_chars": 14019
+  },
+  {
+   "n": 77,
+   "kept": 77,
+   "dropped": 0,
+   "dropped_names": [],
+   "listed_desc_chars": 26066,
+   "arm": "B mcp-ON  default",
+   "mcp": true,
+   "model_asked": "",
+   "budget": 0,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 103,
+   "tool_chars": 162282,
+   "system_chars": 14019
+  },
+  {
+   "n": 77,
+   "kept": 77,
+   "dropped": 0,
+   "dropped_names": [],
+   "listed_desc_chars": 26066,
+   "arm": "C mcp-off opus[1m]",
+   "mcp": false,
+   "model_asked": "opus[1m]",
+   "budget": 0,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 27,
+   "tool_chars": 78023,
+   "system_chars": 14019
+  },
+  {
+   "n": 77,
+   "kept": 77,
+   "dropped": 0,
+   "dropped_names": [],
+   "listed_desc_chars": 26066,
+   "arm": "D mcp-ON  opus[1m]",
+   "mcp": true,
+   "model_asked": "opus[1m]",
+   "budget": 0,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 103,
+   "tool_chars": 162282,
+   "system_chars": 14019
+  },
+  {
+   "n": 77,
+   "kept": 70,
+   "dropped": 7,
+   "dropped_names": [
+    "stitch-design:manage-design-system",
+    "stitch-design:upload-to-stitch",
+    "stitch-utilities:design-md",
+    "stitch-utilities:enhance-prompt",
+    "stitch-utilities:stitch-loop",
+    "stitch-utilities:taste-design",
+    "security-review"
+   ],
+   "listed_desc_chars": 24931,
+   "arm": "E mcp-off b=26500",
+   "mcp": false,
+   "model_asked": "",
+   "budget": 26500,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 27,
+   "tool_chars": 78023,
+   "system_chars": 14019
+  },
+  {
+   "n": 77,
+   "kept": 70,
+   "dropped": 7,
+   "dropped_names": [
+    "stitch-design:manage-design-system",
+    "stitch-design:upload-to-stitch",
+    "stitch-utilities:design-md",
+    "stitch-utilities:enhance-prompt",
+    "stitch-utilities:stitch-loop",
+    "stitch-utilities:taste-design",
+    "security-review"
+   ],
+   "listed_desc_chars": 24931,
+   "arm": "F mcp-ON  b=26500",
+   "mcp": true,
+   "model_asked": "",
+   "budget": 26500,
+   "model_on_wire": "claude-opus-5",
+   "tool_count": 103,
+   "tool_chars": 162282,
+   "system_chars": 14019
+  }
+ ],
+ "stitch_utilities_kept_by_arm": {
+  "A mcp-off default": {
+   "stitch-utilities:design-md": true,
+   "stitch-utilities:enhance-prompt": true,
+   "stitch-utilities:stitch-loop": true,
+   "stitch-utilities:taste-design": true
+  },
+  "B mcp-ON  default": {
+   "stitch-utilities:design-md": true,
+   "stitch-utilities:enhance-prompt": true,
+   "stitch-utilities:stitch-loop": true,
+   "stitch-utilities:taste-design": true
+  },
+  "C mcp-off opus[1m]": {
+   "stitch-utilities:design-md": true,
+   "stitch-utilities:enhance-prompt": true,
+   "stitch-utilities:stitch-loop": true,
+   "stitch-utilities:taste-design": true
+  },
+  "D mcp-ON  opus[1m]": {
+   "stitch-utilities:design-md": true,
+   "stitch-utilities:enhance-prompt": true,
+   "stitch-utilities:stitch-loop": true,
+   "stitch-utilities:taste-design": true
+  },
+  "E mcp-off b=26500": {
+   "stitch-utilities:design-md": false,
+   "stitch-utilities:enhance-prompt": false,
+   "stitch-utilities:stitch-loop": false,
+   "stitch-utilities:taste-design": false
+  },
+  "F mcp-ON  b=26500": {
+   "stitch-utilities:design-md": false,
+   "stitch-utilities:enhance-prompt": false,
+   "stitch-utilities:stitch-loop": false,
+   "stitch-utilities:taste-design": false
+  }
+ },
+ "stitch_utilities_disk": [
+  {
+   "name": "stitch-utilities:design-md",
+   "desc_chars": 84,
+   "ascii": true,
+   "crlf": true,
+   "bom": false,
+   "yaml_error": ""
+  },
+  {
+   "name": "stitch-utilities:enhance-prompt",
+   "desc_chars": 193,
+   "ascii": true,
+   "crlf": true,
+   "bom": false,
+   "yaml_error": ""
+  },
+  {
+   "name": "stitch-utilities:stitch-loop",
+   "desc_chars": 103,
+   "ascii": true,
+   "crlf": true,
+   "bom": false,
+   "yaml_error": ""
+  },
+  {
+   "name": "stitch-utilities:taste-design",
+   "desc_chars": 257,
+   "ascii": false,
+   "crlf": true,
+   "bom": false,
+   "yaml_error": ""
+  }
+ ],
+ "h1_fallback": [
+  {
+   "name": "audit-post",
+   "listed": "Audit-Post — the ONE correct, unskippable procedure for auditing a published post",
+   "h1": "Audit-Post — the ONE correct, unskippable procedure for auditing a published post",
+   "listed_equals_h1": true
+  },
+  {
+   "name": "fable-5-usage",
+   "listed": "Fable 5 usage — when to route to Claude Fable 5, and how to prompt it",
+   "h1": "Fable 5 usage — when to route to Claude Fable 5, and how to prompt it",
+   "listed_equals_h1": true
+  }
+ ],
+ "h1_fallback_count": 2,
+ "yaml_strict_rejects_but_cli_accepts": [
+  {
+   "name": "storm-research",
+   "error": "ScannerError",
+   "listed_chars": 592
+  }
+ ],
+ "name_collisions": [
+  {
+   "name": "seo",
+   "tiers": [
+    "project",
+    "user"
+   ],
+   "listing_entries": 1
+  }
+ ],
+ "plugin_skill_files_on_disk": 32,
+ "plugin_skill_listing_entries": 15,
+ "controls": {
+  "parser_positive_control": "PASS",
+  "listing_found_every_arm": true,
+  "mcp_manipulation_landed": true,
+  "boundary_arms_can_fail": true,
+  "model_axis_landed": false,
+  "models_seen_on_the_wire": [
+   "claude-opus-5"
+  ],
+  "note_if_model_axis_did_not_land": "--model opus[1m] left the same model on the wire in every arm, so this run says NOTHING about the context-window half of the budget rule",
+  "unresolved_but_listed": [
+   "claude-api",
+   "code-review",
+   "dataviz",
+   "fewer-permission-prompts",
+   "init",
+   "keybindings-help",
+   "loop",
+   "run",
+   "security-review",
+   "simplify",
+   "update-config",
+   "workflow-authoring"
+  ],
+  "real_profile_untouched": true,
+  "config_isolated": true
+ },
+ "elapsed_s": 28.7
+}

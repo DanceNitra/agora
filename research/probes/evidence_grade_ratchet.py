@@ -24,6 +24,18 @@ except ImportError:                                    # pragma: no cover - lega
     Inspeximus = _m.Inspeximus
 
 _score = os.path.join(os.path.dirname(__file__), "meta_audit_scoring.py")
+if not os.path.exists(_score):
+    # A reader who clicks the link in the post downloads THIS file and nothing else, and used
+    # to get a bare FileNotFoundError traceback out of importlib. Say what is missing and
+    # where to get it. The sibling is public at the url below.
+    import sys as _sys
+    _sys.stderr.write(
+        "\n"
+        "This probe needs meta_audit_scoring.py beside it, and it is not here.\n"
+        "  expected: " + _score + "\n"
+        "  get it:   curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/research/probes/meta_audit_scoring.py\n"
+        "Then run this file again from the same directory.\n\n")
+    raise SystemExit(2)
 _ss = importlib.util.spec_from_file_location("mas", _score)
 _mas = importlib.util.module_from_spec(_ss); _ss.loader.exec_module(_mas)
 POSTS, SUBSTANTIVE, OVER_FRAMED, HONEST = _mas.POSTS, _mas.SUBSTANTIVE, _mas.OVER_FRAMED, _mas.HONEST

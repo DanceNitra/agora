@@ -1,0 +1,280 @@
+{
+ "probe": "recheck_figures_91188_units.py",
+ "when_utc": "2026-09-01T19:11:49Z",
+ "draft": "drafts/91188_reply_units.md",
+ "draft_bytes": 4749,
+ "cli_version": "2.1.257 (Claude Code)",
+ "checks": 44,
+ "failed": 0,
+ "rows": [
+  {
+   "claim": "the two fractions are declared together",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: ljo=0.8,HUn=0.7"
+  },
+  {
+   "claim": "one entry per dimension, bytes",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: dimension:\"bytes\""
+  },
+  {
+   "claim": "one entry per dimension, lines",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: dimension:\"lines\""
+  },
+  {
+   "claim": "the picker keeps the largest fraction",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: n.reduce((d,p)=>p.frac>d.frac?p:d)"
+  },
+  {
+   "claim": "the byte target is 0.7 of the byte cap",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: targetDesc:Ut(Math.floor(e.byteCap*HUn))"
+  },
+  {
+   "claim": "the line target is 0.7 of the line cap",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: Math.floor(e.lineCap*HUn)} lines"
+  },
+  {
+   "claim": "the fire gate is 0.8 of the largest fraction",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: return r<ljo?null:o"
+  },
+  {
+   "claim": "capDesc renders the line cap as a label",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: capDesc:`${e.lineCap}-line`"
+  },
+  {
+   "claim": "the sibling path branches on dimension",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: d.dimension===\"bytes\"?d.capDesc"
+  },
+  {
+   "claim": "the measured value is String.length",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: byteCount:n.length"
+  },
+  {
+   "claim": "the config schema accepts a per-index cap",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: promptIndexMaxBytes:A().int().positive()"
+  },
+  {
+   "claim": "the caps are 200 and 25000",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: kM=200,MU=25000"
+  },
+  {
+   "claim": "the mount config comes from an environment variable",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: process.env.CLAUDE_MEMORY_STORES"
+  },
+  {
+   "claim": "the READ path compares against the hardcoded caps",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: p=o>kM,w=d>MU"
+  },
+  {
+   "claim": "the truncation warning is appended to the loaded content",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in the bundle: > WARNING: ${k}"
+  },
+  {
+   "claim": "CONTROL: near misses are absent",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent as expected: ljo=0.9,HUn=0.6, dimension:\"graphemes, byteCount:n.byteLeng, kM=201,MU=25001, promptIndexMaxLines:, process.env.CLAUDE_M, p=o>MU,w=d>kM"
+  },
+  {
+   "claim": "the build is named, and so is the one it replaced",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the binary self-reports 2.1.257"
+  },
+  {
+   "claim": "0.7 of 25,000 prints as 17.1KB",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "floor(25000*0.7)=17500 -> 17.1KB"
+  },
+  {
+   "claim": "the byte cap itself prints as 24.4KB",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "25000/1024 -> 24.4KB"
+  },
+  {
+   "claim": "the fire and target values on the byte cap",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "25000 x 0.8 and x 0.7"
+  },
+  {
+   "claim": "the fire and target values on the line cap",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "200 x 0.8 and x 0.7"
+  },
+  {
+   "claim": "18 of 32 below the cut",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "quoted from our own #82056 comment"
+  },
+  {
+   "claim": "the binomial p value",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "our #82056 comment gives p = 0.066"
+  },
+  {
+   "claim": "3 of 6 sessions still answered",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "our #82056 comment: answered in 3 of 6 sessions"
+  },
+  {
+   "claim": "CONTROL: a figure we never published is absent",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "a near-miss ratio appears in neither our comment nor the draft"
+  },
+  {
+   "claim": "the draft does not re-establish what the thread already carries",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "tonydzi carried it there today; the draft references the unit once and proves nothing"
+  },
+  {
+   "claim": "CONTROL: that test can fail",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the establishing words do appear in our own #82056 comment, so the list is not inert"
+  },
+  {
+   "claim": "tonydzi asked it, and the draft says so",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the question is in a comment authored by tonydzi"
+  },
+  {
+   "claim": "the ~22KB target is the issue author's own",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the figure is in the issue body, and pm25coder disclaims it in the thread"
+  },
+  {
+   "claim": "CONTROL: the author split is real, not one blob",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the question text appears in tonydzi's comment only"
+  },
+  {
+   "claim": "138.0 is pm25coder's own figure",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "138.0 appears in pm25coder's comment and not in tonydzi's"
+  },
+  {
+   "claim": "117.6 originates with tonydzi, and pm25coder credits him for it",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "tonydzi published it; pm25coder quotes it back as \"your\" index"
+  },
+  {
+   "claim": "CONTROL: the two figures are not interchangeable",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the other density appears in neither of tonydzi's comments"
+  },
+  {
+   "claim": "the newest comment was read before sending",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "pm25coder's 18:13 comment says he holds the routing point second-hand as well"
+  },
+  {
+   "claim": "niels-roest already published the 70 per cent himself, so we credit it",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "his issue body already states the ratio the draft derives"
+  },
+  {
+   "claim": "the draft carries the caveat we published with those numbers",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "our #82056 comment states that limit"
+  },
+  {
+   "claim": "the draft does not re-endorse only-to-telemetry",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "tonydzi wrote it, and the draft corrects it rather than agreeing"
+  },
+  {
+   "claim": "the draft hands the reader a command instead of a link",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "all three strings the command names are in the binary"
+  },
+  {
+   "claim": "the cited probe resolves on main",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "raw main returns 200 for the cited path"
+  },
+  {
+   "claim": "CONTROL: the fetcher can say no",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "a sibling path that does not exist returns 404"
+  },
+  {
+   "claim": "the read method is disclosed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "stated as a limit"
+  },
+  {
+   "claim": "the sample is scoped",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "stated as a limit"
+  },
+  {
+   "claim": "AI assistance is disclosed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "owner rule, permanent"
+  },
+  {
+   "claim": "pure ASCII, no dash that gh can mangle",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "every character is ASCII"
+  }
+ ],
+ "controls": {
+  "sources_resolve": true,
+  "near_miss_strings_absent_from_binary": true,
+  "reads_the_binary_our_comment_and_the_thread": true
+ }
+}

@@ -45,7 +45,16 @@ def asst_len(conv, mode):
     for m in conv:
         if m.get("role") == "assistant":
             c = m.get("content", "") or ""
-            n += len(c.split()) if mode == "word" else len(c)
+            # An explicit dispatch, not a ternary. Inverting `mode == "word"` in the ternary
+            # silently sent word-mode down the char branch and back: rows [2] and [3] simply
+            # exchanged values and the table kept its labels. With an else that raises, the
+            # same edit is loud instead of a quiet mislabel.
+            if mode == "word":
+                n += len(c.split())
+            elif mode == "char":
+                n += len(c)
+            else:
+                raise ValueError("unknown length mode %r (expected 'word' or 'char')" % mode)
     return n
 
 
@@ -101,6 +110,13 @@ def main():
         tot += 1
         ok += (r["winner"] == m)
     g4_h = ok / tot
+    # The next block narrates this figure as "the celebrated ~80% human parity". Inverting
+    # the comparison above takes it to 0.137 and the sentence still prints, unchanged, next
+    # to a judge that is anti-correlated with humans. A hand-written sentence beside a
+    # computed number needs the number pinned, or the pair becomes a lie nothing watches.
+    assert 0.5 < g4_h <= 1.0, (
+        "judge-vs-human agreement is %.3f. Below chance there is no parity to compare with "
+        "Zheng's 85%%, and the above-chance share below divides by a negative." % g4_h)
 
     print("=== RESULTS (real MT-Bench data, ties excluded) ===")
     print("[1] GPT-4 judge vs HUMAN majority:      %.3f  (n=%d)   <- the celebrated ~80%% 'human parity' (Zheng: 85%% non-tie)" % (g4_h, tot))

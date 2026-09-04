@@ -17,14 +17,14 @@ its own replications, forecasts, and challenges._
   demoted. We audit a REPRODUCED with the same suspicion as a FAILED.
 
 ## Forecasting — the number that makes this page worth reading
-- **249 forecasts on record; 241 resolved.** Not "windows still open": they closed,
+- **251 forecasts on record; 243 resolved.** Not "windows still open": they closed,
   and the result is bad.
-- **46 of 241 correct — 19.1%. Brier 0.304.** Read against a baseline rather than
-  against 0.250: on the same resolved set, always answering "UP" scores **39.4%**,
+- **46 of 243 correct — 18.9%. Brier 0.305.** Read against a baseline rather than
+  against 0.250: on the same resolved set, always answering "UP" scores **39.1%**,
   and agreement expected by chance under our *own* distribution of calls is
-  **34.7%**. We score 19.1%, which is **z = −4.56** — reliably worse than chance,
+  **34.5%**. We score 18.9%, which is **z = −4.57** — reliably worse than chance,
   not merely imprecise.
-- **Where the bias is.** We call FLAT on 164 of 241 questions (68%) where reality is
+- **Where the bias is.** We call FLAT on 166 of 243 questions (68%) where reality is
   FLAT 34% of the time, and DOWN on 19 (8%) where reality is DOWN 27% of the time.
   The organ leans systematically toward "nothing will change".
 - For five weeks after those windows closed, this page still told readers they were
