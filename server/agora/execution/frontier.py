@@ -14,6 +14,7 @@ import json
 import os
 import re
 import time
+import uuid
 from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".frontier.json"
@@ -277,10 +278,67 @@ def _rotation_target(vault: str) -> dict | None:
 _KEEP = 4000
 
 
-def record_seeded(target: str, kind: str = "") -> None:
+def record_seeded(target: str, kind: str = "") -> str:
+    """Record one pick and RETURN ITS ID, so whatever acts on the direction can report back.
+
+    The id is why this returns anything. Measured 2026-09-04: this organ is 39.7% of all metered
+    brain spend, 3.47M tokens over 794 calls, and the question "what did that buy" could not be
+    asked at all. A seed row was {target, kind, ts}: it recorded the choice and nothing about what
+    followed, and a contribution carries {topic, topic_id, claim}, so the only join available was a
+    substring test on free text. That test matches "Game Theory" against work done weeks before any
+    seeding existed, which is a subject-free keyword match, the failure this repository keeps paying
+    for.
+
+    Two things were already fixed earlier the same day in ae6d6bb and are NOT restated here: the
+    ledger cap went from 80 rows to 4,000, and `metabolism._bump` began stamping `first_ts`. What
+    remained was that nothing could ever be written back against a pick. That is what the id and
+    `record_outcome` are for.
+
+    The spend already made stays unpriceable. This buys the next one, not the last one.
+    """
     items = _load()
-    items.append({"target": (target or "")[:120], "kind": kind[:20], "ts": time.time()})
+    seed_id = uuid.uuid4().hex[:10]
+    items.append({"id": seed_id, "target": (target or "")[:120], "kind": kind[:20],
+                  "ts": time.time(), "outcome": None})
     _save(items[-_KEEP:])
+    return seed_id
+
+
+def record_outcome(seed_id: str, outcome: str, note: str = "") -> dict:
+    """Close the loop on one pick. Returns what was written, or why nothing was.
+
+    REFUSES SILENTLY-WRONG WRITES. An unknown id is reported rather than appended as a new row,
+    because a ledger that accepts any key will happily fill up with outcomes attached to nothing and
+    still look healthy. Overwriting an outcome is allowed and recorded with a count, since a
+    direction can be revisited, but the first verdict is kept so a later optimistic one cannot erase
+    a earlier honest one.
+    """
+    if not seed_id or not outcome:
+        return {"written": False, "why": "both seed_id and outcome are required"}
+    items = _load()
+    for x in items:
+        if x.get("id") == seed_id:
+            if x.get("outcome") is not None:
+                x["outcome_first"] = x.get("outcome_first", x["outcome"])
+                x["outcome_revisions"] = x.get("outcome_revisions", 0) + 1
+            x["outcome"] = str(outcome)[:40]
+            if note:
+                x["note"] = str(note)[:200]
+            x["outcome_ts"] = time.time()
+            _save(items)
+            return {"written": True, "id": seed_id, "outcome": x["outcome"],
+                    "revisions": x.get("outcome_revisions", 0)}
+    return {"written": False, "why": "no seed carries id %r; refusing to invent a row for it"
+                                     % seed_id}
+
+
+def outcome_coverage() -> dict:
+    """What share of picks ever got an answer. The number the selector could not produce before."""
+    items = _load()
+    closed = [x for x in items if x.get("outcome") is not None]
+    return {"seeds": len(items), "closed": len(closed),
+            "coverage_pct": round(100.0 * len(closed) / len(items), 1) if items else 0.0,
+            "outcomes": sorted({str(x.get("outcome")) for x in closed})}
 
 
 def format_frontier() -> str:

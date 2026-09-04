@@ -1,0 +1,37 @@
+{
+ "verdict": "UNJUDGEABLE_BY_CONSTRUCTION",
+ "organ": "frontier-seed",
+ "spend_tokens": 3472733,
+ "spend_calls": 794,
+ "spend_share_pct": 39.7,
+ "spend_counter_last_written": "2026-09-03 08:29",
+ "spend_window_start": "UNRECORDED for this row: metabolism._bump sets first_ts since 2026-09-04, but this counter predates that line, so the rate for spend ALREADY made is unrecoverable rather than unimplemented",
+ "organs_carrying_a_start_time": 1,
+ "organs_metered": 10,
+ "seeds": 80,
+ "seed_window": [
+  "2026-09-04 07:17",
+  "2026-09-04 09:40"
+ ],
+ "seed_window_hours": 2.4,
+ "seed_row_fields": [
+  "kind",
+  "target",
+  "ts"
+ ],
+ "seed_has_outcome_field": false,
+ "contributions": 3514,
+ "contribution_window": [
+  "2026-06-13 14:13",
+  "2026-09-03 08:09"
+ ],
+ "contributions_after_first_seed": 0,
+ "window_overlap_seconds": 0,
+ "targets_distinct": 80,
+ "naive_substring_matches": 2,
+ "dated_matches": 0,
+ "the_substring_trap": [
+  "Game Theory",
+  "Philosophy of Science"
+ ]
+}

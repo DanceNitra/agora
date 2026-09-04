@@ -2179,12 +2179,33 @@ async def brain_frontier_seed():
     research at the EDGE, breaking the agents' churn on dense clusters."""
     import asyncio as _aio
     from agora.config import settings
-    from agora.execution.frontier import frontier_target, record_seeded
+    from agora.execution.frontier import frontier_target, outcome_coverage, record_seeded
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
     t = await _aio.to_thread(frontier_target, vault)
+    seed_id = None
     if t:
-        record_seeded(t["target"], t.get("kind", ""))
-    return {"status": "ok", "target": t}
+        # RETURN THE ID. Whoever acts on this direction has to be able to report back, or the organ
+        # stays unpriceable: it is 39.7% of metered brain spend and until today a pick recorded no
+        # field an outcome could ever land in.
+        seed_id = record_seeded(t["target"], t.get("kind", ""))
+        t = dict(t, seed_id=seed_id)
+    return {"status": "ok", "target": t, "seed_id": seed_id,
+            "coverage": outcome_coverage()}
+
+
+@router.post("/brain/frontier-outcome")
+async def brain_frontier_outcome(request: Request):
+    """Close the loop on one seeded direction: did it produce anything?
+
+    Refuses an id it never issued rather than appending a row for it. A ledger that accepts any key
+    fills with verdicts attached to nothing and still reports healthy coverage.
+    """
+    from agora.execution.frontier import outcome_coverage, record_outcome
+    b = await request.json()
+    r = record_outcome(str(b.get("seed_id") or ""), str(b.get("outcome") or ""),
+                       str(b.get("note") or ""))
+    return {"status": "ok" if r.get("written") else "refused", **r,
+            "coverage": outcome_coverage()}
 
 
 @router.get("/brain/frontier")
