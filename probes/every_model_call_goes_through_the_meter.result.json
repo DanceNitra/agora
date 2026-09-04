@@ -1,0 +1,35 @@
+{
+ "script": "every_model_call_goes_through_the_meter.py",
+ "report": {
+  "server\\agora\\execution\\llm_client.py": {
+   "request_sites": 2,
+   "uncovered": [],
+   "metered_functions": [
+    "_local_qwen",
+    "call_llm"
+   ]
+  },
+  "agora-game-server\\mcp_server.py": {
+   "request_sites": 6,
+   "uncovered": [],
+   "metered_functions": [
+    "_llm_content_sync",
+    "_llm_prose_sync"
+   ]
+  }
+ },
+ "allowed": {
+  "_ollama_embed": "the LOCAL embedder on 127.0.0.1:11434, no cloud credit",
+  "_brain_get_sync": "the brain's own HTTP API on 127.0.0.1:8000",
+  "_brain_post_sync": "the brain's own HTTP API on 127.0.0.1:8000",
+  "_wd_alert": "api.telegram.org, a notification, not a model",
+  "_send_telegram": "api.telegram.org, a notification, not a model"
+ },
+ "uncovered_total": 0,
+ "controls": {
+  "meter_selftest_passed": true,
+  "mutation_caught": true,
+  "every_exemption_has_a_reason": true,
+  "files_asserted_present": true
+ }
+}

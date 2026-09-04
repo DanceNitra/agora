@@ -97,7 +97,18 @@ async def _alert(text: str) -> None:
 
 
 async def watch_dungeon_forever() -> None:
-    """The brain's vigil over the dungeon."""
+    """The brain's vigil over the dungeon.
+
+    OFF SWITCH, because stopping the dungeon by hand does not stop it. This watchdog relaunches it
+    after three misses, so a `Stop-Process` on mcp_server.py buys about fifteen minutes and then the
+    spending resumes. Set AGORA_DUNGEON_WATCHDOG=0 in server/.env to keep it down. The flag is read
+    once at brain start, so flipping it takes a brain restart, which is the honest cost of a change
+    that has to survive a process the brain itself supervises.
+    """
+    import os
+    if os.getenv("AGORA_DUNGEON_WATCHDOG", "1").strip().lower() in ("0", "off", "false", "no"):
+        print("[Watchdog] disabled by AGORA_DUNGEON_WATCHDOG; the dungeon will NOT be restarted")
+        return
     await asyncio.sleep(120)                      # grace period after our own boot
     while True:
         await asyncio.sleep(CHECK_EVERY)

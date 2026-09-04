@@ -939,6 +939,40 @@ async def _llm_say(system: str, user: str, fallback: str) -> str:
     return line or fallback
 
 
+# --- spend meter ---------------------------------------------------------------------------------
+# On 2026-09-04 Ollama refused every tier with a weekly usage limit and nothing here could say how
+# many calls the dungeon had made, or from where. The brain has had `metabolism.record_call` inside
+# `call_llm` for a while; the dungeon had nothing, so half the spend was invisible. These two
+# functions are the only paths from this process to a model: `_llm_say` and `_llm_say_sync` both
+# reach `_llm_content_sync`, and `_llm_prose_sync` is the other. Wrapping them rather than editing
+# their bodies keeps the count on the boundary, so a new caller is metered without being told to be.
+def _meter_wrap(fn, _name):
+    def inner(*a, **k):
+        import time as _time
+        t0 = _time.time()
+        out = fn(*a, **k)
+        try:
+            import os as _os, sys as _sys
+            _root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+            _tools = _os.path.join(_root, "tools")
+            if _tools not in _sys.path:
+                _sys.path.insert(0, _tools)
+            from llm_meter import record as _record
+            _record("dungeon", _LLM_MODEL, ok=bool(out),
+                    prompt_chars=sum(len(str(x)) for x in a),
+                    completion_chars=len(out or ""), seconds=_time.time() - t0)
+        except Exception:
+            pass                     # a meter must never break the call it is counting
+        return out
+    inner.__name__ = _name
+    inner.__doc__ = getattr(fn, "__doc__", None)
+    return inner
+
+
+_llm_content_sync = _meter_wrap(_llm_content_sync, "_llm_content_sync")
+_llm_prose_sync = _meter_wrap(_llm_prose_sync, "_llm_prose_sync")
+
+
 def _schedule_thought(eid: str, situation: str, fallback: str) -> None:
     """Show the fallback line instantly, then replace it with an LLM line when ready."""
     engine.set_entity_thought(eid, fallback)

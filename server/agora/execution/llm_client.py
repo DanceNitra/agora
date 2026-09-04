@@ -200,6 +200,7 @@ def call_llm(
                     _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
                 except Exception:
                     pass
+                _meter_row(True, system_prompt, user_prompt, content, "local-qwen")
                 if cache_eligible:
                     _LLM_CACHE[ckey] = (content, time.time())
                 return content
@@ -255,6 +256,7 @@ def call_llm(
                            getattr(u, "completion_tokens", 0) or len(content) // 4)
                 except Exception:
                     pass
+                _meter_row(True, system_prompt, user_prompt, content, str(kwargs.get("model", "?")))
 
                 # deepseek-v4-flash intermittently returns an empty completion (finish=stop,
                 # no error) — and a usage cap can surface as empty too. Retry a couple times, then
@@ -312,6 +314,7 @@ def call_llm(
                     _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
                 except Exception:
                     pass
+                _meter_row(True, system_prompt, user_prompt, content, "local-qwen")
                 if cache_eligible:
                     _LLM_CACHE[ckey] = (content, time.time())
                 return content
@@ -324,7 +327,36 @@ def call_llm(
     # it so the failure stays visible.
     error_summary = "; ".join(errors[-3:])
     print(f"[LLM] all tiers failed — {error_summary[:200]}")
+    _meter_row(False, system_prompt, user_prompt, "", "all-tiers", error_summary)
     return ""
+
+
+def _meter_row(ok: bool, system_prompt: str, user_prompt: str, content: str,
+               model: str = "?", note: str = "") -> None:
+    """One line per call in the shared spend meter. Never raises.
+
+    `metabolism.record_call` already counts successes per organ, which answers "who spends" but not
+    "when", because it keeps one running total and overwrites its timestamp. On 2026-09-04 the
+    weekly quota ran out and neither question could be answered from any artifact: the per-organ
+    totals had no time axis, and failures were never counted at all, so a retry loop against a
+    429 wall left no trace. This adds the axis and counts the refusals. The two meters are kept
+    side by side rather than merged, since the organ attribution is a different question from the
+    call rate and each is already wired where it belongs.
+    """
+    try:
+        import os as _os
+        import sys as _sys
+        _root = _os.path.dirname(_os.path.dirname(_os.path.dirname(
+            _os.path.dirname(_os.path.abspath(__file__)))))
+        _tools = _os.path.join(_root, "tools")
+        if _tools not in _sys.path:
+            _sys.path.insert(0, _tools)
+        from llm_meter import record as _record
+        _record("brain", model, ok=ok,
+                prompt_chars=len(system_prompt) + len(user_prompt),
+                completion_chars=len(content or ""), note=note)
+    except Exception:
+        pass
 
 
 # ── Cost tracking ──────────────────────────────────────
