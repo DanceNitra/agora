@@ -172,16 +172,33 @@ def main():
         refuse("every pair returns the same deviation, so a percentile would be an artefact of "
                "ties rather than a rank")
 
-    below = int((vals < HIS_MEAN_ABS).sum())
+    # RANK HIS PAIR BY OUR OWN RECOMPUTATION OF IT, not by his published constant. His figure
+    # exceeds ours by 1.36e-11, so comparing the population against HIS constant counts his pair as
+    # being below itself and reports 186 of 190 where the honest count is 185. A rank that includes
+    # its own subject on the wrong side is off by one in the direction that flatters the claim.
+    # RANK ON BOTH STATISTICS, because they are not the same ranking and HE PUBLISHES THE RATIO.
+    # The absolute deviation and the fraction of E range disagree sharply: the E range itself varies
+    # by 2.7x across pairs on this graph, so a pair can be extreme in one and ordinary in the other.
+    # A first version of this probe ranked only the absolute deviation, reported the 97th
+    # percentile, and a draft built a retraction on it. In his own unit the same pair is near the
+    # 75th. Reporting one rank for a two-unit question is how that happened.
+    below = int((vals < m).sum())
     pct = 100.0 * below / len(vals)
+    below_f = int((fracs < frac).sum())
+    pct_f = 100.0 * below_f / len(fracs)
     print()
     print("  THE NULL BAND, all 190 pairs on his own graph, nothing cut:")
     print("     mean absolute deviation   min %.6f   median %.6f   max %.6f"
           % (vals.min(), float(np.median(vals)), vals.max()))
     print("     as a fraction of E range  min %.1f%%   median %.1f%%   max %.1f%%"
           % (100 * fracs.min(), 100 * float(np.median(fracs)), 100 * fracs.max()))
-    print("     his pair %.6f sits at the %.0fth percentile (%d of %d pairs are below it)"
-          % (HIS_MEAN_ABS, pct, below, len(vals)))
+    print("     ranked on the ABSOLUTE deviation : %.6f -> %.0fth percentile, %d of %d below"
+          % (m, pct, below, len(vals)))
+    print("     ranked on the FRACTION he publishes: %.1f%% -> %.0fth percentile, %d of %d below"
+          % (100 * frac, pct_f, below_f, len(fracs)))
+    if abs(pct - pct_f) > 5:
+        print("     THE TWO RANKS DISAGREE BY %.0f POINTS. His unit is the fraction, so that is the"
+              " one a claim about his number must use." % abs(pct - pct_f))
 
     # HIS FIVE, located in the population.
     print()
@@ -219,7 +236,11 @@ def main():
                         "max": float(vals.max()),
                         "frac_min": float(fracs.min()), "frac_median": float(np.median(fracs)),
                         "frac_max": float(fracs.max())},
-               "his_pair_percentile": pct, "pairs_below_his": below,
+               "his_pair_percentile_on_mean_abs": pct, "pairs_below_his_mean_abs": below,
+               "his_pair_percentile_on_fraction": pct_f,
+               "pairs_below_his_fraction": below_f,
+               "his_fraction": frac,
+               "all_fractions": [float(x) for x in fracs],
                "his_five": five, "permutation": perm,
                "controls": {"positive_control_reproduces_his_number": True,
                             "population_varies": float(vals.std()),

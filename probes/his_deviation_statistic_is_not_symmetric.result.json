@@ -1,0 +1,92 @@
+{
+ "script": "his_deviation_statistic_is_not_symmetric.py",
+ "graph": "watts_strogatz(10,4,0.1,seed=42)",
+ "grid": "linspace(0,3,21)",
+ "sector_n_up": 5,
+ "his_published": 0.04997721400862463,
+ "rows": [
+  {
+   "pair": [
+    [
+     6,
+     8
+    ],
+    [
+     1,
+     8
+    ]
+   ],
+   "ab": 0.03715163243539895,
+   "ba": 0.03266999621406126,
+   "percent": -12.0630936719418
+  },
+  {
+   "pair": [
+    [
+     0,
+     1
+    ],
+    [
+     6,
+     8
+    ]
+   ],
+   "ab": 0.04997721399502706,
+   "ba": 0.05046454553219808,
+   "percent": 0.9751074504063153
+  },
+  {
+   "pair": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     4
+    ]
+   ],
+   "ab": 0.032136199609117976,
+   "ba": 0.03357510177122273,
+   "percent": 4.477511901240785
+  },
+  {
+   "pair": [
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   "ab": 0.034391522943450104,
+   "ba": 0.03354969046088482,
+   "percent": -2.447790648729058
+  }
+ ],
+ "worst_pair": [
+  [
+   6,
+   8
+  ],
+  [
+   1,
+   8
+  ]
+ ],
+ "worst_percent": -12.0630936719418,
+ "symmetric_reference": {
+  "ab": 0.034003697529157,
+  "ba": 0.034003697529157,
+  "percent": 0.0
+ },
+ "verdict": "THE_REFERENCE_POINT_BREAKS_THE_SYMMETRY",
+ "controls": {
+  "positive_control_reproduces_his_number": true,
+  "shift_is_not_uniform": true,
+  "symmetric_reference_removes_it": true
+ },
+ "seconds": 67.29328489303589
+}

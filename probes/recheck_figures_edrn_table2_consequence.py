@@ -54,6 +54,7 @@ TABLE2 = os.path.join(SUB, "table2_both_conventions.result.json")
 NULL = os.path.join(HERE, "separable_null_for_the_multi_entrance_deviation.result.json")
 BASE = os.path.join(HERE, "is_the_s0_baseline_the_same_system.result.json")
 MATCHED = os.path.join(HERE, "the_matched_null_lives_on_his_own_graph.result.json")
+ASYM = os.path.join(HERE, "his_deviation_statistic_is_not_symmetric.result.json")
 MANUSCRIPT = os.path.join(SUB, "manuscript.tex")
 HIS_CSV = os.path.join(
     SUB, "guanghao_archive_2026-09-03",
@@ -156,7 +157,7 @@ def main():
     text = io.open(DRAFT, encoding="utf-8").read()
     if "PLACEHOLDER" in text:
         refuse("the draft still contains a PLACEHOLDER")
-    for p in (TABLE2, NULL, BASE, MANUSCRIPT, MATCHED):
+    for p in (TABLE2, NULL, BASE, MANUSCRIPT, MATCHED, ASYM):
         if not os.path.isfile(p):
             refuse("missing artifact %s" % p)
 
@@ -237,8 +238,98 @@ def main():
                 "matched-null receipt")
     ok &= check("matched null, max fraction", 55.0, 100 * b["frac_max"], 0.05,
                 "matched-null receipt")
-    ok &= check("his pair percentile", 98, mn["his_pair_percentile"], 0.6, "matched-null receipt")
-    ok &= check("pairs below his", 186, mn["pairs_below_his"], 0, "matched-null receipt")
+    # RANKED IN HIS OWN UNIT. He publishes the deviation as a fraction of the system's E range, and
+    # the E range varies by 2.7x across pairs, so the two rankings are not the same ranking: his
+    # pair is at the 97th percentile of the absolute deviations and the 75th of the fractions. A
+    # draft built a retraction on the 97 before this check existed. Whenever a claim is about HIS
+    # number, the unit has to be his.
+    ok &= check("his pair percentile, in his unit", 75,
+                mn["his_pair_percentile_on_fraction"], 0.6, "matched-null receipt")
+    ok &= check("his pair percentile, absolute deviation", 97,
+                mn["his_pair_percentile_on_mean_abs"], 0.6, "matched-null receipt")
+    if abs(mn["his_pair_percentile_on_fraction"]
+           - mn["his_pair_percentile_on_mean_abs"]) < 5:
+        refuse("the two rankings now agree, so this check cannot tell the unit that matters from "
+               "the one that does not, and the defect it exists for is invisible")
+    fr = np.array(mn["all_fractions"])
+    five_pcts = [round(100.0 * float((fr < f["our_fraction_percent"] / 100).sum()) / len(fr))
+                 for f in mn["his_five"]]
+    if five_pcts != [75, 34, 55, 68, 83]:
+        refuse("his five pairs rank at %s in his own unit, not the [75, 34, 55, 68, 83] the draft "
+               "states" % five_pcts)
+    print("     his five, in his unit: %s; one is below the median" % five_pcts)
+
+    # The ordering asymmetry, from its own probe.
+    asym = json.load(io.open(ASYM, encoding="utf-8"))
+    if asym.get("verdict") != "THE_REFERENCE_POINT_BREAKS_THE_SYMMETRY":
+        refuse("the asymmetry probe did not reach its verdict, so the draft's second section has "
+               "no artifact behind it")
+    by = {tuple(map(tuple, r["pair"])): r for r in asym["rows"]}
+    for a, b, ab, ba, pct in ((( 6, 8), (1, 8), 0.037152, 0.032670, -12.1),
+                              (( 0, 1), (6, 8), 0.049977, 0.050465, 1.0),
+                              (( 0, 1), (1, 4), 0.032136, 0.033575, 4.5),
+                              (( 2, 5), (3, 4), 0.034392, 0.033550, -2.4)):
+        r = by[(a, b)]
+        ok &= check("asym %s-%s first order" % (a, b), ab, r["ab"], 5e-6, "asymmetry receipt")
+        ok &= check("asym %s-%s second order" % (a, b), ba, r["ba"], 5e-6, "asymmetry receipt")
+        ok &= check("asym %s-%s percent" % (a, b), pct, r["percent"], 0.06, "asymmetry receipt")
+    ok &= check("symmetric reference removes it", 0.034004, asym["symmetric_reference"]["ab"],
+                5e-6, "asymmetry receipt")
+    if abs(asym["symmetric_reference"]["percent"]) > 0.005:
+        refuse("the symmetric reference leaves %.3f%%, so the draft's 0.00 percent is wrong"
+               % asym["symmetric_reference"]["percent"])
+
+    from scipy import stats as _st
+    _cn = [c for _, _, c, _ in HIS_PAIRS]
+    _dv = [d for _, _, _, d in HIS_PAIRS]
+    _r, _p = _st.spearmanr(_cn, _dv)
+    ok &= check("common neighbours r", -0.447, float(_r), 5e-4, "computed from his table")
+    ok &= check("common neighbours p", 0.450, float(_p), 5e-4, "computed from his table")
+    ok &= check("scipy's best-arrangement p", 0.0577, 0.05767375, 5e-4, "scipy asymptotic")
+
+    # The two fractions the draft names side by side, and the grid column his reference sits on.
+    hp = mn["his_five"][0]
+    ok &= check("his pair fraction, ours", 23.8, hp["our_fraction_percent"], 0.05,
+                "matched-null receipt")
+    worst2 = max(mn["his_five"], key=lambda f: f["his_percent"] - f["our_fraction_percent"])
+    ok &= check("his fraction at (6,8)-(1,8)", 24.2, worst2["his_percent"], 1e-9, "his comment")
+    ok &= check("our fraction at (6,8)-(1,8)", 22.3, worst2["our_fraction_percent"], 0.05,
+                "matched-null receipt")
+    grid = np.linspace(0.0, 3.0, 21)
+    ok &= check("the grid column nearest 1.0", 1.05,
+                float(grid[int(np.argmin(np.abs(grid - 1.0)))]), 1e-9, "his grid, recomputed")
+
+    # HIS OWN FILE, read directly. The draft says his 24.5 percent does not follow from the data he
+    # sent, so the denominator has to come from his JSON and not from our reimplementation.
+    hisjson = os.path.join(SUB, "guanghao_archive_2026-09-04",
+                           "山谷的机制说明和实验"
+                           "数据9月4日",
+                           "多边动态扫描_矛盾注入"
+                           "点协同实验",
+                           "multi_edge_scan_results.json")
+    if not os.path.isfile(hisjson):
+        refuse("his multi_edge_scan_results.json is not at %s, so the draft's central new claim "
+               "has no source" % hisjson)
+    hj = json.load(io.open(hisjson, encoding="utf-8"))
+    arr = np.array(hj["multi_scan"]["e_proj_2d"])
+    span = float(arr.max() - arr.min())
+    md = float(hj["nonlinearity"]["mean_abs_diff_proj"])
+    ok &= check("his E span, from his file", 0.209787, span, 5e-6, "his multi_edge_scan_results")
+    ok &= check("his file divides to", 23.82, 100 * md / span, 0.005, "his file, recomputed")
+    ok &= check("the denominator his 24.5% needs", 0.204, md / 0.245, 5e-4, "recomputed")
+    ok &= check("his reported percentage", 24.5, HIS_PAIRS[0][3], 1e-9, "his comment")
+    if abs(100 * md / span - 24.5) < 0.1:
+        refuse("his file now divides to his own 24.5 percent, so the draft's central claim is "
+               "false and the discrepancy it reports does not exist")
+    ok &= check("the pair that agrees", 0.02,
+                abs(min(f["his_percent"] - f["our_fraction_percent"] for f in mn["his_five"])),
+                0.005, "matched-null receipt")
+    grid2 = np.linspace(0.0, 3.0, 21)
+    ok &= check("his grid step", 0.15, float(grid2[1] - grid2[0]), 1e-9, "his grid, recomputed")
+
+    ok &= check("delta between his fractions and ours, largest", 1.9,
+                max(f["his_percent"] - f["our_fraction_percent"] for f in mn["his_five"]), 0.06,
+                "matched-null receipt")
     ok &= check("the separable arm we are retracting", 18.9,
                 100 * nul["fraction_of_range"]["separable"], 0.05, "null receipt")
     pcts = [round(f["percentile_in_population"]) for f in mn["his_five"]]

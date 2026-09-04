@@ -235,18 +235,234 @@
    "source": "matched-null receipt"
   },
   {
-   "label": "his pair percentile",
-   "expected": 98.0,
-   "found": 97.89473684210526,
+   "label": "his pair percentile, in his unit",
+   "expected": 75.0,
+   "found": 75.26315789473684,
    "tol": 0.6,
    "ok": true,
    "source": "matched-null receipt"
   },
   {
-   "label": "pairs below his",
-   "expected": 186.0,
-   "found": 186.0,
-   "tol": 0,
+   "label": "his pair percentile, absolute deviation",
+   "expected": 97.0,
+   "found": 97.36842105263158,
+   "tol": 0.6,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "asym (6, 8)-(1, 8) first order",
+   "expected": 0.037152,
+   "found": 0.03715163243539895,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (6, 8)-(1, 8) second order",
+   "expected": 0.03267,
+   "found": 0.03266999621406126,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (6, 8)-(1, 8) percent",
+   "expected": -12.1,
+   "found": -12.0630936719418,
+   "tol": 0.06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(6, 8) first order",
+   "expected": 0.049977,
+   "found": 0.04997721399502706,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(6, 8) second order",
+   "expected": 0.050465,
+   "found": 0.05046454553219808,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(6, 8) percent",
+   "expected": 1.0,
+   "found": 0.9751074504063153,
+   "tol": 0.06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(1, 4) first order",
+   "expected": 0.032136,
+   "found": 0.032136199609117976,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(1, 4) second order",
+   "expected": 0.033575,
+   "found": 0.03357510177122273,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (0, 1)-(1, 4) percent",
+   "expected": 4.5,
+   "found": 4.477511901240785,
+   "tol": 0.06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (2, 5)-(3, 4) first order",
+   "expected": 0.034392,
+   "found": 0.034391522943450104,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (2, 5)-(3, 4) second order",
+   "expected": 0.03355,
+   "found": 0.03354969046088482,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "asym (2, 5)-(3, 4) percent",
+   "expected": -2.4,
+   "found": -2.447790648729058,
+   "tol": 0.06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "symmetric reference removes it",
+   "expected": 0.034004,
+   "found": 0.034003697529157,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "asymmetry receipt"
+  },
+  {
+   "label": "common neighbours r",
+   "expected": -0.447,
+   "found": -0.4472135954999579,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "computed from his table"
+  },
+  {
+   "label": "common neighbours p",
+   "expected": 0.45,
+   "found": 0.4501848557521007,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "computed from his table"
+  },
+  {
+   "label": "scipy's best-arrangement p",
+   "expected": 0.0577,
+   "found": 0.05767375,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "scipy asymptotic"
+  },
+  {
+   "label": "his pair fraction, ours",
+   "expected": 23.8,
+   "found": 23.82286377757687,
+   "tol": 0.05,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "his fraction at (6,8)-(1,8)",
+   "expected": 24.2,
+   "found": 24.2,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
+   "label": "our fraction at (6,8)-(1,8)",
+   "expected": 22.3,
+   "found": 22.269386694564076,
+   "tol": 0.05,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "the grid column nearest 1.0",
+   "expected": 1.05,
+   "found": 1.05,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his grid, recomputed"
+  },
+  {
+   "label": "his E span, from his file",
+   "expected": 0.209787,
+   "found": 0.209786759732916,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "his multi_edge_scan_results"
+  },
+  {
+   "label": "his file divides to",
+   "expected": 23.82,
+   "found": 23.822863784278706,
+   "tol": 0.005,
+   "ok": true,
+   "source": "his file, recomputed"
+  },
+  {
+   "label": "the denominator his 24.5% needs",
+   "expected": 0.204,
+   "found": 0.20398862860663114,
+   "tol": 0.0005,
+   "ok": true,
+   "source": "recomputed"
+  },
+  {
+   "label": "his reported percentage",
+   "expected": 24.5,
+   "found": 24.5,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
+   "label": "the pair that agrees",
+   "expected": 0.02,
+   "found": 0.019464064964090255,
+   "tol": 0.005,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "his grid step",
+   "expected": 0.15,
+   "found": 0.15,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his grid, recomputed"
+  },
+  {
+   "label": "delta between his fractions and ours, largest",
+   "expected": 1.9,
+   "found": 1.930613305435923,
+   "tol": 0.06,
    "ok": true,
    "source": "matched-null receipt"
   },
@@ -324,7 +540,7 @@
   }
  ],
  "failed": 0,
- "distinct_figures_in_draft": 26,
+ "distinct_figures_in_draft": 45,
  "unclaimed": [],
  "controls": {
   "mutation_rejected": true,
