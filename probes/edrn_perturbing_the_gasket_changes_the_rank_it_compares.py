@@ -54,3 +54,31 @@ for eps in (0.5, 0.1, 0.01, 0.001):
 # a perturbation that keeps a mirror symmetry, for contrast
 G=nx.Graph(); G.add_edges_from(EDGES)
 print("\nCONCLUSION: if the rank changes under perturbation, the 2.27e-2 compares different objects.")
+
+# ---- recorded run -------------------------------------------------------------------
+# This probe was cited by name in two letters to collaborators before it wrote anything a
+# reader could check. It printed to stdout and stopped there, so `main` carried the script
+# and no record of the run. The block below re-uses the functions above, changes no
+# measurement, and writes the receipt beside the file under the convention every other
+# probe here follows.
+import json as _json, os as _os
+_rep = {"N": N, "n_edges": len(EDGES), "dim": DIM, "tol": 1e-8,
+        "unperturbed": {"degeneracy": d0, "gap": float(g0),
+                        "levels": [float(x) for x in w0]},
+        "perturbed": {}}
+for _eps in (0.5, 0.1, 0.01, 0.001):
+    _w = list(base); _w[0] = 1.0 + _eps
+    _d, _g, _ws = degen(build(_w))
+    _rep["perturbed"][str(_eps)] = {"edge": list(EDGES[0]), "degeneracy": _d,
+                                    "gap": float(_g), "E0_split": float(_ws[1] - _ws[0]),
+                                    "levels": [float(x) for x in _ws]}
+_rep["rank_changes_under_perturbation"] = any(
+    v["degeneracy"] != d0 for v in _rep["perturbed"].values())
+_rep["ranks_seen"] = sorted({d0} | {v["degeneracy"] for v in _rep["perturbed"].values()})
+print("MEASURED: unperturbed rank %d, perturbed rank(s) %s, rank changes: %s"
+      % (d0, sorted({v["degeneracy"] for v in _rep["perturbed"].values()}),
+         _rep["rank_changes_under_perturbation"]))
+_out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+with open(_out, "w", encoding="utf-8") as _fh:
+    _json.dump(_rep, _fh, indent=1)
+print("wrote", _os.path.basename(_out))

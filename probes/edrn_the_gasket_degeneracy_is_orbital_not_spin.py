@@ -248,3 +248,37 @@ print("  sectors carrying the ground level: %s, each %s-fold"
 print("  -> %d in the full space" % sum(v[1] for v in _carry.values()))
 if sum(v[1] for v in _carry.values()) != deg:
     print("  CONTROL FAILED: the sector sum disagrees with the full-space degeneracy above")
+
+# ---- recorded run -------------------------------------------------------------------
+# Cited by name in a letter to a collaborator before it wrote anything a reader could
+# check. It printed and stopped, so `main` carried the script and no record of the run.
+# Nothing below changes a measurement; it serialises what the run already computed.
+import json as _json, os as _os
+_rep = {
+    "N": N,
+    "n_edges": len(EDGES),
+    "ground_degeneracy_full_space": deg,
+    "orbits": [{"index": _i, "size": len(_o), "edges": [list(_e) for _e in _o]}
+               for _i, _o in enumerate(orbits)],
+    "single_vector_invariance_worst": float(worst_rest),
+    "s2_eigenvalues": [float(_x) for _x in ev],
+    "implied_S": [float((-1 + (1 + 4 * _x) ** 0.5) / 2) for _x in ev],
+    # chars[k] is the 3-tuple (n_elements, character, spread). An earlier version of this
+    # block applied len() and mean() to that tuple and recorded +1.666667 where the run had
+    # printed +4.000000, so the receipt contradicted both the run and the letter citing it.
+    "characters": {str(_k): {"n_elements": _v[0], "value": _v[1], "spread": _v[2]}
+                   for _k, _v in chars.items()},
+    "control_is_E_irrep": bool(_is_E),
+    "sz_sectors": {str(_k): {"E0": _v[0], "in_sector_degeneracy": _v[1]}
+                   for _k, _v in sorted(_sec.items())},
+    "sectors_carrying_ground": sorted(_carry),
+    "sector_sum": sum(_v[1] for _v in _carry.values()),
+}
+_rep["control_sector_sum_equals_full_degeneracy"] = (_rep["sector_sum"] == deg)
+print("MEASURED: full-space degeneracy %d, sector sum %d, control %s"
+      % (deg, _rep["sector_sum"],
+         "PASS" if _rep["control_sector_sum_equals_full_degeneracy"] else "FAIL"))
+_out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+with open(_out, "w", encoding="utf-8") as _fh:
+    _json.dump(_rep, _fh, indent=1)
+print("wrote", _os.path.basename(_out))

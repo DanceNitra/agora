@@ -38,6 +38,7 @@ import itertools
 import json
 import os
 import re
+import subprocess
 import sys
 
 sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace", line_buffering=True)
@@ -317,6 +318,25 @@ def main():
     ok &= check("his E span, from his file", 0.209787, span, 5e-6, "his multi_edge_scan_results")
     ok &= check("his file divides to", 23.82, 100 * md / span, 0.005, "his file, recomputed")
     ok &= check("the denominator his 24.5% needs", 0.204, md / 0.245, 5e-4, "recomputed")
+    # THE ONE VALUE IN HIS FILE THAT PRODUCES 24.5 PERCENT. An earlier draft said no such value
+    # existed; it does, and a verification pass found it. It is E at one grid point on entrance
+    # two's marginal, not a range, but "I cannot find it" was false and refutable in one grep.
+    e2 = np.array(hj["single_scan"]["e2_proj"])
+    sg = np.array(hj["s_grid"])
+    ok &= check("e2_proj[9], the value that reaches his figure", 0.204144, float(e2[9]), 5e-6,
+                "his file")
+    ok &= check("what it divides to", 24.48, 100 * md / float(e2[9]), 0.005, "his file, recomputed")
+    ok &= check("the s value it sits at", 1.35, float(sg[9]), 1e-9, "his file")
+    if abs(100 * md / span - 100 * md / float(e2[9])) < 0.1:
+        refuse("the span and e2_proj[9] now give the same percentage, so the draft's distinction "
+               "between a range and a single point carries nothing")
+    ok &= check("the pair that agrees, to three places", 0.019,
+                abs(min(f["his_percent"] - f["our_fraction_percent"] for f in mn["his_five"])),
+                0.0006, "matched-null receipt")
+    ok &= check("his dual-v0 cross-check", 3.98, 3.98 if "3.98" in
+                subprocess.run(["gh", "api", "repos/luoxuejian000/edrn-dmrg-verification/issues/"
+                                "comments/5537619108"], capture_output=True, text=True,
+                               encoding="utf-8").stdout else 0.0, 1e-9, "his comment")
     ok &= check("his reported percentage", 24.5, HIS_PAIRS[0][3], 1e-9, "his comment")
     if abs(100 * md / span - 24.5) < 0.1:
         refuse("his file now divides to his own 24.5 percent, so the draft's central claim is "
@@ -374,6 +394,26 @@ def main():
                 claimed.add(round(abs(v) / 10 ** np.floor(np.log10(abs(v))), 1))
     claimed |= {2.0, 1.0, 0.0, 0.05, 3.0, 1.2, 1.7, 6.0, 20.0, 12.0, 41.0, 61.0, 15.0, 14.0,
                 11.0, 4.0, 5.0}
+    # THE COVERAGE GATE ONLY EVER SAW DECIMALS, and a verification pass found three claims it could
+    # not: "twelvefold" (unsupported, and our own probe says 2.7x), "6th of 190" (185 below makes
+    # it 5th, contradicting "only four pairs exceed it" in the next clause), and "to 4e-14"
+    # (a dual-v0 cross-check of ONE experiment, quoted as a tolerance for two). Integers, ordinals
+    # and magnitude words carry claims exactly as decimals do.
+    MAGNITUDE_WORDS = ("twofold", "threefold", "fourfold", "fivefold", "tenfold", "twelvefold",
+                       "hundredfold", "twice", "half", "double", "triple", "order of magnitude")
+    found_words = [w for w in MAGNITUDE_WORDS if w in text.lower()]
+    if found_words:
+        refuse("the draft uses magnitude word(s) %s. Each states a ratio that no check here can "
+               "re-derive; replace it with the measured number or remove it." % found_words)
+    ordinals = sorted({m.group(0) for m in re.finditer(r"\d+(?:st|nd|rd|th)", text)})
+    ALLOWED_ORDINALS = {"75th", "97th", "5th", "34th", "55th", "68th", "83th", "73th", "88th",
+                        "87th", "79th"}
+    unchecked = [o for o in ordinals if o not in ALLOWED_ORDINALS]
+    if unchecked:
+        refuse("ordinal rank(s) %s appear with no check behind them; every rank in the draft must "
+               "come from a receipt" % unchecked)
+    print("  ordinals in the draft, all from receipts: %s" % ordinals)
+
     stated = {round(float(m.group(1)), 6) for m in re.finditer(r"(?<![\w.])(\d+\.\d+)", text)}
     unclaimed = sorted(x for x in stated - claimed)
     print()

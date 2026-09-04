@@ -91,6 +91,18 @@ def main():
     best = [f for f in frontier if f[2] <= 0.05]
     reach = max((f[3] for f in best), default=0)
     print(f"\n     at a 5% false-positive budget the best acceptance is {reach} of {len(real)}.")
+
+    # ---- recorded run ------------------------------------------------------------
+    # Cited by name in a letter to a collaborator while it recorded nothing. Nothing
+    # below changes a measurement; it serialises what the run already computed.
+    import json as _json, os as _os
+    _rep = {"n_real_curves": len(real), "best_acceptance_at_5pct_fp": int(reach),
+            "frontier": [{"rel_bar": f[0], "k": f[1], "false_positive": f[2],
+                          "accepted": f[3]} for f in frontier]}
+    _out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+    with open(_out, "w", encoding="utf-8") as _fh:
+        _json.dump(_rep, _fh, indent=1)
+    print("wrote", _os.path.basename(_out))
     for target in (5, 6):
         cheapest = min((f for f in frontier if f[3] >= target), key=lambda f: f[2], default=None)
         if cheapest:

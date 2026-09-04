@@ -123,6 +123,18 @@ def main():
     print(f"      {fp} of 2000 = {100*fp/2000:.2f}%")
 
     print(f"\n   MEASURED: controls all correct = {ok}")
+
+    # ---- recorded run ------------------------------------------------------------
+    # Cited by name in a letter to a collaborator while it recorded nothing. Nothing
+    # below changes a measurement; it serialises what the run already computed.
+    import json as _json, os as _os
+    _rep = {"frozen_k": K, "controls_all_correct": bool(ok),
+            "false_positives_on_noise": int(fp), "noise_curves": 2000,
+            "false_positive_rate_pct": 100.0 * fp / 2000.0}
+    _out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+    with open(_out, "w", encoding="utf-8") as _fh:
+        _json.dump(_rep, _fh, indent=1)
+    print("wrote", _os.path.basename(_out))
     if not ok:
         print("   -> the criterion is not usable as stated; do not pre-register it")
 

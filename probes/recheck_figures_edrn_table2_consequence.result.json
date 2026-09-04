@@ -435,6 +435,46 @@
    "source": "recomputed"
   },
   {
+   "label": "e2_proj[9], the value that reaches his figure",
+   "expected": 0.204144,
+   "found": 0.20414442666878496,
+   "tol": 5e-06,
+   "ok": true,
+   "source": "his file"
+  },
+  {
+   "label": "what it divides to",
+   "expected": 24.48,
+   "found": 24.481302195778472,
+   "tol": 0.005,
+   "ok": true,
+   "source": "his file, recomputed"
+  },
+  {
+   "label": "the s value it sits at",
+   "expected": 1.35,
+   "found": 1.3499999999999999,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his file"
+  },
+  {
+   "label": "the pair that agrees, to three places",
+   "expected": 0.019,
+   "found": 0.019464064964090255,
+   "tol": 0.0006,
+   "ok": true,
+   "source": "matched-null receipt"
+  },
+  {
+   "label": "his dual-v0 cross-check",
+   "expected": 3.98,
+   "found": 3.98,
+   "tol": 1e-09,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
    "label": "his reported percentage",
    "expected": 24.5,
    "found": 24.5,
@@ -540,7 +580,7 @@
   }
  ],
  "failed": 0,
- "distinct_figures_in_draft": 45,
+ "distinct_figures_in_draft": 49,
  "unclaimed": [],
  "controls": {
   "mutation_rejected": true,

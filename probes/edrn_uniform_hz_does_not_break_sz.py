@@ -105,6 +105,32 @@ def main():
     print("      decides blindness: if the diagnostic still reads 0 in a sector where it cannot be 0,")
     print("      the diagnostic is broken. If it moves, the earlier zero was the symmetry speaking.")
 
+    # ---- recorded run ------------------------------------------------------------
+    # Cited by name in a letter to a collaborator while it recorded nothing. The loop
+    # above prints its sectors and keeps none, so this recomputes them from the same
+    # spectrum and serialises them. No measurement changes.
+    import json as _json, os as _os
+    _sec = {}
+    for _t in (0.0, 1.0, 2.0):
+        _b = None
+        for _k in range(v.shape[1]):
+            _g = v[:, _k]
+            _m = float(np.real(_g.conj() @ (Sz @ _g)))
+            if abs(_m - _t) < 1e-6:
+                _b = (float(w[_k]), _m)
+                break
+        _sec[str(_t)] = None if _b is None else {
+            "lowest_E": _b[0], "Sz": _b[1], "mean_magnetisation": _b[1] / N}
+    _rep = {"N": N, "sectors": _sec}
+    _rep["control_nonzero_sector_exists"] = any(
+        v2 is not None and abs(v2["mean_magnetisation"]) > 1e-9 for v2 in _sec.values())
+    print("MEASURED: a sector with non-zero mean magnetisation exists = %s"
+          % _rep["control_nonzero_sector_exists"])
+    _out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+    with open(_out, "w", encoding="utf-8") as _fh:
+        _json.dump(_rep, _fh, indent=1)
+    print("wrote", _os.path.basename(_out))
+
 
 if __name__ == "__main__":
     main()

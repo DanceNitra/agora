@@ -1,0 +1,7 @@
+{
+ "frozen_k": 8.0,
+ "controls_all_correct": true,
+ "false_positives_on_noise": 0,
+ "noise_curves": 2000,
+ "false_positive_rate_pct": 0.0
+}
