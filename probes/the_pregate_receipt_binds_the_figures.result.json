@@ -1,0 +1,53 @@
+{
+ "script": "the_pregate_receipt_binds_the_figures.py",
+ "draft_figures": 26,
+ "cases": [
+  {
+   "case": "1. no receipt at all",
+   "must_refuse": true,
+   "refused": true,
+   "why": "no pregate receipt for luoxuejian000/edrn-dmrg-verification#2. Run it on the CLAIMS before the prose: python tools/pregate.py claims.md --thread luoxuejian000/edrn-dmrg-verification#2 --archive <their",
+   "ok": true
+  },
+  {
+   "case": "2. receipt with blocked claims",
+   "must_refuse": true,
+   "refused": true,
+   "why": "the pregate run at _probe_blocked.json still has 2 blocked claim(s). Delete them and re-run before writing.",
+   "ok": true
+  },
+  {
+   "case": "3. receipt missing three figures",
+   "must_refuse": true,
+   "refused": true,
+   "why": "3 figure(s) in this draft were never put through the pregate: 0.447, 0.866, 1.000. Add them to the claims file, re-run pregate, then send. Receipts read: _probe_partial.json",
+   "ok": true
+  },
+  {
+   "case": "4. complete receipt, WRONG thread",
+   "must_refuse": true,
+   "refused": true,
+   "why": "no pregate receipt for luoxuejian000/edrn-dmrg-verification#2. Run it on the CLAIMS before the prose: python tools/pregate.py claims.md --thread luoxuejian000/edrn-dmrg-verification#2 --archive <their",
+   "ok": true
+  },
+  {
+   "case": "5. complete receipt (must PASS)",
+   "must_refuse": false,
+   "refused": false,
+   "why": "",
+   "ok": true
+  },
+  {
+   "case": "6. removed again",
+   "must_refuse": true,
+   "refused": true,
+   "why": "no pregate receipt for luoxuejian000/edrn-dmrg-verification#2. Run it on the CLAIMS before the prose: python tools/pregate.py claims.md --thread luoxuejian000/edrn-dmrg-verification#2 --archive <their",
+   "ok": true
+  }
+ ],
+ "controls": {
+  "a_complete_receipt_passes": true,
+  "missing_figures_are_named": true,
+  "wrong_thread_does_not_count": true
+ }
+}

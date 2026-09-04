@@ -318,9 +318,14 @@ def main():
         print()
 
     print("  %d of %d claims are worth writing. %d are not." % (len(res) - bad, len(res), bad))
+    # THE RECEIPT BINDS THE NUMBERS, not just the verdict. `send_approved` refuses a draft
+    # carrying a distinctive figure that no pregate run ever examined, so writing a letter with a
+    # number that skipped this check is the case that closes.
+    examined = sorted({n for r in res for n in r["numbers"]})
     if out:
         json.dump({"tool": "pregate", "thread": a.thread, "claims": len(res),
-                   "worth_writing": len(res) - bad, "results": res},
+                   "worth_writing": len(res) - bad, "blocked": bad,
+                   "numbers_examined": examined, "results": res},
                   io.open(out, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
         print("  written: %s" % out)
     if bad:

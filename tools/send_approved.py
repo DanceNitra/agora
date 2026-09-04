@@ -46,6 +46,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -435,6 +436,64 @@ def _thread_moved_gate(path, cmd, thread, acked):
     return 3
 
 
+PREGATE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           "agora_output", "pregate")
+
+
+def _pregate_gate_impl(path, thread_spec):
+    """Every distinctive figure in the draft must have been seen by a pregate run for this thread.
+
+    WHY IT IS BOUND TO THE NUMBERS. A receipt saying "the pre-check ran" proves only that some
+    claims were checked, not that the letter is made of them. Binding the figures closes the case
+    that actually happens: the claim list is cleared, then a number nobody pre-checked is written
+    into the prose anyway.
+
+    Measured 2026-09-04: one reply took nine versions and thirteen refusals here, and seven of the
+    thirteen were a repeat that `tools/pregate.py` finds in seconds. This is the wiring that makes
+    running it first not a thing to remember.
+    """
+    import glob as _glob
+    if not thread_spec:
+        return ("no --thread given, so the pregate receipt for this thread cannot be found. "
+                "Pass --thread owner/repo#N.")
+    body = io.open(path, encoding="utf-8").read()
+    nums = set(re.findall(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])", body))
+    if not nums:
+        return None
+    seen, runs = set(), []
+    for f in _glob.glob(os.path.join(PREGATE_DIR, "*.json")):
+        try:
+            d = json.load(io.open(f, encoding="utf-8"))
+        except Exception:
+            continue
+        if d.get("tool") != "pregate" or d.get("thread") != thread_spec:
+            continue
+        if d.get("blocked"):
+            return ("the pregate run at %s still has %d blocked claim(s). Delete them and re-run "
+                    "before writing." % (os.path.basename(f), d["blocked"]))
+        runs.append(os.path.basename(f))
+        seen |= set(d.get("numbers_examined") or [])
+    if not runs:
+        return ("no pregate receipt for %s. Run it on the CLAIMS before the prose: "
+                "python tools/pregate.py claims.md --thread %s --archive <their files> "
+                "--json agora_output/pregate/<name>.json" % (thread_spec, thread_spec))
+    unchecked = sorted(nums - seen)
+    if unchecked:
+        return ("%d figure(s) in this draft were never put through the pregate: %s. "
+                "Add them to the claims file, re-run pregate, then send. Receipts read: %s"
+                % (len(unchecked), ", ".join(unchecked[:8]), ", ".join(runs)))
+    return None
+
+
+def _pregate_gate(path, thread_spec):
+    why = _pregate_gate_impl(path, thread_spec)
+    if why is None:
+        return None
+    print("REFUSED: the claims were not pre-checked.")
+    print("  " + why)
+    return 1
+
+
 def main(argv=None):
     import owner_spoke as osp   # lives beside this file
 
@@ -538,6 +597,9 @@ def main(argv=None):
     # for being in the way. Gates the PAYLOAD, not the file, for the same reason bind_payload exists.
     # THE GATE FIRST, before anything cheap or expensive. It is the three skills, and it is not
     # waivable by any flag on this command line: the receipts are bound to the draft's bytes.
+    refuse = _pregate_gate(a.file, a.thread)
+    if refuse is not None:
+        return refuse
     refuse = _the_gate(a.file)
     if refuse is not None:
         return refuse
