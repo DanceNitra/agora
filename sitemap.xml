@@ -15,7 +15,7 @@
   <url><loc>https://dancenitra.github.io/agora/public/aiaudit/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/a-status-nobody-earned.html</loc><lastmod>2026-08-22</lastmod></url>
-  <url><loc>https://dancenitra.github.io/agora/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-22</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-28</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/a-green-suite-that-never-ran.html</loc><lastmod>2026-08-13</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/verify-agent-memory-deletion.html</loc><lastmod>2026-08-01</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/defenses-that-failed-their-own-control.html</loc><lastmod>2026-07-30</lastmod></url>
@@ -75,6 +75,7 @@
   <url><loc>https://dancenitra.github.io/agora/public/posts/a-95-confidence-interval-that-covers-31-of-the-time-differen.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/why-crowds-get-dumber-when-they-watch-each-other-and-the-sur.html</loc><lastmod>2026-06-30</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/deep-dive-hot-hand.html</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/pre-trends-test-weak-evidence.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/causal-inference-phase-diagram.html</loc><lastmod>2026-06-29</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/</loc></url>
@@ -82,7 +83,7 @@
   <url><loc>https://dancenitra.github.io/agora/sk/public/self-audit/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/aiaudit/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/a-status-nobody-earned.html</loc><lastmod>2026-08-22</lastmod></url>
-  <url><loc>https://dancenitra.github.io/agora/sk/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-22</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/sk/public/posts/provenance-field-one-value.html</loc><lastmod>2026-08-28</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/a-green-suite-that-never-ran.html</loc><lastmod>2026-08-13</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/verify-agent-memory-deletion.html</loc><lastmod>2026-08-01</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/defenses-that-failed-their-own-control.html</loc><lastmod>2026-07-30</lastmod></url>
@@ -141,6 +142,7 @@
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/a-95-confidence-interval-that-covers-31-of-the-time-differen.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/why-crowds-get-dumber-when-they-watch-each-other-and-the-sur.html</loc><lastmod>2026-06-30</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/sk/public/posts/deep-dive-hot-hand.html</loc><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/pre-trends-test-weak-evidence.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/causal-inference-phase-diagram.html</loc><lastmod>2026-06-29</lastmod></url>
 </urlset>

@@ -11,6 +11,11 @@ on:
     paths:
       - 'index.html'
       - 'public/**'
+      # THE SLOVAK HALF OF THE SITE WAS NOT A TRIGGER. 63 mirrored pages live under sk/,
+      # and a commit touching only them never started a deploy -- measured 2026-08-22, when
+      # a missing sk mirror was pushed and no run fired at all. The deploy job already
+      # COPIES sk/ into the artifact; it just could not be woken by it.
+      - 'sk/**'
       - 'sitemap.xml'
       - 'robots.txt'
       - 'google*.html'          # search-engine ownership tokens
