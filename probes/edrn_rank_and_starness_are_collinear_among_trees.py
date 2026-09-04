@@ -23,3 +23,44 @@ for N in (7, 8, 9, 10):
           % (N, r_star, total, len(same)))
     for s in same[:4]:
         print("      degree sequence %s" % s)
+
+# ---- recorded run -------------------------------------------------------------------
+# Cited by name in a letter to a collaborator while it recorded nothing, so `main` carried
+# the script and no result. The letter discussing it says in as many words that no run of
+# ours stood behind it. This is that run. It changes no measurement.
+import json as _json, os as _os
+_rep = {"lieb_mattis_rank": "2S+1 = |nA - nB| + 1 on a connected bipartite AF Heisenberg graph",
+        "by_N": {}}
+for _N in (7, 8, 9, 10):
+    _star = nx.star_graph(_N - 1)
+    _rs = rank_of_tree(_star)
+    _same, _total, _ranks = [], 0, {}
+    for _T in nx.nonisomorphic_trees(_N):
+        _total += 1
+        _r = rank_of_tree(_T)
+        _ranks[_r] = _ranks.get(_r, 0) + 1
+        if _r == _rs and not nx.is_isomorphic(_T, _star):
+            _same.append(sorted(d for _, d in _T.degree()))
+    _rep["by_N"][str(_N)] = {
+        "star_rank": _rs,
+        "n_nonisomorphic_trees": _total,
+        "n_non_star_trees_at_star_rank": len(_same),
+        "degree_sequences_of_those": _same[:8],
+        "rank_histogram": {str(k): v for k, v in sorted(_ranks.items())},
+        "max_rank_among_non_star_trees": max((k for k in _ranks if k < _rs), default=None),
+    }
+# The question this probe was written to answer: is there a discriminating control, that is a
+# non-star tree carrying the star's rank? If none exists at any N, rank and star-ness cannot be
+# separated within trees, and a regression fitted on non-star trees predicts the star's rank by
+# extrapolation with no data at that point.
+_rep["a_discriminating_control_exists_among_trees"] = any(
+    v["n_non_star_trees_at_star_rank"] > 0 for v in _rep["by_N"].values())
+print("MEASURED: discriminating control among trees exists = %s"
+      % _rep["a_discriminating_control_exists_among_trees"])
+for _k, _v in sorted(_rep["by_N"].items(), key=lambda x: int(x[0])):
+    print("  N=%s: star rank %d, highest non-star rank %s"
+          % (_k, _v["star_rank"], _v["max_rank_among_non_star_trees"]))
+_out = _os.path.splitext(_os.path.abspath(__file__))[0] + ".result.json"
+with open(_out, "w", encoding="utf-8") as _fh:
+    _json.dump(_rep, _fh, indent=1)
+print("wrote", _os.path.basename(_out))
