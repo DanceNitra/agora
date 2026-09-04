@@ -267,6 +267,11 @@ def call_llm(
                         time.sleep(0.4)
                         continue
                     errors.append(f"{tier_name}({model}): empty completion x3")
+                    try:
+                        from agora.execution.metabolism import record_failure as _mfail
+                        _mfail(f"{tier_name}: empty completion x3")
+                    except Exception:
+                        pass
                     break
 
                 # Log successful fallback (so we know when it happens)
@@ -284,6 +289,11 @@ def call_llm(
             except Exception as e:
                 error_str = str(e)
                 errors.append(f"{tier_name}({model}): {error_str[:100]}")
+                try:
+                    from agora.execution.metabolism import record_failure as _mfail
+                    _mfail(f"{tier_name}: {error_str[:80]}")
+                except Exception:
+                    pass
 
                 # Usage limit / rate limit — flip to local qwen3-coder for a sticky window so we
                 # stop hammering the capped cloud, then retry once with backoff.
@@ -320,6 +330,11 @@ def call_llm(
                 return content
         except Exception as e:
             errors.append(f"local-qwen: {str(e)[:80]}")
+            try:
+                from agora.execution.metabolism import record_failure as _mfail
+                _mfail(f"local-qwen: {str(e)[:60]}")
+            except Exception:
+                pass
 
     # All tiers failed. Return EMPTY (not an error string) so callers' existing empty-checks skip
     # the round gracefully instead of RECORDING the error text as content — a "[LLM Error: ...]"

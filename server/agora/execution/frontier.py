@@ -269,10 +269,18 @@ def _rotation_target(vault: str) -> dict | None:
     return None
 
 
+# The window this ledger keeps. It used to be 80 rows, which on a busy day is a few hours: the
+# organ that selects our research direction is the second largest spender in the brain, 3.47M
+# tokens over 794 calls, and its entire history was 80 lines long, all of them from the same day.
+# A selector whose choices cannot be reviewed cannot be judged, and the cap was silently deciding
+# that. 4,000 rows is roughly a year at the observed rate and costs a few hundred kilobytes.
+_KEEP = 4000
+
+
 def record_seeded(target: str, kind: str = "") -> None:
     items = _load()
     items.append({"target": (target or "")[:120], "kind": kind[:20], "ts": time.time()})
-    _save(items[-80:])
+    _save(items[-_KEEP:])
 
 
 def format_frontier() -> str:

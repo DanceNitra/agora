@@ -1,0 +1,17 @@
+{
+ "script": "the_bubbles_are_free_and_the_research_still_pays.py",
+ "chatter_calls_guarded": [
+  1035
+ ],
+ "chatter_calls_unguarded": [],
+ "default_off": true,
+ "canned_else_branch": true,
+ "research_unconditional": {
+  "_collaborate": 2,
+  "_pipeline_tick": 1,
+  "_run_debate": 3,
+  "_run_red_team": 1
+ },
+ "mutation_caught_at": 1035,
+ "verdict": "CHATTER_IS_FREE"
+}

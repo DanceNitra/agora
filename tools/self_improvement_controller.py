@@ -99,9 +99,19 @@ def _check_churn(st, now):
         return
     prev = st.get("organs", {})
     streak = st.setdefault("churn_streak", {})
-    cur = {k: {"ktok": v.get("ktok", 0), "value": v.get("value", 0)} for k, v in m["organs"].items()}
+    cur = {k: {"ktok": v.get("ktok", 0), "value": v.get("value", 0), "cls": v.get("cls", "priced")}
+           for k, v in m["organs"].items()}
+    # ONLY A PRICED ORGAN CAN BE JUDGED. `roi_report` now labels each organ priced / upstream /
+    # unclassified, and an unpriced organ has value None by design: its output is counted where it
+    # lands, not here. Reading that as "value did not grow" would flag every selector, router and
+    # intake path in the system as churning, every hour, forever. Before the labels existed this was
+    # a live hazard rather than a hypothetical: all ten organs read value 0.0, most of them only
+    # because the spend label is a route name and the value key is a module name.
+    unpriced = [k for k, v in cur.items() if v["cls"] != "priced"]
+    if unpriced:
+        print("[selfimp] not judged (unpriced by design): %s" % ", ".join(sorted(unpriced)), flush=True)
     for organ, o in cur.items():
-        if organ in CHURN_EXEMPT:
+        if organ in CHURN_EXEMPT or o["cls"] != "priced":
             continue
         p = prev.get(organ)
         if not p:

@@ -1,0 +1,65 @@
+{
+ "script": "every_spender_is_classified_before_it_is_ranked.py",
+ "organs": {
+  "unknown": {
+   "ktok": 366.8,
+   "cls": "upstream",
+   "value": null
+  },
+  "frontier-seed": {
+   "ktok": 3472.7,
+   "cls": "upstream",
+   "value": null
+  },
+  "agent-dialogue": {
+   "ktok": 4494.9,
+   "cls": "priced",
+   "value": 0.0
+  },
+  "vault-note": {
+   "ktok": 43.5,
+   "cls": "upstream",
+   "value": null
+  },
+  "empirical-test": {
+   "ktok": 33.7,
+   "cls": "upstream",
+   "value": null
+  },
+  "directions": {
+   "ktok": 59.9,
+   "cls": "upstream",
+   "value": null
+  },
+  "seminar": {
+   "ktok": 32.9,
+   "cls": "priced",
+   "value": 0.0
+  },
+  "match": {
+   "ktok": 208.0,
+   "cls": "upstream",
+   "value": null
+  },
+  "scan": {
+   "ktok": 24.7,
+   "cls": "upstream",
+   "value": null
+  },
+  "self-upgrades": {
+   "ktok": 9.0,
+   "cls": "upstream",
+   "value": null
+  }
+ },
+ "total_ktok": 8746.1,
+ "judgeable_share": 0.518,
+ "window_days": null,
+ "fails_total": 0,
+ "unclassified": [],
+ "controls": {
+  "mutation_caught": true,
+  "pricing_still_works": 2,
+  "every_reason_is_a_sentence": true
+ }
+}

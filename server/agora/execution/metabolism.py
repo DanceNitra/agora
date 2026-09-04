@@ -70,15 +70,42 @@ def _caller_organ() -> str:
 
 
 def record_call(prompt_tokens: int, completion_tokens: int) -> None:
-    """Meter one LLM call against its organ (called from inside call_llm)."""
-    organ = _caller_organ()
-    d = _load()
-    e = d.setdefault(organ, {"calls": 0, "tok_in": 0, "tok_out": 0})
-    e["calls"] += 1
-    e["tok_in"] += max(0, int(prompt_tokens or 0))
-    e["tok_out"] += max(0, int(completion_tokens or 0))
-    e["ts"] = time.time()
-    _save(d)
+    """Meter one SUCCESSFUL LLM call against its organ (called from inside call_llm).
+
+    `first_ts` is recorded because without it a total is not a rate. Measured 2026-09-04: the store
+    held 8.75M tokens and every organ carried only a LAST-call timestamp, so nobody could say
+    whether that was a day of spend or three months of it, and the same number supports either
+    "we are fine" or "stop everything".
+    """
+    _bump(_caller_organ(), 1, max(0, int(prompt_tokens or 0)), max(0, int(completion_tokens or 0)), 0)
+
+
+def record_failure(note: str = "") -> None:
+    """Meter one FAILED call: a refusal, a rate limit, a timeout, an empty completion.
+
+    A failure costs the provider's quota and our wall-clock and, before this, left no trace at all:
+    the meter sat on the success path only. So a retry storm against a 429 was invisible in the one
+    artifact meant to explain where the quota went, which is how a weekly limit arrived unannounced.
+    """
+    _bump(_caller_organ(), 0, 0, 0, 1, note)
+
+
+def _bump(organ, calls, tin, tout, fails, note=""):
+    try:
+        d = _load()
+        e = d.setdefault(organ, {"calls": 0, "tok_in": 0, "tok_out": 0, "fails": 0})
+        e["calls"] += calls
+        e["tok_in"] += tin
+        e["tok_out"] += tout
+        e["fails"] = e.get("fails", 0) + fails
+        now = time.time()
+        e.setdefault("first_ts", now)
+        e["ts"] = now
+        if note:
+            e["last_fail"] = str(note)[:120]
+        _save(d)
+    except Exception:
+        pass
 
 
 def value_snapshot() -> dict:
@@ -168,41 +195,91 @@ _SPEND2VALUE = {
     "scout-target": "scout",
     "press-target": "press",
     "agent-dialogue": "dialogue",       # conversations + brainstorms → Seminar contributions
+    "seminar": "dialogue",              # the same organ under its MODULE name, see _caller_organ
+}
+
+# Organs that will never have a value ledger of their own, each with the reason. An organ that is
+# in neither this map nor _SPEND2VALUE is UNCLASSIFIED, which is reported as a defect rather than
+# quietly ranked at ROI 0.0.
+#
+# WHY THIS EXISTS. `roi_report` used to fall back to `value.get(organ, 0.0)`, so an organ whose
+# value key the mapping could not reach scored 0.0 and sat in the ranking next to an organ that
+# genuinely produced nothing. Those are opposite diagnoses wearing one number. Measured 2026-09-04:
+# all 10 spend organs read ROI 0.0 while 3,919 value points sat in the ledgers, because the spend
+# label is a ROUTE name when the HTTP middleware sets one and a MODULE name otherwise, and the map
+# was written entirely against route names. The churn detector reads this number, so the drift also
+# left it unable to tell a wasteful organ from an unmapped one.
+_NO_VALUE_LEDGER = {
+    "unknown": "the stack walk found no Agora namespace, so this spend is unattributable by "
+               "construction; it is a gap in the meter, not an organ",
+    "frontier-seed": "a SELECTOR: it picks the next research direction, and whatever value follows "
+                     "is recorded by the organ that acts on the direction, never here",
+    "directions": "a SELECTOR, same shape as frontier-seed",
+    "match": "a ROUTER: it matches work to an agent; the value lands in the work",
+    "scan": "an INTAKE path: it reads sources into the pool that other organs draw from",
+    "vault-note": "the write path into the vault; the note's value is scored by the organs that "
+                  "later cite it, not at the moment of writing",
+    "empirical-test": "a MEASUREMENT run; its result is recorded by the organ that asked for it",
+    "self-upgrades": "changes to our own code, whose value is the repository, not a ledger",
+    "agent-think": "roleplay flavour, deliberately value-free and already canned by default",
+    "promote-findings": "a PROMOTION path; the promoted finding is scored where it lands",
 }
 
 
 def roi_report() -> dict:
-    """Per-organ spend + value + ROI (value points per kilotoken)."""
+    """Per-organ spend, value and ROI, with every organ CLASSIFIED so a 0.0 cannot lie.
+
+    Three classes, and the difference between them is the whole point:
+      * `priced`         has a value ledger; its ROI is a real number and churn can judge it.
+      * `upstream`       named in `_NO_VALUE_LEDGER` with a reason; it really does spend, and its
+                         value really is recorded elsewhere, so an ROI here would be a fiction.
+      * `unclassified`   in neither map. Reported as a defect, never ranked.
+
+    The number that was missing entirely is `judgeable_share`: what fraction of all spend sits in
+    an organ whose output we can actually price.
+    """
     spend = _load()
     value = value_snapshot()
-    organs = {}
+    organs, unclassified = {}, []
     for organ, e in spend.items():
         ktok = (e["tok_in"] + e["tok_out"]) / 1000.0
-        v = value.get(_SPEND2VALUE.get(organ, organ), 0.0)
-        organs[organ] = {"calls": e["calls"], "ktok": round(ktok, 1), "value": v,
-                         "roi": round(v / ktok, 2) if ktok > 0.05 else None}
+        row = {"calls": e["calls"], "ktok": round(ktok, 1), "fails": e.get("fails", 0),
+               "first_ts": e.get("first_ts"), "last_ts": e.get("ts")}
+        if organ in _SPEND2VALUE:
+            v = value.get(_SPEND2VALUE[organ], 0.0)
+            row.update(cls="priced", value_key=_SPEND2VALUE[organ], value=v,
+                       roi=round(v / ktok, 2) if ktok > 0.05 else None)
+        elif organ in _NO_VALUE_LEDGER:
+            row.update(cls="upstream", value=None, roi=None, why=_NO_VALUE_LEDGER[organ])
+        else:
+            row.update(cls="unclassified", value=None, roi=None,
+                       why="no value key and no declared reason; classify it before trusting any "
+                           "ranking that includes it")
+            unclassified.append(organ)
+        organs[organ] = row
+
     total_ktok = round(sum(o["ktok"] for o in organs.values()), 1)
-    mapped = set(_SPEND2VALUE.get(o, o) for o in organs)
+    judgeable = round(sum(o["ktok"] for o in organs.values() if o["cls"] == "priced"), 1)
+    # The window. A total without one is not a rate, and the same 8.75M tokens reads as calm or as
+    # an emergency depending on whether it covers a day or three months.
+    firsts = [o["first_ts"] for o in organs.values() if o.get("first_ts")]
+    lasts = [o["last_ts"] for o in organs.values() if o.get("last_ts")]
+    window_days = round((max(lasts) - min(firsts)) / 86400.0, 1) if firsts and lasts else None
+    mapped = {_SPEND2VALUE[o] for o in organs if o in _SPEND2VALUE}
     unmetered = {k: v for k, v in value.items() if k not in mapped and v}
-    # HOW MUCH OF THIS RANKING IS ACTUALLY CONNECTED. `unmetered_value` has always been computed here
-    # and never shown, so the CFO line published "best X / worst Y" while a third of the recorded value
-    # had no spend row to pair with. Measured 2026-08-17: 3,912.5 unattributable points against 8,708
-    # attributed (31%), and of 17 spend organs exactly ONE resolved to a value key -- every other organ
-    # reported ROI 0.000 not because it produced nothing but because its value lives under a name the
-    # mapping no longer reaches.
-    #
-    # The cause is a naming drift, not a missing writer: the spend label is a ROUTE name when the HTTP
-    # middleware sets one and a MODULE name otherwise, while _SPEND2VALUE was written entirely against
-    # route names (verify-findings, replication-target, cartography-hole). Today's spend is mostly
-    # module names (seminar, scan, match, directions). The pairs are not guessed back into place here,
-    # because inventing an attribution is worse than admitting there is none -- what ships is the
-    # ADMISSION, so a reader can see the ranking's coverage before trusting its order.
-    attributed = sum(o["value"] for o in organs.values())
-    priced = sum(1 for o in organs.values() if o["value"])
-    return {"organs": organs, "total_ktok": total_ktok, "unmetered_value": unmetered,
+    attributed = sum(o.get("value") or 0.0 for o in organs.values())
+    return {"organs": organs, "total_ktok": total_ktok,
+            "window_days": window_days,
+            "ktok_per_day": round(total_ktok / window_days, 1) if window_days else None,
+            "fails_total": sum(o["fails"] for o in organs.values()),
+            "judgeable_ktok": judgeable,
+            "judgeable_share": round(judgeable / total_ktok, 3) if total_ktok else None,
+            "unclassified": unclassified,
+            "unmetered_value": unmetered,
             "unmetered_total": round(sum(unmetered.values()), 1),
             "attributed_total": round(attributed, 1),
-            "organs_with_value": priced, "organs_total": len(organs),
+            "organs_with_value": sum(1 for o in organs.values() if o.get("value")),
+            "organs_total": len(organs),
             "value_coverage": round(attributed / (attributed + sum(unmetered.values())), 3)
             if (attributed + sum(unmetered.values())) else None}
 
@@ -210,20 +287,34 @@ def roi_report() -> dict:
 def format_metabolism() -> str:
     r = roi_report()
     if not r["organs"]:
-        return "🔥 _No metabolic data yet — the meter starts now._"
-    lines = [f"🔥 *Metabolism* — {r['total_ktok']}k tokens metered"]
+        return "No metabolic data yet -- the meter starts now."
+    share = r.get("judgeable_share")
+    win = ("over %s days, %sk/day" % (r["window_days"], r["ktok_per_day"])
+           if r.get("window_days") else "over an UNKNOWN window (no organ carries a first_ts yet)")
+    out = ["*Metabolism* -- %sk tokens metered %s, %.0f%% of it in an organ we can price"
+           % (r["total_ktok"], win, (share * 100) if share is not None else 0.0)]
+    if r.get("fails_total"):
+        out.append("failed calls: %d (they cost quota and produce nothing)" % r["fails_total"])
     ranked = sorted(r["organs"].items(), key=lambda kv: -(kv[1]["ktok"]))
     for organ, o in ranked[:10]:
-        roi = f"ROI {o['roi']}" if o["roi"] is not None else "—"
-        lines.append(f"• {organ}: {o['ktok']}k tok / {o['calls']} calls · value {o['value']:g} · {roi}")
-    # The coverage line goes FIRST among the notes, because it decides whether the ROI column above is
-    # a ranking or a rumour.
-    if r.get("organs_total"):
-        lines.append(f"\n⚖️ _value coverage:_ {r['organs_with_value']}/{r['organs_total']} organs "
-                     f"resolve to a value ledger; {r['unmetered_total']:g} points "
-                     f"({100 * (1 - (r['value_coverage'] or 1)):.0f}%) have no spend row to pair with, "
-                     f"so a 0.000 below means UNMEASURED, not unproductive.")
+        head = "- %s: %sk tok / %s calls" % (organ, o["ktok"], o["calls"])
+        if o["cls"] == "priced":
+            roi = ("ROI %s" % o["roi"]) if o["roi"] is not None else "ROI --"
+            out.append("%s | value %g | %s" % (head, o["value"], roi))
+        else:
+            label = "NOT PRICED" if o["cls"] == "upstream" else "UNCLASSIFIED"
+            out.append("%s | %s (%s)" % (head, label, (o.get("why") or "")[:60]))
+    # This line decides whether the ROI column above is a ranking or a rumour, so it goes first among
+    # the notes. An unpriced organ is not a zero-value organ; it is one we cannot judge.
+    out.append("")
+    out.append("priced: %s/%s organs resolve to a value ledger. The rest are not zero-value, they "
+               "are unpriced, and their spend is %.0fk tokens."
+               % (r["organs_with_value"], r["organs_total"],
+                  r["total_ktok"] - r["judgeable_ktok"]))
+    if r.get("unclassified"):
+        out.append("UNCLASSIFIED organs (fix the map, do not read their ROI): "
+                   + ", ".join(r["unclassified"]))
     if r.get("unmetered_value"):
         top = sorted(r["unmetered_value"].items(), key=lambda kv: -kv[1])[:5]
-        lines.append("_unattributed:_ " + " · ".join(f"{k} {v:g}" for k, v in top))
-    return "\n".join(lines)
+        out.append("value with no spend row: " + " | ".join("%s %g" % (k, v) for k, v in top))
+    return chr(10).join(out)

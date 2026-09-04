@@ -572,6 +572,7 @@ _PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
 _STUDY = _PACE != "fast"
 _DECIDE_MIN, _DECIDE_MAX = (12.0, 24.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
 _BACKLOG_MIN, _BACKLOG_MAX = (4.0, 9.0)                             # gap to pull the NEXT queued quest
+_CHATTER_LLM = os.getenv("DUNGEON_CHATTER_LLM", "0").strip().lower() in ("1", "on", "true", "yes")
 _CONV_COOLDOWN = 240.0 if _STUDY else 150.0                        # long gap between talks — chatter (agent-dialogue) was the #1 token sink at ROI 0.04; grounded collaboration is the default now
 _WORK_DUR = (8.0, 18.0) if _STUDY else (3.0, 7.0)                   # how long an active quest "works" before it completes (telepathic, time-based)
 
@@ -1023,8 +1024,18 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int], memory: dict) ->
                       f'{{"line":"<one spoken line about the work, max 16 words>"}}.')
             convo = "  ".join(history) if history else "(you open)"
             fb = random.choice(_TALK.get(sid, ["What did you find?", "..."]))
-            line = await _llm_say(sysmsg, f"Your recent work: {my_work}\n"
-                                  f"Dialogue so far: {convo}\nReply to {oname} about the research.", fb)
+            # CANNED BY DEFAULT since 2026-09-04. Each conversation is three model calls whose
+            # product is a speech bubble of at most sixteen words: the line is broadcast, shown,
+            # and never stored as research. Nothing downstream reads it, and the trust update
+            # below does not depend on it. This is the dungeon's twin of the brain seminar the
+            # owner has been reporting for three months, and it was invisible because the dungeon
+            # had no spend meter at all until today. The canned openers keep the world alive and
+            # cost nothing. Set DUNGEON_CHATTER_LLM=1 to spend the model on the bubbles again.
+            if _CHATTER_LLM:
+                line = await _llm_say(sysmsg, f"Your recent work: {my_work}\n"
+                                      f"Dialogue so far: {convo}\nReply to {oname} about the research.", fb)
+            else:
+                line = fb
             engine.set_entity_thought(sid, line)
             # one-shot knowledge packet, speaker → listener, so you SEE who talks to whom
             # (carry the actual line + names so the Event Log shows real Q&A, not just "grew closer")
