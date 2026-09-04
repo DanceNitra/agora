@@ -187,6 +187,15 @@ def test_every_waiver_states_a_reason_and_a_date():
         assert w.get("dated"), f"{path}: waiver carries no date"
 
 
+OUT_OF_REPO_WAIVERS = {
+    # Named, not detected. Measured 2026-08-27; every other waiver must resolve.
+    "C:/Users/Danculus/ramr-pub/ramr_trace_export.py",
+    "C:/Users/Danculus/inspeximus-repo/probes/does_the_headline_number_depend_on_who_judges_it.py",
+    "C:/Users/Danculus/inspeximus-repo/probes/the_judge_is_not_deterministic_at_temperature_zero.py",
+    "agora_output/lab/memops/pilot.py",   # repo-relative but under .gitignore's agora_output/lab/
+}
+
+
 def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
     """A waiver for a finding that no longer occurs is stale permission sitting in the path.
 
@@ -194,8 +203,22 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
     is the only way the list ever shrinks.
     """
     data = json.loads((TOOLS / "construction_waivers.json").read_text(encoding="utf-8"))
+    seen_out_of_repo = set()
     for path, w in data.items():
         if path.startswith("_"):
+            continue
+        # FOUR WAIVERS NAME FILES THAT ARE NOT IN THIS REPOSITORY, so no checkout can resolve
+        # them and this assertion could only ever hold on the one machine that has them. Three are
+        # absolute paths into sibling repositories; the fourth is repo-relative but sits under
+        # agora_output/lab/, which .gitignore excludes. The first version of this exception keyed on
+        # "absolute path" and missed the ignored one, which is why CI failed a second time.
+        #
+        # They are listed by name rather than detected, so the set is identical in every
+        # environment and a fifth cannot appear quietly. The real fix is to move them to the waiver
+        # files of the repositories that own the code, which changes how publish_gate resolves a
+        # cross-repo artifact and is not a test edit.
+        if path in OUT_OF_REPO_WAIVERS:
+            seen_out_of_repo.add(path)
             continue
         p = ROOT / path
         assert p.exists(), f"waiver for {path} but the file is gone -- remove the waiver"
@@ -203,6 +226,10 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
         assert set(w["kinds"]) & kinds, (
             f"waiver for {path} lists {w['kinds']} but the audit now reports {sorted(kinds)} -- "
             "the waiver is stale, delete it")
+    assert seen_out_of_repo == OUT_OF_REPO_WAIVERS, (
+        f"the out-of-repo waiver set moved: {sorted(seen_out_of_repo ^ OUT_OF_REPO_WAIVERS)}. "
+        "A waiver nothing in this checkout can resolve is permission with no check behind it, so "
+        "the set is pinned until those entries move to the repositories that own the code.")
 
 
 # ------------------------------------------------------------------------------ the wiring itself

@@ -147,7 +147,37 @@ def test_showing_the_hash_without_the_text_is_not_an_approval(tmp_path):
     d = _tree(tmp_path, [_show("2026-09-02T10:00:00.000Z", SHA_A),
                          _msg("2026-09-02T10:05:00.000Z", "posli", "human")])
     ok, why = ow.check(SHA_A, project_dir=d, draft=str(f))
-    assert not ok and "never put in front of him" in why
+    # Assert the behaviour and a stable fragment, not the exact sentence: pinning the wording made
+    # this test fail on a message reworded during a real send, which is noise rather than a guard.
+    assert not ok and "in front of him" in why
+
+
+def test_an_approval_given_before_the_text_was_shown_does_not_count(tmp_path):
+    """MEASURED ON A REAL SEND. The hash went up at 07:42:30, the owner answered at 07:43:35, the
+    letter was written out at 07:44:34, and he answered again at 07:50:20. Taking the FIRST reply
+    after the hash refused a send whose text had been displayed before the approval that counts.
+
+    The rule is stricter than the one it replaces, not looser: a message that predates the text is
+    not an answer about it, and if no later message exists the send is still refused."""
+    f = tmp_path / "d.md"
+    f.write_text(DRAFT, encoding="utf-8")
+    early_only = _tree(tmp_path, [
+        _show("2026-09-02T10:00:00.000Z", SHA_A),
+        _msg("2026-09-02T10:01:00.000Z", "ano schvalujem", "human"),   # before the text
+        _asst("2026-09-02T10:02:00.000Z", DRAFT),
+    ])
+    ok, why = ow.check(SHA_A, project_dir=early_only, draft=str(f))
+    assert not ok and "has not spoken since" in why, why
+
+    later = _tree(tmp_path, [
+        _show("2026-09-02T10:00:00.000Z", SHA_A),
+        _msg("2026-09-02T10:01:00.000Z", "ano schvalujem", "human"),
+        _asst("2026-09-02T10:02:00.000Z", DRAFT),
+        _msg("2026-09-02T10:08:00.000Z", "ok posli", "human"),         # after the text
+    ], name="b.jsonl")
+    ok2, why2 = ow.check(SHA_A, project_dir=later, draft=str(f))
+    assert ok2, why2
+    assert "10:08" in why2, "the qualifying reply must be the one that postdates the text"
 
 
 def test_the_text_displayed_before_the_reply_is_what_lets_it_through(tmp_path):
