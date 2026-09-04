@@ -1,0 +1,88 @@
+{
+ "script": "his_nonlinearity_statistic_needs_a_separable_null.py",
+ "when_utc": "2026-09-04T06:30:07Z",
+ "grid": "linspace(0,3,21)",
+ "his_published": {
+  "mean_abs": 0.04997721400862463,
+  "max_abs": 0.18166838189877788,
+  "e_min": 0.183083,
+  "e_max": 0.39287
+ },
+ "arm_connected": {
+  "mean_abs": 0.04997721399502706,
+  "max_abs": 0.18166838189184115,
+  "E_min": 0.18308328680993677,
+  "E_max": 0.3928700465447921
+ },
+ "arm_separable": {
+  "mean_abs": 0.00011429481433928639,
+  "max_abs": 0.0014001114756542754,
+  "E_min": 0.3999999999999996,
+  "E_max": 0.4286307319181085,
+  "separability_drift": 0.0
+ },
+ "arm_cut_his_graph": {
+  "mean_abs": 0.004607426129151806,
+  "max_abs": 0.010937611098085998,
+  "E_min": 0.27807897991563946,
+  "E_max": 0.41349519767687054,
+  "marginal_ranges": [
+   0.08800749314554485,
+   0.04096220593647859
+  ],
+  "block_sizes": [
+   8,
+   4
+  ],
+  "edges_cut": [
+   [
+    0,
+    8
+   ],
+   [
+    1,
+    6
+   ],
+   [
+    1,
+    8
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    5
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    4,
+    6
+   ],
+   [
+    7,
+    9
+   ]
+  ],
+  "edges_left": 12,
+  "separability_drift": 0.0
+ },
+ "fraction_of_range": {
+  "connected": 0.2382286377757687,
+  "separable": 0.003992032570672596,
+  "cut_his_graph": 0.03402418266677425
+ },
+ "verdict": "PARTLY_DISCRIMINATES",
+ "seconds": 9.064894676208496,
+ "controls": {
+  "positive_control_reproduced_his_numbers": true,
+  "separability_asserted_numerically": true,
+  "null_can_exonerate": true,
+  "two_independent_nulls": true,
+  "deviation_scaled_to_each_range": true
+ }
+}

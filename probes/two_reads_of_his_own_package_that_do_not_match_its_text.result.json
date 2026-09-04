@@ -1,0 +1,33 @@
+{
+ "script": "two_reads_of_his_own_package_that_do_not_match_its_text.py",
+ "when_utc": "2026-09-04T06:31:20Z",
+ "claim_1_field_name": {
+  "at_valley": 0.1849481700007527,
+  "s_valley": 1.5,
+  "e_at_zero": 0.3093822070861309,
+  "decomposition_depth": 0.12443403704646655,
+  "latex_depth": 0.124434,
+  "sum": 0.30938220704721925,
+  "identity_holds": true,
+  "latex_matches_decomposition": true
+ },
+ "claim_2_degeneracy": {
+  "smallworld": {
+   "aut": 1,
+   "degeneracy": 1,
+   "gap": 0.7738106522401402
+  },
+  "gasket": {
+   "aut": 6,
+   "degeneracy": 2,
+   "gap": 0.18570872484909273
+  },
+  "discriminates": true
+ },
+ "seconds": 1.4104294776916504,
+ "controls": {
+  "identity_checked_against_his_own_stored_curve": true,
+  "degeneracy_test_carries_a_counterexample": true,
+  "numbers_read_from_his_package_not_his_prose": true
+ }
+}
