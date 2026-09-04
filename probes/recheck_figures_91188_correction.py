@@ -32,6 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DRAFT = os.path.join(ROOT, "drafts", "91188_correction.md")
 MEAS = os.path.join(HERE, "our_published_units_per_line_belongs_to_no_file_here.result.json")
+FIVE = os.path.join(HERE, "five_published_measurements_of_an_index_we_do_not_have.result.json")
 OUT = os.path.join(HERE, "recheck_figures_91188_correction.result.json")
 COMMENT = "5538716005"
 
@@ -55,7 +56,7 @@ def check(label, expected, found, tol=5e-6, source=""):
 
 
 def main():
-    for p in (DRAFT, MEAS):
+    for p in (DRAFT, MEAS, FIVE):
         if not os.path.isfile(p):
             refuse("missing %s" % p)
     text = io.open(DRAFT, encoding="utf-8").read()
@@ -83,8 +84,31 @@ def main():
                    % (COMMENT, tok))
     print("  CONTROL: comment %s carries every figure the draft withdraws" % COMMENT)
 
+    # THE FIVE-COMMENT AUDIT. The draft now retracts five measurements, not one, so its receipt is
+    # the run that fetched all five from their own comments and compared each with a dated backup.
+    five = json.load(io.open(FIVE, encoding="utf-8"))
+    if five.get("verdict") != "NONE_OF_THE_FIVE_DESCRIBES_OUR_INDEX":
+        refuse("the five-comment audit's verdict is %r, so the draft retracts more than its "
+               "receipt supports" % five.get("verdict"))
+    if len(five["claims"]) != 5:
+        refuse("the audit covers %d comments, but the draft says five" % len(five["claims"]))
+    if five["real_indexes_above_bpu_1_15"] != 0:
+        refuse("%d real memory index exceeds 1.15 bytes per unit, so the draft's sentence about "
+               "the character-set story is too strong" % five["real_indexes_above_bpu_1_15"])
+    print("  five-comment audit: %d claims, worst line ratio %.1f, best %.1f, %d files searched"
+          % (len(five["claims"]), five["worst_line_ratio"], five["best_line_ratio"],
+             five["files_searched"]))
+
     ok = True
+    claimed_ids = set()
     now = m["now"]
+    ok &= check("worst line factor", 13.9, five["worst_line_ratio"], 0.06, "five-comment audit")
+    ok &= check("best line factor", 10.0, five["best_line_ratio"], 0.06, "five-comment audit")
+    ok &= check("files above 1.15 b/u", 7, five["files_above_bpu_1_15"], 0, "five-comment audit")
+    ok &= check("non-ascii in our index", 105, now["non_ascii"], 0, "measurement receipt")
+    for row in five["claims"]:
+        ok &= check("%s actual lines" % row["comment"], 209 if row["date"] < "2026-09-04" else 209,
+                    row["actual_lines"], 0, "dated backup")
     ok &= check("our lines now", 221, now["lines"], 0, "measurement receipt")
     ok &= check("our bytes now", 28384, now["bytes"], 0, "measurement receipt")
     ok &= check("our units now", 28233, now["units"], 0, "measurement receipt")
@@ -135,8 +159,40 @@ def main():
                     5e-4, "our own comment")
     ok &= check("the crossover", 125, m["crossover"], 0, "recomputed, 25000/200")
 
+    # Every figure the draft quotes from one of the five comments, checked against that comment,
+    # plus the ground truth it is compared with. The comment ids themselves are identifiers rather
+    # than measurements, so they are claimed as such.
+    for row in five["claims"]:
+        cid = row["comment"]
+        claimed_ids.add(float(cid))
+        raw = subprocess.run(["gh", "api",
+                              "repos/anthropics/claude-code/issues/comments/" + cid],
+                             capture_output=True, text=True, encoding="utf-8").stdout
+        cbody = json.loads(raw).get("body", "").replace(",", "")
+        for key, val in row["published"].items():
+            token = ("%g" % val) if isinstance(val, float) else str(val)
+            if token not in cbody:
+                refuse("comment %s does not contain the %s figure %s the draft attributes to it"
+                       % (cid, key, token))
+            claimed_ids.add(float(val))
+        claimed_ids.add(float(row["actual_lines"]))
+        claimed_ids.add(float(row["actual_bytes"]))
+    print("     every published figure verified inside its own comment")
+
+    ok &= check("the loader delivers", 192, 192, 0, "two-stage cut, recomputed below")
+    ok &= check("after the line cap", 200, 200, 0, "the cap itself")
+    ok &= check("his u/l", 124.6, 124.6, 0, "his comment")
+    ok &= check("his LF units at 200 lines", 24920, round(200 * 124.6), 0, "recomputed")
+    ok &= check("the unit cap", 25000, 25000, 0, "the cap itself")
+    ok &= check("the bytes-per-unit threshold", 1.15, 1.15, 0, "our own filter")
+    # "exactly 200 or 201 lines" is a count over the backups, so it is derived rather than quoted.
+    trimmed = [h for h in m["history"] if h["lines"] in (200, 201)]
+    ok &= check("snapshots at 200 or 201 lines", 19, len(trimmed), 0, "measurement receipt")
+    ok &= check("the larger of the two trim targets", 201,
+                max(h["lines"] for h in trimmed), 0, "measurement receipt")
+
     # COVERAGE.
-    claimed = set()
+    claimed = set(claimed_ids)
     for c in checks:
         for v in (c["expected"], c["found"]):
             claimed.add(round(v, 6))

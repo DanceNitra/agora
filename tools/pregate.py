@@ -57,7 +57,17 @@ NUM = re.compile(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])")
 # A YEAR IS NOT A FINGERPRINT. The first live run flagged two claims as already said because
 # "2026" appears in the other party's comments, which it does in every comment anyone dates.
 # Four-digit integers in the calendar range carry no identity, so they are dropped.
-YEARISH = re.compile(r"^(1[89]\d\d|20\d\d|21\d\d)$")
+# ONLY A PLAUSIBLE DATE IS A DATE. The first version dropped every 20xx, which threw away
+# 2081 and 2070 -- a byte count and a unit count from the very comments a correction was
+# quoting, leaving two of its claims with nothing to check. The window is now the years a
+# GitHub thread can actually carry.
+YEARISH = re.compile(r"^(199\d|20[0-3]\d)$")
+
+# A claim that names one of OUR comments and reports what it said is a RETRACTION, not a repeat.
+# The check inverts for those: the figures must be IN that comment, and a claim that quotes us
+# accurately is exactly what a correction is made of. Found on the first correction this tool was
+# used for, where it flagged six of eighteen claims for restating the numbers being withdrawn.
+QUOTES_OUR_COMMENT = re.compile(r"\bcomment\s+(\d{6,})\b", re.I)
 
 SELF_CLAIM = re.compile(r"\b(i (?:told|answered|said|sent|wrote|replied|showed)|"
                         r"as i (?:said|wrote|showed)|my (?:earlier|previous) (?:comment|reply))\b",
@@ -161,6 +171,21 @@ def words(s):
     return {w for w in re.findall(r"[a-z][a-z0-9_-]{4,}", s.lower()) if w not in STOP}
 
 
+def ubiquitous_numbers(thread, ceiling=0.5):
+    """Figures that appear in half the thread or more identify nothing.
+
+    On claude-code#91188 those are 200, 25000 and 125: the caps under discussion and their ratio.
+    Every participant quotes them in every comment, so matching on one says only that the claim is
+    about the thread's subject.
+    """
+    import collections
+    df = collections.Counter()
+    for _i, _a, _t, body in thread:
+        df.update(set(NUM.findall(body)))
+    cap = max(2, int(ceiling * len(thread)))
+    return {n for n, k in df.items() if k >= cap}
+
+
 def rare_words(thread, ceiling=0.15):
     """Words that appear in few enough comments to fingerprint a claim.
 
@@ -180,12 +205,42 @@ def rare_words(thread, ceiling=0.15):
 
 def check(claims, thread, archive, receipts, ours):
     rare, cap = rare_words(thread)
+    ubiq = ubiquitous_numbers(thread)
+    if ubiq:
+        print("  figures in half the thread or more, ignored as fingerprints: %s"
+              % ", ".join(sorted(ubiq)))
+    by_id = {cid: (who, when, body) for cid, who, when, body in thread}
     print("  text check uses %d word(s) appearing in <= %d of %d comments"
           % (len(rare), cap, len(thread)))
     print()
     results = []
     for c in claims:
-        nums = sorted(n for n in set(NUM.findall(c)) if not YEARISH.match(n))
+        nums = sorted(n for n in set(NUM.findall(c))
+                      if not YEARISH.match(n) and n not in ubiq)
+
+        # RETRACTION MODE. If the claim names one of our comments, the question is not whether we
+        # said this before. We did, on purpose, and the claim exists to withdraw it. What matters
+        # is that the figures really are in the comment named.
+        quoted = [q for q in QUOTES_OUR_COMMENT.findall(c) if q in by_id]
+        if quoted:
+            cid = quoted[0]
+            who, when, body = by_id[cid]
+            # The comment id itself is not one of its figures, and a retraction claim carries
+            # the ground truth beside the published number on purpose. So the test is not "every
+            # figure is in that comment" but "at least one is". Zero means we are attributing the
+            # numbers to the wrong comment, which is the only failure that matters here.
+            check_nums = [n for n in nums if n not in quoted]
+            present = [n for n in check_nums if n.replace(",", "") in body.replace(",", "")]
+            missing = [n for n in check_nums if n not in present]
+            results.append({"claim": c,
+                            "verdict": "QUOTES US" if present else "MISQUOTES US",
+                            "numbers": nums, "hits": [], "leads": [],
+                            "self_attribution": None, "unit": None,
+                            "quotes_comment": cid, "quoted_author": who,
+                            "figures_in_that_comment": present,
+                            "figures_not_in_that_comment": missing,
+                            "numbers_with_no_source": []})
+            continue
         w = words(c)
         hits = []
         for cid, who, when, body in thread:
@@ -304,7 +359,7 @@ def main():
     bad = 0
     for i, r in enumerate(res, 1):
         tag = {"NEW": "NEW ", "ALREADY SAID BY US": "OURS", "ALREADY IN THEIR MATERIAL": "THEIRS",
-               "DEFECT": "STOP"}[r["verdict"]]
+               "DEFECT": "STOP", "QUOTES US": "QUOTE", "MISQUOTES US": "STOP"}[r["verdict"]]
         print("  [%s] %d. %s" % (tag, i, r["claim"][:96]))
         for h in r["hits"]:
             print("          %s (%s %s) carries %s"
@@ -319,7 +374,14 @@ def main():
         if r["numbers_with_no_source"]:
             print("          no receipt and not in their material: %s"
                   % ", ".join(r["numbers_with_no_source"]))
-        if r["verdict"] != "NEW":
+        if r.get("quotes_comment"):
+            print("          quotes comment %s (%s); every figure checked against it"
+                  % (r["quotes_comment"], r["quoted_author"]))
+            print("          in it: %s%s"
+                  % (", ".join(r.get("figures_in_that_comment") or []) or "NOTHING",
+                     ("   |  elsewhere (ground truth): " + ", ".join(r["figures_not_in_that_comment"]))
+                     if r["figures_not_in_that_comment"] else ""))
+        if r["verdict"] not in ("NEW", "QUOTES US"):
             bad += 1
         print()
 

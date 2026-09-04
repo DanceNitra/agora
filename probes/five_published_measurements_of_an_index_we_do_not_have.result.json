@@ -1,0 +1,154 @@
+{
+ "script": "five_published_measurements_of_an_index_we_do_not_have.py",
+ "now": {
+  "lines": 221,
+  "bytes": 28384,
+  "units": 28233,
+  "bpu": 1.0053483512202033,
+  "upl": 127.75113122171946,
+  "crlf": 221,
+  "non_ascii": 105,
+  "mtime": "2026-09-04 16:02"
+ },
+ "history_tail": [
+  {
+   "lines": 200,
+   "bytes": 23975,
+   "units": 23765,
+   "bpu": 1.0088365243004418,
+   "upl": 118.825,
+   "crlf": 200,
+   "non_ascii": 133,
+   "mtime": "2026-08-21 05:12",
+   "path": "MEMORY.md.bak-20260821-prewindowlaw"
+  },
+  {
+   "lines": 200,
+   "bytes": 24389,
+   "units": 24173,
+   "bpu": 1.0089355892938403,
+   "upl": 120.865,
+   "crlf": 198,
+   "non_ascii": 137,
+   "mtime": "2026-08-21 09:08",
+   "path": "MEMORY.md.bak-20260819-prewindowfit-16"
+  },
+  {
+   "lines": 207,
+   "bytes": 26000,
+   "units": 25774,
+   "bpu": 1.0087685264219757,
+   "upl": 124.512077294686,
+   "crlf": 0,
+   "non_ascii": 143,
+   "mtime": "2026-08-22 21:37",
+   "path": "MEMORY.md.bak-20260822-preindextrim"
+  },
+  {
+   "lines": 209,
+   "bytes": 27319,
+   "units": 27094,
+   "bpu": 1.0083044216431682,
+   "upl": 129.63636363636363,
+   "crlf": 209,
+   "non_ascii": 143,
+   "mtime": "2026-08-26 08:46",
+   "path": "MEMORY.md.bak-20260826-084608"
+  }
+ ],
+ "claims": [
+  {
+   "comment": "5495840695",
+   "date": "2026-09-01",
+   "published": {
+    "lines": 15,
+    "bytes": 2081
+   },
+   "nearest_backup": "2026-08-26 08:46",
+   "actual_lines": 209,
+   "actual_bytes": 27319,
+   "actual_bpu": 1.0083044216431682,
+   "line_ratio": 13.933333333333334
+  },
+  {
+   "comment": "5498341230",
+   "date": "2026-09-01",
+   "published": {
+    "lines": 15,
+    "bytes": 2090,
+    "units": 2070,
+    "upl": 138.0,
+    "bpu": 1.01
+   },
+   "nearest_backup": "2026-08-26 08:46",
+   "actual_lines": 209,
+   "actual_bytes": 27319,
+   "actual_bpu": 1.0083044216431682,
+   "line_ratio": 13.933333333333334
+  },
+  {
+   "comment": "5522927403",
+   "date": "2026-09-03",
+   "published": {
+    "lines": 15,
+    "units": 2070,
+    "upl": 138.0
+   },
+   "nearest_backup": "2026-08-26 08:46",
+   "actual_lines": 209,
+   "actual_bytes": 27319,
+   "actual_bpu": 1.0083044216431682,
+   "line_ratio": 13.933333333333334
+  },
+  {
+   "comment": "5533605446",
+   "date": "2026-09-03",
+   "published": {
+    "lines": 20,
+    "units": 6768
+   },
+   "nearest_backup": "2026-08-26 08:46",
+   "actual_lines": 209,
+   "actual_bytes": 27319,
+   "actual_bpu": 1.0083044216431682,
+   "line_ratio": 10.45
+  },
+  {
+   "comment": "5538716005",
+   "date": "2026-09-04",
+   "published": {
+    "lines": 21,
+    "bytes": 11132,
+    "units": 8774,
+    "upl": 417.8,
+    "bpu": 1.269
+   },
+   "nearest_backup": "2026-08-26 08:46",
+   "actual_lines": 209,
+   "actual_bytes": 27319,
+   "actual_bpu": 1.0083044216431682,
+   "line_ratio": 9.952380952380953
+  }
+ ],
+ "files_searched": 97,
+ "matches": 0,
+ "files_above_bpu_1_15": 7,
+ "real_indexes_above_bpu_1_15": 0,
+ "high_bpu_paths": [
+  "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-claude-C--Users-Danculus-agora-d58cd2cd-56c1-4dbb-973e-94c1b0a34285-scratchpad--armB\\memory\\MEMORY.md",
+  "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-claude-C--Users-Danculus-agora-d58cd2cd-56c1-4dbb-973e-94c1b0a34285-scratchpad--armC\\memory\\MEMORY.md",
+  "C:\\Users\\Danculus\\AppData\\Local\\hermes\\hermes-agent\\website\\i18n\\zh-Hans\\docusaurus-plugin-content-docs\\current\\developer-guide\\memory-provider-plugin.md",
+  "C:\\Users\\Danculus\\AppData\\Local\\hermes\\hermes-agent\\website\\i18n\\zh-Hans\\docusaurus-plugin-content-docs\\current\\user-guide\\features\\memory-providers.md",
+  "C:\\Users\\Danculus\\AppData\\Local\\hermes\\hermes-agent\\website\\i18n\\zh-Hans\\docusaurus-plugin-content-docs\\current\\user-guide\\features\\memory.md",
+  "C:\\Users\\Danculus\\my-second-brain\\04 Resources\\Vault_AI\\Concepts\\Memory Hierarchy for Agents.md",
+  "C:\\Users\\Danculus\\my-second-brain-OLD-zaloha\\04 Resources\\Vault_AI\\Concepts\\Memory Hierarchy for Agents.md"
+ ],
+ "worst_line_ratio": 13.933333333333334,
+ "best_line_ratio": 9.952380952380953,
+ "verdict": "NONE_OF_THE_FIVE_DESCRIBES_OUR_INDEX",
+ "controls": {
+  "every_figure_fetched_from_its_comment": true,
+  "ground_truth_from_dated_backups": true,
+  "search_finds_the_current_file": true
+ }
+}

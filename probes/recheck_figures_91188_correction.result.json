@@ -3,6 +3,69 @@
  "draft": "drafts\\91188_correction.md",
  "checks": [
   {
+   "label": "worst line factor",
+   "expected": 13.9,
+   "found": 13.933333333333334,
+   "ok": true,
+   "source": "five-comment audit"
+  },
+  {
+   "label": "best line factor",
+   "expected": 10.0,
+   "found": 9.952380952380953,
+   "ok": true,
+   "source": "five-comment audit"
+  },
+  {
+   "label": "files above 1.15 b/u",
+   "expected": 7.0,
+   "found": 7.0,
+   "ok": true,
+   "source": "five-comment audit"
+  },
+  {
+   "label": "non-ascii in our index",
+   "expected": 105.0,
+   "found": 105.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "5495840695 actual lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "dated backup"
+  },
+  {
+   "label": "5498341230 actual lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "dated backup"
+  },
+  {
+   "label": "5522927403 actual lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "dated backup"
+  },
+  {
+   "label": "5533605446 actual lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "dated backup"
+  },
+  {
+   "label": "5538716005 actual lines",
+   "expected": 209.0,
+   "found": 209.0,
+   "ok": true,
+   "source": "dated backup"
+  },
+  {
    "label": "our lines now",
    "expected": 221.0,
    "found": 221.0,
@@ -218,10 +281,66 @@
    "found": 125.0,
    "ok": true,
    "source": "recomputed, 25000/200"
+  },
+  {
+   "label": "the loader delivers",
+   "expected": 192.0,
+   "found": 192.0,
+   "ok": true,
+   "source": "two-stage cut, recomputed below"
+  },
+  {
+   "label": "after the line cap",
+   "expected": 200.0,
+   "found": 200.0,
+   "ok": true,
+   "source": "the cap itself"
+  },
+  {
+   "label": "his u/l",
+   "expected": 124.6,
+   "found": 124.6,
+   "ok": true,
+   "source": "his comment"
+  },
+  {
+   "label": "his LF units at 200 lines",
+   "expected": 24920.0,
+   "found": 24920.0,
+   "ok": true,
+   "source": "recomputed"
+  },
+  {
+   "label": "the unit cap",
+   "expected": 25000.0,
+   "found": 25000.0,
+   "ok": true,
+   "source": "the cap itself"
+  },
+  {
+   "label": "the bytes-per-unit threshold",
+   "expected": 1.15,
+   "found": 1.15,
+   "ok": true,
+   "source": "our own filter"
+  },
+  {
+   "label": "snapshots at 200 or 201 lines",
+   "expected": 19.0,
+   "found": 19.0,
+   "ok": true,
+   "source": "measurement receipt"
+  },
+  {
+   "label": "the larger of the two trim targets",
+   "expected": 201.0,
+   "found": 201.0,
+   "ok": true,
+   "source": "measurement receipt"
   }
  ],
  "failed": 0,
- "figures": 26,
+ "figures": 42,
  "controls": {
   "withdrawn_figures_read_from_the_live_comment": true,
   "search_control_present": true,

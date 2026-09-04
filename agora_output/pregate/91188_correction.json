@@ -1,35 +1,191 @@
 {
  "tool": "pregate",
  "thread": "anthropics/claude-code#91188",
- "claims": 8,
- "worth_writing": 8,
- "blocked": 0,
+ "claims": 18,
+ "worth_writing": 17,
+ "blocked": 1,
  "numbers_examined": [
+  "1.005",
+  "1.010",
+  "1.269",
   "11132",
+  "2070",
+  "2081",
+  "2090",
+  "24920",
+  "27319",
   "28233",
   "28384",
-  "5538716005"
+  "5495840695",
+  "5498341230",
+  "5522927403",
+  "5533605446",
+  "5538716005",
+  "6768",
+  "8774"
  ],
  "results": [
   {
-   "claim": "Our comment 5538716005 published 417.8 units per line for a 21-line, 11132-byte MEMORY.md, and no file named memory*.md on this machine carries those figures.",
+   "claim": "Five comments we posted between 1 and 4 September published measurements of our own memory index, and none of them describes the file we keep.",
    "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5495840695 published 15 lines and 2081 bytes on 1 September, when the file held 209 lines and 27319 bytes.",
+   "verdict": "QUOTES US",
    "numbers": [
-    "11132",
-    "5538716005"
+    "2081",
+    "27319",
+    "5495840695"
    ],
    "hits": [],
    "leads": [],
    "self_attribution": null,
    "unit": null,
-   "numbers_with_no_source": [
-    "5538716005"
-   ]
+   "quotes_comment": "5495840695",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "2081"
+   ],
+   "figures_not_in_that_comment": [
+    "27319"
+   ],
+   "numbers_with_no_source": []
   },
   {
-   "claim": "The agora memory index measures 221 lines, 28384 bytes, 28233 UTF-16 units, 127.8 units per line, and 221 CRLF pairs.",
+   "claim": "Comment 5498341230 published 15 lines, 2090 bytes, 2070 UTF-16 units, 1.010 bytes per unit and 138.0 units per line.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "1.010",
+    "2070",
+    "2090",
+    "5498341230"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5498341230",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "1.010",
+    "2070",
+    "2090"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5522927403 published 138 units per line from 2070 units over 15 lines.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "2070",
+    "5522927403"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5522927403",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "2070"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5533605446 published 20 lines and 6768 units and called the index CJK-flavored.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "5533605446",
+    "6768"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5533605446",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "6768"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5538716005 published 21 lines, 11132 bytes, 8774 units, 1.269 bytes per unit and 417.8 units per line.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "1.269",
+    "11132",
+    "5538716005",
+    "8774"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5538716005",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "1.269",
+    "11132",
+    "8774"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The published line counts are out by a factor of 10 to 14 against dated backups from the same days.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The character-set story contradicts itself: 1.010 bytes per unit and nearly ASCII on 1 September, CJK-flavored on 3 September, 1.269 on 4 September, with no structural change claimed.",
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "1.010",
+    "1.269"
+   ],
+   "hits": [
+    {
+     "where": "comment 5498341230",
+     "who": "pm25coder",
+     "when": "2026-09-01T18:13",
+     "numbers": [
+      "1.010"
+     ]
+    },
+    {
+     "where": "comment 5538716005",
+     "who": "pm25coder",
+     "when": "2026-09-04T09:48",
+     "numbers": [
+      "1.269"
+     ]
+    }
+   ],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our index measures 221 lines, 28384 bytes, 28233 UTF-16 units, 1.005 bytes per unit, 127.8 units per line, 221 CRLF pairs, 105 non-ASCII characters and 0 astral characters.",
    "verdict": "NEW",
    "numbers": [
+    "1.005",
     "28233",
     "28384"
    ],
@@ -40,7 +196,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "At 127.8 units per line our index sits 2.8 units above the 125 crossover, not two orders of magnitude from it.",
+   "claim": "At 127.8 units per line our index sits 2.8 above the 125 crossover, so the contrast between an unstable file and an immune one does not exist.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -50,7 +206,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Twenty-four archived copies plus the live file give 25 snapshots from 2026-08-17 to 2026-09-04, ranging from 80.2 to 163.6 units per line, and 22 of the 25 sit within 10 units of the 125 crossover.",
+   "claim": "A search of 97 files named memory*.md under this profile matches none of the published figures, and the same search finds the current index by its own byte and line count.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -60,7 +216,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Our index was at 129.6 units per line on 2026-08-26 and 127.8 today, so it has stayed inside the flip band for at least nine days.",
+   "claim": "Seven files exceed 1.15 bytes per unit and none is a memory index: three vendor documentation pages, two vault notes and two synthetic probe fixtures.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -70,7 +226,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "At 127.8 units per line the unit cap binds at line 195.7 and the line cap at line 200, so on our file the unit cap binds first by 4.3 lines.",
+   "claim": "Twenty-four dated backups plus the live file range from 80.2 to 163.6 units per line between 17 August and 4 September.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -80,7 +236,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "The conclusion we drew, that our binding dimension is stable by two orders of margin, is false for the file we actually keep.",
+   "claim": "Nineteen of those snapshots sit at exactly 200 or 201 lines in backups named prewindowfit, preindextrim and prewindowdrop, so the file was repeatedly trimmed to fit 200 lines and 25000 units.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -90,7 +246,46 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Our own data therefore supports the drift argument rather than bounding it, because we have twenty-five snapshots and they move.",
+   "claim": "Because the crossover is 25000 divided by 200, a file trimmed to both caps lands next to 125 by construction, so the time series mostly measures our own trimming policy.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Between 22 and 26 August with no trim in between the ratio moved from 124.5 to 129.6 and crossed 125.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The CRLF arithmetic in comment 5538716005 uses only his figures and stands: 200 lines at 124.6 units per line is 24920 units under LF, and a CRLF copy pays 200 more and crosses at the 200th line.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "24920",
+    "5538716005"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5538716005",
+   "quoted_author": "pm25coder",
+   "figures_in_that_comment": [
+    "24920"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Applying the loader's two-stage cut to our file, the line cap takes 221 lines to 200 and the unit cut at the last newline before 25000 units lands at line 192, so the loader delivers 192 of 221 lines.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
