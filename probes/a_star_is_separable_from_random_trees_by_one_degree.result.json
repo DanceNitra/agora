@@ -1,0 +1,102 @@
+{
+ "probe": "a_star_is_separable_from_random_trees_by_one_degree.py",
+ "when_utc": "2026-09-02T11:27:18Z",
+ "networkx": "3.6.1",
+ "python": "3.12.10",
+ "elapsed_s": 0.6,
+ "rows": [
+  {
+   "N": 7,
+   "star_max_degree": 6,
+   "labelled_trees": 16807,
+   "labelled_stars": 7,
+   "exact_p_random_tree_reaches_star_degree": 0.00041649312786339027,
+   "exact_p_as_one_in": 2401,
+   "exact_star_percent": 0.0416,
+   "exact_p_perfect_at_his_design": 0.979386,
+   "non_isomorphic_trees": 11,
+   "exact_p_perfect_at_his_design_if_non_isomorphic": 0.0085,
+   "his_design_negatives": 50,
+   "control_negative_arm_accuracy": 0.5095,
+   "control_positive_arm_accuracy": 1.0
+  },
+  {
+   "N": 8,
+   "star_max_degree": 7,
+   "labelled_trees": 262144,
+   "labelled_stars": 8,
+   "exact_p_random_tree_reaches_star_degree": 3.0517578125e-05,
+   "exact_p_as_one_in": 32768,
+   "exact_star_percent": 0.0031,
+   "exact_p_perfect_at_his_design": 0.998475,
+   "non_isomorphic_trees": 23,
+   "exact_p_perfect_at_his_design_if_non_isomorphic": 0.1083,
+   "his_design_negatives": 50,
+   "control_negative_arm_accuracy": 0.5068,
+   "control_positive_arm_accuracy": 1.0
+  },
+  {
+   "N": 9,
+   "star_max_degree": 8,
+   "labelled_trees": 4782969,
+   "labelled_stars": 9,
+   "exact_p_random_tree_reaches_star_degree": 1.8816764231589208e-06,
+   "exact_p_as_one_in": 531441,
+   "exact_star_percent": 0.0002,
+   "exact_p_perfect_at_his_design": 0.999906,
+   "non_isomorphic_trees": 47,
+   "exact_p_perfect_at_his_design_if_non_isomorphic": 0.3412,
+   "his_design_negatives": 50,
+   "control_negative_arm_accuracy": 0.5042,
+   "control_positive_arm_accuracy": 1.0
+  }
+ ],
+ "enumeration": {
+  "5": {
+   "trees": 125,
+   "max_degree_histogram": {
+    "2": 60,
+    "3": 60,
+    "4": 5
+   }
+  },
+  "6": {
+   "trees": 1296,
+   "max_degree_histogram": {
+    "2": 360,
+    "3": 810,
+    "4": 120,
+    "5": 6
+   }
+  },
+  "7": {
+   "trees": 16807,
+   "max_degree_histogram": {
+    "2": 2520,
+    "3": 11550,
+    "4": 2520,
+    "5": 210,
+    "6": 7
+   }
+  },
+  "8": {
+   "trees": 262144,
+   "max_degree_histogram": {
+    "2": 20160,
+    "3": 181440,
+    "4": 54320,
+    "5": 5880,
+    "6": 336,
+    "7": 8
+   }
+  }
+ },
+ "controls": {
+  "enumeration_reproduces_cayley_and_the_star_count": true,
+  "prufer_multiplicity_rule_checked_against_decoded_graphs": 2893,
+  "negative_arm_cannot_separate_one_population": true,
+  "positive_control_proves_the_negative_arm_can_fire": true,
+  "no_published_figure_comes_from_a_sample": true,
+  "the_alternative_population_is_measured_not_assumed_away": true
+ }
+}

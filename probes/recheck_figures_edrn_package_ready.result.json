@@ -1,0 +1,239 @@
+{
+ "probe": "recheck_figures_edrn_package_ready.py",
+ "when_utc": "2026-09-01T17:25:25Z",
+ "draft": "drafts/edrn_package_ready.md",
+ "draft_bytes": 8374,
+ "checks": 32,
+ "failed": 0,
+ "rows": [
+  {
+   "claim": "source was PRB format",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "as-received line 1",
+   "vacuous": false
+  },
+  {
+   "claim": "output is sn-jnl two column",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex line 1",
+   "vacuous": false
+  },
+  {
+   "claim": "every number in his body survives",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "build_manuscript.py refuses on any lost numeric token; proved able to fire by mutation",
+   "vacuous": false
+  },
+  {
+   "claim": "abstract 334 to 248, one method",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "build receipt abstract_words=248",
+   "vacuous": false
+  },
+  {
+   "claim": "the two counters agree",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "build and requirements checker both report 248",
+   "vacuous": false
+  },
+  {
+   "claim": "the accent renders as an accent",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "abstract.tex carries the accent macro, not a bare apostrophe",
+   "vacuous": false
+  },
+  {
+   "claim": "no hardcoded table number",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the caption now references the table instead of naming it",
+   "vacuous": false
+  },
+  {
+   "claim": "acknowledgements no longer duplicate the contributions",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the contribution sentences are gone, the thanks remain",
+   "vacuous": false
+  },
+  {
+   "claim": "data availability keeps his own URL",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the pointer is his subtree, not the repository root",
+   "vacuous": false
+  },
+  {
+   "claim": "the graphical abstract shows an interior minimum",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "drawn from the 9-point focused audit; the control fails on a monotone series",
+   "vacuous": false
+  },
+  {
+   "claim": "keywords name the lattice",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex keywords",
+   "vacuous": false
+  },
+  {
+   "claim": "the setup sentence claims nothing about their content",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the four are cited; no characterisation of them is asserted",
+   "vacuous": false
+  },
+  {
+   "claim": "four figures",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "extract_figures receipt",
+   "vacuous": false
+  },
+  {
+   "claim": "ten references carry DOIs",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex, 10 doi.org links",
+   "vacuous": false
+  },
+  {
+   "claim": "his bibliography had seven entries",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "as-received has 7 bibitems",
+   "vacuous": false
+  },
+  {
+   "claim": "none of them was Voigt or Zou",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "as-received contains none of Voigt, Zou, Richter, Tomczak",
+   "vacuous": false
+  },
+  {
+   "claim": "the four are cited now",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex: four bibitems plus the setup sentence",
+   "vacuous": false
+  },
+  {
+   "claim": "the EPJ B 2004 reference is exact",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex bibliography; DOI re-verified against Crossref 2026-09-01",
+   "vacuous": false
+  },
+  {
+   "claim": "6.1 exclusion clause",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex Sec 6.1",
+   "vacuous": false
+  },
+  {
+   "claim": "his duplicate data availability removed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "present in his file, absent from ours",
+   "vacuous": false
+  },
+  {
+   "claim": "Marat's affiliation restored",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex affil[3]",
+   "vacuous": false
+  },
+  {
+   "claim": "keywords added and were absent",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "present in ours, absent from his",
+   "vacuous": false
+  },
+  {
+   "claim": "ORCID present",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex Declarations",
+   "vacuous": false
+  },
+  {
+   "claim": "contributions say he wrote the manuscript",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex author contributions",
+   "vacuous": false
+  },
+  {
+   "claim": "gasket controls credited to him",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.tex author contributions",
+   "vacuous": false
+  },
+  {
+   "claim": "no approval asserted anywhere",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "neither the manuscript nor the cover letter asserts their approval",
+   "vacuous": false
+  },
+  {
+   "claim": "compiles to 10 pages",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "manuscript.log page count=10",
+   "vacuous": false
+  },
+  {
+   "claim": "sixteen rules all pass",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "requirements receipt 16/16",
+   "vacuous": false
+  },
+  {
+   "claim": "graphical abstract geometry",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "graphical abstract receipt [480, 262]",
+   "vacuous": false
+  },
+  {
+   "claim": "every named abstract item is back",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "7 of 7 restored items found in our abstract",
+   "vacuous": false
+  },
+  {
+   "claim": "and they were in his abstract to begin with",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "his abstract carries them, so the loss was real and the restoration is not invented",
+   "vacuous": false
+  },
+  {
+   "claim": "every section and table number cited in the letter resolves",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "computed 26 section numbers from the source and 5 table numbers from the aux; letter cites sections ['4.5', '6.1'] and tables ['2']",
+   "vacuous": false
+  }
+ ],
+ "controls": {
+  "every_artifact_present": true,
+  "mutations_rejected": true,
+  "compares_against_his_file_not_only_our_receipts": true
+ }
+}

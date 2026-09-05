@@ -1,0 +1,103 @@
+{
+ "script": "does_the_baseline_defect_reach_the_papers_headline_number.py",
+ "when_utc": "2026-09-03T21:14:01Z",
+ "graph": "L2 Sierpinski gasket, 15 vertices, 27 edges",
+ "contradiction_edge": [
+  0,
+  6
+ ],
+ "sector_n_up": 7,
+ "valley_s": 1.0,
+ "identity_checks": {
+  "ground_energy": true,
+  "degeneracy": true,
+  "splitting": true,
+  "gap_to_next_distinct": true
+ },
+ "energy_convention": "sigma (4x)",
+ "ground_energy": -6.241884144879747,
+ "splitting": 8.881784197001252e-16,
+ "gap_to_next_distinct": 0.04642718121226075,
+ "baseline_by_seed": [
+  0.24673114075776426,
+  0.2467311407577649,
+  0.2467311407577675,
+  0.24673114075776637,
+  0.24673114075776414,
+  0.24673114075776698,
+  0.24673114075776548,
+  0.24673114075776723,
+  0.2467311407577647,
+  0.2467311407577661,
+  0.2467311407577675,
+  0.24673114075776667
+ ],
+ "valley_by_seed": [
+  0.1596582438144843,
+  0.15965824381448632,
+  0.15965824381448382,
+  0.1596582438144859,
+  0.15965824381448637,
+  0.15965824381448554,
+  0.15965824381448518,
+  0.15965824381448337,
+  0.15965824381448493,
+  0.15965824381448424,
+  0.15965824381448648,
+  0.1596582438144845
+ ],
+ "depth_by_seed": [
+  0.08707289694327996,
+  0.08707289694327858,
+  0.08707289694328368,
+  0.08707289694328046,
+  0.08707289694327777,
+  0.08707289694328144,
+  0.0870728969432803,
+  0.08707289694328385,
+  0.08707289694327977,
+  0.08707289694328185,
+  0.08707289694328102,
+  0.08707289694328216
+ ],
+ "baseline_spread": 3.3584246494910985e-15,
+ "valley_spread": 3.1086244689504383e-15,
+ "published_range": [
+  0.0874,
+  0.1045
+ ],
+ "first_five_depths": [
+  0.08707289694327996,
+  0.08707289694327858,
+  0.08707289694328368,
+  0.08707289694328046,
+  0.08707289694327777
+ ],
+ "first_five_inside_published_range": 5,
+ "scatter_is_in": "NEITHER",
+ "rotation_test": {
+  "baseline s=0": {
+   "degeneracy": 1,
+   "single_spread": 0.0,
+   "average_spread": 0.0,
+   "average_value": 0.2467311407577634
+  },
+  "valley s=1.00": {
+   "degeneracy": 2,
+   "single_spread": 1.1379786002407855e-15,
+   "average_spread": 1.1102230246251565e-16,
+   "average_value": 0.11026913715112466
+  }
+ },
+ "real_rotations_did_not_move_it_at": [
+  "valley s=1.00"
+ ],
+ "caveat": "a real-rotation arm is a LOWER bound on the reachable spread; the interval is computed in the_manifold_reachable_set_is_an_interval_and_real_rotations_cannot_see_it.py",
+ "controls": {
+  "identity_control_against_three_published_quantities": true,
+  "both_terms_measured_over_the_same_seeds": true,
+  "published_seed_range_checked": true,
+  "rotation_remedy_demonstrated_on_this_graph": true,
+  "three_outcomes_reachable": true
+ }
+}

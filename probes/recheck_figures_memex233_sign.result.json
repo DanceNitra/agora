@@ -1,0 +1,145 @@
+{
+ "probe": "recheck_figures_memex233_sign.py",
+ "when_utc": "2026-09-01T20:26:10Z",
+ "draft": "drafts/memex233_sign_derivation.md",
+ "draft_bytes": 2016,
+ "his_evidence_fields": [
+  "concept",
+  "observation_id",
+  "weight",
+  "sign",
+  "step",
+  "owner_instance",
+  "id"
+ ],
+ "commit_gap_seconds": 8.0,
+ "checks": 20,
+ "failed": 0,
+ "rows": [
+  {
+   "claim": "his Evidence fields are the ones the draft lists",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "fetched from master: concept, observation_id, weight, sign, step, owner_instance, id"
+  },
+  {
+   "claim": "it carries no value field, so the suggestion is not already shipped",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "no value-shaped field among 7 fields"
+  },
+  {
+   "claim": "CONTROL: the field scan really found fields",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "7 fields parsed, so an empty parse cannot pass the check above"
+  },
+  {
+   "claim": "concept is already the key, so we do not ask him to add one",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "concept is present and the draft asks only for a value"
+  },
+  {
+   "claim": "the gap really is eight seconds",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "comment 2026-09-01T15:51:51Z, commit 2026-09-01T15:51:59Z, gap 8s"
+  },
+  {
+   "claim": "the file path is the one named",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the commit touched lantern-babel-codex-bridge/ARCHITECTURE.md"
+  },
+  {
+   "claim": "the old shape is still readable in the committed file",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the live file carries both the correction note and the old field names"
+  },
+  {
+   "claim": "the conflict kind is spelled the way the draft spells it",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the literal appears in check_conflict"
+  },
+  {
+   "claim": "the keyed branch runs before any embedding",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "keyed append at +2921, first _qvec at +2994"
+  },
+  {
+   "claim": "equality only when the value is on both records",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the guard and the equality are both present"
+  },
+  {
+   "claim": "and it falls back to a deterministic clash, not a judge",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the fallback calls the deterministic default"
+  },
+  {
+   "claim": "the callback name is right",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "check_conflict takes incompatible=None"
+  },
+  {
+   "claim": "CONTROL: a wrong kind string is absent from our code",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "near-miss kind names do not appear, so the match is selective"
+  },
+  {
+   "claim": "no claim that our design is better",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no claim he should build it",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no novelty claim",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "the textbook framing is stated",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the draft credits the mechanism rather than claiming it"
+  },
+  {
+   "claim": "the limit is stated with the suggestion",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "stated inline"
+  },
+  {
+   "claim": "AI assistance is disclosed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "owner rule, permanent"
+  },
+  {
+   "claim": "pure ASCII apart from nothing, and no dash gh can mangle",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "no em dash or en dash"
+  }
+ ],
+ "controls": {
+  "his_dataclass_fetched_not_recalled": true,
+  "commit_gap_computed": true,
+  "our_fallback_branch_asserted": true
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "probe": "does_an_unquoted_colon_space_still_hide_a_skill.py",
+ "when_utc": "2026-09-01T14:11:02Z",
+ "claude_version": "2.1.252 (Claude Code)",
+ "platform": "win32",
+ "issue_under_test": "anthropics/claude-code#78270 (open, CLI 2.1.211, Windows 11)",
+ "text_used_in_both_colon_cases": "Does a thing. Use when: you need the thing done.",
+ "listing_chars_project_arm": 5514,
+ "arms": {
+  "project": {
+   "cs-colon-space-unquoted": {
+    "case": "colon-space-unquoted",
+    "strict_yaml_parses": false,
+    "listed": true,
+    "description_chars": 48,
+    "description": "Does a thing. Use when: you need the thing done."
+   },
+   "cs-colon-space-quoted": {
+    "case": "colon-space-quoted",
+    "strict_yaml_parses": true,
+    "listed": true,
+    "description_chars": 48,
+    "description": "Does a thing. Use when: you need the thing done."
+   },
+   "cs-no-colon-control": {
+    "case": "no-colon-control",
+    "strict_yaml_parses": true,
+    "listed": true,
+    "description_chars": 42,
+    "description": "Does a thing when you need the thing done."
+   }
+  },
+  "plugin": {
+   "cstest:cs-colon-space-unquoted": {
+    "case": "colon-space-unquoted",
+    "strict_yaml_parses": false,
+    "listed": true,
+    "description_chars": 48,
+    "description": "Does a thing. Use when: you need the thing done."
+   },
+   "cstest:cs-colon-space-quoted": {
+    "case": "colon-space-quoted",
+    "strict_yaml_parses": true,
+    "listed": true,
+    "description_chars": 48,
+    "description": "Does a thing. Use when: you need the thing done."
+   },
+   "cstest:cs-no-colon-control": {
+    "case": "no-colon-control",
+    "strict_yaml_parses": true,
+    "listed": true,
+    "description_chars": 42,
+    "description": "Does a thing when you need the thing done."
+   }
+  }
+ },
+ "verdicts": {
+  "project": {
+   "cs-colon-space-unquoted": "name listed WITH description -- lenient parse, #78270 does not reproduce",
+   "cs-colon-space-quoted": "name listed WITH description -- lenient parse, #78270 does not reproduce",
+   "cs-no-colon-control": "name listed WITH description -- lenient parse, #78270 does not reproduce"
+  },
+  "plugin": {
+   "cstest:cs-colon-space-unquoted": "name listed WITH description -- lenient parse, #78270 does not reproduce",
+   "cstest:cs-colon-space-quoted": "name listed WITH description -- lenient parse, #78270 does not reproduce",
+   "cstest:cs-no-colon-control": "name listed WITH description -- lenient parse, #78270 does not reproduce"
+  }
+ },
+ "plugin_install_log_tail": "Adding marketplace…✔ Successfully added marketplace: cstest-marketplace (declared in user settings)\nInstalling plugin \"cstest@cstest-marketplace\"...✔ Successfully installed plugin: cstest@cstest-marketplace (scope: user)\n",
+ "controls": {
+  "trigger_is_real_unquoted_fails_strict_yaml": true,
+  "quoted_and_control_parse_strict_yaml": true,
+  "control_skill_arrived_with_description": true,
+  "quoted_skill_arrived_with_description": true,
+  "no_pre_existing_entry_is_name_only": true,
+  "real_profile_untouched": true
+ },
+ "elapsed_s": 11.3
+}

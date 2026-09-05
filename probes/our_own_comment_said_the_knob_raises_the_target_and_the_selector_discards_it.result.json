@@ -1,0 +1,45 @@
+{
+ "probe": "our_own_comment_said_the_knob_raises_the_target_and_the_selector_discards_it.py",
+ "selector_source": "function IHe({rawSizeBytes:e,surfaceCap:n,splicedSizeBytes:r,spliceCap:o,spliceActive:d}){return n!==void 0&&(!d||e/n>=r/o)?{sizeBytes:e,byteCap:n}:{sizeBytes:r,byteCap:o}}",
+ "selector_sha256_16": "43f9143b809e2246",
+ "selector_pin_matched": true,
+ "index_raw_utf8_bytes": 26699,
+ "index_spliced_utf16_units": 26548,
+ "splice_cap": 25000,
+ "crossover_algebraic": 25142.195268946813,
+ "crossover_scanned": 25143,
+ "what_the_user_is_told": {
+  "configured 22,000": {
+   "cap_used": 22000,
+   "honoured": true,
+   "target_at_0.7": 15399,
+   "fires_at_0.8": true
+  },
+  "configured 31,500": {
+   "cap_used": 25000,
+   "honoured": false,
+   "target_at_0.7": 17500,
+   "fires_at_0.8": true
+  },
+  "configured 100,000": {
+   "cap_used": 25000,
+   "honoured": false,
+   "target_at_0.7": 17500,
+   "fires_at_0.8": true
+  },
+  "unset": {
+   "cap_used": 25000,
+   "honoured": false,
+   "target_at_0.7": 17500,
+   "fires_at_0.8": true
+  }
+ },
+ "our_published_sentence": "raising the configured value raises the number you are told to aim for",
+ "that_sentence_holds_below_the_crossover_only": true,
+ "controls": {
+  "selector_text_pinned_not_binary_size": true,
+  "tighter_cap_wins_and_looser_cap_discarded_both_exercised": true,
+  "crossover_algebra_checked_against_a_brute_scan": true,
+  "default_no_knob_path_has_its_own_arm": true
+ }
+}

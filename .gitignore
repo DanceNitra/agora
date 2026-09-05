@@ -319,3 +319,19 @@ agora_output/edrn_submission/sn-jnl.cls
 
 # Gated drafts. Nothing here has the owner's approval to leave the machine.
 drafts/
+
+# A COLLABORATOR'S UNPUBLISHED DATA. This repository is PUBLIC.
+#
+# NARROW ON PURPOSE, and the first version of this block was not. It read `probes/*edrn*` and
+# `agora_output/edrn_*`, which would have silently hidden every future probe for a paper that
+# IS published: Zenodo 10.5281/zenodo.22047304, 2026-08-21, CC-BY-4.0, and PUBLISHED.md tells
+# readers to run `probes/edrn_manuscript_lint.py` and three others to reproduce its checks.
+# Hiding those would suppress the reproducibility of published work, which is the opposite of
+# what this file is for.
+#
+# What is genuinely not ours to publish is Marat's own DATA and the analysis built directly on
+# it, while the features it derives are unpublished. The manuscript itself is out under CC-BY.
+probes/.cache_marat_tat*
+probes/*marats_*
+probes/*his_importance_table*
+probes/*his_heaviest_feature*

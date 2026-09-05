@@ -1,0 +1,59 @@
+{
+ "script": "the_manifold_reachable_set_is_an_interval_and_real_rotations_cannot_see_it.py",
+ "when_utc": "2026-09-03T20:07:27Z",
+ "graph": "L2 Sierpinski gasket, his labelling",
+ "edge": [
+  0,
+  6
+ ],
+ "sector_n_up": 7,
+ "s": 1.0,
+ "ground_degeneracy": 2,
+ "reachable_interval": [
+  0.11026913715112588,
+  0.1596582438144869
+ ],
+ "grid_interval": [
+  0.11026913715112588,
+  0.1596582438144869
+ ],
+ "a_recomputed": 0.11026913715112588,
+ "b_recomputed": 0.11546199465569758,
+ "recorded": {
+  "a": 0.110269137,
+  "b": 0.115461995
+ },
+ "a_matches_record": true,
+ "b_matches_record": true,
+ "real_rotation_range": [
+  0.15965824381448612,
+  0.15965824381448696
+ ],
+ "real_rotation_spread": 8.326672684688674e-16,
+ "minimiser": {
+  "u": -3.527763488073975e-15,
+  "t": -1.1855598607461732e-15,
+  "r": 3.721648480337758e-15,
+  "eigen_residual": 2.1717868614207508e-14
+ },
+ "published_five": [
+  0.159295,
+  0.142707,
+  0.143544,
+  0.142196,
+  0.146785
+ ],
+ "published_five_inside": 5,
+ "controls": {
+  "closed_form_and_grid_agree": true,
+  "real_rotation_arm_run_as_a_negative_control": true,
+  "minimiser_verified_as_an_eigenstate": true,
+  "recorded_parameters_recomputed": true,
+  "published_values_checked_against_the_interval": true
+ },
+ "supersedes": [
+  "the_projection_average_makes_the_baseline_unique.result.json",
+  "does_the_baseline_defect_reach_the_papers_headline_number.result.json",
+  "where_table_1s_five_seed_values_come_from.result.json"
+ ]
+}

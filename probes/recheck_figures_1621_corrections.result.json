@@ -1,0 +1,245 @@
+{
+ "probe": "recheck_figures_1621_corrections.py",
+ "when_utc": "2026-09-01T19:42:05Z",
+ "draft": "drafts/1621_review_corrections.md",
+ "draft_bytes": 1627,
+ "comments_read": 41,
+ "report_chars": 24358,
+ "checks": 38,
+ "failed": 0,
+ "rows": [
+  {
+   "claim": "icophy really did state both halves first",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "icophy 2026-08-21T08:04:00Z carries both phrases, so the report is correct"
+  },
+  {
+   "claim": "no attribution correction survives",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no ISO credit claim survives",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no field-name pedantry survives",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no closing audit of his document survives",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "no retired digest is offered to readers",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "absent from the draft"
+  },
+  {
+   "claim": "he wrote 'wrong in the same direction' himself",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "his own 22 August comment, English half"
+  },
+  {
+   "claim": "and 错了 in his Chinese half",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "his own 22 August comment, Chinese half"
+  },
+  {
+   "claim": "the report dropped it in English",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "live #1621 English body"
+  },
+  {
+   "claim": "the report dropped it in Chinese too",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "live #1621 Chinese body"
+  },
+  {
+   "claim": "CONTROL: the check can tell the two texts apart",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the exact string is in his comment and absent from the report"
+  },
+  {
+   "claim": "the 6 of 8 count is the maintainer's own",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "guide 2.3 states the count"
+  },
+  {
+   "claim": "the guide names SIX categories, not the four we once listed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the four-item list is followed by two more categories in the guide"
+  },
+  {
+   "claim": "two of those carry a v1.1 caveat",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the v1.1 note names the two and says they are not typical pretexts"
+  },
+  {
+   "claim": "CONTROL: the four-item list is NOT republished",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "our own earlier parenthetical stays out of the draft"
+  },
+  {
+   "claim": "supporting: the maintainer records the same posture",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "same comment"
+  },
+  {
+   "claim": "supporting: we conceded publicly that the labels are not wrong",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "we published that concession; the draft now restates it rather than reversing it"
+  },
+  {
+   "claim": "CONTROL: the reversed sentence is gone",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the line that contradicted our own concession is removed"
+  },
+  {
+   "claim": "the report really does say harmless",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "quoted from the live #1621 body"
+  },
+  {
+   "claim": "8 of 18 from the keyword rule",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in our own published #1591 audit"
+  },
+  {
+   "claim": "7 undetermined",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in our own published #1591 audit"
+  },
+  {
+   "claim": "3 long-response",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "in our own published #1591 audit"
+  },
+  {
+   "claim": "the URL we hand him resolves",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "live fetch returns 200"
+  },
+  {
+   "claim": "CONTROL: the fetcher can say no",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "a non-existent issue in the same repo returns 404"
+  },
+  {
+   "claim": "the bare reference really lands on an unrelated issue",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "deepseek-ai/DeepSeek-V3#1 is 'Are there any plans to release the knowledge distilling R1 sample?' (2024-12-26)"
+  },
+  {
+   "claim": "the report does carry that bare reference",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "quoted from the live #1621 body"
+  },
+  {
+   "claim": "the probe we cite resolves on main, so the counts are re-derivable",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "live fetch of the raw file on main"
+  },
+  {
+   "claim": "every link's text names its own target",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "1 links checked, none mislabelled"
+  },
+  {
+   "claim": "CONTROL: there is at least one link to check",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "1 markdown links in the draft"
+  },
+  {
+   "claim": "no self-defence of an unattacked position",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "cut by the humanizer and asserted absent"
+  },
+  {
+   "claim": "no flourish about carrying a load",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "cut by the humanizer and asserted absent"
+  },
+  {
+   "claim": "no signpost before the counts",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "cut by the humanizer and asserted absent"
+  },
+  {
+   "claim": "no claim about not claiming",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "cut by the humanizer and asserted absent"
+  },
+  {
+   "claim": "attribution is not raised",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "cut by the humanizer and asserted absent"
+  },
+  {
+   "claim": "the note opens by thanking him",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "our register in this thread opens with a specific thank-you"
+  },
+  {
+   "claim": "AI assistance is disclosed",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "owner rule, permanent"
+  },
+  {
+   "claim": "every evidence string is intact",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "the CJK and field names survived"
+  },
+  {
+   "claim": "no em dash or en dash, which a real send once mangled",
+   "phrase_in_draft": true,
+   "verified": true,
+   "source": "neither dash appears"
+  }
+ ],
+ "controls": {
+  "attribution_priority_computed_not_asserted": true,
+  "report_sentences_quoted_from_live_body": true,
+  "a_correction_we_declined_is_asserted_absent": true
+ }
+}

@@ -1,0 +1,113 @@
+{
+ "probe": "what_the_epjb_submission_still_needs.py",
+ "when_utc": "2026-09-03T21:11:58Z",
+ "manuscript": "agora_output/edrn_submission/manuscript.tex",
+ "manuscript_bytes": 39317,
+ "rules_checked": 16,
+ "satisfied": 16,
+ "todo": 0,
+ "rows": [
+  {
+   "rule": "template",
+   "requirement": "Springer Nature sn-jnl class with the [iicol] option",
+   "satisfied": true,
+   "detail": "documentclass[pdflatex,sn-mathphys-num,iicol]{sn-jnl}"
+  },
+  {
+   "rule": "abstract-length",
+   "requirement": "abstract of 150 to 250 words",
+   "satisfied": true,
+   "detail": "248 words (guideline: 150 to 250)"
+  },
+  {
+   "rule": "corresponding-email",
+   "requirement": "clear indication and active e-mail of the corresponding author",
+   "satisfied": true,
+   "detail": "email macro: True | address in file: rastislav.drahos@gmail.com"
+  },
+  {
+   "rule": "orcid",
+   "requirement": "16-digit ORCID if available",
+   "satisfied": true,
+   "detail": "ORCID mentioned: True"
+  },
+  {
+   "rule": "ai-disclosure",
+   "requirement": "LLM use documented in the Methods section",
+   "satisfied": true,
+   "detail": "found 'Artificial intelligence'"
+  },
+  {
+   "rule": "competing-interests",
+   "requirement": "Competing Interests statement",
+   "satisfied": true,
+   "detail": "Competing Interests statement present: True"
+  },
+  {
+   "rule": "author-contributions",
+   "requirement": "Author contributions statement",
+   "satisfied": true,
+   "detail": "Author contributions statement present: True"
+  },
+  {
+   "rule": "declarations",
+   "requirement": "a Statements and Declarations section",
+   "satisfied": true,
+   "detail": "Declarations heading present: True"
+  },
+  {
+   "rule": "data-availability",
+   "requirement": "Data Availability Statement",
+   "satisfied": true,
+   "detail": "Data availability statement present: True"
+  },
+  {
+   "rule": "heading-depth",
+   "requirement": "decimal headings, no more than three levels",
+   "satisfied": true,
+   "detail": "sections 8, subsections 19, subsubsections 0, paragraphs 0 (max 3 levels)"
+  },
+  {
+   "rule": "reference-dois",
+   "requirement": "DOIs included as full links where available",
+   "satisfied": true,
+   "detail": "10 of 10 citable references carry a DOI; 1 exempt as online documents with an access date"
+  },
+  {
+   "rule": "one-ref-per-number",
+   "requirement": "one reference per number",
+   "satisfied": true,
+   "detail": "11 entries, 0 suspected multiple references"
+  },
+  {
+   "rule": "acknowledgments",
+   "requirement": "acknowledgments in a separate section on the title page",
+   "satisfied": true,
+   "detail": "acknowledgments present: True (EPJ B wants them on the title page)"
+  },
+  {
+   "rule": "orbit-arithmetic",
+   "requirement": "Sec 6.1 counts must add to the stated total",
+   "satisfied": true,
+   "detail": "thirty stated, twelve+sixteen listed, exclusion clause present: True"
+  },
+  {
+   "rule": "no-marker",
+   "requirement": "no editing instruction left in the text",
+   "satisfied": true,
+   "detail": "the BEFORE SUBMISSION instruction is not in the file"
+  },
+  {
+   "rule": "figures-as-files",
+   "requirement": "figures supplied as files, named FigN",
+   "satisfied": true,
+   "detail": "0 inline tikzpicture figures, 4 \\includegraphics"
+  }
+ ],
+ "controls": {
+  "target_exists_and_parses": true,
+  "every_rule_proved_able_to_fail": true,
+  "fixture_count_matches_rule_count": true
+ },
+ "elapsed_s": 0.0
+}

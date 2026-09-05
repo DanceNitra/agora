@@ -1,0 +1,59 @@
+{
+ "probe": "the_knob_can_silence_the_memory_reminder_on_the_branch_we_never_read.py",
+ "selector_source": "function IHe({rawSizeBytes:e,surfaceCap:n,splicedSizeBytes:r,spliceCap:o,spliceActive:d}){return n!==void 0&&(!d||e/n>=r/o)?{sizeBytes:e,byteCap:n}:{sizeBytes:r,byteCap:o}}",
+ "selector_sha256_16": "43f9143b809e2246",
+ "index_disk_bytes": 26701,
+ "index_spliced_utf16_units_after_crlf_collapse": 26336,
+ "index_lines": 213,
+ "line_dimension_changes_the_verdict": true,
+ "silences_at_configured": 33377,
+ "still_fires_at": 33376,
+ "rows": {
+  "unset, default": {
+   "cap_used": 25000,
+   "honoured": false,
+   "dimension": "lines",
+   "frac": 1.065,
+   "fires": true,
+   "target": 140
+  },
+  "22,000, spliceActive": {
+   "cap_used": 22000,
+   "honoured": true,
+   "dimension": "bytes",
+   "frac": 1.213681818181818,
+   "fires": true,
+   "target": 15399
+  },
+  "31,500, spliceActive": {
+   "cap_used": 25000,
+   "honoured": false,
+   "dimension": "lines",
+   "frac": 1.065,
+   "fires": true,
+   "target": 140
+  },
+  "31,500, !spliceActive": {
+   "cap_used": 31500,
+   "honoured": true,
+   "dimension": "bytes",
+   "frac": 0.8476507936507937,
+   "fires": true,
+   "target": 22050
+  },
+  "33377, !spliceActive": {
+   "cap_used": 33377,
+   "honoured": true,
+   "dimension": "bytes",
+   "frac": 0.7999820235491506,
+   "fires": false,
+   "target": 23363
+  }
+ },
+ "controls": {
+  "both_ternary_branches_exercised_and_they_disagree": true,
+  "silencing_has_a_witness_and_the_value_below_it_does_not": true,
+  "selector_text_pinned": true,
+  "line_dimension_reported_rather_than_assumed": true
+ }
+}
