@@ -423,18 +423,44 @@ def thread_is_open(lead: dict) -> bool | None:
         return None
 
 
+# A closed lead must also reach the OUTCOME ledger, because that is the file the status endpoint
+# reads. `box_mark` wrote only to the box, so triage was invisible to `/brain/scout/status`: it
+# derives `hours_since_triage` from `.scout.json`, never from `.scout_box.json`. Measured
+# 2026-09-06 after triaging 21 leads: box mtime 12:12 the same day, ledger mtime three days
+# earlier, `stage` still `triage_blocked` and `hours_since_triage` still 75.9. So the one signal
+# saying "nobody is draining the box" could not be cleared by draining the box, and the task text
+# tells you to close leads with exactly this call.
+#
+# The phrasing is not decorative. `/brain/scout/status` buckets an outcome by searching for the
+# literal substring "no real fit"; anything else counts as `drafted`. Writing the bare status here
+# would have filed every no-fit as a draft.
+_MARK_OUTCOME = {
+    "no_fit": "no real fit (triage)",
+    "dropped": "no real fit (thread closed upstream)",
+    "done": "drafted",
+}
+
+
 def box_mark(url: str, status: str = "done") -> bool:
     items = box_load()
-    hit = False
+    hit = None
+    st = (status or "done")[:20]
     for x in items:
         if x.get("url") == url:
-            x["status"] = (status or "done")[:20]
+            x["status"] = st
             x["closed_ts"] = time.time()
             x.setdefault("by", OWNER)      # a record closed before `by` existed still names its owner
-            hit = True
-    if hit:
+            hit = x
+    if hit is not None:
         _box_save(items)
-    return hit
+        # `record_contacted` dedups on url and returns None on a repeat, so a lead the
+        # correspondent already logged at draft time is not counted twice.
+        try:
+            record_contacted(url, hit.get("repo", ""), int(hit.get("issue_number") or 0),
+                             _MARK_OUTCOME.get(st, "drafted"))
+        except Exception:
+            pass
+    return hit is not None
 
 
 def box_rule(url: str, verdict: str, by: str = "") -> bool:
