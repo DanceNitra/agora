@@ -1,0 +1,91 @@
+{
+ "n_entities": 30,
+ "cells": [
+  {
+   "key": true,
+   "guard": true,
+   "tag": true,
+   "n": 30,
+   "mean_records": 1.0,
+   "survivor": {
+    "correction": 30
+   }
+  },
+  {
+   "key": true,
+   "guard": true,
+   "tag": false,
+   "n": 30,
+   "mean_records": 1.0,
+   "survivor": {
+    "correction": 30
+   }
+  },
+  {
+   "key": true,
+   "guard": false,
+   "tag": true,
+   "n": 30,
+   "mean_records": 1.0,
+   "survivor": {
+    "stale": 30
+   }
+  },
+  {
+   "key": true,
+   "guard": false,
+   "tag": false,
+   "n": 30,
+   "mean_records": 1.0,
+   "survivor": {
+    "stale": 30
+   }
+  },
+  {
+   "key": false,
+   "guard": true,
+   "tag": true,
+   "n": 30,
+   "mean_records": 3.0,
+   "survivor": {
+    "both": 30
+   }
+  },
+  {
+   "key": false,
+   "guard": true,
+   "tag": false,
+   "n": 30,
+   "mean_records": 3.0,
+   "survivor": {
+    "both": 30
+   }
+  },
+  {
+   "key": false,
+   "guard": false,
+   "tag": true,
+   "n": 30,
+   "mean_records": 3.0,
+   "survivor": {
+    "both": 30
+   }
+  },
+  {
+   "key": false,
+   "guard": false,
+   "tag": false,
+   "n": 30,
+   "mean_records": 3.0,
+   "survivor": {
+    "both": 30
+   }
+  }
+ ],
+ "controls": {
+  "key_off_surfaces_3_records": true,
+  "key_off_shows_both_values": true,
+  "guard_on_retains_correction": true
+ },
+ "note": "Reader-accuracy numbers are deliberately absent. They need an LLM judge and Ollama cloud returned 429 on 2026-09-06, so they could not be re-run and are not cited."
+}
