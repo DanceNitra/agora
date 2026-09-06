@@ -1,0 +1,291 @@
+{
+ "tool": "pregate",
+ "thread": "luoxuejian000/edrn-dmrg-verification#2",
+ "claims": 14,
+ "worth_writing": 14,
+ "blocked": 0,
+ "numbers_examined": [
+  "0.0000",
+  "0.000000",
+  "0.020668",
+  "0.035243",
+  "0.049977",
+  "0.062058",
+  "0.064153",
+  "0.0642",
+  "0.074977",
+  "0.105",
+  "0.193039",
+  "0.300934",
+  "5170522293",
+  "5506336171",
+  "5537106140"
+ ],
+ "results": [
+  {
+   "claim": "In comment 5506336171 we gave the tree control as 0.074977 for edge (2,3), and the edited run reproduces that figure.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.074977",
+    "5506336171"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5506336171",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.074977"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5506336171 we gave the random-graph edge (7,8) as 0.064153 in depth, and at 20 seeds its standard deviation is 0.000000 across every run.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.000000",
+    "0.064153",
+    "5506336171"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5506336171",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.064153"
+   ],
+   "figures_not_in_that_comment": [
+    "0.000000"
+   ],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5537106140 we gave that curve as rising strictly from 0.193039 at zero to 0.300934 at three, and it still does.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.193039",
+    "0.300934",
+    "5537106140"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5537106140",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.193039",
+    "0.300934"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5537106140 we gave the multi-entrance deviation as 0.049977 for one entrance pair, and that section is now deleted.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.049977",
+    "5537106140"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5537106140",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.049977"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5170522293 the tabulated random-graph depth appears as 0.0642 with a cross-seed spread of 0.0000 over three seeds.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.0000",
+    "0.0642",
+    "5170522293"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5170522293",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.0000"
+   ],
+   "figures_not_in_that_comment": [
+    "0.0642"
+   ],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Edge (8,14) over 20 seeds gives a mean of 0.062058 and a standard deviation of 0.035243 in depth.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.035243",
+    "0.062058"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5506336171 uses the figure 0.105 for a different quantity, and the small-world (7,8) minimum found by extending the scan to negative contradiction strength sits at s = -0.105 in that parameter.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.105",
+    "5506336171"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5506336171",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.105"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The prominence of that minimum in absolute terms is 0.020668 in the enhanced diagnosis, identical across five seeds.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.020668"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5303073894",
+     "who": "DanceNitra",
+     "when": "2026-08-15T16:08",
+     "words": [
+      "absolute",
+      "diagnosis",
+      "enhanced",
+      "identical",
+      "minimum"
+     ]
+    },
+    {
+     "where": "comment 5356860591",
+     "who": "DanceNitra",
+     "when": "2026-08-20T13:54",
+     "words": [
+      "diagnosis",
+      "enhanced",
+      "minimum",
+      "prominence",
+      "seeds"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The manuscript's own 24.5 percent is the uniform-truncation recovery at chi_B = 8 in the tensor-RG section.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "nx.random_unlabeled_tree shares 2 of the 14 tree edges with his generator.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The full-data script declares linspace(0.0, 3.0, 61), which is a step of 0.05 across the range.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5536511118",
+     "who": "DanceNitra",
+     "when": "2026-09-04T06:15",
+     "words": [
+      "declares",
+      "full-data",
+      "linspace",
+      "script"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "13 points over the same range would be a step of 0.25 instead.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The valley positions 1.20 and 1.70 both lie on that 61-point grid.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The syntax errors in the longer script are at lines 131 and 162 of the file.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5492822332",
+     "who": "DanceNitra",
+     "when": "2026-09-01T10:52",
+     "words": [
+      "errors",
+      "longer",
+      "script"
+     ]
+    },
+    {
+     "where": "comment 5493287832",
+     "who": "luoxuejian000",
+     "when": "2026-09-01T11:33",
+     "words": [
+      "errors",
+      "longer",
+      "script"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

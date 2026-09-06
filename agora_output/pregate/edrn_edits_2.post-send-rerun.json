@@ -1,0 +1,115 @@
+{
+ "tool": "pregate",
+ "thread": "luoxuejian000/edrn-dmrg-verification#2",
+ "thread_url": "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2",
+ "threads": [
+  "luoxuejian000/edrn-dmrg-verification#2",
+  "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2"
+ ],
+ "claims": 4,
+ "worth_writing": 2,
+ "blocked": 2,
+ "numbers_examined": [
+  "0.008356",
+  "0.050837",
+  "0.050837261219370",
+  "0.104966",
+  "0.105007",
+  "0.2341",
+  "0.3287",
+  "0.3294",
+  "5506336171",
+  "5536511118"
+ ],
+ "results": [
+  {
+   "claim": "In comment 5536511118 we gave the manifold average for edge (8,14) as 0.050837261219370 in the sector n_up = 7, matching the repaired CSV value 0.050837 exactly.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.050837",
+    "0.050837261219370",
+    "5536511118"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5536511118",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.050837",
+    "0.050837261219370"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5506336171 the single returned vector for that edge gives a depth of 0.104966 instead.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.104966",
+    "5506336171"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5506336171",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.104966"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "At the reference point s = 0 the three seeds return an enhanced diagnosis of 0.3294, then 0.3287, then 0.2341 for that same edge.",
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "0.2341",
+    "0.3287",
+    "0.3294"
+   ],
+   "hits": [
+    {
+     "where": "comment 5558144407",
+     "who": "DanceNitra",
+     "when": "2026-09-06T08:50",
+     "numbers": [
+      "0.2341",
+      "0.3287",
+      "0.3294"
+     ]
+    }
+   ],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Over 20 seeds edge (8,14) spans a minimum of 0.008356 and a maximum of 0.105007 in depth.",
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "0.008356",
+    "0.105007"
+   ],
+   "hits": [
+    {
+     "where": "comment 5558144407",
+     "who": "DanceNitra",
+     "when": "2026-09-06T08:50",
+     "numbers": [
+      "0.008356",
+      "0.105007"
+     ]
+    }
+   ],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ],
+ "note": "NOT the gate receipt for comment 5558144407. That comment was sent at 08:50:59Z; this file was written at 09:00:14Z while repairing the thread-spelling defect, and it OVERWROTE the original, which is not recoverable. Its 2 blocked claims are self-referential: pregate finds those figures already published, in our own comment 5558144407. Re-running pregate after a send always blocks that way."
+}

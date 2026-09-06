@@ -453,20 +453,46 @@ def _pregate_gate_impl(path, thread_spec):
     running it first not a thing to remember.
     """
     import glob as _glob
-    if not thread_spec:
-        return ("no --thread given, so the pregate receipt for this thread cannot be found. "
-                "Pass --thread owner/repo#N.")
+    # THE NUMBERS DECIDE WHETHER THIS GATE APPLIES, so they are read FIRST.
+    #
+    # This used to ask for --thread before looking at the draft, which made the gate unpassable
+    # for a command that CREATES the thread: `gh pr create` has no owner/repo#N, by definition,
+    # so a submission carrying no figure at all was refused for want of a number that cannot
+    # exist yet. Measured 2026-09-05 on the first list submission, whose body has no distinctive
+    # figure and nothing to pre-check.
+    #
+    # This is the same shape `_new_thread_gate` below describes and fixed for itself: a gate
+    # failing closed on a question that does not apply. Nothing is loosened. A draft that DOES
+    # carry a figure still needs a thread and still refuses without one, which is the case the
+    # gate exists for.
     body = io.open(path, encoding="utf-8").read()
     nums = set(re.findall(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])", body))
     if not nums:
         return None
+    if not thread_spec:
+        return ("this draft carries %d distinctive figure(s) (%s) and no --thread, so the pregate "
+                "receipt for them cannot be found. Pass --thread owner/repo#N."
+                % (len(nums), ", ".join(sorted(nums)[:4])))
     seen, runs = set(), []
     for f in _glob.glob(os.path.join(PREGATE_DIR, "*.json")):
         try:
             d = json.load(io.open(f, encoding="utf-8"))
         except Exception:
             continue
-        if d.get("tool") != "pregate" or d.get("thread") != thread_spec:
+        # A thread has two spellings, owner/repo#N and the issue URL, and the two tools
+        # disagreed about which is canonical: pregate only accepted the short form while
+        # this check keyed on whatever --thread was given, which must match the URL the
+        # publish command posts to. Measured 2026-09-06: the receipt was real and this
+        # refused to see it. Match on either spelling; pregate now records both.
+        _keys = set(d.get("threads") or [])
+        for _k in ("thread", "thread_url"):
+            if d.get(_k):
+                _keys.add(d[_k])
+        import re as _re
+        _m = _re.match(r"^https?://github\.com/([\w.-]+)/([\w.-]+)/(?:issues|pull)/(\d+)",
+                       thread_spec or "")
+        _want = {thread_spec, "%s/%s#%s" % _m.groups() if _m else thread_spec}
+        if d.get("tool") != "pregate" or not (_keys & _want):
             continue
         if d.get("blocked"):
             return ("the pregate run at %s still has %d blocked claim(s). Delete them and re-run "

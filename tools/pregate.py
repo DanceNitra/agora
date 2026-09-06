@@ -52,7 +52,16 @@ PROBES = os.path.join(ROOT, "probes")
 
 # A number long enough to be a fingerprint. "1", "20" and "2026" appear everywhere; 0.049977 does
 # not. Four significant digits is where a coincidence stops being plausible.
-NUM = re.compile(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])")
+# A figure at the end of a sentence is still a figure. The lookahead used to reject any
+# trailing dot, so "the spread is 0.035243." was invisible while "0.035243 in depth" was
+# seen. Measured 2026-09-06: `send_approved` demanded two figures this refused to examine,
+# and the only way through was to reword the claim so a word followed every number. The
+# lookahead exists to stop matching inside a longer number like 1.2.3, so it now rejects a
+# dot only when a DIGIT follows it.
+# NOT IDEMPOTENT ACROSS A SEND. Once a comment is published, re-running this on the same
+# claims blocks them as ALREADY SAID BY US, citing that comment. The verdict is correct and
+# the gate is not broken; it ran before the send, which is the only time it means anything.
+NUM = re.compile(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w]|\.\d)")
 
 # A YEAR IS NOT A FINGERPRINT. The first live run flagged two claims as already said because
 # "2026" appears in the other party's comments, which it does in every comment anyone dates.
@@ -109,11 +118,29 @@ def load_claims(path, out):
     return claims
 
 
+def normalise_thread(spec):
+    """Accept either spelling of the same thread and return owner/repo#N.
+
+    `send_approved` keys its pregate lookup on whatever string it was given as --thread, and it
+    requires that string to match the URL the publish command posts to. This tool accepted only
+    owner/repo#123. So the two could never agree: pass the URL and pregate refused, pass the short
+    form and the sender said no receipt existed for the thread. Measured 2026-09-06, it cost a
+    hand-edited receipt to get one comment out. Both spellings now mean the same thread here, and
+    the receipt records the short form whichever way it was asked.
+    """
+    spec = spec.strip()
+    m = re.match(r"^https?://github\.com/([\w.-]+)/([\w.-]+)/(?:issues|pull)/(\d+)", spec)
+    if m:
+        return "%s/%s#%s" % m.groups()
+    return spec
+
+
 def fetch_thread(spec, out):
     """[(id, author, created, body)] for every comment, including the issue body itself."""
+    spec = normalise_thread(spec)
     m = re.match(r"^([\w.-]+/[\w.-]+)#(\d+)$", spec)
     if not m:
-        refuse("--thread must look like owner/repo#123, got %r" % spec, out)
+        refuse("--thread must look like owner/repo#123 or the issue URL, got %r" % spec, out)
     repo, num = m.group(1), m.group(2)
     rows = []
     for url, kind in (("repos/%s/issues/%s" % (repo, num), "issue"),
@@ -391,7 +418,13 @@ def main():
     # number that skipped this check is the case that closes.
     examined = sorted({n for r in res for n in r["numbers"]})
     if out:
-        json.dump({"tool": "pregate", "thread": a.thread, "claims": len(res),
+        _short = normalise_thread(a.thread)
+        _url = None
+        _m = re.match(r"^([\w.-]+)/([\w.-]+)#(\d+)$", _short)
+        if _m:
+            _url = "https://github.com/%s/%s/issues/%s" % _m.groups()
+        json.dump({"tool": "pregate", "thread": _short, "thread_url": _url,
+                   "threads": [x for x in (_short, _url) if x], "claims": len(res),
                    "worth_writing": len(res) - bad, "blocked": bad,
                    "numbers_examined": examined, "results": res},
                   io.open(out, "w", encoding="utf-8"), indent=1, ensure_ascii=False)

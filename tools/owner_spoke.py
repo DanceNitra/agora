@@ -258,9 +258,19 @@ def check(sha: str, project_dir: str | None = None, draft: str | None = None) ->
                 return False, ("the whole draft was on screen at %s and he has not spoken since. "
                                "His last message, %s, came before the text was complete."
                                % (complete.isoformat(), after[-1][0].isoformat()))
-            reply_at, reply_txt = qualifying[0]
+            # EVERY qualifying message, not just the first. Taking `qualifying[0]` locked the
+            # owner out by construction: once an instant "posli" landed, no later message could
+            # ever be considered, however long he then spent reading. Measured 2026-09-06 on a
+            # real send, where he replied in 8.4 s, was told to wait, and his next two messages
+            # were still judged against the first one's timestamp. A guard that cannot be
+            # satisfied after a fast first reply is not strict, it is broken.
+            #
+            # Nothing is loosened. Each candidate is still required to come after the whole draft
+            # was on screen, and is still charged the full reading rate from the last NEW content
+            # it follows. A later message simply gets its own honest measurement.
             carriers = {t for t in first_shown.values()}
-            after = [(reply_at, reply_txt)]
+            reply_at = reply_txt = None
+            _why = None
 
             # COULD HE HAVE READ IT? Not whether he did, which no transcript can say.
             #
@@ -272,27 +282,34 @@ def check(sha: str, project_dir: str | None = None, draft: str | None = None) ->
             # prose are argued about; nobody argues about 1,000 words a minute. Both real approvals
             # sit 8x and 30x under it, so this fires on an instant "ok" after a large new block and
             # on nothing else. A necessary condition, and the docstring says so.
-            prev_msgs = [t for t, _ in humans if t < reply_at]
-            since = max(prev_msgs) if prev_msgs else None
             shown_at = {}
-            for s in want:
-                hits = [t for t, txt in assistant_texts(p) if _tight(s) in _tight(txt)]
+            for _s in want:
+                hits = [t for t, txt in assistant_texts(p) if _tight(_s) in _tight(txt)]
                 if hits:
-                    shown_at[s] = min(hits)
-            fresh = [s for s, t in shown_at.items() if since is None or t > since]
-            if fresh:
-                last_new = max(shown_at[s] for s in fresh)
-                secs = (reply_at - last_new).total_seconds()
-                words = sum(len(s.split()) for s in fresh)
-                wpm = words / (secs / 60.0) if secs > 0 else float("inf")
-                if wpm > 1000:
-                    return False, ("%d new words were put in front of him and the reply came %.1f s "
-                                   "later, which is %.0f words a minute. Nobody reads at that rate, "
-                                   "so this is an acknowledgement rather than an answer about the "
-                                   "text." % (words, secs, wpm))
-                rate = "%.0f wpm over %d new word(s)" % (wpm, words)
-            else:
-                rate = "no content new since his previous message"
+                    shown_at[_s] = min(hits)
+            for cand_at, cand_txt in qualifying:
+                prev_msgs = [t for t, _ in humans if t < cand_at]
+                since = max(prev_msgs) if prev_msgs else None
+                fresh = [x for x, t in shown_at.items() if since is None or t > since]
+                if fresh:
+                    last_new = max(shown_at[x] for x in fresh)
+                    secs = (cand_at - last_new).total_seconds()
+                    words = sum(len(x.split()) for x in fresh)
+                    wpm = words / (secs / 60.0) if secs > 0 else float("inf")
+                    if wpm > 1000:
+                        _why = ("%d new words were put in front of him and the reply came %.1f s "
+                                "later, which is %.0f words a minute. Nobody reads at that rate, "
+                                "so this is an acknowledgement rather than an answer about the "
+                                "text." % (words, secs, wpm))
+                        continue
+                    rate = "%.0f wpm over %d new word(s)" % (wpm, words)
+                else:
+                    rate = "no content new since his previous message"
+                reply_at, reply_txt = cand_at, cand_txt
+                break
+            if reply_at is None:
+                return False, _why or "no qualifying message cleared the reading-rate check"
+            after = [(reply_at, reply_txt)]
             return True, ("shown %s, all %d lines displayed across %d message(s), %s, human "
                           "replied %s: %r" % (anchor.isoformat(), len(want), len(carriers),
                                               rate, reply_at.isoformat(), after[0][1][:50]))
