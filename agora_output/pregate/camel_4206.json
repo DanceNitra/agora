@@ -1,0 +1,131 @@
+{
+ "tool": "pregate",
+ "thread": "camel-ai/camel#4206",
+ "thread_url": "https://github.com/camel-ai/camel/issues/4206",
+ "threads": [
+  "camel-ai/camel#4206",
+  "https://github.com/camel-ai/camel/issues/4206"
+ ],
+ "claims": 6,
+ "worth_writing": 6,
+ "blocked": 0,
+ "numbers_examined": [],
+ "results": [
+  {
+   "claim": "On the OWASP Agent Memory Guard repository at commit 3e1d6e4, package version 0.3.1, the protected-key category of its own security benchmark reproduces at 8 of 8 poisoned writes blocked.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 4929170035",
+     "who": "fengju0213",
+     "when": "2026-07-20T13:00",
+     "words": [
+      "agent",
+      "benchmark",
+      "memory",
+      "version"
+     ]
+    },
+    {
+     "where": "comment 5075962765",
+     "who": "hegu-1",
+     "when": "2026-07-25T00:59",
+     "words": [
+      "agent",
+      "benchmark",
+      "memory"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Under that same policy a legitimate write to the same key by its owner is blocked too, 8 of 8.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "With a supersession key and the echo defence on, recall returns 1 record and it is the correction, in 30 of 30 trials.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "With a supersession key and the echo defence off, recall returns 1 record and it is the stale value, in 30 of 30 trials.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 4929170035",
+     "who": "fengju0213",
+     "when": "2026-07-20T13:00",
+     "words": [
+      "recall",
+      "stale",
+      "supersession",
+      "value"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "With no supersession key recall returns 3 records and both values stay visible, in 30 of 30 trials.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 4929170035",
+     "who": "fengju0213",
+     "when": "2026-07-20T13:00",
+     "words": [
+      "recall",
+      "records",
+      "supersession"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In every one of those cases history still returns the correction, marked superseded.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 4929170035",
+     "who": "fengju0213",
+     "when": "2026-07-20T13:00",
+     "words": [
+      "every",
+      "history",
+      "superseded"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

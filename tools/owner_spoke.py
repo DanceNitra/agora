@@ -128,7 +128,16 @@ def _tight(s: str) -> str:
     and the displayed 同一个 方向上 compared unequal. Between CJK characters a line break is not a
     space, and at 45 characters or more two different sentences do not collide once spacing is gone.
     """
-    return "".join((s or "").split())
+    # BACKTICKS GO TOO, on both sides. A draft pasted into chat inside a ``` fence carries three
+    # backticks the file does not, and they land INSIDE the compared string once whitespace is
+    # gone: `...30/30```Theaudittrail...`. So a correctly displayed draft could never match, and
+    # the refusal named a line that was on screen. Measured 2026-09-06 on a real send to
+    # camel-ai/camel#4206, which took five attempts to get past this.
+    #
+    # This is symmetric and only ignores a formatting character. The guard asks whether the WORDS
+    # were put in front of him, and a fence is not a word. Inline code in the draft itself carries
+    # backticks on both sides already, so nothing that used to match stops matching.
+    return "".join((s or "").replace("`", "").split())
 
 
 def _samples(body: str, floor: int = 45) -> list[str]:

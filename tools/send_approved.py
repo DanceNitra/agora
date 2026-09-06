@@ -503,6 +503,17 @@ def _pregate_gate_impl(path, thread_spec):
         return ("no pregate receipt for %s. Run it on the CLAIMS before the prose: "
                 "python tools/pregate.py claims.md --thread %s --archive <their files> "
                 "--json agora_output/pregate/<name>.json" % (thread_spec, thread_spec))
+    # THE THREAD'S OWN NUMBER IS NOT A CLAIM. Writing "#4206" to point at the issue you are
+    # replying in is a reference, not a figure about the world, and there is nothing for the
+    # pregate to check: no claims file can contain it and no archive can corroborate it. Measured
+    # 2026-09-06 on a real send to camel-ai/camel#4206, refused for exactly this. The exemption is
+    # deliberately the narrowest one available: ONLY the number in `--thread`, and only where the
+    # draft writes it with a leading `#`. A bare 4206, or any other issue number, still has to be
+    # pre-checked, so this cannot be widened into "numbers near a hash are fine".
+    _own_m = re.match(r"^https?://github\.com/[\w.-]+/[\w.-]+/(?:issues|pull)/(\d+)",
+                      thread_spec or "") or re.match(r"^[\w.-]+/[\w.-]+#(\d+)$", thread_spec or "")
+    if _own_m and ("#" + _own_m.group(1)) in body:
+        nums.discard(_own_m.group(1))
     unchecked = sorted(nums - seen)
     if unchecked:
         return ("%d figure(s) in this draft were never put through the pregate: %s. "
