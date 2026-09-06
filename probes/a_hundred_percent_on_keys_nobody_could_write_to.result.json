@@ -1,0 +1,45 @@
+{
+ "amg_full": {
+  "arm": "AMG, their benchmark policy",
+  "protected_keys": [
+   "identity.*",
+   "system.*",
+   "agent.goal",
+   "agent.capabilities",
+   "security.*"
+  ],
+  "attacks": 8,
+  "blocked": 8,
+  "not_blocked": [],
+  "control_legit_updates_allowed": 0
+ },
+ "amg_missing_one": {
+  "arm": "AMG, 'agent.goal' not listed",
+  "protected_keys": [
+   "identity.*",
+   "system.*",
+   "agent.capabilities",
+   "security.*"
+  ],
+  "attacks": 8,
+  "blocked": 7,
+  "not_blocked": [
+   "agent.goal"
+  ],
+  "control_legit_updates_allowed": 1
+ },
+ "inspeximus": {
+  "arm": "inspeximus, no key list",
+  "attacks": 8,
+  "prior_value_restored": 8,
+  "tamper_visible_in_history": 8,
+  "failures": []
+ },
+ "_measured": {
+  "date": "2026-09-06",
+  "amg_commit": "3e1d6e4",
+  "amg_version": "0.3.1",
+  "inspeximus_version": "2.26.1",
+  "corpus": "their ATTACK_CORPUS, category=protected_key"
+ }
+}
