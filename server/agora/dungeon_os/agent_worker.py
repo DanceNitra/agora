@@ -1183,8 +1183,25 @@ class CorporationWorker:
         lead = words(title) | words(summary)
         if not lead:
             return ""
+        # A THEME MAY NOT EXCLUDE A LEAD ON A WORD THAT IS THE MISSION. The 50%-of-a-theme's-words
+        # rule is fine for a long theme and lethal for a short one: "Flashbulb Memory" is two words,
+        # so any lead containing "memory" hits 50% and dies. Measured 2026-09-06 against the live
+        # 200-theme store, on five leads worded from the owner's OWN board text: FOUR were filtered
+        # out, three of them by that single theme. The error runs in the excluding direction, which
+        # is the expensive one, and it is the same defect CLAUDE.md records for board_priority_terms
+        # -- "agent" and "memory" are the commonest words we have, so they discriminate nothing.
+        #
+        # So a theme now fires only on its DISTINCTIVE words: the ones that are not themselves the
+        # board's priority terms. A theme made entirely of mission words can no longer refuse
+        # anything, and a deliberate narrow skip like "reranking" still fires on the first word.
+        try:
+            from agora.execution.board import priorities_text
+            from agora.execution.methods import board_priority_terms
+            _mission = {w for t in board_priority_terms(priorities_text()) for w in words(t)}
+        except Exception:
+            _mission = set()
         for theme in skipped_themes():
-            tw = words(theme)
+            tw = words(theme) - _mission
             if tw and len(tw & lead) / len(tw) >= 0.5:
                 return f"gatekeeper-skipped theme: {theme[:60]}"
         for txt in recent_texts():

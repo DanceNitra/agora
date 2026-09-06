@@ -31,23 +31,54 @@ def _save(items: list) -> None:
         pass
 
 
-def record_skip(theme: str, reason: str = "") -> dict | None:
-    """One editorial skip = one ledger entry (deduped on the first 60 chars)."""
+def _skip_words(t: str) -> set:
+    """The theme's content words, split the way the dungeon's consumer splits them.
+
+    `agent_worker` filters a lead when >= 50% of a stored theme's words appear in it, so dedup has
+    to reason in the same units. Comparing raw substrings instead is what let a one-word theme be
+    absorbed by an unrelated slug that merely contained it.
+    """
+    import re as _re
+    return {w for w in _re.split(r"[^a-z0-9]+", (t or "").lower()) if len(w) > 2}
+
+
+def record_skip(theme: str, reason: str = "") -> dict:
+    """One editorial skip = one ledger entry.
+
+    DEDUP IS DIRECTIONAL, and it used to run the wrong way. The old rule bumped an existing entry
+    whenever the new theme appeared anywhere inside it as a substring, so a GENERAL theme was
+    swallowed by any longer SPECIFIC entry that happened to contain it. Measured 2026-09-06: the
+    board calls reranking a dead end, `record_skip("reranking")` reported nothing recorded, and the
+    entry it had merged into was a Reddit slug,
+    `xWhX61651H8_n8n_just_leveled_up_rag_agents_reranking_metadat`. The consumer needs >= 50% of a
+    theme's words to fire, so that slug filters no lead about reranking, and the skip I had just
+    performed did nothing at all. A hole in the EXCLUDING direction, which is the expensive one.
+
+    Now two themes are the same theme only when their word sets match, or when the smaller set is
+    contained in the larger AND has at least two words. One word is never enough to be absorbed.
+
+    Returns a dict carrying `status`: `recorded`, `deduped` or `refused`. It used to return None for
+    both `refused` and `deduped`, so the caller could not tell a rejected theme from a merged one.
+    """
     t = (theme or "").strip()
     if len(t) < 6:
-        return None
+        return {"status": "refused", "theme": t, "why": "under six characters"}
     items = _load()
-    if any(t[:60].lower() in (x.get("theme", "").lower()) for x in items):
-        for x in items:
-            if t[:60].lower() in x.get("theme", "").lower():
-                x["count"] = x.get("count", 1) + 1
-                x["ts"] = time.time()
-        _save(items)
-        return None
+    tw = _skip_words(t)
+    for x in items:
+        xw = _skip_words(x.get("theme", ""))
+        if not tw or not xw:
+            continue
+        same = (tw == xw) or (tw < xw and len(tw) >= 2) or (xw < tw and len(xw) >= 2)
+        if same:
+            x["count"] = x.get("count", 1) + 1
+            x["ts"] = time.time()
+            _save(items)
+            return {"status": "deduped", "theme": t, "merged_into": x.get("theme", "")[:160]}
     rec = {"theme": t[:160], "reason": (reason or "")[:200], "count": 1, "ts": time.time()}
     items.append(rec)
     _save(items[-200:])
-    return rec
+    return dict(rec, status="recorded")
 
 
 def skipped_themes(max_age_days: int = 30) -> list[str]:

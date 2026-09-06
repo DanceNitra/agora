@@ -1644,7 +1644,11 @@ async def brain_gatekeeper_skip(request: Request):
     """THE GATEKEEPER — Claude records an editorial skip so queue generators stop re-offering it."""
     from agora.execution.gatekeeper import record_skip
     b = await request.json()
-    return {"status": "ok", "recorded": bool(record_skip(b.get("theme") or "", b.get("reason") or ""))}
+    r = record_skip(b.get("theme") or "", b.get("reason") or "")
+    # `recorded` stays a boolean for anything reading it, but say WHICH of the two false
+    # cases happened: a theme refused as too short and one merged into an existing entry
+    # were indistinguishable, and that hid a dedup running in the wrong direction.
+    return {"status": "ok", "recorded": r.get("status") == "recorded", "result": r}
 
 
 @router.get("/brain/gatekeeper/skips")
