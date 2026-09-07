@@ -35,3 +35,20 @@ dungeon LLM key in agora-game-server/.env read via pilot.py).
 - Write receipts were DISABLED in this run (INSPEXIMUS_RECEIPTS unset), so
   verify_writes() reports "nothing to verify" — a receipts-on rerun is the next step.
 - One scenario, one user scope. Multi-user and larger corpora are future runs.
+
+---
+
+## Receipts-on pass (v2, same real inputs)
+
+A second migration pass over the SAME ledger + export, with the tamper-evident
+write chain enabled (`Inspeximus(receipts=True)`):
+
+- Same numbers: 250 events -> 248 chains -> 247 imported, 0 unkeyed
+- **`verify_writes()` = `[true, []]`** — the hash-chained write chain verifies over
+  all 247 imported records
+- Parity recomputed live against the v1 temp mem0 store: same rows
+- Files: `migrated_receipts.json` + sidecar `migrated_receipts.json.receipts.json`
+  (228 KB receipt chain), receipt `MIGRATE_RECEIPTS_RESULT.json`
+
+The tool gained `--receipts` / `receipts=True` (inspeximus repo commit) so this
+needs no code edit, just the flag.
