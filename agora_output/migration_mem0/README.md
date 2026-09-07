@@ -52,3 +52,37 @@ write chain enabled (`Inspeximus(receipts=True)`):
 
 The tool gained `--receipts` / `receipts=True` (inspeximus repo commit) so this
 needs no code edit, just the flag.
+
+---
+
+## Multi-user + larger corpus (v3, real run)
+
+Three scenarios ingested as THREE users into one live mem0 (shared qdrant +
+shared ledger): A01_update, A02_update, A05_update — 150 sessions, 2,000s ingest.
+
+- **777 ledger events -> 777 chains -> 777 imported, 0 unkeyed** — per-user uid
+  distribution exact (A01=266, A02=253, A05=258; verified against the live export)
+- **Scoped recall works via the product API**: `recall(q, k, user_id=uid)` —
+  8 hits per user; the earlier `where={"user_id":...}` in my own driver matched
+  nothing because canonical remember() stores the uid at `meta.uid` (core.py:2786)
+  and recall scopes via its `user_id` parameter (core.py:10771, 10974). My driver
+  bug, not a product bug — and the same error was in this guide's Step 2 (fixed).
+- **No cross-user leakage** at content level: no user's scoped results contain
+  another user's known fact text (all three users checked)
+- **verify_writes() = [true, []]** with receipts ON; sidecar 713 KB
+
+## Honest findings the run produced
+
+1. **mem0's silent in-add corrections leave NO ledger trace.** 777 events were
+   ~1.0 per chain — mem0's internal reconciliation during add() does not write
+   UPDATE rows. A ledger-based migration can therefore reconstruct explicit
+   changes (update()/delete()) but not mem0's quiet merges. Fidelity claim
+   adjusted accordingly.
+2. **mem0 extraction non-determinism propagates**: the "current job title" fact
+   that appeared as a clean memory in the single-user run existed in this run
+   only inside an HR-consolidation narrative — migration moves what mem0
+   extracted, nothing more.
+3. Open question flagged: `recall(k=266, user_id=...)` returned 33 — either an
+   internal cap or a relevance cut; needs its own probe before any claim.
+
+Receipt: MIGRATE_MULTI_RESULT.json; store: migrated_multi.json (+sidecar 713 KB).

@@ -1,0 +1,99 @@
+{
+  "run": "migrate_multi",
+  "scenarios": [
+    "A01_update.json",
+    "A02_update.json",
+    "A05_update.json"
+  ],
+  "preheat": "OK 421",
+  "per_user": [
+    {
+      "user_id": "A01_update",
+      "sessions": 50,
+      "memories": 266,
+      "ingest_seconds": 667.7,
+      "parse_errors": 0
+    },
+    {
+      "user_id": "A02_update",
+      "sessions": 50,
+      "memories": 253,
+      "ingest_seconds": 585.3,
+      "parse_errors": 0
+    },
+    {
+      "user_id": "A05_update",
+      "sessions": 50,
+      "memories": 258,
+      "ingest_seconds": 743.2,
+      "parse_errors": 3
+    }
+  ],
+  "facts": {
+    "A01_update": {
+      "target_fact": "Current job title at Bridgemark Solutions",
+      "current": "$74,500"
+    },
+    "A02_update": {
+      "target_fact": "User's department name at Meridian Consulting Group",
+      "current": "January 15th"
+    },
+    "A05_update": {
+      "target_fact": "A05 Detailed home address — current unit number at 742 Birchwood Lane, Ashford Heights",
+      "current": "90 days' written notice before lease end date"
+    }
+  },
+  "scoped_recall_checks": [
+    {
+      "user_id": "A01_update",
+      "query": "What is my Current job title at Bridgemark Solutions?",
+      "scoped_hits": 8,
+      "own_fact_keyphrase_overlap": 0.0,
+      "own_fact_present": false,
+      "other_user_fact_leaked": false,
+      "leaked_from": [],
+      "global_recall_mixed_users": false
+    },
+    {
+      "user_id": "A02_update",
+      "query": "What is my User's department name at Meridian Consulting Group?",
+      "scoped_hits": 8,
+      "own_fact_keyphrase_overlap": 1.0,
+      "own_fact_present": true,
+      "other_user_fact_leaked": false,
+      "leaked_from": [],
+      "global_recall_mixed_users": false
+    },
+    {
+      "user_id": "A05_update",
+      "query": "What is my A05 Detailed home address — current unit number at 742 Birchwood Lane, Ashford Heights?",
+      "scoped_hits": 8,
+      "own_fact_keyphrase_overlap": 0.29,
+      "own_fact_present": false,
+      "other_user_fact_leaked": false,
+      "leaked_from": [],
+      "global_recall_mixed_users": false
+    }
+  ],
+  "migration": {
+    "events": 777,
+    "chains": 777,
+    "chains_imported": 777,
+    "superseded_events": 0,
+    "noop_events": 0,
+    "deleted_events": 0,
+    "reconciled": 0,
+    "chain_end_missing": 0,
+    "unkeyed": 0
+  },
+  "integrity": [
+    true,
+    []
+  ],
+  "check_api": "recall(query, k, user_id=uid) — canonical scoping; where={'user_id':...} matched nothing (uid lives at meta.uid, core.py:2786/10974)",
+  "multi_user_verdict": {
+    "scoped_no_cross_user_leak": true,
+    "own_fact_findable_scoped": false,
+    "note": "leakage checked at content level (other users' known fact text inside scoped hits) because recall's projection does not include meta.uid"
+  }
+}
