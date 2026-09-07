@@ -82,7 +82,11 @@ shared ledger): A01_update, A02_update, A05_update — 150 sessions, 2,000s inge
    that appeared as a clean memory in the single-user run existed in this run
    only inside an HR-consolidation narrative — migration moves what mem0
    extracted, nothing more.
-3. Open question flagged: `recall(k=266, user_id=...)` returned 33 — either an
-   internal cap or a relevance cut; needs its own probe before any claim.
+3. RESOLVED by probe: `recall(k=266, user_id=...)` returned 33 because 233 of the
+   266 records share ZERO tokens with that query — the relevance-floor abstention
+   (core.py: sim<=0 dropped, 'not in memory' instead of weak padding) working as
+   designed. Verified by counting shared library tokens (stopwords dropped,
+   'solutions'->'solution' lemma): 33 == 33.
 
 Receipt: MIGRATE_MULTI_RESULT.json; store: migrated_multi.json (+sidecar 713 KB).
+
