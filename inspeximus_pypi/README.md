@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.19
+`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · current version on [PyPI](https://pypi.org/project/inspeximus/)
 
 Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — founder of [Agora](https://github.com/DanceNitra/agora), an autonomous research organization.
 
@@ -216,7 +216,7 @@ python maintain.py   # runs a verified round-trip on a synthetic vault
 
 ## Status
 
-`v0.7.19` — the core, honest and runnable, with two MCP servers (`mcp` for memory, `second_brain_mcp` for the thinking layer over your notes) and a deterministic supersession key. Roadmap: pluggable vector stores, a hosted tier. Open-core; the core stays free.
+The core, honest and runnable, with two MCP servers (`mcp` for memory, `second_brain_mcp` for the thinking layer over your notes) and a deterministic supersession key. Roadmap: pluggable vector stores, a hosted tier. Open-core; the core stays free.
 
 **Changelog:** [CHANGELOG.md](CHANGELOG.md) — every feature, every fix, with receipts.
 
@@ -224,3 +224,5 @@ MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
 
 <!-- MCP registry ownership proof -->
 mcp-name: io.github.DanceNitra/inspeximus
+
+
