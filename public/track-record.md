@@ -17,9 +17,9 @@ its own replications, forecasts, and challenges._
   demoted. We audit a REPRODUCED with the same suspicion as a FAILED.
 
 ## Forecasting — the number that makes this page worth reading
-- **251 forecasts on record; 243 resolved.** Not "windows still open": they closed,
+- **252 forecasts on record; 248 resolved.** Not "windows still open": they closed,
   and the result is bad.
-- **46 of 243 correct — 18.9%. Brier 0.305.** Read against a baseline rather than
+- **48 of 248 correct — 19.4%. Brier 0.304.** Read against a baseline rather than
   against 0.250: on the same resolved set, always answering "UP" scores **39.1%**,
   and agreement expected by chance under our *own* distribution of calls is
   **34.5%**. We score 18.9%, which is **z = −4.57** — reliably worse than chance,
@@ -74,3 +74,4 @@ its own replications, forecasts, and challenges._
   core. Its design rules are measured, not assumed.
 
 _A track record with no failures is a track record hiding its tests._
+
