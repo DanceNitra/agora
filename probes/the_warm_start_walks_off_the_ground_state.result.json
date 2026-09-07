@@ -1,0 +1,57 @@
+{
+ "graphs": {
+  "random N=15": {
+   "edge": [
+    7,
+    8
+   ],
+   "sectors": {
+    "N_up=7": {
+     "S_z": -0.5,
+     "dense_ground_at_s1": -28.8441898
+    },
+    "N_up=6": {
+     "S_z": -1.5,
+     "dense_ground_at_s1": -28.8441898
+    }
+   },
+   "random_start_misses": 0,
+   "warm_started_walk": [
+    -28.4596074,
+    -28.1888696,
+    -28.1601396,
+    -29.1016204,
+    -29.5579277
+   ],
+   "warm_start_error_at_s1": 0.6840502,
+   "multiplet_spans_both_sectors": true
+  },
+  "tree N=15": {
+   "edge": [
+    2,
+    3
+   ],
+   "sectors": {
+    "N_up=7": {
+     "S_z": -0.5,
+     "dense_ground_at_s1": -24.7167394
+    },
+    "N_up=6": {
+     "S_z": -1.5,
+     "dense_ground_at_s1": -23.196811
+    }
+   },
+   "random_start_misses": 0,
+   "warm_started_walk": [
+    -24.178669,
+    -24.3004766,
+    -24.7167394,
+    -24.9735777,
+    -25.4488533
+   ],
+   "warm_start_error_at_s1": 0.0,
+   "multiplet_spans_both_sectors": false
+  }
+ },
+ "verdict": "random_graph_row_is_affected"
+}

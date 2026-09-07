@@ -1,0 +1,135 @@
+{
+ "grid_points": 61,
+ "seeds": 5,
+ "edges": {
+  "(0, 7)": {
+   "published": 0.1,
+   "degenerate_reference": true,
+   "continued": {
+    "positions": [
+     0.1,
+     null,
+     0.1,
+     null,
+     0.1
+    ],
+    "distinct": [
+     0.1
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 2
+   },
+   "independent": {
+    "positions": [
+     0.1,
+     null,
+     0.1,
+     null,
+     0.1
+    ],
+    "distinct": [
+     0.1
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 2
+   }
+  },
+  "(2, 3)": {
+   "published": 1.7,
+   "degenerate_reference": false,
+   "continued": {
+    "positions": [
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002
+    ],
+    "distinct": [
+     1.7000000000000002
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 0
+   },
+   "independent": {
+    "positions": [
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002,
+     1.7000000000000002
+    ],
+    "distinct": [
+     1.7000000000000002
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 0
+   }
+  },
+  "(4, 8)": {
+   "published": 0.05,
+   "degenerate_reference": true,
+   "continued": {
+    "positions": [
+     null,
+     0.05,
+     0.05,
+     0.05,
+     0.05
+    ],
+    "distinct": [
+     0.05
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 1
+   },
+   "independent": {
+    "positions": [
+     null,
+     0.05,
+     0.05,
+     0.05,
+     0.05
+    ],
+    "distinct": [
+     0.05
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 1
+   }
+  },
+  "(13, 14)": {
+   "published": 0.1,
+   "degenerate_reference": true,
+   "continued": {
+    "positions": [
+     0.1,
+     0.1,
+     null,
+     0.1,
+     0.1
+    ],
+    "distinct": [
+     0.1
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 1
+   },
+   "independent": {
+    "positions": [
+     0.1,
+     0.1,
+     null,
+     0.1,
+     0.1
+    ],
+    "distinct": [
+     0.1
+    ],
+    "agrees_with_published": true,
+    "no_valley_in": 1
+   }
+  }
+ },
+ "verdict": "position_is_real"
+}

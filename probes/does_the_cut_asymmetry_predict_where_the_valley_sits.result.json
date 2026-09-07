@@ -1,0 +1,207 @@
+{
+ "n_edges_with_a_valley": 13,
+ "positions": [
+  0.1,
+  1.7,
+  0.95,
+  0.95,
+  1.9,
+  1.7,
+  0.3,
+  1.95,
+  0.25,
+  0.05,
+  1.6,
+  1.7,
+  0.1
+ ],
+ "features": {
+  "size_imbalance": {
+   "spearman": -0.5872,
+   "p": 0.03725,
+   "permutations": 200000,
+   "exact": false,
+   "values": [
+    13,
+    11,
+    13,
+    13,
+    9,
+    7,
+    5,
+    11,
+    13,
+    13,
+    5,
+    11,
+    13
+   ],
+   "p_bonferroni": 0.149
+  },
+  "spin_sum": {
+   "spearman": -0.738,
+   "p": 0.0035,
+   "permutations": 200000,
+   "exact": false,
+   "values": [
+    1.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    1.5,
+    0.5,
+    0.5,
+    1.5
+   ],
+   "p_bonferroni": 0.014
+  },
+  "spin_difference": {
+   "spearman": 0.0,
+   "p": 1.0,
+   "permutations": 200000,
+   "exact": false,
+   "values": [
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5
+   ],
+   "p_bonferroni": 1.0
+  },
+  "smaller_side": {
+   "spearman": 0.5872,
+   "p": 0.03725,
+   "permutations": 200000,
+   "exact": false,
+   "values": [
+    1,
+    2,
+    1,
+    1,
+    3,
+    4,
+    5,
+    2,
+    1,
+    1,
+    5,
+    2,
+    1
+   ],
+   "p_bonferroni": 0.149
+  },
+  "endpoint_label_sum": {
+   "spearman": -0.2951,
+   "p": 0.32454,
+   "permutations": 200000,
+   "exact": false,
+   "values": [
+    7,
+    11,
+    7,
+    13,
+    11,
+    5,
+    13,
+    7,
+    12,
+    12,
+    21,
+    25,
+    27
+   ],
+   "p_bonferroni": 1.0
+  }
+ },
+ "without_degenerate_edges": {
+  "n": 10,
+  "features": {
+   "size_imbalance": {
+    "spearman": -0.2405,
+    "p": 0.49602,
+    "exact": false
+   },
+   "spin_sum": {
+    "spearman": 0.0,
+    "p": 1.0,
+    "exact": false
+   },
+   "spin_difference": {
+    "spearman": 0.0,
+    "p": 1.0,
+    "exact": false
+   },
+   "smaller_side": {
+    "spearman": 0.2405,
+    "p": 0.49602,
+    "exact": false
+   },
+   "endpoint_label_sum": {
+    "spearman": -0.3416,
+    "p": 0.33058,
+    "exact": false
+   }
+  }
+ },
+ "partial_spin_sum_given_size": {
+  "partial_rho": -0.6167,
+  "spin_vs_size_rho": 0.5431
+ },
+ "scope": "thirteen cuts of ONE tree, in sample. This is a lead strong enough to justify a confirming measurement on a graph whose positions have not been seen, not a law. The confirming test is to predict positions from the sublattice counts alone and then measure them.",
+ "disqualified_as_group_indicator": {
+  "spin_sum": [
+   0.5
+  ],
+  "spin_difference": [
+   0.5
+  ]
+ },
+ "degenerate_edges_sit_lowest": {
+  "degenerate_positions": [
+   0.05,
+   0.1,
+   0.1
+  ],
+  "other_positions": [
+   0.25,
+   0.3,
+   0.95,
+   0.95,
+   1.6,
+   1.7,
+   1.7,
+   1.7,
+   1.9,
+   1.95
+  ],
+  "all_below_every_other": true,
+  "two_sided_p_if_all_below": 0.006993006993006993
+ },
+ "verdict": {
+  "cut_asymmetry_predicts_position": false,
+  "survives_dropping_the_degenerate_edges": false,
+  "p_on_the_clean_subset": 0.49602,
+  "best_structural": "size_imbalance",
+  "best_rho": -0.5872,
+  "best_p": 0.03725,
+  "negative_control_p": 0.32454,
+  "what_the_ranking_was_carrying": [
+   "spin_difference",
+   "spin_sum"
+  ]
+ }
+}
