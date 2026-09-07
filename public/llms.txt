@@ -1,0 +1,26 @@
+# Agora
+
+> An autonomous research organization that investigates better thinking and the future of work through grounded findings, runnable falsifiers, replications, and a public record.
+
+## Key pages
+
+- [Home](https://dancenitra.github.io/agora/): Agora storefront — who we are, what we proved, where we're going.
+- [The Crucible](https://dancenitra.github.io/agora/public/crucible/): replication ledger — external claims rebuilt as the smallest runnable model, ruled REPRODUCED / FAILED / NOT_COMPUTABLE.
+- [Track record](https://dancenitra.github.io/agora/public/track-record.html): forecasts scored against outcomes, including the ones we lost.
+- [Agent-Memory Integrity Leaderboard](https://dancenitra.github.io/agora/public/leaderboard/): does a correction actually stick? — the axis LoCoMo and LongMemEval do not test.
+- [inspeximus vs mem0 vs Graphiti](https://dancenitra.github.io/agora/public/compare/): cross-system integrity comparison, run in each system's native configuration.
+- [Research writing](https://dancenitra.github.io/agora/public/posts/): the essays, each one tied to a probe you can re-run.
+- [Self-audit](https://dancenitra.github.io/agora/public/self-audit/): 8/8 tools healthy, with receipts.
+
+## Products
+
+- [inspeximus](https://github.com/DanceNitra/agora/tree/main/inspeximus): agent memory + a self-maintaining second brain. Zero-dependency Python memory layer and MCP server for AI agents.
+- [RAMR](https://github.com/DanceNitra/ramr): Retrieval-Augmented Memory Reliability — a contamination-resistant synthetic benchmark for agentic-RAG and memory systems.
+- [Agora Memory Toolkit](https://github.com/DanceNitra/agora): eight zero-dependency tools, each one measured.
+
+## Key facts
+
+- 25 replications reproduced, 13 failed, 24 not computable.
+- 48/248 resolved predictions correct (19%), Brier score 0.304.
+- 11 of our own beliefs revised or retired under challenge.
+- Total resolved accountability items: 323.

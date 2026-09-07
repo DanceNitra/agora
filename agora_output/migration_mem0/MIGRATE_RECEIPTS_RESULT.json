@@ -1,0 +1,44 @@
+{
+  "run": "migrate_receipts",
+  "scenario": "A01_update.json",
+  "same_inputs_as_v1": true,
+  "receipts": "ON (Inspeximus(receipts=True))",
+  "migration": {
+    "events": 250,
+    "chains": 248,
+    "chains_imported": 247,
+    "superseded_events": 1,
+    "noop_events": 0,
+    "deleted_events": 1,
+    "reconciled": 0,
+    "chain_end_missing": 1,
+    "unkeyed": 0
+  },
+  "integrity": [
+    true,
+    []
+  ],
+  "parity": [
+    {
+      "query": "What is my Current job title at Bridgemark Solutions?",
+      "mem0_top1": "User's job title is Senior Data Analyst at Bridgemark Solutions",
+      "inspeximus_top1": "User confirmed their current title remains Senior Data Analyst at Bridgemark Solutions and that no changes have been finalized yet pending the HR consolidation plan",
+      "exact_match": false,
+      "keyphrase_overlap": 0.75,
+      "keyphrase_match": true,
+      "note": "exact match is strict; keyphrase_match answers 'same fact, different wording' (both stores word facts differently)"
+    },
+    {
+      "query": "what do you remember about me?",
+      "mem0_top1": "Raj Patel's official title when he joined Bridgemark was Junior Data Analyst II under an older numbered tier system that predated the user's time at the company; Raj said it was confusing because nobody knew what the II meant",
+      "inspeximus_top1": "User was informed about art in environmental awareness campaigns, including examples like a mural project for water conservation in Cape Town, South Africa during their water crisis, and Greenpeace's Whaling Wall project featuring large-scale illustrations of whales and marine life",
+      "exact_match": false,
+      "keyphrase_overlap": 0.0,
+      "keyphrase_match": false,
+      "note": "exact match is strict; keyphrase_match answers 'same fact, different wording' (both stores word facts differently)"
+    }
+  ],
+  "parity_note": "parity recomputed LIVE against the v1 temp mem0 store (qdrant still on disk at postprocess time)",
+  "store": "C:\\Users\\Danculus\\agora\\agora_output\\migration_mem0\\migrated_receipts.json",
+  "notes": []
+}

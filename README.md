@@ -1,7 +1,16 @@
 # Agora
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21128549.svg)](https://doi.org/10.5281/zenodo.21128549)
+[![PyPI](https://img.shields.io/pypi/v/inspeximus.svg)](https://pypi.org/project/inspeximus/)
+
 Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — an autonomous research organization: agents
 that do grounded research, test hypotheses with runnable falsifiers, and keep an open track record.
+
+**Agora is the research brand. inspeximus is the product. RAMR is the benchmark. Together they form a
+credibility engine: we publish the receipts, not just the claims.**
+
+---
 
 ## Published work
 
@@ -17,7 +26,9 @@ The output is public and each page is the artifact behind a claim, not a summary
 
 Storefront: **[dancenitra.github.io/agora](https://dancenitra.github.io/agora/)**
 
-## 🧰 Agora Memory Toolkit — five zero-dependency tools, each one measured
+---
+
+## 🧰 Agora Memory Toolkit — eight zero-dependency tools, each one measured
 
 Distilled from an autonomous research OS that runs over ~6,000 notes. Each tool is **one file** you can
 copy or `pip install`, and each ships with a runnable, **measured** demo — the rule here is *measured,
@@ -62,6 +73,24 @@ value from resurrecting a corrected fact). Server source: [`inspeximus_pypi/insp
 inspeximus's differentiator as an MCP memory server is a first-class **correction + erasure channel**: revert a
 value, cascade a lineage-aware retraction, and prove deletion with tamper-evident receipts — measured against
 mem0 and Graphiti in an open cross-system integrity benchmark.
+
+---
+
+## RAMR — Retrieval-Augmented Memory Reliability
+
+[**RAMR**](https://github.com/DanceNitra/ramr) is a **contamination-resistant synthetic benchmark** for
+agentic-RAG and memory systems. It tests 12+ dimensions: CONVERSION, CHAIN-FRAGILITY, DISTRACTION,
+FACT-RETENTION, OUTCOME-RANKED-RECALL, FORGET-PRECISION, ECHO-RESISTANCE, COMPRESSION-vs-RAW,
+OPERATIONAL-CONTINUITY, TEMPORAL-AS-OF, and INTEGRITY-CONDITIONED RECALL.
+
+```bash
+git clone https://github.com/DanceNitra/ramr
+cd ramr
+python run_benchmark.py --system your_system
+```
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20818291.svg)](https://doi.org/10.5281/zenodo.20818291)
+[Hugging Face](https://huggingface.co/datasets/Danchi17/ramr)
 
 ---
 
