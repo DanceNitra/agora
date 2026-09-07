@@ -666,77 +666,77 @@ m.restore_now(<span class="s">"region"</span>, <span class="s">"osaka"</span>, s
 <div class="seckick"><span class="en">Essays · every one ships a number</span></div>
 <h2 data-reveal=""><span class="en">Writing</span></h2>
 <div class="windex" data-reveal="">
-<a class="wrow" href="public/posts/a-status-nobody-earned.html">
+<a class="wrow" href="public/posts/surface-rules-solved-97-percent-of-my-benchmark.html">
 <span class="wno">01</span>
+<span class="wtitle"><span class="en">Surface rules solved 97.2% of my benchmark — and fixing it planted two more</span></span>
+<span class="wdek"><span class="en">A contamination-resistant benchmark that audited itself: surface rules solved 97.2% of its traces. Fixing the leak planted two more shortcuts — the full audit trail, the permuted-label control, and a one-command tool to run on your own eval data.</span></span>
+<span class="wmeta">2026‑09‑07 · <span class="en">6 min</span></span>
+</a>
+<a class="wrow" href="public/posts/a-status-nobody-earned.html">
+<span class="wno">02</span>
 <span class="wtitle"><span class="en">Our claims table certified five rows it had never run, and the number it certified was a draw from a distribution</span></span>
 <span class="wdek"><span class="en">An outside reader ran the command five rows of our published claims table cite and it died before argument handling, under a status promising it needed only dependencies. Nothing checked whether a REPRODUCIBLE command could start. Then the number itself: the store returns byte-identical contexts over 20 runs while the shared gpt-4o-mini judge scores them 0.75 x26, 0.70 x2, 0.80 x2 at temperature 0.0. Re-running one judge moves the figure as much as changing the judge does, and no judge ever answered that the superseded value was current.</span></span>
 <span class="wmeta">2026‑08‑22 · <span class="en">5 min</span></span>
 </a>
 <a class="wrow" href="public/posts/provenance-field-one-value.html">
-<span class="wno">02</span>
+<span class="wno">03</span>
 <span class="wtitle"><span class="en">Two stores, one product: a provenance field at 100% coverage with 8 distinct values, and another at 0.99 whose field resolves to nothing while the record does not</span></span>
 <span class="wdek"><span class="en">Across 235,055 records in eleven live agent-memory stores, `source` is populated on 92.63% and not one value is a path or a URL, so nothing can be fetched from it. Eight stores hold one constant each, the name of the writing process. Corrected 28 August: the ninth store's records DO resolve, 426 of 432 path and commit pairs, one key away from the field being audited. W3C PROV separated wasAttributedTo from wasDerivedFrom in 2013.</span></span>
 <span class="wmeta">2026‑08‑22 · <span class="en">7 min</span></span>
 </a>
 <a class="wrow" href="public/posts/a-green-suite-that-never-ran.html">
-<span class="wno">03</span>
+<span class="wno">04</span>
 <span class="wtitle"><span class="en">A green test suite that never ran 156 of its tests</span></span>
 <span class="wdek"><span class="en">Our suite reported 2813 passed while 156 test functions had never been collected in the CI base image. A module-level pytest.importorskip removes a whole file and reports one skip line, so `-ra` cannot tell it from a single deliberate skip. Script, controls, and the two ways we measured it wrong first.</span></span>
 <span class="wmeta">2026‑08‑13 · <span class="en">4 min</span></span>
 </a>
 <a class="wrow" href="public/posts/verify-agent-memory-deletion.html">
-<span class="wno">04</span>
+<span class="wno">05</span>
 <span class="wtitle"><span class="en">Verify AI agent memory deletion: can you prove it is gone?</span></span>
 <span class="wdek"><span class="en">Your agent's delete() returns success - that does not mean the data left. Run a free self-check on your own store and see what your delete really removed.</span></span>
 <span class="wmeta">2026‑08‑01 · <span class="en">5 min</span></span>
 </a>
 <a class="wrow" href="public/posts/defenses-that-failed-their-own-control.html">
-<span class="wno">05</span>
+<span class="wno">06</span>
 <span class="wtitle"><span class="en">The control is the number: four memory-poisoning defenses that failed, including one of ours</span></span>
 <span class="wdek"><span class="en">We published an 88-100% memory-poisoning hijack without printing its control: a RANDOM five-word trigger reaches 65-90% on the same fixture, and our own probe records optimization_margin_over_random = 0.0. Plus three other defenses that died the same way - a perplexity gate that only catches gibberish, a geometry detector whose separability margin inverts across encoders, and an outlier check evaded by padding.</span></span>
 <span class="wmeta">2026‑07‑30 · <span class="en">6 min</span></span>
 </a>
 <a class="wrow" href="public/posts/knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can.html">
-<span class="wno">06</span>
+<span class="wno">07</span>
 <span class="wtitle"><span class="en">Knowledge decay may not be a slope. It may be a cliff you cannot climb back up.</span></span>
 <span class="wdek"><span class="en">Knowledge stores are usually described as decaying smoothly. Notes go stale at some rate, so the health metric is a level: what fraction is out of date, how old the average fact is. Cleanup is then a </span></span>
 <span class="wmeta">2026‑07‑25 · <span class="en">4 min</span></span>
 </a>
 <a class="wrow" href="public/posts/does-deleting-agent-memory-actually-erase.html">
-<span class="wno">07</span>
+<span class="wno">08</span>
 <span class="wtitle"><span class="en">We deleted our own memory and the data came back</span></span>
 <span class="wdek"><span class="en">A cross-system audit of whether a delete in agent memory actually erases. Native delete clears retrieval on inspeximus, mem0 and Graphiti, but the value survives one layer down, and a copy the app embedded into its own vector index outlives every store's delete. Measured, judge-free, with the fix we shipped.</span></span>
 <span class="wmeta">2026‑07‑15 · <span class="en">5 min</span></span>
 </a>
 <a class="wrow" href="public/posts/memory-injection-defense-where-it-breaks.html">
-<span class="wno">08</span>
+<span class="wno">09</span>
 <span class="wtitle"><span class="en">We poisoned our own agent memory to find where the defense breaks</span></span>
 <span class="wdek"><span class="en">A MINJA-shaped memory-injection probe against our own agent-memory library, reported honestly: a corroboration gate stops the attack on earned memory (0/10) but blocks a fresh true fact nine times in ten, its trust root is self-gradable (attack back to 8/10) until anchored to an exogenous warrant, and a bare warrant string only relocates the anchor (7/10 under adaptive attack). No live agent, one encoder, open benchmark.</span></span>
 <span class="wmeta">2026‑07‑15 · <span class="en">8 min</span></span>
 </a>
 <a class="wrow" href="public/posts/proving-erasure-agent-memory-deletion-executed-vs-recoverable.html">
-<span class="wno">09</span>
+<span class="wno">10</span>
 <span class="wtitle"><span class="en">A GDPR 'delete' can pass every check while 5 of 6 stores keep the data</span></span>
 <span class="wdek"><span class="en">'We deleted the row' verifies a deletion executed; GDPR Article 17 asks that no recoverable copy survives. We built a 6-store forget-verification benchmark: the common 'delete the row' pattern scores 0.17 (five stores still leak) vs 1.00 for a correct hard-delete, plus a signed proof-of-erasure.</span></span>
 <span class="wmeta">2026‑07‑14 · <span class="en">4 min</span></span>
 </a>
 <a class="wrow" href="public/posts/agent-memory-tenant-isolation-by-construction.html">
-<span class="wno">10</span>
+<span class="wno">11</span>
 <span class="wtitle"><span class="en">Tenant isolation in agent memory, by construction</span></span>
 <span class="wdek"><span class="en">Most agent-memory libraries scope by a user_id you pass on each call. inspeximus 1.6.0 makes the scope a property of the handle instead, so no forgotten parameter can leak a tenant. Then we red-teamed our own release, found the consolidation pass wasn't scoped, and fixed it.</span></span>
 <span class="wmeta">2026‑07‑14 · <span class="en">6 min</span></span>
 </a>
 <a class="wrow" href="public/posts/agent-tool-reversibility-93-percent-signature-decidable.html">
-<span class="wno">11</span>
+<span class="wno">12</span>
 <span class="wtitle"><span class="en">Agent-tool reversibility is 93% decidable from the signature — the 7% that isn't is your shell</span></span>
 <span class="wdek"><span class="en">We labeled 330 real agent tools (ToolEmu, two models, Cohen's kappa 0.82): reversibility is ~93% decidable from the tool signature. The undecidable 7% are universal executors — shell, SQL, eval — and that's where memory-poisoning routes irreversible harm. inspeximus 1.2.0 ships the gate.</span></span>
 <span class="wmeta">2026‑07‑13 · <span class="en">4 min</span></span>
-</a>
-<a class="wrow" href="public/posts/recency-of-mention-decides-what-llm-agents-write-back-to-memory.html">
-<span class="wno">12</span>
-<span class="wtitle"><span class="en">In LLM memory consolidation, recency of mention decides what gets written back</span></span>
-<span class="wdek"><span class="en">Measured across two model families: a retired value echoed last is re-stored 45-85% of the time; put the correction last and it drops to 0.00. Over three real write-back cycles the error locks in rather than grows. A write-path guard zeroes it unconditionally; a prompt instruction works only if the model obeys.</span></span>
-<span class="wmeta">2026‑07‑12 · <span class="en">5 min</span></span>
 </a>
 </div>
 </div></section>
