@@ -1,0 +1,40 @@
+{
+ "duplicated_both_sides": [
+  "reasoning-tier-token-budget.md"
+ ],
+ "live_rows": 221,
+ "archived_rows": 205,
+ "total_ever": 426,
+ "classes": {
+  "live": {
+   "undeclared": 8,
+   "project": 50,
+   "feedback": 157,
+   "reference": 4,
+   "user": 2
+  },
+  "archive": {
+   "feedback": 94,
+   "project": 104,
+   "reference": 6,
+   "undeclared": 1
+  }
+ },
+ "unresolved": {
+  "live": 0,
+  "archive": 0
+ },
+ "guard_share_live": 71.9,
+ "guard_share_archived": 45.9,
+ "retirement_verdict": "guards_under_represented_in_the_archive",
+ "live_lines": 207,
+ "live_units": 25506,
+ "rows_delivered": 213,
+ "rows_below_the_cut": 8,
+ "below_the_cut_classes": {
+  "undeclared": 1,
+  "project": 5,
+  "feedback": 2
+ },
+ "below_the_cut_guard_share": 25.0
+}
