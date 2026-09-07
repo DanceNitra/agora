@@ -1,5 +1,19 @@
 [
  {
+  "slug": "surface-rules-solved-97-percent-of-my-benchmark",
+  "title": "Surface rules solved 97.2% of my benchmark — and fixing it planted two more",
+  "title_sk": "Povrchové pravidlá vyriešili 97,2 % môjho benchmarku — a ich oprava zasadila ďalšie dva",
+  "desc": "A contamination-resistant benchmark that audited itself: surface rules solved 97.2% of its traces. Fixing the leak planted two more shortcuts — the full audit trail, the permuted-label control, and a one-command tool to run on your own eval data.",
+  "desc_sk": "Benchmark odolný voči kontaminácii, ktorý auditoval samého seba: povrchové pravidlá vyriešili 97,2 % jeho traceov. Oprava úniku zasadila dva ďalšie skraty — kompletná auditná stopa, control s permutovanými štítkami a nástroj na jeden príkaz pre vaše vlastné eval dáta.",
+  "date": "2026-09-07",
+  "tags": "agent-memory, benchmark, evaluation, memaudit, llm",
+  "tags_sk": "agent-memory, benchmark, vyhodnocovanie, memaudit, llm",
+  "kicker": "Benchmarks",
+  "kicker_sk": "Benchmarky",
+  "read": 6,
+  "bilingual": true
+ },
+ {
   "slug": "a-status-nobody-earned",
   "title": "Our claims table certified five rows it had never run, and the number it certified was a draw from a distribution",
   "title_sk": "Nasa tabulka tvrdeni certifikovala pat riadkov, ktore nikdy nespustila, a cislo, ktore certifikovala, bolo losom z rozdelenia",
