@@ -1,42 +1,37 @@
-"""When a memory index is pruned, what class of row leaves? And what leaves without anyone pruning it?
+"""When a memory index is pruned, what class of row leaves? Per retirement event, not on average.
 
-WHY THIS EXISTS. anthropics/claude-code#91188 converged on a reminder design, and then hit a question
-none of the three participants could answer. @samvallad33 said the compaction reminder "trains the
-agent to delete guard lines". @pm25coder agreed the mechanism is plausible, asked for the number, and
-said plainly that nobody in the thread has data on the CONTENT CLASS of what actually gets deleted.
-Every measurement on that thread so far is about counts, units and ratios.
+WHY THIS EXISTS. anthropics/claude-code#91188 reached a question none of its participants could
+answer. @samvallad33 said the compaction reminder "trains the agent to delete guard lines".
+@pm25coder agreed the mechanism was plausible, asked for the number, and wrote that nobody there has
+data on the CONTENT CLASS of what gets deleted. Every measurement on that thread is counts, units and
+ratios.
 
-This store can answer it, because retirement here is not a delete. A retired row moves from
-`MEMORY.md` to `MEMORY_ARCHIVE.md`, and every row on both sides points at a topic file that declares
-its own type. So the class of what left is recoverable, row by row, without inferring anything from
-the prose.
+This store can answer it, because retirement is a move rather than a delete: a retired pointer goes
+to `MEMORY_ARCHIVE.md` under a dated heading saying why, and every pointer on both sides names a file
+that declares its own type.
 
-TWO KINDS OF LEAVING, and the second is the one the thread has not considered.
+THE AVERAGE IS THE WRONG NUMBER, and the first version of this probe published it. Across the whole
+archive, guards are 44.9% against 74.3% in the live index, which reads as "retirement spares guards".
+Split by the dated heading each row sits under, the archive is eight separate events that disagree in
+sign: one retired 9 rows of which 9 were guards, another retired 54 of which 3 were. The pooled figure
+is almost entirely that one event. A share pooled over events with opposite signs is Simpson's paradox
+with a date stamp on it, and the thread's own participant holds 306 snapshots and would say so.
 
-  RETIRED   a person or a session moved the row to the archive. Deliberate, recorded, reversible.
-  UNREAD    the row is still in the live index and never reaches the model, because the loader stops
-            at a cap partway down the file. Nothing was deleted. The row is simply below the cut.
+FOUR MORE DEFECTS THE FIRST VERSION CARRIED, found by an adversarial pass and each verified here:
+  * it counted the index's own link to `MEMORY_ARCHIVE.md` as a pointer to a memory;
+  * it counted lines with `split("\\n")`, which yields a phantom final element on a file ending in a
+    newline, so 206 lines were published as 207;
+  * it treated one archive section as retirement when that section's own heading says nothing ever
+    pointed at those rows, so they were never in the live index to be retired from;
+  * it never asked how many memory files are in NEITHER index, which is the larger loss.
 
-The second is silent. A guard that falls below the cut is as absent as a deleted one, and no
-compaction reminder was involved, so a thread reasoning only about what the reminder provokes cannot
-see it.
-
-WHAT IS CLASSIFIED. Each row resolves to its topic file, whose frontmatter declares
-`metadata.type` as one of user, feedback, project or reference. Two of those are guards in the sense
-@samvallad33 means, rules about how the work is done: `feedback` (corrections and confirmed
-approaches) and `user` (who the user is and what they want). The other two are the record of work:
-`project` and `reference`. That mapping is the only judgement here and it is written down rather
-than implied.
-
-THE CONTROLS, because each number can be produced by a broken reader:
-  * every row must resolve to a file that exists. Rows that do not are counted and excluded, and if
-    many fail the classification is measuring parse failures rather than content;
-  * the classifier must not be constant. The distribution over the whole corpus is printed, so a
-    result of "everything is a guard" is visible as such;
-  * a row must not appear on both sides. An overlap means the archive is a copy rather than a
-    destination, and the retirement numbers would be fiction;
-  * the loader cut is READ FROM THE LOADER'S OWN RULE, not guessed, and the probe reports what the
-    rule yields on this file rather than assuming the file is over it.
+THE CONTROLS:
+  * every pointer must resolve to a file that exists, and unresolved ones are counted, not dropped;
+  * the classifier must not be constant, so the full distribution is printed;
+  * a pointer on both sides at once is a defect in the store: named below 2% of rows, a refusal above
+    it, because then the archive is a copy rather than a destination;
+  * the delivered set is compared against `what_our_own_index_actually_delivers.py`, which has
+    measured this file for weeks. Two readings that disagree mean one of them is wrong.
 """
 import io
 import json
@@ -44,40 +39,30 @@ import os
 import re
 import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
 MEM = os.path.join(os.path.expanduser("~"), ".claude", "projects",
                    "C--Users-Danculus-agora", "memory")
 LIVE = os.path.join(MEM, "MEMORY.md")
 ARCHIVE = os.path.join(MEM, "MEMORY_ARCHIVE.md")
-
-# The loader's documented rule, quoted in the index's own header: it keeps the smaller of 200 lines
-# and 25,000 UTF-16 units, whole lines, counting CR.
 LINE_CAP, UNIT_CAP = 200, 25000
 
-# THE SAME PATTERN `what_our_own_index_actually_delivers.py` USES, deliberately identical. This
-# probe first required a leading dash, and the index carries several pointers on one line, so it
-# missed 48 of 222 links and reported 5 rows below the loader cut where that probe measured 9 files
-# outside the window. Two definitions of "a row" is how two measurements of one file disagree.
-ROW = re.compile(r"\]\(([^)]+\.md)\)")
+LINK = re.compile(r"\]\(([^)]+\.md)\)")
+HEADING = re.compile(r"^##+ (.+)$", re.M)
+NOT_A_MEMORY = {"MEMORY.md", "MEMORY_ARCHIVE.md"}
 GUARD_TYPES = {"feedback", "user"}
-RECORD_TYPES = {"project", "reference"}
+NOT_A_RETIREMENT = "reachable again"
 
 
 def units(s: str) -> int:
     return len(s.encode("utf-16-le")) // 2
 
 
-def rows_of(path: str):
-    if not os.path.exists(path):
-        return []
-    text = io.open(path, encoding="utf-8").read()
-    seen, out = set(), []
-    for m in ROW.finditer(text):
-        slug = os.path.basename(m.group(1))
-        if slug in seen:                 # a pointer repeated in the file is one pointer
+def pointers(text: str):
+    out = []
+    for x in LINK.findall(text):
+        b = os.path.basename(x)
+        if b in NOT_A_MEMORY or b in out:
             continue
-        seen.add(slug)
-        out.append((slug, slug, m.start()))
+        out.append(b)
     return out
 
 
@@ -89,27 +74,35 @@ def type_of(slug: str):
     m = re.search(r"^\s*type:\s*([a-z |]+)\s*$", head, re.M)
     if not m:
         return "undeclared"
-    # `type: user | feedback | project | reference` is the TEMPLATE line, not a value. A file that
-    # still carries it never had its type chosen, and counting the first alternative as the answer
-    # would silently label every unfinished note "user".
     v = m.group(1).strip()
+    # `type: user | feedback | project | reference` is the template line, not a chosen value.
     return "undeclared" if "|" in v else v
 
 
-def loader_cut(path: str) -> int:
-    """How many rows the loader actually delivers, by its own rule."""
+def guard_share(slugs):
+    ts = [t for t in (type_of(s) for s in slugs) if t]
+    if not ts:
+        return 0, 0, 0.0
+    g = sum(1 for t in ts if t in GUARD_TYPES)
+    return len(ts), g, 100.0 * g / len(ts)
+
+
+def events(text: str):
+    parts = HEADING.split(text)
+    return [(parts[i].strip(), pointers(parts[i + 1])) for i in range(1, len(parts), 2)]
+
+
+def delivered_pointers(path: str):
     text = io.open(path, encoding="utf-8", newline="").read()
-    lines = text.split("\n")
     kept, total = [], 0
-    for i, ln in enumerate(lines):
+    for i, ln in enumerate(text.splitlines()):
         if i >= LINE_CAP:
             break
         total += units(ln + "\n")
         if total > UNIT_CAP:
             break
         kept.append(ln)
-    delivered = "\n".join(kept)
-    return len(set(os.path.basename(x) for x in ROW.findall(delivered)))
+    return pointers("\n".join(kept))
 
 
 def main():
@@ -117,118 +110,80 @@ def main():
         print("the index is not on this machine: %s" % LIVE)
         return 2
 
-    live, arch = rows_of(LIVE), rows_of(ARCHIVE)
-    live_slugs = {s for _t, s, _o in live}
-    arch_slugs = {s for _t, s, _o in arch}
+    live_text = io.open(LIVE, encoding="utf-8", newline="").read()
+    arch_text = io.open(ARCHIVE, encoding="utf-8", newline="").read()
+    live, arch = pointers(live_text), pointers(arch_text)
 
-    # A ROW ON BOTH SIDES IS A FINDING AT ONE, AND A VOID AT MANY. If the archive is largely a copy
-    # of the live index, no retirement number means anything and the run must refuse. A handful is a
-    # defect in the store worth naming, and excluding those rows keeps the comparison honest.
-    overlap = sorted(live_slugs & arch_slugs)
-    total_rows = len(live_slugs | arch_slugs)
-    if len(overlap) > 0.02 * total_rows:
-        print("  VOID: %d of %d row(s) appear in BOTH the live index and the archive, so the archive "
-              "is a copy rather than a destination and no retirement number below means anything."
-              % (len(overlap), total_rows))
+    overlap = sorted(set(live) & set(arch))
+    if len(overlap) > 0.02 * len(set(live) | set(arch)):
+        print("  VOID: %d pointers are live and archived at once, so the archive is a copy rather "
+              "than a destination and no retirement number below means anything." % len(overlap))
         return 1
     if overlap:
-        print("  DUPLICATED, live and archived at once, and excluded from both sides below:")
-        for slug in overlap:
-            print("    %s  (declared %s)" % (slug, type_of(slug) or "no file"))
-        live = [r for r in live if r[1] not in set(overlap)]
-        arch = [r for r in arch if r[1] not in set(overlap)]
-    out_overlap = overlap
+        print("  LIVE AND ARCHIVED AT ONCE, excluded from both sides below:")
+        for s in overlap:
+            print("    %s  (declared %s)" % (s, type_of(s) or "no file"))
+        live = [s for s in live if s not in set(overlap)]
+        arch = [s for s in arch if s not in set(overlap)]
 
-    out = {"duplicated_both_sides": out_overlap,
-           "live_rows": len(live), "archived_rows": len(arch),
-           "total_ever": len(live) + len(arch), "classes": {}}
-    print("  live index      : %d rows" % len(live))
-    print("  archive         : %d rows" % len(arch))
-    print("  ever written    : %d, of which %.1f%% retired"
-          % (len(live) + len(arch), 100.0 * len(arch) / max(1, len(live) + len(arch))))
+    ln, lg, lshare = guard_share(live)
+    print("\n  live index   %3d pointers, %3d guards, %.1f%%" % (ln, lg, lshare))
 
-    tally = {}
-    unresolved = {"live": 0, "archive": 0}
-    for label, rows in (("live", live), ("archive", arch)):
-        counts = {}
-        for _title, slug, _off in rows:
-            t = type_of(slug)
-            if t is None:
-                unresolved[label] += 1
-                continue
-            counts[t] = counts.get(t, 0) + 1
-        tally[label] = counts
+    print("\n  THE ARCHIVE IS NOT ONE POPULATION. Guard share per dated event:\n")
+    print("  %-52s %5s %7s %8s" % ("event", "rows", "guards", "share"))
+    rows_out, pooled_n, pooled_g = [], 0, 0
+    for name, slugs in events(arch_text):
+        slugs = [s for s in slugs if s not in set(overlap)]
+        n, g, share = guard_share(slugs)
+        if not n:
+            continue
+        retirement = NOT_A_RETIREMENT not in name.lower()
+        if retirement:
+            pooled_n += n
+            pooled_g += g
+        print("  %-52s %5d %7d %7.1f%%%s"
+              % (name[:52], n, g, share, "" if retirement else "   <- never in the live index"))
+        rows_out.append({"event": name, "rows": n, "guards": g, "guard_share": round(share, 1),
+                         "is_a_retirement": retirement})
+    pooled = 100.0 * pooled_g / max(1, pooled_n)
+    print("  %-52s %5d %7d %7.1f%%" % ("ALL RETIREMENT EVENTS POOLED", pooled_n, pooled_g, pooled))
 
-    print("\n  %-12s %-9s %-9s" % ("type", "live", "archived"))
-    every = sorted(set(tally["live"]) | set(tally["archive"]))
-    for t in every:
-        print("  %-12s %-9d %-9d" % (t, tally["live"].get(t, 0), tally["archive"].get(t, 0)))
-    print("  %-12s %-9d %-9d  (row points at a file that is not there)"
-          % ("unresolved", unresolved["live"], unresolved["archive"]))
-    out["classes"] = tally
-    out["unresolved"] = unresolved
+    retirements = [r for r in rows_out if r["is_a_retirement"]]
+    above = [r for r in retirements if r["guard_share"] >= lshare]
+    print("\n  %d of %d retirement events took guards at or above the live rate of %.1f%%."
+          % (len(above), len(retirements), lshare))
+    biggest = max(retirements, key=lambda r: r["rows"])
+    rest_n, rest_g = pooled_n - biggest["rows"], pooled_g - biggest["guards"]
+    print("  The largest single event, %s, is %d rows at %.1f%%. Without it the pooled share is "
+          "%.1f%% against %.1f%% live."
+          % (biggest["event"][:44], biggest["rows"], biggest["guard_share"],
+             100.0 * rest_g / max(1, rest_n), lshare))
 
-    resolved = {k: sum(v.values()) for k, v in tally.items()}
-    if min(resolved.values()) < 5:
-        print("\n  VOID: too few rows resolve to a file to compare classes (%s)." % resolved)
-        return 1
-    if len(every) < 2:
-        print("\n  VOID: every row classifies the same way, so the classifier cannot separate "
-              "anything and no comparison below is available.")
-        return 1
+    on_disk = {f for f in os.listdir(MEM) if f.endswith(".md") and f not in NOT_A_MEMORY}
+    orphans = sorted(on_disk - set(live) - set(arch) - set(overlap))
+    on, og, oshare = guard_share(orphans)
+    print("\n  %d memory files on disk. %d are in NEITHER index: not live, not archived, nothing "
+          "points at them." % (len(on_disk), len(orphans)))
+    print("  Of those, %d are guards (%.1f%%)." % (og, oshare))
 
-    def share(counts, group):
-        n = sum(counts.values())
-        return 100.0 * sum(counts.get(t, 0) for t in group) / max(1, n)
+    dl = delivered_pointers(LIVE)
+    below = [s for s in live if s not in set(dl)]
+    print("\n  the live file is %d lines and %d units, against caps of %d and %d"
+          % (len(live_text.splitlines()), units(live_text), LINE_CAP, UNIT_CAP))
+    print("  the loader delivers %d of %d pointers; %d sit below the cut"
+          % (len(dl), len(live), len(below)))
+    if below:
+        bn, bg, bshare = guard_share(below)
+        print("  of those %d, %d are guards (%.1f%%)" % (bn, bg, bshare))
 
-    gl, ga = share(tally["live"], GUARD_TYPES), share(tally["archive"], GUARD_TYPES)
-    rl, ra = share(tally["live"], RECORD_TYPES), share(tally["archive"], RECORD_TYPES)
-    print("\n  guards (feedback, user)   live %5.1f%%   archived %5.1f%%" % (gl, ga))
-    print("  record (project, reference) live %5.1f%%   archived %5.1f%%" % (rl, ra))
-    out["guard_share_live"], out["guard_share_archived"] = round(gl, 1), round(ga, 1)
-
-    print()
-    if ga > gl:
-        print("  RETIREMENT FAVOURS GUARDS on this store: a retired row is more likely to be a rule "
-              "about how to work than a live row is, %.1f%% against %.1f%%." % (ga, gl))
-        out["retirement_verdict"] = "guards_over_represented_in_the_archive"
-    elif gl > ga:
-        print("  RETIREMENT SPARES GUARDS on this store: guards are %.1f%% of the live index and "
-              "only %.1f%% of the archive, so what leaves is mostly the record of work." % (gl, ga))
-        out["retirement_verdict"] = "guards_under_represented_in_the_archive"
-    else:
-        print("  Retirement is indifferent to the class here.")
-        out["retirement_verdict"] = "indifferent"
-
-    # THE SECOND KIND OF LEAVING, which no delete is involved in.
-    delivered = loader_cut(LIVE)
-    below = len(live) - delivered
-    total_units, total_lines = units(io.open(LIVE, encoding="utf-8", newline="").read()), \
-        len(io.open(LIVE, encoding="utf-8", newline="").read().split("\n"))
-    print("\n  the live file is %d lines and %d UTF-16 units, against caps of %d and %d"
-          % (total_lines, total_units, LINE_CAP, UNIT_CAP))
-    print("  the loader delivers %d of its %d rows; %d sit below the cut and never arrive"
-          % (delivered, len(live), below))
-    out.update({"live_lines": total_lines, "live_units": total_units,
-                "rows_delivered": delivered, "rows_below_the_cut": below})
-
-    if below > 0:
-        cut_rows = live[delivered:]
-        cut_types = {}
-        for _t, slug, _o in cut_rows:
-            k = type_of(slug) or "unresolved"
-            cut_types[k] = cut_types.get(k, 0) + 1
-        gshare = 100.0 * sum(cut_types.get(t, 0) for t in GUARD_TYPES) / max(1, len(cut_rows))
-        print("  of those %d, %.1f%% are guards: %s"
-              % (below, gshare, ", ".join("%s %d" % kv for kv in sorted(cut_types.items()))))
-        out["below_the_cut_classes"] = cut_types
-        out["below_the_cut_guard_share"] = round(gshare, 1)
-        print("\n  A row below the cut was not deleted and no reminder was involved. It is in the "
-              "file, it is not in the model, and nothing reports the difference.")
-    else:
-        print("  Nothing sits below the cut on this file today, so the silent half does not arise "
-              "here and only the retirement result above stands.")
-
+    out = {"live_pointers": ln, "live_guards": lg, "live_guard_share": round(lshare, 1),
+           "events": rows_out, "pooled_retirement_share": round(pooled, 1),
+           "events_at_or_above_live_rate": len(above), "retirement_events": len(retirements),
+           "files_on_disk": len(on_disk), "in_neither_index": len(orphans),
+           "orphan_guards": og, "orphan_slugs": orphans,
+           "live_lines": len(live_text.splitlines()), "live_units": units(live_text),
+           "delivered": len(dl), "below_the_cut": len(below),
+           "duplicated_both_sides": overlap}
     path = os.path.splitext(os.path.abspath(__file__))[0] + ".result.json"
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(out, indent=1))
