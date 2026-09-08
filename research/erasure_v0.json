@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/DanceNitra/agora/main/research/erasure_v0.json",
+  "title": "cross-store erasure companion to schema_v0 — erasure_v0 (DRAFT, not agreed)",
+  "description": "A COMPANION to schema_v0, not a revision of it. schema_v0 stays exactly as pinned: it carries writes, and a read-side ledger owns the bitemporal transaction boundary. This file covers the operation schema_v0 puts out of scope, which the read-side partner asked to settle before either side leaves synthetic data: what happens when a record must stop existing rather than stop being current. DRAFT: proposed by the write side, not agreed by any read side. Runnable counter-example beside it: probes/a_partner_who_says_erased_and_still_answers.py.",
+  "$comment": "WHY A COMPANION AND NOT schema_v1. A bitemporal ledger and an erasure request want opposite things. 'The earlier record remains in the history' is correct for supersession and is precisely what an erasure must undo, so folding erasure into the write envelope would make every write carry a lifecycle question it does not have. Keeping it separate also keeps the composable-not-coupled property: a plain vector store can ingest schema_v0 and ignore this file entirely.",
+  "$defs": {
+    "lifecycle": {
+      "description": "THREE operations where schema_v0 has one. Conflating them is the trap: each keeps a different thing.",
+      "oneOf": [
+        {
+          "const": "superseded",
+          "title": "the value changed",
+          "description": "The old value is KEPT and stays readable as history. This is schema_v0's existing behaviour and needs nothing here."
+        },
+        {
+          "const": "retracted",
+          "title": "the record was wrong",
+          "description": "It stops being evidence for any current answer. The ACT stays auditable and the content MAY remain for audit. A retraction is not an erasure and must not be answered with an erasure receipt."
+        },
+        {
+          "const": "erased",
+          "title": "the content must not remain",
+          "description": "The subject withdrew consent or the content is unlawful. The content must be gone from history too. Only a content-free tombstone and a proof of the act survive. A ledger that keeps the old row 'for audit' has NOT performed this operation."
+        }
+      ]
+    },
+    "erase_request": {
+      "type": "object",
+      "description": "POST /mnemo/v0/erase. Erase everything attributable to `subject`, including records derived from it.",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "The erasure handle. THIS IS THE ONE FIELD schema_v0 CANNOT SUPPLY TODAY: its sources are {channel, principal} and inspeximus resolves erasure on a `doc` identifier, refusing a source without one. Until fact_record.sources carries `doc`, a subject sent here cannot be tied back to the writes it should reach. Measured in the probe beside this file."
+        },
+        "request_id": {"type": "string", "description": "The data-subject request this act belongs to. Echoed in the receipt and in every tombstone."},
+        "basis": {"type": "string", "description": "The legal or operational basis, e.g. 'GDPR Art.17'. Recorded, never interpreted."},
+        "authorized_by": {"type": "string", "description": "Who authorised it. Seeded into the manifest's hash chain, so repointing a manifest at a different authoriser breaks entry 0."},
+        "dry_run": {"type": "boolean", "description": "Report what would be erased and change nothing."}
+      },
+      "required": ["subject", "request_id"],
+      "additionalProperties": true
+    },
+    "erase_receipt": {
+      "type": "object",
+      "description": "The synchronous answer. A COUNT IS NOT EVIDENCE: the probe beside this file runs two partners that return an identical {erased: 2}, one having deleted and one not, and the count does not separate them.",
+      "properties": {
+        "erased": {"type": "integer", "minimum": 0, "description": "Best-effort count of rows removed. Reported, not trusted."},
+        "request_id": {"type": "string"},
+        "ledger_transaction_id": {"type": "string", "description": "The read side's own transaction id for the act, so the erasure is auditable in its ledger the way a write is."},
+        "tombstones": {"type": "integer", "minimum": 0, "description": "Content-free markers left behind, so a later integrity check reports the missing rows as deliberately erased rather than as tampering."},
+        "history_purged": {"type": "boolean", "description": "Whether prior versions of the same key were removed too. FALSE here means the operation was a retraction, whatever it was called."}
+      },
+      "required": ["erased", "request_id"],
+      "additionalProperties": true
+    },
+    "still_recoverable_request": {
+      "type": "object",
+      "description": "POST /mnemo/v0/still_recoverable. The self-check that makes the receipt mean something. Asked AFTER erase, with the sensitive values themselves.",
+      "properties": {
+        "subject": {"type": "string"},
+        "values": {"type": "array", "items": {"type": "string"}, "description": "The sensitive strings that must no longer be retrievable. Sent only to a party that already held them."}
+      },
+      "required": ["subject", "values"],
+      "additionalProperties": true
+    },
+    "still_recoverable_response": {
+      "type": "object",
+      "description": "TRUE means erasure is incomplete HERE, and the honest answer. A partner that answers false while still returning the value is the failure this whole exchange exists to catch, and the manifest catches it by name.",
+      "properties": {
+        "recoverable": {"type": "boolean"},
+        "matched": {"type": "integer", "minimum": 0, "description": "How many of the supplied values are still reachable. Never echo the values themselves."}
+      },
+      "required": ["recoverable"],
+      "additionalProperties": true
+    },
+    "deletion_manifest": {
+      "type": "object",
+      "description": "What the write side produces after cascading across every registered store. Hash-chained, honest by construction: complete only if EVERY store verified the data absent, and it names the ones that did not.",
+      "properties": {
+        "subject": {"type": "string"},
+        "request_id": {"type": "string"},
+        "basis": {"type": "string"},
+        "authorized_by": {"type": "string"},
+        "complete": {"type": "boolean", "description": "True only if no registered store still returns the values."},
+        "residual_targets": {"type": "array", "items": {"type": "string"}, "description": "The stores that still leak, by name. A manifest that is not complete says WHO."},
+        "entries": {"type": "array", "items": {"type": "object"}, "description": "Per-store outcome, hash-chained from a header seeded with subject, request_id, basis, authorized_by and the target list."},
+        "out_of_scope": {"type": "array", "items": {"type": "string"}, "description": "Stated, never silently passed: backups, and embedding inversion of retained vectors."}
+      },
+      "required": ["subject", "request_id", "complete", "entries"],
+      "additionalProperties": true
+    }
+  },
+  "type": "object",
+  "properties": {
+    "version": {"const": "erasure_v0"},
+    "erase_request": {"$ref": "#/$defs/erase_request"},
+    "erase_receipt": {"$ref": "#/$defs/erase_receipt"},
+    "still_recoverable_request": {"$ref": "#/$defs/still_recoverable_request"},
+    "still_recoverable_response": {"$ref": "#/$defs/still_recoverable_response"},
+    "deletion_manifest": {"$ref": "#/$defs/deletion_manifest"},
+    "lifecycle": {"$ref": "#/$defs/lifecycle"}
+  },
+  "examples": [
+    {
+      "version": "erasure_v0",
+      "erase_request": {
+        "subject": "synthetic-runbook",
+        "request_id": "REQ-001",
+        "basis": "GDPR Art.17",
+        "authorized_by": "data-subject"
+      },
+      "erase_receipt": {
+        "erased": 2,
+        "request_id": "REQ-001",
+        "ledger_transaction_id": "T0007",
+        "tombstones": 2,
+        "history_purged": true
+      },
+      "still_recoverable_request": {
+        "subject": "synthetic-runbook",
+        "values": ["jane@example.com"]
+      },
+      "still_recoverable_response": {"recoverable": false, "matched": 0}
+    }
+  ],
+  "open_questions": [
+    "fact_record.sources needs a `doc` handle before any of this can address a real write. That is the one schema_v1 change this proposal implies, and it is small: add `doc` alongside `channel` and `principal`.",
+    "Does the read side purge prior versions of a key on erasure, or only the current row? `history_purged` makes the answer explicit; the two sides may reasonably differ, but the contract must not leave it unstated.",
+    "Retraction has no endpoint here on purpose. It belongs in the write envelope as a status, not in the erasure path, and it should not be settled by borrowing this one.",
+    "The values sent to still_recoverable are the sensitive strings themselves. That is acceptable only to a party that already holds them, and it should carry an explicit statement to that effect rather than being inferred."
+  ]
+}
