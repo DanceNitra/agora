@@ -1,0 +1,64 @@
+{
+ "probe": "the_old_retry_must_not_restore_the_old_value.py",
+ "checks": [
+  {
+   "check": "both_writes_committed",
+   "pass": true,
+   "got": "delivered / delivered"
+  },
+  {
+   "check": "CONTROL_supersession_fired",
+   "pass": true,
+   "got": "The example billing service authenticates with signed requests."
+  },
+  {
+   "check": "replay_returned_its_original_receipt",
+   "pass": true,
+   "got": "L0001"
+  },
+  {
+   "check": "THE_POINT_old_retry_did_not_restore_old_value",
+   "pass": true,
+   "got": "The example billing service authenticates with signed requests."
+  },
+  {
+   "check": "CONTROL_client_refuses_a_revision_offline",
+   "pass": true,
+   "got": "raised before any network call"
+  },
+  {
+   "check": "CONTROL_receiver_answers_409",
+   "pass": true,
+   "got": "409"
+  },
+  {
+   "check": "CONTROL_stale_restore_rejected",
+   "pass": true,
+   "got": "409"
+  },
+  {
+   "check": "CONTROL_and_it_did_not_take",
+   "pass": true,
+   "got": "The example billing service authenticates with signed requests."
+  },
+  {
+   "check": "CONTROL_a_key_never_written_reads_empty",
+   "pass": true,
+   "got": "None"
+  },
+  {
+   "check": "effective_value_makes_a_reemit_a_409",
+   "pass": true,
+   "got": "so send it once and keep the bytes, or omit the field as his fixtures do"
+  }
+ ],
+ "all_passed": true,
+ "current_value_at_end": {
+  "valid_from": 1782700060.0,
+  "text": "The example billing service authenticates with signed requests.",
+  "source_id": "synthetic-after-002"
+ },
+ "history_depth": 1,
+ "connector_commit": "yadu9989/memstrata-inspeximus-connector@HEAD",
+ "note": "The receiver here implements his stated contract and is NOT his service. This shows our side speaks schema_v0 end to end; it shows nothing about MemStrata."
+}

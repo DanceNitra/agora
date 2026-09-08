@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/DanceNitra/agora/blob/main/inspeximus/schema_v0.json",
+  "$id": "https://raw.githubusercontent.com/DanceNitra/agora/main/research/schema_v0.json",
   "title": "inspeximus fact-record interchange — schema_v0",
   "description": "Open, composable-not-coupled interchange for agentic memory. inspeximus emits a fact record on the WRITE side (corroboration counting + deterministic (subject,relation) supersession key + bi-temporal valid_from/recorded_at). A read-side ledger (e.g. MemStrata, arXiv:2606.26511) ingests the record, owns the bitemporal transaction boundary, and returns a synchronous ack-by-id so the writer knows the fact was durably committed. A plain vector store may ingest the same record and ignore fields it does not use. inspeximus also runs standalone (its own (subject,relation) supersession drives stale recall to 0% without any external ledger); in that mode `status` is authoritative, in a combined deployment the read-side ledger overrides it. Versioned so both sides code against one thing.",
   "type": "object",
