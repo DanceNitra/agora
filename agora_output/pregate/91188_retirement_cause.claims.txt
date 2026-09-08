@@ -1,0 +1,14 @@
+Our archive heading for the 54-row event reads "Demoted from the index 2026-09-04, to fit the loader window".
+The tool that performed it, tools/trim_memory_index.py, carries a hardcoded 32-entry list.
+Its commit message on 2026-09-04 says thirty-two entries were moved to MEMORY_ARCHIVE.md by the tool's own criterion: a one-off domain result leaves, a cross-cutting working rule stays.
+The 2026-08-26 commit states the same criterion in its own words, for 19 entries.
+Every row in both loader-window events was evaluated on content, by a written criterion, recorded on the day.
+Restricted to the 32 rows the tool names, in the pre-event snapshot, they form 24 separate runs, the largest is 7 rows, and none reaches the end of the file.
+That archive section holds 53 rows, and the tool named only 32 of them.
+Of the other 21 rows, 15 shared a physical line in the index with a named row and left as a side effect of their neighbour's judgment.
+The remaining 6 rows belong to a later edit nobody traced, misfiled under the same heading.
+There are 26 dated copies of the index in our memory directory.
+Zero cross-line references exist in any of the 26 snapshots, so no row has ever cited another.
+An injected reference is found by the same counter, so the absence is the index's shape rather than the instrument.
+pm25coder raised typing the retirement cause at 07:11 on 2026-09-08 and attributed it to stonianua, who stated it as point 1 at 11:26.
+Our index packs several pointers onto one line to fit the line cap, and a shared line moves whole.

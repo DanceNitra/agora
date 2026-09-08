@@ -70,5 +70,12 @@
   ],
   "reason": "The gate flags CONTROL['expected'] and CONTROL['tol'] for never advancing. Both are the constant side of a tolerance comparison; the moving side is the manifold-average depth computed by the run. The control was proved able to fire rather than argued: a copy with expected set to 0.077000000 instead of the agreed 0.058909125 REFUSED with exit 2 and the message 'control cell his sector gives 0.058909125 against the agreed 0.077000000'. Same shape and same reasoning as the waiver already recorded for agora_output/edrn_submission/regenerate_table2.py. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
   "dated": "2026-09-03"
+ },
+ "probes/was_the_row_judged_or_did_the_window_just_end.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "AGORA_MEMORY_DIR selects WHICH store is read, so it can change every number and is disclosed rather than dismissed: the published run used the default, ~/.claude/projects/C--Users-Danculus-agora/memory, holding 26 dated copies of MEMORY.md and MEMORY_ARCHIVE.md with 11 dated sections. It cannot be swept, because the claim is about that one store's own retirement history and no second store has one. The resolved path is written into the receipt as memory_dir on every run.",
+  "dated": "2026-09-08"
  }
 }

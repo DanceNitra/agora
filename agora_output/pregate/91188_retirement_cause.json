@@ -1,0 +1,187 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#91188",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/91188",
+ "threads": [
+  "anthropics/claude-code#91188",
+  "https://github.com/anthropics/claude-code/issues/91188"
+ ],
+ "claims": 14,
+ "worth_writing": 14,
+ "blocked": 0,
+ "numbers_examined": [],
+ "results": [
+  {
+   "claim": "Our archive heading for the 54-row event reads \"Demoted from the index 2026-09-04, to fit the loader window\".",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5580153257",
+     "who": "DanceNitra",
+     "when": "2026-09-08T06:10",
+     "words": [
+      "demoted",
+      "heading",
+      "loader"
+     ]
+    },
+    {
+     "where": "comment 5580849663",
+     "who": "pm25coder",
+     "when": "2026-09-08T07:11",
+     "words": [
+      "demoted",
+      "heading",
+      "loader"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The tool that performed it, tools/trim_memory_index.py, carries a hardcoded 32-entry list.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Its commit message on 2026-09-04 says thirty-two entries were moved to MEMORY_ARCHIVE.md by the tool's own criterion: a one-off domain result leaves, a cross-cutting working rule stays.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The 2026-08-26 commit states the same criterion in its own words, for 19 entries.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Every row in both loader-window events was evaluated on content, by a written criterion, recorded on the day.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Restricted to the 32 rows the tool names, in the pre-event snapshot, they form 24 separate runs, the largest is 7 rows, and none reaches the end of the file.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5580153257",
+     "who": "DanceNitra",
+     "when": "2026-09-08T06:10",
+     "words": [
+      "names",
+      "separate",
+      "snapshot"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "That archive section holds 53 rows, and the tool named only 32 of them.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Of the other 21 rows, 15 shared a physical line in the index with a named row and left as a side effect of their neighbour's judgment.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The remaining 6 rows belong to a later edit nobody traced, misfiled under the same heading.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "There are 26 dated copies of the index in our memory directory.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Zero cross-line references exist in any of the 26 snapshots, so no row has ever cited another.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "An injected reference is found by the same counter, so the absence is the index's shape rather than the instrument.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "pm25coder raised typing the retirement cause at 07:11 on 2026-09-08 and attributed it to stonianua, who stated it as point 1 at 11:26.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our index packs several pointers onto one line to fit the line cap, and a shared line moves whole.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

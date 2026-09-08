@@ -55,6 +55,14 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RECENT_HOURS = 12          # the bound humanizer_receipt.py already applies to its other evidence
 
+# THE RECEIPT'S LABEL IS NOT THE SKILL'S NAME. `humanizer_receipt.py` records three skills as
+# humanizer, redteam and verify, while the skills are called humanizer, stress-claim and
+# verify-claims. Without this map a real verify-claims run was reported as "the transcript records no
+# `verify` skill invocation", which is a true sentence about the wrong name.
+ALIASES = {"verify": ("verify-claims", "verify"),
+           "redteam": ("stress-claim", "redteam"),
+           "humanizer": ("humanizer",)}
+
 
 def transcript_path():
     """The current session's transcript, from the environment the harness sets."""
@@ -88,7 +96,7 @@ def find(skill, draft, tp):
                 if not isinstance(c, dict) or c.get("type") != "tool_use" or c.get("name") != "Skill":
                     continue
                 inp = c.get("input") or {}
-                if inp.get("skill") != skill:
+                if inp.get("skill") not in ALIASES.get(skill, (skill,)):
                     continue
                 args = str(inp.get("args") or "")
                 if want not in args and alt not in args:
@@ -119,8 +127,10 @@ def check(skill, draft):
 
     hits = find(skill, draft, tp)
     if not hits:
-        return None, ("the transcript records no `%s` skill invocation naming %s. Invoke the skill "
-                      "on this draft, then record the receipt." % (skill, os.path.basename(draft)))
+        return None, ("the transcript records no %s skill invocation naming %s. Invoke the skill "
+                      "on this draft, then record the receipt."
+                      % (" or ".join("`%s`" % a for a in ALIASES.get(skill, (skill,))),
+                         os.path.basename(draft)))
 
     newest = hits[0]
     ran = epoch(newest["timestamp"])
