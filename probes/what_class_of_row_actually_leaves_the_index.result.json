@@ -1,0 +1,108 @@
+{
+ "live_pointers": 224,
+ "live_guards": 166,
+ "live_guard_share": 74.1,
+ "events": [
+  {
+   "event": "Older / closed",
+   "rows": 48,
+   "guards": 22,
+   "guard_share": 45.8,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Moved from the index 2026-08-17 (the index had reached the read limit)",
+   "rows": 39,
+   "guards": 29,
+   "guard_share": 74.4,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Rotated out of the index 2026-08-22 (byte cap, not staleness)",
+   "rows": 18,
+   "guards": 14,
+   "guard_share": 77.8,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Demoted from the index 2026-08-26, to fit the loader window",
+   "rows": 19,
+   "guards": 10,
+   "guard_share": 52.6,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Reachable again (nothing pointed at these; found 2026-08-27 by [[a-memory-file-nothing-points-at-is-never-recalled]])",
+   "rows": 18,
+   "guards": 4,
+   "guard_share": 22.2,
+   "is_a_retirement": false
+  },
+  {
+   "event": "Moved from the index 2026-08-30 (index was over the 200-line load cap)",
+   "rows": 8,
+   "guards": 5,
+   "guard_share": 62.5,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Rotated out of the index on 2026-08-31",
+   "rows": 8,
+   "guards": 8,
+   "guard_share": 100.0,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Demoted from the index 2026-09-04, to fit the loader window",
+   "rows": 54,
+   "guards": 3,
+   "guard_share": 5.6,
+   "is_a_retirement": true
+  },
+  {
+   "event": "Found unpointed 2026-09-08 (nobody retired these)",
+   "rows": 68,
+   "guards": 0,
+   "guard_share": 0.0,
+   "is_a_retirement": false
+  },
+  {
+   "event": "Corrected 2026-09-08: restored, then read properly",
+   "rows": 1,
+   "guards": 0,
+   "guard_share": 0.0,
+   "is_a_retirement": false
+  }
+ ],
+ "pooled_retirement_share": 46.9,
+ "events_at_or_above_live_rate": 3,
+ "retirement_events": 7,
+ "files_on_disk": 505,
+ "in_neither_index": 0,
+ "orphan_guards": 0,
+ "orphan_slugs": [],
+ "live_lines": 199,
+ "live_units": 24875,
+ "delivered": 224,
+ "below_the_cut": 0,
+ "duplicated_both_sides": [],
+ "retired_rows": 194,
+ "retired_still_referenced": 124,
+ "retired_referenced_share": 63.9,
+ "live_still_referenced": 189,
+ "live_referenced_share": 84.4,
+ "heterogeneity": {
+  "chi2": 65.9,
+  "df": 6,
+  "mc_draws": 20000,
+  "mc_at_or_above": 0,
+  "common_rate": 46.9
+ },
+ "resurrected": [
+  "real-vector-sampling-cannot-see-a-degeneracy.md",
+  "tenant-filtered-view-persisted-drops-everyone-elses-rows.md"
+ ],
+ "rows_ever": 418,
+ "guards_ever": 257,
+ "guard_share_ever": 61.5
+}
