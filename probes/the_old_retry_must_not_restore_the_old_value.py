@@ -9,6 +9,12 @@ So the half we CAN run is run here: his published client (`memstrata-inspeximus-
 92 tests green) sends real bytes over real HTTP to a receiver that implements the rules his
 `docs/API_CONTRACT.md` states. When the token arrives, only the URL and the credentials change.
 
+TWO CHECKS CARRY THE THIRD STEP, not one, and a mutation audit is why that is spelled out.
+`replay_returned_its_original_receipt` tests the replay path: remove the receiver's replay branch and
+it goes red. `the_value_after_the_replay_is_still_the_new_one` tests the outcome and survives that
+mutation, because the valid_from ordering rule refuses the stale write instead. Citing the second
+alone would credit the probe with power it does not have.
+
 THE ASSERTION THAT MATTERS is the third step, not the first two. Sending a fact and then a newer one
 is easy to get right. The failure that costs a reader a correct answer is a RETRY: the sender resends
 the older record's exact bytes after a lost reply, and a naive receiver treats it as a fresh write and
@@ -235,7 +241,12 @@ def main():
     first_receipt = ledger.by_id[before["fact_record"]["id"]][1]["ledger_record_id"]
     check("replay_returned_its_original_receipt",
           r3 is not None and r3.state == "delivered" and first_receipt == "L0001", first_receipt)
-    check("THE_POINT_old_retry_did_not_restore_old_value",
+    # NOT the check with power over replay handling, despite what its first name said. Deleting
+    # the receiver's replay branch leaves this green, because the valid_from ordering rule
+    # refuses the stale write instead and the value ends up right for another reason. The check
+    # above it is the one that goes red. Both are needed: one tests the replay path, one tests
+    # the outcome.
+    check("the_value_after_the_replay_is_still_the_new_one",
           cur_after_replay and cur_after_replay["text"] == after["fact_record"]["text"],
           cur_after_replay and cur_after_replay["text"])
 
@@ -280,7 +291,10 @@ def main():
     print("    effective_value = value * 0.5^(age/half_life), clock reset on access.")
     print("    3.10 -> %s" % hashlib.sha256(canon(a)).hexdigest()[:16])
     print("    3.09 -> %s" % hashlib.sha256(canon(b)).hexdigest()[:16])
-    check("effective_value_makes_a_reemit_a_409", not same,
+    # Renamed: this compares two canonical digests locally and never contacts the receiver, so
+    # it observes no HTTP status. The consequence is a 409, and the contract says so; this check
+    # measures the cause.
+    check("effective_value_changes_the_bytes_under_one_id", not same,
           "so send it once and keep the bytes, or omit the field as his fixtures do")
 
     srv.shutdown()

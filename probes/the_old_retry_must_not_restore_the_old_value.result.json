@@ -17,7 +17,7 @@
    "got": "L0001"
   },
   {
-   "check": "THE_POINT_old_retry_did_not_restore_old_value",
+   "check": "the_value_after_the_replay_is_still_the_new_one",
    "pass": true,
    "got": "The example billing service authenticates with signed requests."
   },
@@ -47,7 +47,7 @@
    "got": "None"
   },
   {
-   "check": "effective_value_makes_a_reemit_a_409",
+   "check": "effective_value_changes_the_bytes_under_one_id",
    "pass": true,
    "got": "so send it once and keep the bytes, or omit the field as his fixtures do"
   }
