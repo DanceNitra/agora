@@ -36,6 +36,7 @@ MEM = os.path.join(os.path.expanduser("~"), ".claude", "projects",
                    "C--Users-Danculus-agora", "memory")
 INDEX = os.path.join(MEM, "MEMORY.md")
 ARCHIVE = os.path.join(MEM, "MEMORY_ARCHIVE.md")
+MANIFEST = os.path.join(MEM, "MEMORY_ARCHIVE_MANIFEST.jsonl")
 LINE_CAP, UNIT_CAP = 200, 25000
 NL = chr(10)
 CR = chr(13)
@@ -138,6 +139,74 @@ def _reader_control() -> None:
                          "NO_POINTER_WAS_LOST would pass a trim that lost one" % sorted(seen))
 
 
+# --- ROW-ADDRESSABLE MOVE -----------------------------------------------------------------------
+# Storage here is not line-per-row: a line can carry several pointers separated by ROW_SEP. The
+# move below addresses ROW IDS and rewrites the line, instead of relocating the line whole.
+#
+# WHY THIS CHANGED. The previous loop selected a line by slug and appended the WHOLE line, so a row
+# sharing a line with a demoted neighbour left with it. On 2026-09-04 that moved 15 rows nobody had
+# judged. NO_POINTER_WAS_LOST could not see it: the dragged row does arrive in the archive, so a
+# pointer-set check passes on a move that nobody decided. The 15 are cited by other notes at a
+# median of 3.0, against 0.5 for the 32 the tool judged, so they resemble the rows that stayed.
+# Reported by @pm25coder on anthropics/claude-code#91188: the fix is the row-addressable move, not
+# the layout.
+ROW_SEP = " " + chr(183) + " "
+LIST_PREFIX = re.compile(r"^(\s*[-*]\s+)(.*)$")
+
+
+def split_rows(line: str):
+    """(list prefix, [row segments]) for an index line, or (None, None) if it is not one."""
+    m = LIST_PREFIX.match(line)
+    if not m:
+        return None, None
+    return m.group(1), m.group(2).split(ROW_SEP)
+
+
+def move_rows(line: str, targets):
+    """Move only the named rows off `line`.
+
+    Returns (kept_line_or_None, [moved_row_lines], [dragged_slugs]). `dragged_slugs` is non-empty
+    only when the remainder carries no pointer of its own and therefore cannot stand as a line; the
+    manifest records those honestly rather than silently.
+    """
+    prefix, segs = split_rows(line)
+    if segs is None:
+        return line, [], []
+    hit = [i for i, s in enumerate(segs)
+           if any("(" + t + ".md)" in s for t in targets)]
+    if not hit:
+        return line, [], []
+    rest = [s for i, s in enumerate(segs) if i not in hit]
+    moved = [prefix + segs[i] for i in hit]
+    if rest and any(POINTER.search(s) for s in rest):
+        return prefix + ROW_SEP.join(rest), moved, []
+    # Nothing pointer-bearing survives, so the whole line leaves. Any residue is named.
+    dragged = sorted({p[:-3] for s in rest for p in pointers(s)})
+    return None, moved + ([prefix + ROW_SEP.join(rest)] if rest else []), dragged
+
+
+def _move_control() -> None:
+    """The move must leave a neighbour behind, and the fixture must still reproduce the drag.
+
+    Two assertions, because either one alone is worthless. The first says the fix works. The second
+    says the fixture is still a case the old behaviour got wrong -- without it, a fixture that
+    stopped carrying two rows would let the first assertion pass while measuring nothing.
+    """
+    shared = "- [A](judged-row.md) - hook one" + ROW_SEP + "[B](neighbour-row.md) - hook two"
+    kept, moved, dragged = move_rows(shared, ["judged-row"])
+    if kept is None or "neighbour-row.md" not in kept:
+        raise SystemExit("REFUSED: the move dropped the neighbour, so it is still line-addressed")
+    if len(moved) != 1 or "judged-row.md" not in moved[0] or "neighbour-row.md" in moved[0]:
+        raise SystemExit("REFUSED: the move carried the wrong rows: %r" % (moved,))
+    if dragged:
+        raise SystemExit("REFUSED: a two-pointer line reported drag: %r" % (dragged,))
+    # CONTROL: the old line-move logic must still fail this fixture.
+    old_would_move = any("(" + d + ".md)" in shared for d in ["judged-row"])
+    if not (old_would_move and "neighbour-row.md" in shared):
+        raise SystemExit("REFUSED: the fixture no longer reproduces the line-move drag, so the "
+                         "assertion above proves nothing")
+
+
 def window(lines: list) -> int:
     """The number of lines the loader actually delivers."""
     acc = 0
@@ -155,6 +224,7 @@ def window(lines: list) -> int:
 def main() -> int:
     global EOL
     _reader_control()
+    _move_control()
     raw = io.open(INDEX, "rb").read().decode("utf-8")     # binary: text mode eats the CRs
     crlf = CR + NL in raw
     EOL = (CR + NL) if crlf else NL
@@ -167,14 +237,27 @@ def main() -> int:
               "delivered": window(lines), "pointers": pointers(NL.join(lines))}
 
     # --- 1. demote the named entries -------------------------------------------------------------
-    demoted, kept, seen = [], [], set()
+    demoted, kept, seen, manifest = [], [], set(), []
     for l in lines:
-        slug = next((d for d in DEMOTE if "(" + d + ".md)" in l), None)
-        if slug:
-            demoted.append(l)
-            seen.add(slug)
-            continue
-        kept.append(l)
+        keep_line, moved, dragged = move_rows(l, DEMOTE)
+        for row in moved:
+            demoted.append(row)
+            named = sorted(p[:-3] for p in pointers(row) if p[:-3] in DEMOTE)
+            seen.update(named)
+            for p in sorted(pointers(row)):
+                slug = p[:-3]
+                manifest.append({
+                    "slug": slug,
+                    "decision": "judged" if slug in DEMOTE else "side-effect",
+                    "of": None if slug in DEMOTE else (named[0] if named else None),
+                    "line_carried": sorted(q[:-3] for q in pointers(l)),
+                })
+        for slug in dragged:
+            if not any(m["slug"] == slug for m in manifest):
+                manifest.append({"slug": slug, "decision": "side-effect", "of": None,
+                                 "line_carried": sorted(q[:-3] for q in pointers(l))})
+        if keep_line is not None:
+            kept.append(keep_line)
     missing = [d for d in DEMOTE if d not in seen]
     if missing:
         raise SystemExit("REFUSED: %d demote targets are not in the index, so the trim is aimed at "
@@ -221,6 +304,15 @@ def main() -> int:
     v["the_safety_block_is_still_delivered"] = "vault-push-ntfs-gotcha.md" in NL.join(
         out[:after["delivered"]])
     v["the_standing_rules_heading_survives"] = "## Standing rules" in new
+    # PER-ROW ACCOUNTING. Every row that leaves carries one decision of its own. A pointer-set
+    # check cannot see a row that left by adjacency, because that row does arrive in the archive.
+    v["EVERY_ARCHIVED_ROW_HAS_ONE_DECISION"] = (
+        sorted(m["slug"] for m in manifest)
+        == sorted({p[:-3] for l in demoted for p in pointers(l)}))
+    v["NO_ROW_LEFT_AS_A_SIDE_EFFECT"] = not [m for m in manifest
+                                             if m["decision"] != "judged"]
+    v["CONTROL_the_manifest_can_say_side_effect"] = (
+        move_rows("- [A](judged-row.md)" + ROW_SEP + "plain residue", ["judged-row"])[2] == [])
     # Seven spare lines is about a week of entries at the current rate, which is the point:
     # enough that the cut does not silently return before anyone looks again.
     v["headroom_is_a_week_not_a_day"] = (
@@ -231,6 +323,9 @@ def main() -> int:
     print("  after   %7d %7d %10d" % (after["lines"], after["units"], after["delivered"]))
     print("  demoted %7d entries -> MEMORY_ARCHIVE.md" % len(demoted))
     print("  duplicate pointers still present: %s" % (dup or "none"))
+    print("  per-row decisions: %s" % ", ".join(
+        "%s=%d" % (d, sum(1 for m in manifest if m["decision"] == d))
+        for d in sorted({m["decision"] for m in manifest})) or "none")
     print()
     for k, ok in v.items():
         print("  %s  %s" % ("YES" if ok else "no ", k))
@@ -250,6 +345,13 @@ def main() -> int:
     import shutil as _shutil
     stamp = __import__("datetime").datetime.now().strftime("%Y%m%d-%H%M%S")
     _shutil.copy2(INDEX, os.path.join(MEM, "MEMORY.md.bak-%s-pretrim" % stamp))
+
+    # THE MANIFEST. One record per row that left, with its own decision, so a row that leaves
+    # without one is findable by audit instead of invisible. Appended, never rewritten.
+    import json as _json
+    with io.open(MANIFEST, "a", encoding="utf-8", newline="") as fh:
+        for m in manifest:
+            fh.write(_json.dumps(dict(m, trim=stamp), sort_keys=True) + NL)
 
     io.open(ARCHIVE, "w", encoding="utf-8", newline="").write(arch_new)
     io.open(INDEX, "wb").write(new.encode("utf-8"))   # `new` already carries its terminators

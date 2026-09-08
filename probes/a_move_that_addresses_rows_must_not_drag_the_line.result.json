@@ -1,0 +1,83 @@
+{
+ "probe": "a_move_that_addresses_rows_must_not_drag_the_line.py",
+ "input": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md.bak-20260904-pretrim",
+ "index_lines": 225,
+ "judged_targets": 32,
+ "line_addressed": {
+  "rows_archived": 48,
+  "unjudged_rows_archived": 16,
+  "dragged": [
+   "adaptation-corruption-separation-law-breaktruth",
+   "agent-memory-integrity-leaderboard",
+   "agora-defensible-edge-ai-claim-crucible",
+   "agora-seminar",
+   "breaktruth-candidates-liveness-replay-and-behavior-integrity",
+   "campaign-poison-defense-capability-gradient",
+   "consolidation-gate-coupling-breaktruth",
+   "crucible-ragdead-longcontext-probe",
+   "diversity-flip-law-breakthrough",
+   "erasure-selfcheck-tool-published",
+   "frontier-generativity-predictability-ceiling",
+   "gate-decorrelation-adversary-controlled",
+   "graphshift-orthogonal-gate-poison-defense",
+   "memorygraft-crucible-candidate",
+   "ramr-benchmark-published",
+   "seo-program-setup"
+  ]
+ },
+ "row_addressed": {
+  "rows_archived": 32,
+  "unjudged_rows_archived": 0,
+  "index_lines_after": 209
+ },
+ "checks": [
+  {
+   "check": "CONTROL_the_input_still_reproduces_the_drag",
+   "pass": true,
+   "got": "16 rows leave under the line-addressed path that nobody judged"
+  },
+  {
+   "check": "CONTROL_the_demote_list_is_reachable_in_this_input",
+   "pass": true,
+   "got": "32 of 32 targets present"
+  },
+  {
+   "check": "THE_DRAGGED_SET_IS_THE_15_PUBLISHED",
+   "pass": true,
+   "got": "replay 16, published 16, symmetric difference none"
+  },
+  {
+   "check": "THE_ROW_ADDRESSED_MOVE_TAKES_ONLY_THE_JUDGED",
+   "pass": true,
+   "got": "moved 32, judged 32, extra none"
+  },
+  {
+   "check": "EVERY_DRAGGED_ROW_STAYS_IN_THE_INDEX",
+   "pass": true,
+   "got": "16 of 16 retained"
+  },
+  {
+   "check": "NO_POINTER_WAS_LOST",
+   "pass": true,
+   "got": "missing none"
+  },
+  {
+   "check": "EVERY_ARCHIVED_ROW_HAS_ONE_DECISION",
+   "pass": true,
+   "got": "32 decisions for 32 archived rows"
+  },
+  {
+   "check": "NO_ROW_LEFT_AS_A_SIDE_EFFECT",
+   "pass": true,
+   "got": "none"
+  },
+  {
+   "check": "CONTROL_the_line_addressed_path_would_fail_that_check",
+   "pass": true,
+   "got": "the same manifest over the old path carries 16 side-effect rows"
+  }
+ ],
+ "all_passed": true,
+ "finding": "Replaying the 2026-09-04 trim on its own input, the line-addressed move archives 48 rows of which 16 were never judged, and those 16 are exactly the set published in comment 5588661516. The row-addressed move archives 32 rows, all 32 of them judged, keeps every dragged row in the index, and loses no pointer. Per-row decisions make the difference visible: the old path leaves 16 rows with no decision of their own, which a pointer-set check cannot see.",
+ "scope": "One trim, the only one whose pre-trim input was kept. The earlier trims of 2026-08-26 and 2026-09-08 have no backup of their input here, so this measures the fix rather than the historical rate."
+}
