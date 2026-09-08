@@ -178,18 +178,51 @@ def fetch_thread(spec, out):
     if not m:
         refuse("--thread must look like owner/repo#123 or the issue URL, got %r" % spec, out)
     repo, num = m.group(1), m.group(2)
-    rows = []
-    for url, kind in (("repos/%s/issues/%s" % (repo, num), "issue"),
-                      ("repos/%s/issues/%s/comments" % (repo, num), "comments")):
-        cmd = ["gh", "api", url] + (["--paginate"] if kind == "comments" else [])
+
+    def _get(url, paginate=False):
+        cmd = ["gh", "api", url] + (["--paginate"] if paginate else [])
         r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
-        if r.returncode != 0:
-            refuse("could not read %s (%s). A repeat check that cannot see the thread reports NEW "
-                   "for everything." % (url, (r.stderr or "").strip()[:120]), out)
-        data = json.loads(r.stdout)
+        return (None, (r.stderr or "").strip()[:120]) if r.returncode != 0 else (json.loads(r.stdout), "")
+
+    def _collect(data, rows):
+        """Flatten a comment and, for a discussion, its nested replies.
+
+        A reply is where a collaborator most often states the number you are about to repeat back at
+        them, so reading only the top level would report NEW for anything said in one.
+        """
         for c in (data if isinstance(data, list) else [data]):
             rows.append((str(c.get("id")), (c.get("user") or {}).get("login", "?"),
                          (c.get("created_at") or "")[:16], c.get("body") or ""))
+            for rep in (c.get("replies") or []):
+                if isinstance(rep, dict):
+                    rows.append((str(rep.get("id")), (rep.get("user") or {}).get("login", "?"),
+                                 (rep.get("created_at") or "")[:16], rep.get("body") or ""))
+
+    rows, why = [], ""
+    head, err = _get("repos/%s/issues/%s" % (repo, num))
+    if head is not None:
+        _collect(head, rows)
+        body, err2 = _get("repos/%s/issues/%s/comments" % (repo, num), paginate=True)
+        if body is None:
+            refuse("could not read %s/issues/%s/comments (%s). A repeat check that cannot see the "
+                   "thread reports NEW for everything." % (repo, num, err2), out)
+        _collect(body, rows)
+    else:
+        # A GITHUB DISCUSSION IS NOT AN ISSUE, and the issue path 404s for one. Tried only as a
+        # fallback, so a real issue outage still refuses loudly instead of reading something else.
+        why = err
+        head, derr = _get("repos/%s/discussions/%s" % (repo, num))
+        if head is None:
+            refuse("could not read %s#%s as an issue (%s) or as a discussion (%s). A repeat check "
+                   "that cannot see the thread reports NEW for everything."
+                   % (repo, num, why, derr), out)
+        _collect(head, rows)
+        body, derr2 = _get("repos/%s/discussions/%s/comments" % (repo, num), paginate=True)
+        if body is None:
+            refuse("read the discussion but not its comments (%s). A repeat check that sees only "
+                   "the opening post reports NEW for everything said since." % derr2, out)
+        _collect(body, rows)
+
     if not rows:
         refuse("the thread returned no comments at all", out)
     return rows

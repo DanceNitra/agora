@@ -1,0 +1,198 @@
+{
+ "tool": "pregate",
+ "thread": "DanceNitra/agora#2",
+ "thread_url": "https://github.com/DanceNitra/agora/issues/2",
+ "threads": [
+  "DanceNitra/agora#2",
+  "https://github.com/DanceNitra/agora/issues/2"
+ ],
+ "claims": 15,
+ "worth_writing": 15,
+ "blocked": 0,
+ "numbers_examined": [],
+ "results": [
+  {
+   "claim": "His published client sent our paired-write fixture over real HTTP and ten checks passed, five of them controls.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18340917",
+     "who": "yadu9989",
+     "when": "2026-09-08T03:08",
+     "words": [
+      "client",
+      "fixture",
+      "published"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "After a restarted sender resent the old record's exact bytes, the current value was still the new one.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18340917",
+     "who": "yadu9989",
+     "when": "2026-09-08T03:08",
+     "words": [
+      "after",
+      "bytes",
+      "sender"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The $id inside our schema_v0 named inspeximus/schema_v0.json while the file is at research/schema_v0.json, so it returned 404.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our effective_value is value times 0.5 to the power of age over half_life with the clock reset on access, so it is time dependent and a re-emit changes the bytes under one source id.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "His fixtures omit effective_value and our schema marks it optional, so omitting it on the wire is conformant.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "His client raises SourceConflict before any network call when the same source id is enqueued with different content.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "His receiver answers 409 for changed content under an existing id when the sender has no local record of that id.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "A bitemporal ledger keeps the earlier record in history, and an erasure request requires that record not to remain.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18340917",
+     "who": "yadu9989",
+     "when": "2026-09-08T03:08",
+     "words": [
+      "earlier",
+      "history",
+      "keeps"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our draft carries three operations where schema_v0 has one: superseded, retracted and erased.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The erasure extension is two endpoints, POST /mnemo/v0/erase and POST /mnemo/v0/still_recoverable, matching the ErasureTarget protocol inspeximus already implements.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Two partner fixtures answered identical erase requests and both reported an erased count of 2.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The honest partner produced a complete deletion manifest and the lying partner produced an incomplete manifest naming the leaking store.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The erased count did not separate the two partners; only the post-erasure recheck did.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "schema_v0 carries sources as channel and principal, and inspeximus refuses a source without a doc key because doc is what erasure resolves on.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Adding doc alongside channel and principal is the only schema_v1 change this proposal requires.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
