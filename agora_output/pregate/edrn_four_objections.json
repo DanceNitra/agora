@@ -1,0 +1,252 @@
+{
+ "tool": "pregate",
+ "thread": "luoxuejian000/edrn-dmrg-verification#2",
+ "thread_url": "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2",
+ "threads": [
+  "luoxuejian000/edrn-dmrg-verification#2",
+  "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2"
+ ],
+ "claims": 10,
+ "worth_writing": 10,
+ "blocked": 0,
+ "numbers_examined": [
+  "0.0372",
+  "0.050837",
+  "0.496",
+  "0.6841",
+  "28.1601396",
+  "28.8441898",
+  "3083",
+  "5536511118"
+ ],
+ "results": [
+  {
+   "claim": "On the random N=15 graph at s = 1.0, in the units where one edge contributes 4 S_i . S_j, dense diagonalisation gives a ground energy of -28.8441898, while the warm-started scan reports -28.1601396, which is 0.6841 higher in energy.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.6841",
+    "28.1601396",
+    "28.8441898"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5150703763",
+     "who": "DanceNitra",
+     "when": "2026-08-01T08:51",
+     "words": [
+      "energy",
+      "higher",
+      "warm-started"
+     ]
+    },
+    {
+     "where": "comment 5154110455",
+     "who": "luoxuejian000",
+     "when": "2026-08-02T00:06",
+     "words": [
+      "energy",
+      "higher",
+      "warm-started"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "From a fresh random vector at k=1 and tol=1e-9, eigsh finds -28.8441898 in 5 of 5 seeds, so the loss of the ground state comes from the continuation rather than the solver.",
+   "verdict": "NEW",
+   "numbers": [
+    "28.8441898"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "On the random N=15 graph the same ground energy -28.8441898 appears in the S_z = -1/2 and S_z = -3/2 sectors, so the ground multiplet carries S >= 3/2.",
+   "verdict": "NEW",
+   "numbers": [
+    "28.8441898"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5464635577",
+     "who": "maratsultanov2",
+     "when": "2026-08-29T20:11",
+     "words": [
+      "appears",
+      "energy",
+      "sectors"
+     ]
+    },
+    {
+     "where": "comment 5465130513",
+     "who": "maratsultanov2",
+     "when": "2026-08-29T22:01",
+     "words": [
+      "appears",
+      "energy",
+      "sectors"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "On the N=15 tree the lowest state of the S_z = -3/2 sector lies 1.52 higher in energy than the lowest of S_z = -1/2, as Lieb-Mattis requires for a bipartite 8 and 7 graph.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5150703763",
+     "who": "DanceNitra",
+     "when": "2026-08-01T08:51",
+     "words": [
+      "energy",
+      "higher",
+      "lowest"
+     ]
+    },
+    {
+     "where": "comment 5154110455",
+     "who": "luoxuejian000",
+     "when": "2026-08-02T00:06",
+     "words": [
+      "energy",
+      "higher",
+      "lowest"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The fractal generations are L1 with 6 sites, L2 with 15 and L3 with 42, and the S_z = 0 sector at 42 sites holds 538,257,874,440 states.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The Spearman rank correlation between the tree valley position and the size imbalance of the cut is -0.59, at p = 0.0372 from 200,000 random permutations, and the same correlation gives p = 0.496 on the ten edges whose s=0 reference is unique.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.0372",
+    "0.496"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "With ten points and heavy ties the design detects only a Spearman correlation of absolute value 0.65 or more.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5330550656",
+     "who": "DanceNitra",
+     "when": "2026-08-18T15:41",
+     "words": [
+      "absolute",
+      "correlation",
+      "detects"
+     ]
+    },
+    {
+     "where": "comment 5542121681",
+     "who": "DanceNitra",
+     "when": "2026-09-04T14:44",
+     "words": [
+      "absolute",
+      "correlation",
+      "design",
+      "spearman"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "A cycle has no bridge, so removing any ring edge leaves one connected path rather than two components.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5558144407",
+     "who": "DanceNitra",
+     "when": "2026-09-06T08:50",
+     "words": [
+      "components",
+      "connected",
+      "removing"
+     ]
+    },
+    {
+     "where": "comment 5566419385",
+     "who": "luoxuejian000",
+     "when": "2026-09-07T07:03",
+     "words": [
+      "components",
+      "connected",
+      "removing"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In comment 5536511118 we gave the manifold average for edge (8,14) as 0.050837, and that is the route that settles a degenerate reference.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.050837",
+    "5536511118"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5536511118",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.050837"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Discrete scale invariance and the log-periodic corrections to scaling it produces are set out in Sornette, Phys. Rep. 297, 239, 1998, and the Sierpinski gasket case for the Blume-Capel model in Lessa and Andrade, Phys. Rev. E 62, 3083, 2000.",
+   "verdict": "NEW",
+   "numbers": [
+    "3083"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

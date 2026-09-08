@@ -111,5 +111,7 @@
    "numbers_with_no_source": []
   }
  ],
- "note": "NOT the gate receipt for comment 5558144407. That comment was sent at 08:50:59Z; this file was written at 09:00:14Z while repairing the thread-spelling defect, and it OVERWROTE the original, which is not recoverable. Its 2 blocked claims are self-referential: pregate finds those figures already published, in our own comment 5558144407. Re-running pregate after a send always blocks that way."
+ "note": "NOT the gate receipt for comment 5558144407. That comment was sent at 08:50:59Z; this file was written at 09:00:14Z while repairing the thread-spelling defect, and it OVERWROTE the original, which is not recoverable. Its 2 blocked claims are self-referential: pregate finds those figures already published, in our own comment 5558144407. Re-running pregate after a send always blocks that way.",
+ "sent": "5558144407",
+ "sent_note": "Published 2026-09-06 as comment 5558144407. The two blocked claims were correctly flagged as already said by us, and were kept on purpose: the letter is a correction that quotes our own earlier figures back."
 }
