@@ -1,0 +1,71 @@
+{
+ "probe": "a_partner_who_says_erased_and_still_answers.py",
+ "checks": [
+  {
+   "check": "honest_partner_gives_a_complete_manifest",
+   "pass": true,
+   "got": "True"
+  },
+  {
+   "check": "honest_partner_is_not_named_as_residual",
+   "pass": true,
+   "got": "[]"
+  },
+  {
+   "check": "and_the_manifest_verifies",
+   "pass": true,
+   "got": "[]"
+  },
+  {
+   "check": "THE_POINT_lying_partner_is_not_complete",
+   "pass": true,
+   "got": "False"
+  },
+  {
+   "check": "THE_POINT_and_the_manifest_names_it",
+   "pass": true,
+   "got": "['memstrata-ledger-that-lies']"
+  },
+  {
+   "check": "the_lying_manifest_still_verifies_as_a_document",
+   "pass": true,
+   "got": "[]"
+  },
+  {
+   "check": "CONTROL_both_arms_reported_the_same_erased_count",
+   "pass": true,
+   "got": "2 vs 2"
+  },
+  {
+   "check": "CONTROL_so_the_count_is_not_what_separated_them",
+   "pass": true,
+   "got": "only the recheck did"
+  },
+  {
+   "check": "schema_v0_source_has_no_doc_handle",
+   "pass": true,
+   "got": "so 'erase everything from source X' cannot be expressed on the wire"
+  },
+  {
+   "check": "CONTROL_with_a_doc_handle_the_same_erasure_works",
+   "pass": true,
+   "got": "erased=1"
+  }
+ ],
+ "all_passed": true,
+ "honest_arm": {
+  "complete": true,
+  "residual_targets": []
+ },
+ "lying_arm": {
+  "complete": false,
+  "residual_targets": [
+   "memstrata-ledger-that-lies"
+  ]
+ },
+ "proposed_endpoints": [
+  "POST /mnemo/v0/erase",
+  "POST /mnemo/v0/still_recoverable"
+ ],
+ "note": "The partner here is a fixture implementing the proposed contract, not MemStrata. This shows the protocol catches a partner who reports success without erasing; it shows nothing about any real service."
+}
