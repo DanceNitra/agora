@@ -42,6 +42,26 @@
    "got": "['`complete` is True but the entries say False \u2014 the verdict does not follow from the evidence', \"`residual_targets` is [] but the entries say ['receiver-that-does-not-delete']\"]"
   },
   {
+   "check": "D_the_record_reached_the_receiver",
+   "pass": true,
+   "got": "True"
+  },
+  {
+   "check": "D_OUR_OWN_OUTBOX_LEAKS_and_is_named",
+   "pass": true,
+   "got": "['connector-outbox']"
+  },
+  {
+   "check": "E_the_proposed_delete_path_closes_it",
+   "pass": true,
+   "got": "True"
+  },
+  {
+   "check": "CONTROL_D_and_E_differ_only_by_the_delete_path",
+   "pass": true,
+   "got": "so D is a measurement, not a broken target"
+  },
+  {
    "check": "a_schema_v0_shaped_source_cannot_be_written_back",
    "pass": true,
    "got": "the value survives the hop; the ROLE does not"
@@ -76,6 +96,19 @@
   "POST /mnemo/v0/erase",
   "POST /mnemo/v0/still_recoverable"
  ],
+ "outbox_arms": {
+  "as_shipped": {
+   "complete": false,
+   "residual_targets": [
+    "connector-outbox"
+   ],
+   "secret_still_in_queue": true
+  },
+  "with_delete_path": {
+   "complete": true,
+   "secret_still_in_queue": false
+  }
+ },
  "not_covered_by_still_recoverable": [
   "a value surviving in an embedding",
   "a response or retrieval cache",

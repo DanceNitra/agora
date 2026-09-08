@@ -54,6 +54,8 @@ try:
 except ImportError:
     Inspeximus = None
 
+CONNECTOR = os.path.join(tempfile.gettempdir(), "claude", "C--Users-Danculus-agora",
+                         "5d882efe-89a3-4f28-a05d-2f4c4390562b", "scratchpad", "connector")
 SUBJECT = "synthetic-runbook"
 SECRET = "jane@example.com"
 TOKEN = "local-fixture-token-not-a-secret"
@@ -96,6 +98,18 @@ def serve(receiver):
             if self.headers.get("Authorization") != "Bearer " + TOKEN:
                 return self._send(401, {"reason": "unauthorized"})
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)) or b"{}")
+            if self.path == "/mnemo/v0":
+                fr = (body.get("fact_record") or {})
+                sources = fr.get("sources") or [{}]
+                receiver.rows[fr.get("id")] = {
+                    "subject": (sources[0] or {}).get("principal"), "text": fr.get("text") or ""}
+                return self._send(200, {
+                    "source_id": fr.get("id"), "ledger_record_id": "L-" + str(fr.get("id")),
+                    "transaction_id": "T-" + str(fr.get("id")), "status": "committed",
+                    "committed_at": 1.0,
+                    "payload_sha256": __import__("hashlib").sha256(
+                        json.dumps(body, sort_keys=True, separators=(",", ":"),
+                                   ensure_ascii=False).encode("utf-8")).hexdigest()})
             if self.path == "/mnemo/v0/erase":
                 return self._send(200, {"erased": receiver.erase(body.get("subject")),
                                         "request_id": body.get("request_id")})
@@ -136,6 +150,83 @@ def make_target(port, name):
     HttpTarget.still_recoverable = lambda self, subject, values: bool(
         call("still_recoverable", {"subject": subject, "values": list(values)})["recoverable"])
     return HttpTarget()
+
+
+class OutboxTarget(ErasureTarget):
+    """The connector's own durable queue, as an erasure target.
+
+    Real code, our side of the wire. `producer_outbox.payload` is the canonical bytes of the whole
+    envelope, delivered rows are retained so a replay resends identical bytes, and the published
+    client has no DELETE at all. `can_delete=False` models it as shipped; True models the delete path
+    this probe proposes, so the arms differ by exactly the thing under discussion.
+    """
+    name = "connector-outbox"
+
+    def __init__(self, db_path, can_delete):
+        self.db_path = db_path
+        self.can_delete = can_delete
+
+    def _rows(self, subject):
+        import sqlite3
+        with sqlite3.connect(self.db_path) as c:
+            return [(r[0], bytes(r[1])) for r in
+                    c.execute("SELECT source_id, payload FROM producer_outbox").fetchall()
+                    if subject.encode("utf-8") in bytes(r[1])]
+
+    def erase(self, subject):
+        hit = self._rows(subject)
+        if self.can_delete:
+            import sqlite3
+            with sqlite3.connect(self.db_path) as c:
+                c.executemany("DELETE FROM producer_outbox WHERE source_id=?",
+                              [(sid,) for sid, _ in hit])
+                c.commit()
+        return {"erased": len(hit)}
+
+    def still_recoverable(self, subject, values):
+        blob = b" ".join(p for _, p in self._rows(subject))
+        return any(v and v.encode("utf-8") in blob for v in values)
+
+
+def run_outbox_arm(can_delete):
+    """Send one record carrying the secret through his real client, then try to erase it."""
+    import sys as _sys
+    for cand in (os.path.join(CONNECTOR, "src"), CONNECTOR):
+        if os.path.isdir(cand) and cand not in _sys.path:
+            _sys.path.insert(0, cand)
+    try:
+        from memstrata_mnemo_connector import DeliveryCredentials, DurableOutbox
+    except ImportError:
+        return None
+
+    receiver = Receiver(deletes=True)
+    srv, port = serve(receiver)
+    db = os.path.join(tempfile.mkdtemp(prefix="outbox-arm-"), "outbox.sqlite3")
+    box = DurableOutbox(db, "http://127.0.0.1:%d/mnemo/v0" % port, allow_loopback_http=True,
+                        max_attempts=2, base_backoff=0.01, max_backoff=0.02)
+    env = {"version": "schema_v0", "fact_record": {
+        "id": "synthetic-erasure-001", "valid_from": 1782700000.0, "recorded_at": 1782700000.4,
+        "key": "example-billing::contact", "subject": "example-billing", "relation": "contact",
+        "object": None, "text": "Contact for example-billing is %s." % SECRET,
+        "sources": [{"channel": "doc", "principal": SUBJECT}],
+        "corroboration_count": 1, "mtype": "semantic", "status": "active"}}
+    box.enqueue(env)
+    import time as _t
+    t0 = _t.time()
+    r = box.deliver_next(credentials=DeliveryCredentials(bearer_token=TOKEN))
+    while r is None and _t.time() - t0 < 15:
+        _t.sleep(0.02)
+        r = box.deliver_next(credentials=DeliveryCredentials(bearer_token=TOKEN))
+
+    m = DeletionManifest()
+    m.register(make_target(port, "receiver-that-deletes"))
+    target = OutboxTarget(db, can_delete)
+    m.register(target)
+    out = m.execute(SUBJECT, [SECRET], request_id="REQ-001", basis="GDPR Art.17",
+                    authorized_by="data-subject")
+    srv.shutdown()
+    return {"delivered": r is not None and r.state == "delivered", "manifest": out,
+            "still_there": target.still_recoverable(SUBJECT, [SECRET])}
 
 
 def run_arm(name, deletes, report=None):
@@ -209,6 +300,32 @@ def main():
     check("CONTROL_verify_REJECTS_a_doctored_manifest", v_ok is False and bool(v_problems),
           v_problems[:2] if v_problems else "accepted it")
 
+    # THE ONE REAL STORE IN THIS PROBE, and it is ours. The connector's outbox retains the whole
+    # envelope in plaintext and the published client has no DELETE, so a subject erased from both
+    # memory stores is still in the queue that sent it.
+    as_shipped = run_outbox_arm(can_delete=False)
+    with_delete = run_outbox_arm(can_delete=True)
+    if as_shipped is None or with_delete is None:
+        print("\n  outbox arms SKIPPED: his client is not importable here")
+    else:
+        print("\n  D  outbox as shipped, no delete path: complete=%s residual=%s  secret still in queue=%s"
+              % (as_shipped["manifest"].get("complete"), as_shipped["manifest"].get("residual_targets"), as_shipped["still_there"]))
+        print("  E  outbox with the delete path:      complete=%s residual=%s  secret still in queue=%s"
+              % (with_delete["manifest"].get("complete"), with_delete["manifest"].get("residual_targets"), with_delete["still_there"]))
+        check("D_the_record_reached_the_receiver", as_shipped["delivered"], as_shipped["delivered"])
+        check("D_OUR_OWN_OUTBOX_LEAKS_and_is_named",
+              as_shipped["manifest"].get("complete") is False
+              and "connector-outbox" in (as_shipped["manifest"].get("residual_targets") or [])
+              and as_shipped["still_there"] is True,
+              as_shipped["manifest"].get("residual_targets"))
+        check("E_the_proposed_delete_path_closes_it",
+              with_delete["manifest"].get("complete") is True
+              and not with_delete["manifest"].get("residual_targets") and with_delete["still_there"] is False,
+              with_delete["manifest"].get("complete"))
+        check("CONTROL_D_and_E_differ_only_by_the_delete_path",
+              as_shipped["manifest"].get("complete") != with_delete["manifest"].get("complete"),
+              "so D is a measurement, not a broken target")
+
     # THE WIRE-FORMAT GAP, stated as narrowly as it is true.
     store = Inspeximus(os.path.join(tempfile.mkdtemp(prefix="erasure-handle-"), "store.json"))
     refused = None
@@ -232,6 +349,12 @@ def main():
                                   "residual_targets": arm["manifest"].get("residual_targets")}
                     for arm in (a, b, c)},
            "proposed_endpoints": ["POST /mnemo/v0/erase", "POST /mnemo/v0/still_recoverable"],
+           "outbox_arms": ({"as_shipped": {"complete": as_shipped["manifest"].get("complete"),
+                                           "residual_targets": as_shipped["manifest"].get("residual_targets"),
+                                           "secret_still_in_queue": as_shipped["still_there"]},
+                            "with_delete_path": {"complete": with_delete["manifest"].get("complete"),
+                                                 "secret_still_in_queue": with_delete["still_there"]}}
+                           if as_shipped and with_delete else None),
            "not_covered_by_still_recoverable": [
                "a value surviving in an embedding", "a response or retrieval cache",
                "freed database pages before a vacuum",
