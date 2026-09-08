@@ -325,8 +325,23 @@ def _humanizer_runs_last(a) -> None:
     """
     if a.skill != "humanizer":
         return
-    d = sha(a.draft)
-    missing = [s for s in ("redteam", "verify") if not os.path.exists(receipt_path(d, s))]
+    # BY DRAFT, NOT BY SHA. The first version required a receipt on THESE bytes, which the
+    # humanizer is about to change by definition: its own edit then invalidates the two receipts it
+    # just demanded, and no ordering can satisfy all three at once. What the rule is actually for is
+    # that the content passes RAN before the wording pass, so it asks that instead, and the three
+    # receipts are recorded together on the final bytes afterwards.
+    rel = os.path.relpath(a.draft, ROOT).replace(os.sep, "/")
+    ran = set()
+    for fn in (os.listdir(DIR) if os.path.isdir(DIR) else []):
+        if not fn.endswith(".json"):
+            continue
+        try:
+            r = json.load(io.open(os.path.join(DIR, fn), encoding="utf-8"))
+        except Exception:
+            continue
+        if r.get("draft") == rel:
+            ran.add(r.get("skill"))
+    missing = [s for s in ("redteam", "verify") if s not in ran]
     if missing:
         raise SystemExit(
             "REFUSED: the humanizer runs LAST, and %s %s no receipt on these bytes.\n"

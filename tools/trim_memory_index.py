@@ -213,8 +213,16 @@ def demote_rows(lines, targets):
 
     def record(slug, named, source_line):
         # ONE ENTRY PER SLUG. The manifest is keyed by row id, and the same target can be linked
-        # from two segments of one line; a fuzz run produced 227 double entries from that shape
-        # alone. A second entry is not a second decision.
+        # from two segments of one line, which produced two entries for one row. A second entry is
+        # not a second decision.
+        #
+        # NO COUNT HERE ANY MORE, and the reason is worse than the arithmetic. This said "a fuzz
+        # run produced 227 double entries". The harness partitioned 227 lines carrying the shape
+        # from 34 that reached a double entry, so the figure was wrong on its own terms. Then a
+        # verify pass ran the harness against this tree and it raised ValueError: it unpacks three
+        # values from move_rows, which returns two here and on origin/main. So both counts were
+        # measured against a move_rows that exists in neither tree. The shape is real and the
+        # de-dup above is the fix; the numbers were about nothing.
         if slug in by_slug:
             return
         by_slug.add(slug)
