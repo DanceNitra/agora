@@ -76,6 +76,11 @@ def main():
     for slug in res:
         check("names_%s" % slug[:28], slug.replace(".md", "") in draft)
 
+    # The statistic must be NAMED, not called "the observed dispersion". Our own pregate refused
+    # that sentence for stating a comparison without naming the axis it is measured on, which is
+    # the standing rule that a rank is not a rank until you name the unit.
+    check("chi_square_is_named_and_matches", het.get("chi2") == 65.9
+          and "observed chi-square of 65.9" in draft, het.get("chi2"))
     check("monte_carlo_bound_only", het.get("mc_at_or_above") == 0 and het.get("mc_draws") == 20000
           and "none of 20,000 Monte Carlo draws" in draft and "p < 5e-5" in draft, het.get("mc_draws"))
 
