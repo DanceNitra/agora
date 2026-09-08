@@ -1,0 +1,142 @@
+{
+ "probe": "the_evicted_rows_are_a_random_sample_not_a_loss.py",
+ "supersedes": "the reading in packing_the_index_evicted_rows_nobody_judged.py",
+ "memory_dir": "C:\\Users\\Danculus/.claude/projects/C--Users-Danculus-agora/memory",
+ "groups": {
+  "judged, named by the tool": {
+   "n": 32,
+   "median_all_citers": 0.5,
+   "mean_all_citers": 0.94,
+   "median_live_citers": 0.0,
+   "mean_live_citers": 0.28
+  },
+  "moved by adjacency": {
+   "n": 16,
+   "median_all_citers": 3.0,
+   "mean_all_citers": 3.5,
+   "median_live_citers": 0.0,
+   "mean_live_citers": 1.31
+  },
+  "still live in the index": {
+   "n": 226,
+   "median_all_citers": 3.0,
+   "mean_all_citers": 5.43,
+   "median_live_citers": 2.0,
+   "mean_live_citers": 2.76
+  }
+ },
+ "adjacency_slugs": [
+  "adaptation-corruption-separation-law-breaktruth",
+  "agent-memory-integrity-leaderboard",
+  "agora-defensible-edge-ai-claim-crucible",
+  "agora-seminar",
+  "breaktruth-candidates-liveness-replay-and-behavior-integrity",
+  "campaign-poison-defense-capability-gradient",
+  "consolidation-gate-coupling-breaktruth",
+  "crucible-ragdead-longcontext-probe",
+  "diversity-flip-law-breakthrough",
+  "erasure-selfcheck-tool-published",
+  "frontier-generativity-predictability-ceiling",
+  "gate-decorrelation-adversary-controlled",
+  "graphshift-orthogonal-gate-poison-defense",
+  "memorygraft-crucible-candidate",
+  "ramr-benchmark-published",
+  "seo-program-setup"
+ ],
+ "permutation": {
+  "draws": 20000,
+  "judged_vs_adjacency": {
+   "gap": 2.5,
+   "p": 0.007299635018249088
+  },
+  "judged_vs_live": {
+   "gap": 2.5,
+   "p": 0.007099645017749113
+  },
+  "adjacency_vs_live": {
+   "gap": 0.0,
+   "p": 1.0,
+   "note": "the medians tie, so the observed gap is 0 and every relabelling reaches it; this is not a measurement"
+  }
+ },
+ "random_draw": {
+  "P_random_16_reach_the_adjacency_median": 0.7006,
+  "ks_D": 0.2019,
+  "ks_p": 0.5117,
+  "mwu_adjacency_vs_live_p": 0.3564,
+  "mwu_judged_vs_adjacency_p": 0.00458
+ },
+ "live_citers_only": {
+  "judged_median": 0.0,
+  "adjacency_median": 0.0,
+  "live_median": 2.0,
+  "adjacency_rows_with_no_live_citer": 9,
+  "judged_vs_adjacency_p": 1.0,
+  "adjacency_vs_live_p": 0.06499675016249187
+ },
+ "power_adjacency_vs_live": {
+  "shift_+1": 0.125,
+  "shift_+2": 0.37,
+  "shift_+3": 0.6275,
+  "shift_+4": 0.92
+ },
+ "adjacency_median_bootstrap_95CI": [
+  1.0,
+  4.0
+ ],
+ "checks": [
+  {
+   "check": "CONTROL_the_test_REJECTS_a_shifted_copy",
+   "pass": true,
+   "got": "p = 0.0091 against the same group shifted by +4"
+  },
+  {
+   "check": "CONTROL_the_test_FAILS_TO_REJECT_a_resampled_copy",
+   "pass": true,
+   "got": "8 of 200 resampled pairs reach p < 0.05"
+  },
+  {
+   "check": "CONTROL_the_counter_finds_a_slug_that_is_in_the_store",
+   "pass": true,
+   "got": "1228 references across the live rows"
+  },
+  {
+   "check": "CONTROL_a_slug_that_does_not_exist_counts_zero",
+   "pass": true,
+   "got": ""
+  },
+  {
+   "check": "CONTROL_the_three_groups_are_disjoint",
+   "pass": true,
+   "got": "judged 32, adjacency 16, live 226"
+  },
+  {
+   "check": "CONTROL_the_citing_pools_partition_the_corpus",
+   "pass": true,
+   "got": "226 live-row notes + 285 retired notes = 511 files"
+  },
+  {
+   "check": "THE_SAME_GAP_HOLDS_AGAINST_THE_ROWS_THAT_STAYED",
+   "pass": true,
+   "got": "judged vs adjacency gap 2.5 p 0.0073; judged vs live gap 2.5 p 0.0071"
+  },
+  {
+   "check": "THE_ADJACENCY_GROUP_IS_A_TYPICAL_RANDOM_DRAW",
+   "pass": true,
+   "got": "P(random 16 reach median 3.0) = 0.701; KS D = 0.202 p = 0.5117; MWU p = 0.3564"
+  },
+  {
+   "check": "THE_DIRECTION_REVERSES_UNDER_LIVE_CITERS_ONLY",
+   "pass": true,
+   "got": "adjacency median 0.0 vs live 2.0; 9 of 16 have no live citer"
+  },
+  {
+   "check": "THE_ADJACENCY_ARM_IS_UNDERPOWERED_BELOW_A_LARGE_SHIFT",
+   "pass": true,
+   "got": "a +2 shift is detected only 37% of the time"
+  }
+ ],
+ "all_passed": true,
+ "finding": "The 16 rows that left by sharing a line are cited at a median of 3.0, against 0.5 for the 32 the tool judged and 3.0 for the 226 still live, and judged against adjacency gives p = 0.0073. That p does not mean what we published. Judged against the rows that STAYED gives the same gap and p = 0.0071, so the statistic is measuring the tool's selection of the 32 rather than any property of the 16. Drawing 16 rows at random from the live index reaches the adjacency median 70% of the time, and Kolmogorov-Smirnov cannot separate them (D = 0.202, p = 0.5117). Restricting the citers to rows still in the index reverses the direction: 9 of the 16 have no citation from any live row, and the adjacency median falls to 0.0 against 2.0 for live. The adjacency-vs-live arm never had the power to say otherwise, detecting a true shift of +2 references only 37% of the time. What is measured is that the line a row sits on is unrelated to how often it is cited, which is what line adjacency means. The eviction of 16 unjudged rows is a real defect in the move; this measurement does not show those rows were load-bearing.",
+ "scope": "Citations are counted as they stand today and note files carry no history, so none of these numbers is dated to the retirement. The age of a row also predicts its citation count, and the judged rows are younger than the adjacency rows, which is a further reason not to read the surviving gap as a property of the eviction."
+}
