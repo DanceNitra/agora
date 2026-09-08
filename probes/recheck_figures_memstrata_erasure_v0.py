@@ -45,8 +45,8 @@ def main():
           names.get("replay_returned_its_original_receipt") is True
           and names.get("the_value_after_the_replay_is_still_the_new_one") is True,
           "%d checks, %d controls, neither number quoted" % (n_checks, n_controls))
-    check("the_draft_says_which_one_tests_the_replay_path",
-          "receipt-identity one" in draft and "delete the receiver's replay branch" in draft)
+    check("the_draft_does_not_overstate_the_paired_run",
+          "second pair of eyes rather than news" in draft and "behaves as you reported" in draft)
     check("CONTROL_no_check_still_claims_more_than_it_measures",
           not any(c["check"].startswith("THE_POINT") for c in p["checks"])
           and "makes_a_reemit_a_409" not in json.dumps(p),
@@ -65,9 +65,18 @@ def main():
     # construction, which the draft must not present as evidence.
     check("THIRD_ARM_varies_count_independently_of_deletion",
           zero["reported"] == 0 and zero["complete"] is True and dele["reported"] != zero["reported"]
-          and "one deletes but reports zero" in draft, zero)
-    check("the_draft_says_the_first_two_are_equal_by_construction",
-          "report the same count by construction" in draft)
+          and "erased\": N}` receipt cannot tell you" in draft, zero)
+    check("the_draft_leads_with_the_real_store_not_the_mocks",
+          "producer_outbox.payload" in draft and "erasure target neither of us listed" in draft)
+    # THE ARM THAT MOVED THE ARGUMENT: one real store on our own side of the wire.
+    ob = e.get("outbox_arms") or {}
+    check("OUR_OWN_QUEUE_LEAKED_and_the_manifest_named_it",
+          ob.get("as_shipped", {}).get("complete") is False
+          and "connector-outbox" in (ob.get("as_shipped", {}).get("residual_targets") or [])
+          and ob["as_shipped"]["secret_still_in_queue"] is True, ob.get("as_shipped"))
+    check("and_a_delete_path_closes_it",
+          ob.get("with_delete_path", {}).get("complete") is True
+          and ob["with_delete_path"]["secret_still_in_queue"] is False, ob.get("with_delete_path"))
     check("CONTROL_verify_can_say_no",
           any(c["check"] == "CONTROL_verify_REJECTS_a_doctored_manifest" and c["pass"]
               for c in e["checks"]), "a verifier that always says yes fails the probe")
@@ -83,19 +92,17 @@ def main():
     # the schema claims
     s0 = json.load(open(SCHEMA, encoding="utf-8"))
     check("schema_id_is_self_consistent",
-          s0["$id"].endswith("research/schema_v0.json")
-          and "it now resolves from the URL it names" in draft, s0["$id"])
+          s0["$id"].endswith("research/schema_v0.json") and "Both fixed" in draft, s0["$id"])
     check("effective_value_is_optional_in_ours",
-          "effective_value" not in s0["$defs"]["fact_record"]["required"]
-          and "my schema marks it optional" in draft,
-          s0["$defs"]["fact_record"]["required"])
+          "effective_value" not in s0["$defs"]["fact_record"]["required"],
+          "the draft no longer restates the formula; he has had it three times")
     e0 = json.load(open(ERASURE_SCHEMA, encoding="utf-8"))
     life = [x["const"] for x in e0["$defs"]["lifecycle"]["oneOf"]]
     check("three_lifecycle_states_and_the_draft_names_them",
           life == ["superseded", "retracted", "erased"]
           and all(w in draft for w in life), life)
-    check("four_open_questions", len(e0["open_questions"]) == 4
-          and "Four questions are open" in draft, len(e0["open_questions"]))
+    check("open_questions_counted_from_the_file", len(e0["open_questions"]) == 5
+          and "Five questions are open" in draft, len(e0["open_questions"]))
     check("seven_weeks_not_nine", "seven weeks" in draft and "21 July" in draft,
           "measured: 84df666 renamed mnemo/ to research/ on 2026-07-21, 49 days")
 
@@ -105,13 +112,19 @@ def main():
           os.path.getmtime(PAIRED) >= os.path.getmtime(PAIRED.replace(".result.json", ".py"))
           and os.path.getmtime(ERASE) >= os.path.getmtime(ERASE.replace(".result.json", ".py")))
     check("CONTROL_the_draft_says_the_receiver_is_not_his_service",
-          "not your service" in draft and "nothing about MemStrata" in draft)
+          "my fixture, not your service" in draft and "nothing about MemStrata" in draft)
     # WITHDRAWN, each refuted by the gate and each must stay out.
     for phrase in ("nine weeks", "cannot be expressed on the wire", "rather than quickly",
                    "the count did not separate them", "a partner who says"):
         check("WITHDRAWN_%s" % phrase[:22].replace(" ", "_"), phrase not in draft)
     check("pure_ascii", all(ord(c) < 128 for c in raw), "gh mangles anything else")
-    check("length_reasonable", 2000 <= len(raw) <= 5100, "%d chars" % len(raw))
+    # THE BOUND COMES FROM THE THREAD, not from me. Measured on DanceNitra/agora#2: the longest
+    # comment anyone has posted there is 2,783 characters, and ours run 1,581 to 2,683. An earlier
+    # version of this check carried a cap I had invented, and I raised it twice to let a 5,358
+    # character draft through, which is twice the longest thing in the discussion.
+    THREAD_LONGEST = 2783
+    check("length_fits_the_thread_it_enters", len(raw) <= int(THREAD_LONGEST * 1.25),
+          "%d chars against a %d-char longest comment" % (len(raw), THREAD_LONGEST))
 
     print("\n  %s" % ("all checks passed" if ok else "FAILED"))
     return 0 if ok else 1
