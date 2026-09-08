@@ -1,4 +1,24 @@
-"""The rows that left because they shared a line look like the rows that stayed, not like the judged.
+"""
+THE CONCLUSION IN THIS FILE IS SUPERSEDED. Read
+probes/the_evicted_rows_are_a_random_sample_not_a_loss.py instead.
+
+The counts below are correct and reproduce. The reading built on them -- "the rows nobody evaluated
+resemble the rows that stayed, not the rows that were chosen to go" -- does not survive three arms
+run 2026-09-08:
+
+  * judged against the rows that STAYED gives the same median gap and about the same p, so the
+    statistic measures the tool's selection of the 32, not a property of the 16;
+  * 16 rows drawn at random from the live index reproduce the adjacency median most of the time,
+    and Kolmogorov-Smirnov cannot separate the two groups;
+  * restricting the citing corpus to rows still in the index reverses the direction, because most
+    of the adjacency group's citations come from notes that have themselves already left.
+
+The `p = 1.0000` reported here for adjacency against live was never a measurement: the medians tie,
+so the observed gap is 0 and every relabelling of an absolute statistic reaches it.
+
+What survives is not in this file: 16 rows left with no decision recorded, which is measured
+against the real input by probes/a_move_that_addresses_rows_must_not_drag_the_line.py.
+The rows that left because they shared a line look like the rows that stayed, not like the judged.
 
 WHAT THIS ANSWERS. On anthropics/claude-code#91188 I published a measurement and named the next open
 question: of the 15 rows that left our index because they shared a physical line with a row the trim
@@ -163,7 +183,11 @@ def main():
           "judged %d, adjacency %d, live %d" % (len(judged), len(adjacency), len(live)))
     # A test that can never reject would make any p meaningless.
     _, self_hits, _ = permutation_p(ja, ja)
-    check("CONTROL_the_permutation_test_can_fail_to_reject",
+    # THIS CONTROL CANNOT FAIL, and it is left in place, named, rather than quietly deleted.
+    # permutation_p(ja, ja) has an observed gap of 0 and an absolute statistic, so every draw
+    # reaches it: 20000 of 20000 for ANY input. The working version is in the superseding probe,
+    # where a group is tested against a SHIFTED copy of itself.
+    check("BROKEN_CONTROL_kept_for_the_record_it_cannot_fail",
           self_hits > draws * 0.5,
           "a group against itself: %d of %d shuffles reach a zero gap" % (self_hits, draws))
     # CORRECTED 2026-09-08. This used to assert `len(adjacency) == 15`, the number published in

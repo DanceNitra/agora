@@ -186,6 +186,14 @@ def _finding(departures):
             for d in departures]
 
 
+def _archive_slugs():
+    """Every row named anywhere in MEMORY_ARCHIVE.md, under any heading."""
+    arc = io.open(os.path.join(MEM, "MEMORY_ARCHIVE.md"),
+                  encoding="utf-8", errors="replace").read()
+    return {os.path.splitext(os.path.basename(m))[0] for m in LINK.findall(arc)
+            if not is_index_file(m)}
+
+
 def main():
     snaps = snapshots()
     if len(snaps) < 3:
@@ -306,9 +314,24 @@ def main():
     # was taken as corroboration of the label; it was evidence that the last transition IS the
     # 2026-09-04 event, which is the defect the labels above now fix. Kept, restated.
     last = departures[-1] if departures else {}
+    # CORRECTED 2026-09-08, twice over. It asserted `rows_left == 54`, a literal, and the literal
+    # was wrong: a prefix filter on "memory" had hidden a row, so the real count is 55. Fixing the
+    # filter made this control fire, correctly.
+    #
+    # It is no longer a literal at all. The property is that every row leaving the index at this
+    # transition is recorded SOMEWHERE in the archive; the 09-04 section holds 54 of the 55, and
+    # `reasoning-tier-token-budget` sits under a different heading. So a count against the section
+    # alone would keep breaking, while the thing worth guarding -- that nothing departs unrecorded
+    # -- is exact.
+    # Both sides stripped of the extension: `slugs` carries ".md" and the archive set does not,
+    # and comparing them raw reported all 55 as unrecorded.
+    unrecorded = sorted({os.path.splitext(x)[0] for x in last.get("slugs", [])}
+                        - _archive_slugs())
     check("CONTROL_the_last_transition_is_the_09_04_event_not_a_09_08_one",
-          last.get("rows_left") == 54 and "2026-09-04" in last.get("archive_event", ""),
-          "%s rows, matched to %r" % (last.get("rows_left"), last.get("archive_event", "")[:52]))
+          "2026-09-04" in last.get("archive_event", "") and not unrecorded,
+          "%s rows departed, %d unrecorded anywhere in the archive%s"
+          % (last.get("rows_left"), len(unrecorded),
+             ("; " + ", ".join(unrecorded)) if unrecorded else ""))
     # The old version counted repeated dates, which is not the property it named. A real
     # filename-versus-mtime disagreement is the thing that would break an ordering by filename.
     disagree = [(n, DATE_IN_NAME.search(n).group(1),

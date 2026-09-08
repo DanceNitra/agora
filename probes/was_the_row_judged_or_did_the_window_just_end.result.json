@@ -239,8 +239,8 @@
  "checks": [
   {
    "check": "CONTROL_the_last_transition_is_the_09_04_event_not_a_09_08_one",
-   "pass": false,
-   "got": "55 rows, matched to 'Demoted from the index 2026-09-04, to fit the loader'"
+   "pass": true,
+   "got": "55 rows departed, 0 unrecorded anywhere in the archive"
   },
   {
    "check": "CONTROL_a_filename_date_really_does_disagree_with_its_mtime",
@@ -288,7 +288,7 @@
    "got": "125 of 198 retired rows are cited by a [[wikilink]] in some note today, which is undated"
   }
  ],
- "all_passed": false,
+ "all_passed": true,
  "finding": [
   "Moved from the index 2026-08-17 (the index had reached the read limit): 40 rows, one block, not at the end.",
   "Rotated out of the index 2026-08-22 (byte cap, not staleness): 18 rows, scattered, 2 separate runs.",
