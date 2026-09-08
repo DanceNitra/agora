@@ -1,0 +1,106 @@
+{
+ "probe": "the_tier_must_escalate_on_anything_checkable.py",
+ "cases": [
+  {
+   "case": "a bare procedural note",
+   "want": "LIGHT",
+   "got": "LIGHT",
+   "pass": true,
+   "triggers": []
+  },
+  {
+   "case": "addresses are not figures",
+   "want": "LIGHT",
+   "got": "LIGHT",
+   "pass": true,
+   "triggers": []
+  },
+  {
+   "case": "one figure",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a number"
+   ]
+  },
+  {
+   "case": "a percentage",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a number"
+   ]
+  },
+  {
+   "case": "a bare decimal",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a number"
+   ]
+  },
+  {
+   "case": "names a person",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "names a person"
+   ]
+  },
+  {
+   "case": "a claim about their code",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a claim about someone else's software"
+   ]
+  },
+  {
+   "case": "length alone",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "length"
+   ]
+  },
+  {
+   "case": "a url",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a number",
+    "a citation"
+   ]
+  },
+  {
+   "case": "an arxiv id",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "a number",
+    "a citation"
+   ]
+  },
+  {
+   "case": "a long quotation",
+   "want": "FULL",
+   "got": "FULL",
+   "pass": true,
+   "triggers": [
+    "quotes someone"
+   ]
+  }
+ ],
+ "all_passed": true,
+ "must_escalate": 9,
+ "total": 11,
+ "note": "The classifier reads surface features. A claim in pure prose with no digit, name or citation reads LIGHT; the backstop is that LIGHT still requires all three receipts, so depth drops and the pass never disappears."
+}

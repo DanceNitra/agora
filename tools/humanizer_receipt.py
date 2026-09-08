@@ -111,6 +111,10 @@ def main() -> int:
     ap.add_argument("--evidence", default="",
                     help="path to an artifact the skill run produced (its output/transcript "
                          "file). Required for `record`: a receipt must point at something.")
+    ap.add_argument("--in-session", action="store_true",
+                    help="the skill ran through the Skill tool in this session rather than in a "
+                         "subagent; evidence is the harness's own tool_use record, checked by "
+                         "tools/skill_ran.py. Needs --found of at least 200 characters.")
     ap.add_argument("--report", default="",
                     help="the file the SUBAGENT wrote, named in its brief and ending "
                          ".report.md. Required when the transcript is empty, because then "
@@ -142,11 +146,34 @@ def main() -> int:
     # So a receipt must now POINT AT SOMETHING the run produced. This does not prove the right skill
     # ran; nothing local can. It does make a bare assertion impossible, and it leaves an audit trail
     # that a later reader can open and disagree with.
+    # THE IN-SESSION PATH. A skill invoked through the Skill tool leaves no file, so every rule
+    # below refuses it and the only way through was to spend a subagent on every send. The harness
+    # writes a tool_use record for the invocation; that record is evidence this session cannot
+    # author, unlike the .report.md the file path accepts.
+    if a.in_session:
+        try:
+            from skill_ran import check as _skill_ran
+        except ImportError:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from skill_ran import check as _skill_ran
+        rec, why = _skill_ran(a.skill, a.draft)
+        if why:
+            raise SystemExit(
+                "REFUSED: --in-session claims the %s skill ran here, and the transcript does not "
+                "show it.\n  %s" % (a.skill, why))
+        # On this path the transcript proves the run and --found is the only account of what it
+        # saw, so it carries the same minimum as the empty-transcript path.
+        if len(a.found.strip()) < 200:
+            raise SystemExit(
+                "REFUSED: --in-session needs --found to describe what the run actually found. "
+                "Got %d characters; 200 minimum." % len(a.found.strip()))
+        return _write(a, {"tier": "in_session_skill_call", "invocation": rec})
+
     ev = (a.evidence or "").strip()
     if not ev:
         raise SystemExit(
-            "REFUSED: --evidence is required. Pass the path to the artifact the skill run produced "
-            "(the agent's output file, the storm report, the verify transcript).\n"
+            "REFUSED: --evidence is required, or pass --in-session when the skill ran through the "
+            "Skill tool rather than in a subagent.\n"
             "  A receipt that points at nothing is the assertion it was built to replace.")
     # THE EVIDENCE MUST BE A SKILL OR AGENT TRANSCRIPT, NEVER SOMETHING I WROTE.
     #
@@ -267,31 +294,37 @@ def main() -> int:
             "draft's bytes; evidence from an older run is evidence about an older draft."
             % (ev, age_h))
     ev_sha = hashlib.sha256(io.open(ev, "rb").read()).hexdigest()
+    return _write(a, {"path": ev.replace(os.sep, "/"), "bytes": ev_bytes,
+                      "sha256": ev_sha, "age_hours_at_record": round(age_h, 2),
+                      "transcript_empty": EV_EMPTY,
+                      # Which artefact this receipt rests on. "agent_report" means a file the agent
+                      # wrote; "transcript" means the harness kept one; "in_session_skill_call"
+                      # means the harness's own record of the invocation. There is no tier for
+                      # "the session's own summary", which is the point.
+                      "tier": "transcript" if not EV_EMPTY else "agent_report",
+                      "agent_report": rep_meta})
+
+
+def _write(a, evidence):
+    """One receipt shape for every evidence path, so the two cannot drift apart."""
     os.makedirs(DIR, exist_ok=True)
     d = sha(a.draft)
     body = io.open(a.draft, encoding="utf-8").read()
+    words = len(body.split())
     json.dump({"draft": os.path.relpath(a.draft, ROOT).replace(os.sep, "/"),
                "skill": a.skill,
                "content_sha256": d, "found": a.found.strip(),
-               "evidence": {"path": ev.replace(os.sep, "/"), "bytes": ev_bytes,
-                            "sha256": ev_sha, "age_hours_at_record": round(age_h, 2),
-                            "transcript_empty": EV_EMPTY,
-                            # Which artefact this receipt actually rests on. "agent_report" means a
-                            # file the agent wrote; "transcript" means the harness kept one. There
-                            # is no tier for "the session's own summary", which is the point.
-                            "tier": "transcript" if not EV_EMPTY else "agent_report",
-                            "agent_report": rep_meta},
-               "before_words": a.before or len(body.split()),
-               "after_words": a.after or len(body.split()),
+               "evidence": evidence,
+               "before_words": a.before or words,
+               "after_words": a.after or words,
                "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                "note": f"records that the {a.skill} SKILL was run on these exact bytes; keyed by "
                        f"content, so any later edit invalidates it"},
               io.open(receipt_path(d, a.skill), "w", encoding="utf-8"),
               ensure_ascii=False, indent=2)
     print(f"  recorded {a.skill}  {os.path.basename(a.draft)}  sha {d[:32]}  "
-          f"{a.before or len(body.split())} -> {a.after or len(body.split())} words  "
-          f"evidence {os.path.basename(ev)} ({ev_bytes} B"
-          f"{', TRANSCRIPT EMPTY' if EV_EMPTY else ''})")
+          f"{a.before or words} -> {a.after or words} words  "
+          f"tier {evidence.get('tier')}")
     return 0
 
 
