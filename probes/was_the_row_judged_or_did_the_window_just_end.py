@@ -80,6 +80,11 @@ MEM = os.environ.get(
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+\.md)\)")
 WIKI = re.compile(r"\[\[([^\]]+)\]\]")
 DATE_IN_NAME = re.compile(r"bak-(\d{8})")
+SECTION = re.compile(r"^##\s+(.+)$", re.M)
+# A transition is only allowed to carry the contiguity claim if it is almost entirely ONE archive
+# event. Below this it is a blend of separately-reasoned decisions and its run count describes none
+# of them.
+MIN_PURITY = 0.9
 
 
 def snapshots():
@@ -115,6 +120,46 @@ def rows_of(path):
     return out
 
 
+def archive_events():
+    """Each dated section of MEMORY_ARCHIVE.md and the slug set it holds.
+
+    The archive is the record of WHY rows left. A snapshot pair only shows THAT they left, and its
+    later file's mtime is not the event's date: a backup is written before a trim, so the change
+    belongs to the earlier file's edit.
+    """
+    path = os.path.join(MEM, "MEMORY_ARCHIVE.md")
+    if not os.path.isfile(path):
+        return {}
+    text = io.open(path, encoding="utf-8", errors="replace").read()
+    parts = SECTION.split(text)
+    out = {}
+    for head, body in zip(parts[1::2], parts[2::2]):
+        slugs = {os.path.basename(m) for m in LINK.findall(body)
+                 if not os.path.basename(m).lower().startswith("memory")}
+        if slugs:
+            out[head.strip()] = slugs
+    return out
+
+
+def wikilink_referenced(slugs):
+    """How many of these slugs a note file cites with [[...]] TODAY.
+
+    Undated by construction: the note files are not versioned. It is reported so the VOID verdict on
+    index-internal references cannot be mistaken for "nothing pointed at these rows".
+    """
+    names = {os.path.splitext(s)[0] for s in slugs}
+    hit = set()
+    for f in glob.glob(os.path.join(MEM, "*.md")):
+        if os.path.basename(f).lower().startswith("memory"):
+            continue
+        body = io.open(f, encoding="utf-8", errors="replace").read()
+        here = set(WIKI.findall(body))
+        for n in names:
+            if n in here and os.path.basename(f) != n + ".md":
+                hit.add(n)
+    return len(hit), len(names)
+
+
 def runs(positions):
     """Maximal runs of consecutive integers, as (start, end) pairs."""
     if not positions:
@@ -132,8 +177,8 @@ def runs(positions):
 
 
 def _finding(departures):
-    """One sentence per event. The reference figure is deliberately absent: it is void, not zero."""
-    return ["%s: %d rows left as %s." % (d["at"], d["rows_left"], d["shape"])
+    """One sentence per event, named by the archive event rather than by a snapshot's mtime."""
+    return ["%s: %d rows, %s." % (d["archive_event"], d["rows_left"], d["shape"])
             for d in departures]
 
 
@@ -148,6 +193,9 @@ def main():
              time.strftime("%Y-%m-%d", time.localtime(snaps[-1][0]))))
 
     parsed = [(t, n, rows_of(p)) for t, n, p in snaps]
+    global EVENTS
+    EVENTS = archive_events()
+    print("  %d dated sections in the archive\n" % len(EVENTS))
     ok, checks = True, []
 
     def check(name, cond, got=""):
@@ -182,23 +230,42 @@ def main():
         referenced = sum(1 for s in gone if refs[s])
         # Kept for the receipt, but the verdict on it is VOID: see the positive control below, and
         # section 2 of the docstring. A flat index gives this nothing to count.
+        # WHICH EVENT IS THIS? Matched by slug set against the archive's own dated sections. The
+        # snapshot mtime says when the pair was OBSERVED, never when the rows left.
+        overlaps = sorted(((len(set(gone) & sl), h) for h, sl in EVENTS.items()), reverse=True)
+        top_n, top_h = overlaps[0] if overlaps else (0, "no archive section matches")
+        purity = top_n / float(len(gone))
         departures.append({
             "from": n0, "to": n1,
-            "at": time.strftime("%Y-%m-%d %H:%M", time.localtime(t1)),
+            "observed_between": "%s and %s" % (
+                time.strftime("%Y-%m-%d %H:%M", time.localtime(t0)),
+                time.strftime("%Y-%m-%d %H:%M", time.localtime(t1))),
+            "archive_event": top_h,
+            "rows_of_this_event_seen": "%d of %d" % (top_n, len(gone)),
+            "purity": round(purity, 3),
+            "is_one_event": purity >= MIN_PURITY,
             "rows_left": len(gone), "rows_before": len(r0), "rows_after": len(r1),
             "runs": len(rr), "largest_run": max(b - a + 1 for a, b in rr),
             "reaches_the_file_end": touches_tail,
             "referenced_by_another_row_when_it_left": referenced,
-            "shape": ("one block at the end, a window ending" if len(rr) == 1 and touches_tail
-                      else "one block, not at the end" if len(rr) == 1
-                      else "scattered, %d separate runs" % len(rr)),
+            # A BLEND GETS NO SHAPE. Its run count spans several decisions, so naming a shape for
+            # it would attribute one pattern to three separate judgements.
+            "shape": (("one block at the end, a window ending" if len(rr) == 1 and touches_tail
+                       else "one block, not at the end" if len(rr) == 1
+                       else "scattered, %d separate runs" % len(rr))
+                      if purity >= MIN_PURITY else
+                      "WITHHELD: %d%% of one event, so the runs span several decisions"
+                      % round(purity * 100)),
             "slugs": sorted(gone)[:60]})
 
-    print("  %-19s %5s %5s %6s %s"
-          % ("when", "left", "runs", "biggest", "shape"))
+    print("  %-58s %5s %5s %s" % ("archive event the transition contains", "left", "runs", "shape"))
     for d in departures:
-        print("  %-19s %5d %5d %6d %s"
-              % (d["at"], d["rows_left"], d["runs"], d["largest_run"], d["shape"]))
+        print("  %-58s %5d %5d %s"
+              % (d["archive_event"][:58], d["rows_left"], d["runs"], d["shape"]))
+    print()
+    for d in departures:
+        print("    observed between %s   %s of its rows   purity %.0f%%"
+              % (d["observed_between"], d["rows_of_this_event_seen"], d["purity"] * 100))
 
     # 3. Returns: a row absent in one snapshot and present in a later one. Walk the series once,
     # remembering what went missing, and record the first snapshot that has it back.
@@ -231,14 +298,23 @@ def main():
     # last event independently at 54 rows.
     dated = [(n, DATE_IN_NAME.search(n).group(1)) for _, n, _ in parsed if DATE_IN_NAME.search(n)]
     repeated = len(dated) - len({d for _, d in dated})
+    # THIS CONTROL FIRED CORRECTLY AND WAS READ BACKWARDS. "54 rows agrees with the archive probe"
+    # was taken as corroboration of the label; it was evidence that the last transition IS the
+    # 2026-09-04 event, which is the defect the labels above now fix. Kept, restated.
     last = departures[-1] if departures else {}
-    check("CONTROL_agrees_with_the_archive_probe_on_the_last_event",
-          last.get("rows_left") == 54,
-          "this reader: %s rows; the archive probe measured 54" % last.get("rows_left"))
-    check("CONTROL_filename_dates_are_NOT_used_for_order",
-          repeated > 0,
-          "%d of %d dated filenames repeat a date, so mtime is the only ordering available"
-          % (repeated, len(dated)))
+    check("CONTROL_the_last_transition_is_the_09_04_event_not_a_09_08_one",
+          last.get("rows_left") == 54 and "2026-09-04" in last.get("archive_event", ""),
+          "%s rows, matched to %r" % (last.get("rows_left"), last.get("archive_event", "")[:52]))
+    # The old version counted repeated dates, which is not the property it named. A real
+    # filename-versus-mtime disagreement is the thing that would break an ordering by filename.
+    disagree = [(n, DATE_IN_NAME.search(n).group(1),
+                 time.strftime("%Y%m%d", time.localtime(t)))
+                for t, n, _ in parsed if DATE_IN_NAME.search(n)
+                and DATE_IN_NAME.search(n).group(1) != time.strftime("%Y%m%d", time.localtime(t))]
+    check("CONTROL_a_filename_date_really_does_disagree_with_its_mtime",
+          bool(disagree),
+          "%d of %d dated files disagree, e.g. %s" % (len(disagree), len(dated),
+                                                      disagree[0] if disagree else "-"))
     check("CONTROL_at_least_one_row_is_seen_leaving",
           bool(departures), "%d transitions removed rows" % len(departures))
     # COVERAGE, not completeness. The archive records 7 retirement events; this series shows 4
@@ -280,6 +356,22 @@ def main():
     spread = {d["shape"].split(",")[0] for d in departures}
     check("CONTROL_the_discriminator_separates_at_least_two_shapes",
           len(spread) > 1, sorted(spread))
+    # A transition that blends events must be visibly excluded, or the eligibility rule is decoration.
+    check("CONTROL_a_blended_transition_has_its_shape_WITHHELD",
+          any(not d["is_one_event"] for d in departures)
+          and all(d["shape"].startswith("WITHHELD") for d in departures if not d["is_one_event"]),
+          [(d["archive_event"][:34], d["purity"]) for d in departures if not d["is_one_event"]])
+    # THE NUMBER THAT KEEPS THE VOID HONEST. Index-internal references are zero; note-level ones are
+    # not, and a void verdict without this reads as "nothing pointed at these rows".
+    retired = set()
+    for h, sl in EVENTS.items():
+        if "NEVER IN THE LIVE INDEX" not in h:
+            retired |= sl
+    wl_hit, wl_total = wikilink_referenced(retired)
+    check("CONTROL_note_level_references_are_reported_not_omitted",
+          wl_total > 0,
+          "%d of %d retired rows are cited by a [[wikilink]] in some note today, which is undated"
+          % (wl_hit, wl_total))
 
     out = {"probe": os.path.basename(__file__), "memory_dir": MEM,
            "snapshots": len(parsed), "departures": departures, "returns": returns,

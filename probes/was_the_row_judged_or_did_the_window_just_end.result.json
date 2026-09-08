@@ -6,7 +6,11 @@
   {
    "from": "MEMORY.md.bak-20260817",
    "to": "MEMORY.md.bak-20260819-precrowdfix",
-   "at": "2026-08-19 14:26",
+   "observed_between": "2026-08-17 19:26 and 2026-08-19 14:26",
+   "archive_event": "Moved from the index 2026-08-17 (the index had reached the read limit)",
+   "rows_of_this_event_seen": "40 of 40",
+   "purity": 1.0,
+   "is_one_event": true,
    "rows_left": 40,
    "rows_before": 251,
    "rows_after": 228,
@@ -61,7 +65,11 @@
   {
    "from": "MEMORY.md.bak-20260822-preindextrim",
    "to": "MEMORY.md.bak-20260826-084608",
-   "at": "2026-08-26 08:46",
+   "observed_between": "2026-08-22 21:37 and 2026-08-26 08:46",
+   "archive_event": "Rotated out of the index 2026-08-22 (byte cap, not staleness)",
+   "rows_of_this_event_seen": "18 of 18",
+   "purity": 1.0,
+   "is_one_event": true,
    "rows_left": 18,
    "rows_before": 247,
    "rows_after": 246,
@@ -94,7 +102,11 @@
   {
    "from": "MEMORY.md.bak-20260826-084608",
    "to": "MEMORY.md.bak-20260904-pretrim",
-   "at": "2026-09-04 20:43",
+   "observed_between": "2026-08-26 08:46 and 2026-09-04 20:43",
+   "archive_event": "Demoted from the index 2026-08-26, to fit the loader window",
+   "rows_of_this_event_seen": "19 of 35",
+   "purity": 0.543,
+   "is_one_event": false,
    "rows_left": 35,
    "rows_before": 246,
    "rows_after": 258,
@@ -102,7 +114,7 @@
    "largest_run": 33,
    "reaches_the_file_end": false,
    "referenced_by_another_row_when_it_left": 0,
-   "shape": "scattered, 2 separate runs",
+   "shape": "WITHHELD: 54% of one event, so the runs span several decisions",
    "slugs": [
     "a-causal-claim-has-no-receipt.md",
     "a-cherry-pick-from-a-behind-branch-reverts-the-page.md",
@@ -144,10 +156,14 @@
   {
    "from": "MEMORY.md.bak-20260904-pretrim",
    "to": "MEMORY.md",
-   "at": "2026-09-08 12:09",
+   "observed_between": "2026-09-04 20:43 and 2026-09-08 17:45",
+   "archive_event": "Demoted from the index 2026-09-04, to fit the loader window",
+   "rows_of_this_event_seen": "53 of 54",
+   "purity": 0.981,
+   "is_one_event": true,
    "rows_left": 54,
    "rows_before": 258,
-   "rows_after": 226,
+   "rows_after": 225,
    "runs": 13,
    "largest_run": 22,
    "reaches_the_file_end": true,
@@ -215,20 +231,20 @@
   {
    "slug": "the-index-we-optimised-was-truncated-before-it-was-read.md",
    "left_before": "2026-09-04 20:43",
-   "back_at": "2026-09-08 12:09",
+   "back_at": "2026-09-08 17:45",
    "back_in": "MEMORY.md"
   }
  ],
  "checks": [
   {
-   "check": "CONTROL_agrees_with_the_archive_probe_on_the_last_event",
+   "check": "CONTROL_the_last_transition_is_the_09_04_event_not_a_09_08_one",
    "pass": true,
-   "got": "this reader: 54 rows; the archive probe measured 54"
+   "got": "54 rows, matched to 'Demoted from the index 2026-09-04, to fit the loader'"
   },
   {
-   "check": "CONTROL_filename_dates_are_NOT_used_for_order",
+   "check": "CONTROL_a_filename_date_really_does_disagree_with_its_mtime",
    "pass": true,
-   "got": "18 of 25 dated filenames repeat a date, so mtime is the only ordering available"
+   "got": "14 of 25 dated files disagree, e.g. ('MEMORY.md.bak-20260819-prewindowfit-3', '20260819', '20260820')"
   },
   {
    "check": "CONTROL_at_least_one_row_is_seen_leaving",
@@ -258,15 +274,25 @@
   {
    "check": "CONTROL_the_discriminator_separates_at_least_two_shapes",
    "pass": true,
-   "got": "['one block', 'scattered']"
+   "got": "['WITHHELD: 54% of one event', 'one block', 'scattered']"
+  },
+  {
+   "check": "CONTROL_a_blended_transition_has_its_shape_WITHHELD",
+   "pass": true,
+   "got": "[('Demoted from the index 2026-08-26,', 0.543)]"
+  },
+  {
+   "check": "CONTROL_note_level_references_are_reported_not_omitted",
+   "pass": true,
+   "got": "122 of 196 retired rows are cited by a [[wikilink]] in some note today, which is undated"
   }
  ],
  "all_passed": true,
  "finding": [
-  "2026-08-19 14:26: 40 rows left as one block, not at the end.",
-  "2026-08-26 08:46: 18 rows left as scattered, 2 separate runs.",
-  "2026-09-04 20:43: 35 rows left as scattered, 2 separate runs.",
-  "2026-09-08 12:09: 54 rows left as scattered, 13 separate runs."
+  "Moved from the index 2026-08-17 (the index had reached the read limit): 40 rows, one block, not at the end.",
+  "Rotated out of the index 2026-08-22 (byte cap, not staleness): 18 rows, scattered, 2 separate runs.",
+  "Demoted from the index 2026-08-26, to fit the loader window: 35 rows, WITHHELD: 54% of one event, so the runs span several decisions.",
+  "Demoted from the index 2026-09-04, to fit the loader window: 54 rows, scattered, 13 separate runs."
  ],
  "reference_measure_verdict": "VOID. Zero cross-line references exist anywhere in the 26 snapshots, so the counter never had a target. An injected reference IS found, so the absence is a property of the index rather than of the instrument.",
  "scope": "References are counted from INSIDE the index only. Note files are not versioned, so a [[link]] in a note today cannot be dated to the retirement. This is index-level reference at retirement time, not the full false-retirement rate."
