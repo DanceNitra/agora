@@ -1,0 +1,69 @@
+{
+ "probe": "a_retired_row_that_comes_back_is_the_cap_charging_twice.py",
+ "memory_dir": "C:\\Users\\Danculus/.claude/projects/C--Users-Danculus-agora/memory",
+ "snapshots": 26,
+ "cohorts": [
+  {
+   "from": "2026-08-17 19:26",
+   "to": "2026-08-19 14:26",
+   "rows_left": 40,
+   "snapshots_after": 24,
+   "returned": 0,
+   "returned_slugs": []
+  },
+  {
+   "from": "2026-08-22 21:37",
+   "to": "2026-08-26 08:46",
+   "rows_left": 18,
+   "snapshots_after": 2,
+   "returned": 0,
+   "returned_slugs": []
+  },
+  {
+   "from": "2026-08-26 08:46",
+   "to": "2026-09-04 20:43",
+   "rows_left": 35,
+   "snapshots_after": 1,
+   "returned": 1,
+   "returned_slugs": [
+    "the-index-we-optimised-was-truncated-before-it-was-read"
+   ]
+  },
+  {
+   "from": "2026-09-04 20:43",
+   "to": "2026-09-08 17:45",
+   "rows_left": 54,
+   "snapshots_after": 0,
+   "returned": 0,
+   "returned_slugs": []
+  }
+ ],
+ "rows_with_a_window": 93,
+ "returned": 1,
+ "rate_percent": 1.08,
+ "checks": [
+  {
+   "check": "CONTROL_the_reader_finds_at_least_one_return",
+   "pass": true,
+   "got": "1 found; a zero here would not be distinguishable from a blind reader"
+  },
+  {
+   "check": "CONTROL_a_slug_in_no_snapshot_counts_zero",
+   "pass": true,
+   "got": ""
+  },
+  {
+   "check": "CONTROL_every_cohort_states_its_own_window",
+   "pass": true,
+   "got": "4 cohorts, 1 of them blind"
+  },
+  {
+   "check": "CONTROL_the_largest_window_is_on_the_oldest_cohort",
+   "pass": true,
+   "got": "oldest has 24"
+  }
+ ],
+ "all_passed": true,
+ "finding": "Across the cohorts that have any later snapshot, 1 of 93 retired rows reappear in the live index, a rate of 1.1%. The strongest arm is the oldest: 40 rows against 24 later snapshots, with 0 returns. The cohort asked about, the rows that left at the most recent transition, has no later snapshot at all, so for them the metric is absent rather than low, and becomes answerable at the next trim.",
+ "scope": "Matching is by slug. A row rewritten under a new name is not caught, so this is a lower bound on re-creation rather than an estimate of it."
+}
