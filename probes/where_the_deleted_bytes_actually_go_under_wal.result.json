@@ -7,9 +7,10 @@
  "rows": 30,
  "arms": [
   {
-   "arm": "DELETE only",
+   "arm": "closed: DELETE only",
    "steps": [],
    "secure_delete": false,
+   "connection_closed_before_reading": true,
    "positive_control": true,
    "negative_control": 0,
    "rows_after": 0,
@@ -19,20 +20,89 @@
     "-shm": 0
    },
    "after": {
-    "db": 0,
-    "-wal": 60,
-    "-shm": 0
+    "db": 30,
+    "-wal": null,
+    "-shm": null
    },
+   "wal_survived": false,
    "residue": [
-    "-wal"
+    "db"
    ]
   },
   {
-   "arm": "DELETE + VACUUM",
+   "arm": "closed: DELETE + VACUUM",
    "steps": [
     "VACUUM"
    ],
    "secure_delete": false,
+   "connection_closed_before_reading": true,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": null,
+    "-shm": null
+   },
+   "wal_survived": false,
+   "residue": []
+  },
+  {
+   "arm": "closed: DELETE + checkpoint",
+   "steps": [
+    "PRAGMA wal_checkpoint(TRUNCATE)"
+   ],
+   "secure_delete": false,
+   "connection_closed_before_reading": true,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 30,
+    "-wal": null,
+    "-shm": null
+   },
+   "wal_survived": false,
+   "residue": [
+    "db"
+   ]
+  },
+  {
+   "arm": "closed: secure_delete + DELETE",
+   "steps": [],
+   "secure_delete": true,
+   "connection_closed_before_reading": true,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": null,
+    "-shm": null
+   },
+   "wal_survived": false,
+   "residue": []
+  },
+  {
+   "arm": "held open: DELETE only",
+   "steps": [],
+   "secure_delete": false,
+   "connection_closed_before_reading": false,
    "positive_control": true,
    "negative_control": 0,
    "rows_after": 0,
@@ -46,16 +116,43 @@
     "-wal": 60,
     "-shm": 0
    },
+   "wal_survived": true,
    "residue": [
     "-wal"
    ]
   },
   {
-   "arm": "DELETE + wal_checkpoint(TRUNCATE)",
+   "arm": "held open: DELETE + VACUUM",
+   "steps": [
+    "VACUUM"
+   ],
+   "secure_delete": false,
+   "connection_closed_before_reading": false,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": 60,
+    "-shm": 0
+   },
+   "wal_survived": true,
+   "residue": [
+    "-wal"
+   ]
+  },
+  {
+   "arm": "held open: DELETE + checkpoint",
    "steps": [
     "PRAGMA wal_checkpoint(TRUNCATE)"
    ],
    "secure_delete": false,
+   "connection_closed_before_reading": false,
    "positive_control": true,
    "negative_control": 0,
    "rows_after": 0,
@@ -69,53 +166,10 @@
     "-wal": 0,
     "-shm": 0
    },
+   "wal_survived": false,
    "residue": [
     "db"
    ]
-  },
-  {
-   "arm": "DELETE + VACUUM + checkpoint",
-   "steps": [
-    "VACUUM",
-    "PRAGMA wal_checkpoint(TRUNCATE)"
-   ],
-   "secure_delete": false,
-   "positive_control": true,
-   "negative_control": 0,
-   "rows_after": 0,
-   "before": {
-    "db": 0,
-    "-wal": 30,
-    "-shm": 0
-   },
-   "after": {
-    "db": 0,
-    "-wal": 0,
-    "-shm": 0
-   },
-   "residue": []
-  },
-  {
-   "arm": "secure_delete + DELETE + both",
-   "steps": [
-    "VACUUM",
-    "PRAGMA wal_checkpoint(TRUNCATE)"
-   ],
-   "secure_delete": true,
-   "positive_control": true,
-   "negative_control": 0,
-   "rows_after": 0,
-   "before": {
-    "db": 0,
-    "-wal": 30,
-    "-shm": 0
-   },
-   "after": {
-    "db": 0,
-    "-wal": 0,
-    "-shm": 0
-   },
-   "residue": []
   }
  ],
  "checks": [
@@ -135,31 +189,41 @@
    "got": ""
   },
   {
-   "check": "DELETE_alone_leaves_every_copy_in_the_wal",
+   "check": "CONTROL_no_wal_survives_a_closed_connection",
    "pass": true,
-   "got": "{'db': 0, '-wal': 60, '-shm': 0}"
+   "got": "closing the last WAL connection checkpoints and unlinks the sidecar"
   },
   {
-   "check": "VACUUM_does_not_touch_the_wal",
+   "check": "CONTROL_a_held_open_connection_DOES_leave_one",
    "pass": true,
-   "got": "a vacuum rewrites the database, not the log"
+   "got": "so the two lifecycles are genuinely different states, not a labelling difference"
   },
   {
-   "check": "A_CHECKPOINT_ALONE_MOVES_IT_INTO_THE_DATABASE",
+   "check": "CLOSED_delete_alone_leaves_the_bytes_in_the_database",
    "pass": true,
-   "got": "{'db': 30, '-wal': 0, '-shm': 0}"
+   "got": "{'db': 30, '-wal': None, '-shm': None}"
   },
   {
-   "check": "only_vacuum_AND_checkpoint_clears_both",
+   "check": "CLOSED_and_a_VACUUM_clears_them",
    "pass": true,
-   "got": "{'db': 0, '-wal': 0, '-shm': 0}"
+   "got": "{'db': 0, '-wal': None, '-shm': None}"
   },
   {
-   "check": "secure_delete_also_clears_it",
+   "check": "CLOSED_a_checkpoint_alone_does_not",
    "pass": true,
-   "got": ""
+   "got": "a checkpoint moves the log into the database; it clears nothing"
+  },
+  {
+   "check": "CLOSED_secure_delete_alone_also_clears_them",
+   "pass": true,
+   "got": "{'db': 0, '-wal': None, '-shm': None}"
+  },
+  {
+   "check": "HELD_OPEN_gives_a_different_answer",
+   "pass": true,
+   "got": "a VACUUM looks insufficient with the connection open and sufficient once it closes"
   }
  ],
  "all_passed": true,
- "note": "One filesystem, one SQLite build, one page size, payloads small enough to stay in the b-tree. secure_delete is off by default and changes the answer."
+ "note": "One filesystem, one SQLite build, one page size, payloads small enough to stay in the b-tree. secure_delete is off by default and changes the answer. The first version of this probe held one connection open for every arm and reported that a VACUUM was insufficient; that state does not occur in a client that opens and closes per operation, which is why both lifecycles are measured here."
 }

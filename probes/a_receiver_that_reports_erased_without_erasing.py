@@ -199,33 +199,56 @@ class OutboxTarget(ErasureTarget):
     """
     name = "connector-outbox"
 
-    def __init__(self, db_path, can_delete):
+    def __init__(self, db_path, can_delete, vacuum=False):
         self.db_path = db_path
         self.can_delete = can_delete
+        self.vacuum = vacuum
 
     def _rows(self, subject):
+        """Closes the connection. `with sqlite3.connect(...)` commits and does NOT close, so this
+        left a handle open, the `-wal` stayed on disk with the deleted payload in it, and the
+        file-reading check that replaced the SELECT then reported the value still recoverable after
+        a VACUUM that had actually worked. Third instance tonight of an answer that changed with the
+        connection's lifetime."""
         import sqlite3
-        with sqlite3.connect(self.db_path) as c:
+        c = sqlite3.connect(self.db_path)
+        try:
             return [(r[0], bytes(r[1])) for r in
                     c.execute("SELECT source_id, payload FROM producer_outbox").fetchall()
                     if subject.encode("utf-8") in bytes(r[1])]
+        finally:
+            c.close()
 
     def erase(self, subject):
         hit = self._rows(subject)
         if self.can_delete:
             import sqlite3
-            with sqlite3.connect(self.db_path) as c:
-                c.executemany("DELETE FROM producer_outbox WHERE source_id=?",
-                              [(sid,) for sid, _ in hit])
+            c = sqlite3.connect(self.db_path)
+            c.executemany("DELETE FROM producer_outbox WHERE source_id=?",
+                          [(sid,) for sid, _ in hit])
+            c.commit()
+            if self.vacuum:
+                c.execute("VACUUM")
                 c.commit()
+            c.close()          # the client's own lifecycle: the connection does not stay open
         return {"erased": len(hit)}
 
     def still_recoverable(self, subject, values):
-        blob = b" ".join(p for _, p in self._rows(subject))
+        """Read the FILE, not the table.
+
+        This asked the table first, so a DELETE emptied the rows, the check answered clean, and the
+        arm that proposed a delete path passed while the payload bytes were still in the database
+        file. That is the failure this probe exists to name, performed by this probe.
+        """
+        blob = b""
+        for sfx in ("", "-wal", "-shm"):
+            f = self.db_path + sfx
+            if os.path.exists(f):
+                blob += open(f, "rb").read()
         return any(v and v.encode("utf-8") in blob for v in values)
 
 
-def run_outbox_arm(can_delete):
+def run_outbox_arm(can_delete, vacuum=False):
     """Send one record carrying the secret through his real client, then try to erase it."""
     import sys as _sys
     for cand in (os.path.join(CONNECTOR, "src"), CONNECTOR):
@@ -257,7 +280,7 @@ def run_outbox_arm(can_delete):
 
     m = DeletionManifest()
     m.register(make_target(port, "receiver-that-deletes"))
-    target = OutboxTarget(db, can_delete)
+    target = OutboxTarget(db, can_delete, vacuum)
     m.register(target)
     out = m.execute(SUBJECT, [SECRET], request_id="REQ-001", basis="GDPR Art.17",
                     authorized_by="data-subject")
@@ -342,26 +365,39 @@ def main():
     # memory stores is still in the queue that sent it.
     as_shipped = run_outbox_arm(can_delete=False)
     with_delete = run_outbox_arm(can_delete=True)
-    if as_shipped is None or with_delete is None:
+    with_vacuum = run_outbox_arm(can_delete=True, vacuum=True)
+    if as_shipped is None or with_delete is None or with_vacuum is None:
         print("\n  outbox arms SKIPPED: his client is not importable here")
     else:
         print("\n  D  outbox as shipped, no delete path: complete=%s residual=%s  secret still in queue=%s"
               % (as_shipped["manifest"].get("complete"), as_shipped["manifest"].get("residual_targets"), as_shipped["still_there"]))
-        print("  E  outbox with the delete path:      complete=%s residual=%s  secret still in queue=%s"
+        print("  E  delete only:                      complete=%s residual=%s  secret still in queue=%s"
               % (with_delete["manifest"].get("complete"), with_delete["manifest"].get("residual_targets"), with_delete["still_there"]))
+        print("  F  delete + VACUUM:                  complete=%s residual=%s  secret still in queue=%s"
+              % (with_vacuum["manifest"].get("complete"), with_vacuum["manifest"].get("residual_targets"), with_vacuum["still_there"]))
         check("D_the_record_reached_the_receiver", as_shipped["delivered"], as_shipped["delivered"])
         check("D_OUR_OWN_OUTBOX_LEAKS_and_is_named",
               as_shipped["manifest"].get("complete") is False
               and "connector-outbox" in (as_shipped["manifest"].get("residual_targets") or [])
               and as_shipped["still_there"] is True,
               as_shipped["manifest"].get("residual_targets"))
-        check("E_the_proposed_delete_path_closes_it",
-              with_delete["manifest"].get("complete") is True
-              and not with_delete["manifest"].get("residual_targets") and with_delete["still_there"] is False,
-              with_delete["manifest"].get("complete"))
-        check("CONTROL_D_and_E_differ_only_by_the_delete_path",
-              as_shipped["manifest"].get("complete") != with_delete["manifest"].get("complete"),
-              "so D is a measurement, not a broken target")
+        # A DELETE ALONE DOES NOT CLOSE IT, and the first version of this check said it did
+        # because the target asked the table. Reading the file, the bytes are still there.
+        check("E_a_delete_alone_does_NOT_close_it",
+              with_delete["manifest"].get("complete") is False
+              and with_delete["still_there"] is True,
+              "the rows are gone and the bytes are not")
+        check("F_a_delete_plus_VACUUM_does",
+              with_vacuum["manifest"].get("complete") is True
+              and with_vacuum["still_there"] is False,
+              "so the check got stricter rather than unpassable")
+        # THE CONTROL MOVED WITH THE FINDING. It used to compare D against E, when E was expected
+        # to pass; now a delete alone leaks too, so both are False and comparing them proves
+        # nothing. F is the arm that can differ, so the control is D against F: something CAN
+        # close this, which is what makes D and E measurements rather than a broken target.
+        check("CONTROL_something_CAN_close_it_so_D_and_E_are_measurements",
+              as_shipped["manifest"].get("complete") != with_vacuum["manifest"].get("complete"),
+              "D leaks, F does not, and only the VACUUM separates them")
 
     # THE WIRE-FORMAT GAP, stated as narrowly as it is true.
     store = Inspeximus(os.path.join(tempfile.mkdtemp(prefix="erasure-handle-"), "store.json"))
@@ -397,8 +433,11 @@ def main():
                                            "residual_targets": as_shipped["manifest"].get("residual_targets"),
                                            "secret_still_in_queue": as_shipped["still_there"]},
                             "with_delete_path": {"complete": with_delete["manifest"].get("complete"),
-                                                 "secret_still_in_queue": with_delete["still_there"]}}
-                           if as_shipped and with_delete else None),
+                                                 "secret_still_in_queue": with_delete["still_there"]},
+                            "with_delete_and_vacuum": {
+                                "complete": with_vacuum["manifest"].get("complete"),
+                                "secret_still_in_queue": with_vacuum["still_there"]}}
+                           if as_shipped and with_delete and with_vacuum else None),
            "not_covered_by_still_recoverable": [
                "a value surviving in an embedding", "a response or retrieval cache",
                "freed database pages before a vacuum",

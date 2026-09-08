@@ -1,35 +1,29 @@
-"""A DELETE moves the bytes; it does not remove them. Under WAL, neither VACUUM nor a checkpoint alone.
+"""Where do deleted bytes go, and does it matter whether the connection is still open? It does.
 
-WHY THIS EXISTS. A reply to a collaborator was about to say "a DELETE leaves the secret in the
-database until a VACUUM". That sentence is wrong twice for the client under discussion, and the
-severe-test rule says a claim ships only with a runnable measurement, so here it is.
+WHY THIS EXISTS, and why its first version was wrong. It was written to correct a sentence saying "a
+DELETE leaves the secret in the database until a VACUUM". The first version reported something more
+elaborate: every copy in the `-wal` sidecar, a VACUUM that does not touch it, a checkpoint that moves
+the bytes into the durable file. That was measured with ONE CONNECTION HELD OPEN for the whole arm.
 
-The client sets `PRAGMA journal_mode=WAL` and `PRAGMA synchronous=FULL`. Under those settings the
-payload never reaches the main database file at all while the WAL is unchecked, and the two obvious
-remedies each fix half the problem:
+The client this is about never does that. Its `_connect` is a context manager that opens, acts and
+closes, and closing the last WAL connection checkpoints and unlinks the `-wal`. Between operations
+there is no sidecar at all. So the elaborate answer described a state that deployment never reaches,
+and the plain sentence it set out to correct was right.
 
-  DELETE only                  the rows are gone from every query, and every copy is in the -wal
-  DELETE + VACUUM              still in the -wal. A vacuum rewrites the database, not the log.
-  DELETE + checkpoint          now in the .db instead. The checkpoint MOVED it into the durable file.
-  DELETE + VACUUM + checkpoint gone from both
+Both are measured here, because the gap between them IS the finding:
 
-So a caller who runs one of them and checks with a query gets a clean answer and a file that still
-holds the data. That is the failure this probe exists to name, and it is the same shape as the check
-that motivated it: `still_recoverable` runs a SELECT, so it reports a row gone while the bytes stay
-on disk.
+  HELD OPEN   what a caller sees who keeps one connection for the life of a process
+  CLOSED      what a caller sees who opens and closes per operation, as that client does
 
-CONTROLS, because a byte-counting probe is easy to write blind:
-  * a POSITIVE control on every arm: the canary must be present BEFORE the delete, or the arm proves
-    nothing and is reported void rather than passing;
-  * a NEGATIVE control: a string never written anywhere must count zero, or the counter is matching
-    something other than what it claims;
-  * `-shm` is counted too, so "we only looked where we expected it" cannot hide a copy;
-  * and the row count is asserted to reach zero, so an arm that failed to delete cannot pass as one
-    that deleted cleanly.
+CONTROLS. Every arm carries a positive control: the canary must be present before the delete, or the
+arm is void rather than passing. A negative control string never written must count zero. `-shm` is
+counted too, so "we only looked where we expected it" cannot hide a copy. The row count must reach
+zero, so an arm that failed to delete cannot pass as one that deleted cleanly. And the closed arms
+assert that no `-wal` survives, which is the property whose absence made the first version wrong.
 
 WHAT THIS DOES NOT SHOW. One filesystem, one SQLite build, one page size, and payloads small enough
-to live in the b-tree rather than on overflow pages. `secure_delete` is measured as a fifth arm
-because it changes the answer, and it is off by default.
+to stay in the b-tree rather than spill to overflow pages. `secure_delete` is measured because it
+changes the answer and is off by default.
 """
 import json
 import os
@@ -48,11 +42,19 @@ def files_of(p):
 
 
 def counts(p, needle=CANARY):
-    return {k: v.count(needle) for k, v in files_of(p).items()}
+    """None where a file does not exist, which is different from zero copies in it."""
+    return {(sfx or "db"): (open(p + sfx, "rb").read().count(needle)
+                            if os.path.exists(p + sfx) else None)
+            for sfx in ("", "-wal", "-shm")}
 
 
-def arm(label, steps, secure_delete=False):
-    """One deletion strategy, with its own positive control."""
+def arm(label, steps, secure_delete=False, close_first=True):
+    """One deletion strategy, with its own positive control.
+
+    `close_first` is the whole point. True closes the connection before the files are read, which is
+    what a client that opens and closes per operation produces. False reads them with the connection
+    still open, which is what the first version of this probe did and why it got the answer wrong.
+    """
     p = os.path.join(tempfile.mkdtemp(prefix="wal-residue-"), "t.db")
     c = sqlite3.connect(p)
     if secure_delete:
@@ -67,34 +69,46 @@ def arm(label, steps, secure_delete=False):
     c.commit()
 
     before = counts(p)
-    negative = sum(counts(p, NEVER).values())
+    negative = sum(v for v in counts(p, NEVER).values() if v)
     c.execute("DELETE FROM producer_outbox")
     c.commit()
     for st in steps:
         c.execute(st)
         c.commit()
-    after = counts(p)
     left = c.execute("SELECT COUNT(*) FROM producer_outbox").fetchone()[0]
-    c.close()
+    if close_first:
+        c.close()
+        after = counts(p)
+    else:
+        after = counts(p)
+        c.close()
 
     return {"arm": label, "steps": steps, "secure_delete": secure_delete,
-            "positive_control": sum(before.values()) > 0, "negative_control": negative,
+            "connection_closed_before_reading": close_first,
+            "positive_control": sum(v for v in before.values() if v) > 0, "negative_control": negative,
             "rows_after": left, "before": before, "after": after,
+            "wal_survived": bool(after["-wal"]),
             "residue": sorted(k for k, v in after.items() if v)}
 
 
 def main():
     arms = [
-        arm("DELETE only", []),
-        arm("DELETE + VACUUM", ["VACUUM"]),
-        arm("DELETE + wal_checkpoint(TRUNCATE)", ["PRAGMA wal_checkpoint(TRUNCATE)"]),
-        arm("DELETE + VACUUM + checkpoint", ["VACUUM", "PRAGMA wal_checkpoint(TRUNCATE)"]),
-        arm("secure_delete + DELETE + both", ["VACUUM", "PRAGMA wal_checkpoint(TRUNCATE)"], True),
+        # CLOSED: the lifecycle a client that opens and closes per operation actually produces.
+        arm("closed: DELETE only", []),
+        arm("closed: DELETE + VACUUM", ["VACUUM"]),
+        arm("closed: DELETE + checkpoint", ["PRAGMA wal_checkpoint(TRUNCATE)"]),
+        arm("closed: secure_delete + DELETE", [], True),
+        # HELD OPEN: what the first version of this probe measured, kept so the gap is visible.
+        arm("held open: DELETE only", [], close_first=False),
+        arm("held open: DELETE + VACUUM", ["VACUUM"], close_first=False),
+        arm("held open: DELETE + checkpoint", ["PRAGMA wal_checkpoint(TRUNCATE)"], close_first=False),
     ]
-    print("\n  %-36s %-28s %s" % ("arm", "copies left", "where"))
+    print("\n  %-36s %-30s %s" % ("arm", "copies left", "where"))
     for a in arms:
-        print("  %-36s %-28s %s"
-              % (a["arm"], "db=%(db)d wal=%(-wal)d shm=%(-shm)d" % a["after"],
+        print("  %-36s %-30s %s"
+              % (a["arm"],
+                 "db=%s wal=%s shm=%s" % tuple("-" if a["after"][k] is None else a["after"][k]
+                                               for k in ("db", "-wal", "-shm")),
                  ", ".join(a["residue"]) or "NONE"))
 
     ok, checks = True, []
@@ -115,26 +129,38 @@ def main():
           all(a["rows_after"] == 0 for a in arms))
 
     by = {a["arm"]: a for a in arms}
-    check("DELETE_alone_leaves_every_copy_in_the_wal",
-          by["DELETE only"]["after"]["-wal"] > 0 and by["DELETE only"]["after"]["db"] == 0,
-          by["DELETE only"]["after"])
-    check("VACUUM_does_not_touch_the_wal",
-          by["DELETE + VACUUM"]["after"]["-wal"] > 0,
-          "a vacuum rewrites the database, not the log")
-    check("A_CHECKPOINT_ALONE_MOVES_IT_INTO_THE_DATABASE",
-          by["DELETE + wal_checkpoint(TRUNCATE)"]["after"]["db"] > 0
-          and by["DELETE + wal_checkpoint(TRUNCATE)"]["after"]["-wal"] == 0,
-          by["DELETE + wal_checkpoint(TRUNCATE)"]["after"])
-    check("only_vacuum_AND_checkpoint_clears_both",
-          not by["DELETE + VACUUM + checkpoint"]["residue"],
-          by["DELETE + VACUUM + checkpoint"]["after"])
-    check("secure_delete_also_clears_it",
-          not by["secure_delete + DELETE + both"]["residue"])
+    check("CONTROL_no_wal_survives_a_closed_connection",
+          not any(a["wal_survived"] for a in arms if a["connection_closed_before_reading"]),
+          "closing the last WAL connection checkpoints and unlinks the sidecar")
+    check("CONTROL_a_held_open_connection_DOES_leave_one",
+          any(a["wal_survived"] for a in arms if not a["connection_closed_before_reading"]),
+          "so the two lifecycles are genuinely different states, not a labelling difference")
+
+    check("CLOSED_delete_alone_leaves_the_bytes_in_the_database",
+          by["closed: DELETE only"]["after"]["db"] > 0,
+          by["closed: DELETE only"]["after"])
+    check("CLOSED_and_a_VACUUM_clears_them",
+          not by["closed: DELETE + VACUUM"]["residue"],
+          by["closed: DELETE + VACUUM"]["after"])
+    check("CLOSED_a_checkpoint_alone_does_not",
+          by["closed: DELETE + checkpoint"]["after"]["db"] > 0,
+          "a checkpoint moves the log into the database; it clears nothing")
+    check("CLOSED_secure_delete_alone_also_clears_them",
+          not by["closed: secure_delete + DELETE"]["residue"],
+          by["closed: secure_delete + DELETE"]["after"])
+
+    check("HELD_OPEN_gives_a_different_answer",
+          by["held open: DELETE + VACUUM"]["after"]["-wal"] > 0
+          and not by["closed: DELETE + VACUUM"]["residue"],
+          "a VACUUM looks insufficient with the connection open and sufficient once it closes")
 
     out = {"probe": os.path.basename(__file__), "pragmas": ["journal_mode=WAL", "synchronous=FULL"],
            "rows": ROWS, "arms": arms, "checks": checks, "all_passed": ok,
            "note": "One filesystem, one SQLite build, one page size, payloads small enough to stay "
-                   "in the b-tree. secure_delete is off by default and changes the answer."}
+                   "in the b-tree. secure_delete is off by default and changes the answer. The first "
+                   "version of this probe held one connection open for every arm and reported that a "
+                   "VACUUM was insufficient; that state does not occur in a client that opens and "
+                   "closes per operation, which is why both lifecycles are measured here."}
     path = os.path.splitext(os.path.abspath(__file__))[0] + ".result.json"
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(out, indent=1))
