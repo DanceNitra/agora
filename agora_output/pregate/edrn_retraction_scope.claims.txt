@@ -1,0 +1,13 @@
+Guanghao withdrew the section on involutive automorphism and complete E(s) curve degeneracy after an exhaustive search over connected graphs with N at most 6.
+His exhaustive check found 84 counterexample edge pairs across 142 graphs, 45 at a degenerate ground state and 39 at a non-degenerate one.
+In his figure 9, five nodes and six edges, two edges share the valley position, the gap and the reading at a non-degenerate ground state and still differ in depth.
+Sorting the correlation values discards the magnitudes the standard deviation is built from, so reading and mapping were never equivalent in general.
+The s=1 orbit result is a separate theorem whose premise is that at the uniform point every bond carries the same coupling, so H is invariant under the full automorphism group.
+Over every connected graph on 4, 5 and 6 vertices there are 1106 pairs of a graph and a contradiction edge.
+With one edge weighted differently, 851 of those 1106 pairs lose automorphisms and the same 851 gain edge orbits.
+398 of the 1106 pairs collapse to the trivial automorphism group.
+255 of the 1106 pairs keep the full automorphism group even with one edge weighted differently.
+The counterexamples are measured at valley bottoms where s is not 1, so in about three quarters of cases the symmetry the s=1 argument uses is not acting there.
+The random-graph control row needs the sector stated explicitly, since prepare_sector_operators uses N_up=7 which is S_z=-1/2.
+Every scan point must start from a fresh random vector, because continuation at k=1 let the scan leave the ground state.
+Where two sectors agree within the convergence tolerance the diagnostic is not defined by a single state and must be averaged over the degenerate manifold using the projector.
