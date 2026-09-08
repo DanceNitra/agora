@@ -76,8 +76,26 @@ def main():
     shared = [e for e in extra if e in line_of and line_of[e] in named_lines]
     check("15_shared_a_line_with_a_named_row",
           len(shared) == 15 and "15 shared a physical line" in draft, len(shared))
-    check("6_are_from_an_untraced_edit",
-          len(extra) - len(shared) == 6 and "remaining 6" in draft, len(extra) - len(shared))
+    # CORRECTED 2026-09-08. This was named `6_are_from_an_untraced_edit` and only counted to 6.
+    # It never looked at whether the six were traced, so it passed while the draft it guarded
+    # called them untraced. They are not: all six sit BELOW a dated note in the same archive
+    # section that gives the date, the cause (207 lines against a 200-line cap), the measuring
+    # probe and the criterion. The 2026-09-04 heading carries a second, later retirement event.
+    # A check that counts a set without testing the property claimed about it reports SAFE.
+    note = "retired 2026-09-07"
+    lines_of_sec = sec.splitlines()
+    note_at = next((i for i, l in enumerate(lines_of_sec) if note in l), None)
+    covered = set()
+    if note_at is not None:
+        covered = {os.path.splitext(os.path.basename(m))[0]
+                   for l in lines_of_sec[note_at:] for m in LINK.findall(l)
+                   if not is_index_file(m)}
+    remainder = set(extra) - set(shared)
+    check("6_are_a_second_dated_event_under_the_same_heading",
+          len(remainder) == 6 and remainder <= covered
+          and "second retirement" in draft.lower(),
+          "%d rows, %d of them under the %s note" % (len(remainder),
+                                                     len(remainder & covered), note))
 
     pos = sorted(ordinals[d] for d in T.DEMOTE if d in ordinals)
     runs, a, b = [], pos[0], pos[0]

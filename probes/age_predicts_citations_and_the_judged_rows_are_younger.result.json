@@ -1,0 +1,70 @@
+{
+ "probe": "age_predicts_citations_and_the_judged_rows_are_younger.py",
+ "memory_dir": "C:\\Users\\Danculus/.claude/projects/C--Users-Danculus-agora/memory",
+ "rows_with_an_age": 276,
+ "spearman_rho": 0.4598,
+ "spearman_p": 7.647800937780818e-16,
+ "median_age_days": {
+  "judged": 40.7,
+  "adjacency": 64.3
+ },
+ "unmatched": {
+  "gap": 2.5,
+  "p": 0.007299635018249088
+ },
+ "age_matched_band_days": [
+  16.6,
+  86.0
+ ],
+ "age_matched": {
+  "n_judged": 17,
+  "n_adjacency": 15,
+  "gap": 2,
+  "p": 0.14699265036748163
+ },
+ "checks": [
+  {
+   "check": "CONTROL_the_ages_are_not_a_constant",
+   "pass": true,
+   "got": "span 92 days across 82 distinct days"
+  },
+  {
+   "check": "CONTROL_a_shuffled_pairing_gives_no_correlation",
+   "pass": true,
+   "got": "shuffled rho = 0.003"
+  },
+  {
+   "check": "CONTROL_the_band_holds_both_groups",
+   "pass": true,
+   "got": "17 judged, 15 adjacency in the band"
+  },
+  {
+   "check": "CONTROL_the_band_removed_the_age_difference",
+   "pass": true,
+   "got": "median age gap 2.0 days in the band against 23.6 unmatched"
+  },
+  {
+   "check": "CONTROL_the_matched_test_can_still_reject",
+   "pass": true,
+   "got": "p = 0.0018 against the band's adjacency rows shifted by +4"
+  },
+  {
+   "check": "AGE_PREDICTS_CITATIONS",
+   "pass": true,
+   "got": "rho = 0.460"
+  },
+  {
+   "check": "THE_JUDGED_ROWS_ARE_YOUNGER",
+   "pass": true,
+   "got": "40.7 vs 64.3 days"
+  },
+  {
+   "check": "THE_GAP_IS_NOT_ROBUST_TO_AGE",
+   "pass": true,
+   "got": "matched p = 0.1470 against unmatched 0.0073"
+  }
+ ],
+ "all_passed": true,
+ "finding": "Age predicts citation count in this store: Spearman rho = 0.46 over 276 rows. The 32 rows the tool judged have a median age of 40.7 days against 64.3 for the 16 that left by adjacency, so the judged rows are younger and have had less time to be cited. Inside an age-matched band the citation gap between the two groups gives p = 0.147, against 0.0073 unmatched. The gap is therefore not robust to age. That is not the same as showing age causes it: file creation time is a proxy for when a note was written, and a copy or a restore would reset it.",
+ "scope": "Age is the file creation time on this machine, a proxy for when the note was written. This shows the citation gap is not robust to age; it does not show age is the cause."
+}
