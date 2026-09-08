@@ -1,9 +1,14 @@
 {
  "tool": "pregate",
  "thread": "anthropics/claude-code#91188",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/91188",
+ "threads": [
+  "anthropics/claude-code#91188",
+  "https://github.com/anthropics/claude-code/issues/91188"
+ ],
  "claims": 18,
- "worth_writing": 17,
- "blocked": 1,
+ "worth_writing": 11,
+ "blocked": 7,
  "numbers_examined": [
   "1.005",
   "1.010",
@@ -13,6 +18,7 @@
   "2081",
   "2090",
   "24920",
+  "25000",
   "27319",
   "28233",
   "28384",
@@ -73,16 +79,17 @@
    "quotes_comment": "5498341230",
    "quoted_author": "pm25coder",
    "figures_in_that_comment": [
-    "1.010",
+    "1.010"
+   ],
+   "figures_not_in_that_comment": [
     "2070",
     "2090"
    ],
-   "figures_not_in_that_comment": [],
    "numbers_with_no_source": []
   },
   {
    "claim": "Comment 5522927403 published 138 units per line from 2070 units over 15 lines.",
-   "verdict": "QUOTES US",
+   "verdict": "MISQUOTES US",
    "numbers": [
     "2070",
     "5522927403"
@@ -93,15 +100,15 @@
    "unit": null,
    "quotes_comment": "5522927403",
    "quoted_author": "pm25coder",
-   "figures_in_that_comment": [
+   "figures_in_that_comment": [],
+   "figures_not_in_that_comment": [
     "2070"
    ],
-   "figures_not_in_that_comment": [],
    "numbers_with_no_source": []
   },
   {
    "claim": "Comment 5533605446 published 20 lines and 6768 units and called the index CJK-flavored.",
-   "verdict": "QUOTES US",
+   "verdict": "MISQUOTES US",
    "numbers": [
     "5533605446",
     "6768"
@@ -112,10 +119,10 @@
    "unit": null,
    "quotes_comment": "5533605446",
    "quoted_author": "pm25coder",
-   "figures_in_that_comment": [
+   "figures_in_that_comment": [],
+   "figures_not_in_that_comment": [
     "6768"
    ],
-   "figures_not_in_that_comment": [],
    "numbers_with_no_source": []
   },
   {
@@ -134,11 +141,12 @@
    "quotes_comment": "5538716005",
    "quoted_author": "pm25coder",
    "figures_in_that_comment": [
-    "1.269",
+    "1.269"
+   ],
+   "figures_not_in_that_comment": [
     "11132",
     "8774"
    ],
-   "figures_not_in_that_comment": [],
    "numbers_with_no_source": []
   },
   {
@@ -146,14 +154,25 @@
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
-   "leads": [],
+   "leads": [
+    {
+     "where": "comment 5548415211",
+     "who": "tonydzi",
+     "when": "2026-09-05T01:28",
+     "words": [
+      "backups",
+      "counts",
+      "dated"
+     ]
+    }
+   ],
    "self_attribution": null,
    "unit": null,
    "numbers_with_no_source": []
   },
   {
    "claim": "The character-set story contradicts itself: 1.010 bytes per unit and nearly ASCII on 1 September, CJK-flavored on 3 September, 1.269 on 4 September, with no structural change claimed.",
-   "verdict": "ALREADY SAID BY US",
+   "verdict": "ALREADY IN THEIR MATERIAL",
    "numbers": [
     "1.010",
     "1.269"
@@ -171,6 +190,14 @@
      "where": "comment 5538716005",
      "who": "pm25coder",
      "when": "2026-09-04T09:48",
+     "numbers": [
+      "1.269"
+     ]
+    },
+    {
+     "where": "comment 5544430073",
+     "who": "pm25coder",
+     "when": "2026-09-04T17:53",
      "numbers": [
       "1.269"
      ]
@@ -210,7 +237,18 @@
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
-   "leads": [],
+   "leads": [
+    {
+     "where": "comment 5499087276",
+     "who": "DanceNitra",
+     "when": "2026-09-01T19:14",
+     "words": [
+      "finds",
+      "published",
+      "search"
+     ]
+    }
+   ],
    "self_attribution": null,
    "unit": null,
    "numbers_with_no_source": []
@@ -230,16 +268,62 @@
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
-   "leads": [],
+   "leads": [
+    {
+     "where": "comment 5545593515",
+     "who": "DanceNitra",
+     "when": "2026-09-04T19:38",
+     "words": [
+      "august",
+      "backups",
+      "dated"
+     ]
+    }
+   ],
    "self_attribution": null,
    "unit": null,
    "numbers_with_no_source": []
   },
   {
    "claim": "Nineteen of those snapshots sit at exactly 200 or 201 lines in backups named prewindowfit, preindextrim and prewindowdrop, so the file was repeatedly trimmed to fit 200 lines and 25000 units.",
-   "verdict": "NEW",
-   "numbers": [],
-   "hits": [],
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "25000"
+   ],
+   "hits": [
+    {
+     "where": "comment 5494059646",
+     "who": "tonydzi",
+     "when": "2026-09-01T12:38",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5497653756",
+     "who": "tonydzi",
+     "when": "2026-09-01T17:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5499087276",
+     "who": "DanceNitra",
+     "when": "2026-09-01T19:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5500579898",
+     "who": "pm25coder",
+     "when": "2026-09-01T21:19",
+     "numbers": [
+      "25000"
+     ]
+    }
+   ],
    "leads": [],
    "self_attribution": null,
    "unit": null,
@@ -247,9 +331,44 @@
   },
   {
    "claim": "Because the crossover is 25000 divided by 200, a file trimmed to both caps lands next to 125 by construction, so the time series mostly measures our own trimming policy.",
-   "verdict": "NEW",
-   "numbers": [],
-   "hits": [],
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "25000"
+   ],
+   "hits": [
+    {
+     "where": "comment 5494059646",
+     "who": "tonydzi",
+     "when": "2026-09-01T12:38",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5497653756",
+     "who": "tonydzi",
+     "when": "2026-09-01T17:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5499087276",
+     "who": "DanceNitra",
+     "when": "2026-09-01T19:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5500579898",
+     "who": "pm25coder",
+     "when": "2026-09-01T21:19",
+     "numbers": [
+      "25000"
+     ]
+    }
+   ],
    "leads": [],
    "self_attribution": null,
    "unit": null,
@@ -267,7 +386,7 @@
   },
   {
    "claim": "The CRLF arithmetic in comment 5538716005 uses only his figures and stands: 200 lines at 124.6 units per line is 24920 units under LF, and a CRLF copy pays 200 more and crosses at the 200th line.",
-   "verdict": "QUOTES US",
+   "verdict": "MISQUOTES US",
    "numbers": [
     "24920",
     "5538716005"
@@ -278,21 +397,57 @@
    "unit": null,
    "quotes_comment": "5538716005",
    "quoted_author": "pm25coder",
-   "figures_in_that_comment": [
+   "figures_in_that_comment": [],
+   "figures_not_in_that_comment": [
     "24920"
    ],
-   "figures_not_in_that_comment": [],
    "numbers_with_no_source": []
   },
   {
    "claim": "Applying the loader's two-stage cut to our file, the line cap takes 221 lines to 200 and the unit cut at the last newline before 25000 units lands at line 192, so the loader delivers 192 of 221 lines.",
-   "verdict": "NEW",
-   "numbers": [],
-   "hits": [],
+   "verdict": "ALREADY SAID BY US",
+   "numbers": [
+    "25000"
+   ],
+   "hits": [
+    {
+     "where": "comment 5494059646",
+     "who": "tonydzi",
+     "when": "2026-09-01T12:38",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5497653756",
+     "who": "tonydzi",
+     "when": "2026-09-01T17:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5499087276",
+     "who": "DanceNitra",
+     "when": "2026-09-01T19:14",
+     "numbers": [
+      "25000"
+     ]
+    },
+    {
+     "where": "comment 5500579898",
+     "who": "pm25coder",
+     "when": "2026-09-01T21:19",
+     "numbers": [
+      "25000"
+     ]
+    }
+   ],
    "leads": [],
    "self_attribution": null,
    "unit": null,
    "numbers_with_no_source": []
   }
- ]
+ ],
+ "killed": "Draft abandoned 2026-09-04: it was a public retraction of six comments we believed were ours, and they are @pm25coder's. Refuted by one `gh auth status`. The draft and its claims are kept at drafts/claims_91188_correction.md.DEAD-false-premise-pm25coder-is-not-us and drafts/91188_correction.md.DEAD-false-premise-pm25coder-is-not-us, and the original run, made with an --ours that wrongly included him, is at drafts/pregate_91188_correction.json.DEAD-ran-with-wrong-ours-including-pm25coder. This record is the corrected re-run; its 7 blocked claims are correct and are why the draft was killed."
 }

@@ -1,0 +1,260 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#91188",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/91188",
+ "threads": [
+  "anthropics/claude-code#91188",
+  "https://github.com/anthropics/claude-code/issues/91188"
+ ],
+ "claims": 23,
+ "worth_writing": 23,
+ "blocked": 0,
+ "numbers_examined": [
+  "0.014"
+ ],
+ "results": [
+  {
+   "claim": "Of 194 distinct retired rows in my memory store, 124 or 63.9 per cent were still linked from another record.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Of 224 live rows, 189 or 84.4 per cent were still linked from another record.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Retirement in this store is a move rather than a delete, so a dropped row stays reachable and its file is untouched.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The store cannot establish the direction, because index membership causes a row to be recalled and cited.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Two rows appear in two separate retirement events, which is only possible if they returned to the live index in between.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Two resurrections in 194 retirements is 1.0 per cent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The probe deduplicated rows within an event and not across events, so it counted each of those two rows twice.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Fixing that double count changed four figures I had already written down.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The live index holds 224 pointers of which 166, or 74.1 per cent, declare a rule type rather than a record.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The seven retirement events took guards at 45.8, 74.4, 77.8, 52.6, 62.5, 100.0 and 5.6 per cent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The pooled retirement share over 194 rows and 91 guards is 46.9 per cent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Two archive headings are word for word identical apart from their date and their events differ at 52.6 against 5.6 per cent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5545593515",
+     "who": "DanceNitra",
+     "when": "2026-09-04T19:38",
+     "words": [
+      "apart",
+      "events",
+      "identical"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "None of 20,000 Monte Carlo draws at these seven event sizes reached the observed chi-square of 65.9, so p is below 5e-5.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "My first draft quoted 3e-12 from a chi-square, and two cells have an expected count of 3.75, so that approximation does not hold.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Dropping the 54-row event leaves the other six differing at p equal to 0.014.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.014"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "229 of my 505 memory files declare type project and 259 declare type feedback.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "My index keeps feedback at 2.8 times the rate it keeps project, 63.3 per cent against 22.7 per cent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "One of the four files I first argued from opens with the words RESOLVED 2026-06-26, and I had restored it to the live index that morning labelled decision open.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "68 files sat in neither index, and all 68 are still linked from another note.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "44 of those 68 are linked from a note the loader delivers every session.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "My archive's own heading for those 68 says they were never in the live index.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The check on_disk minus live minus archive is orphan detection, which fsck has performed on unreferenced inodes since the 1980s and which Obsidian ships as a plugin for markdown notes.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The two-file invariant quantifies over rows, and a file absent from both indexes has no row on either side of the diff.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
