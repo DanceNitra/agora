@@ -52,14 +52,19 @@
    "got": "['connector-outbox']"
   },
   {
-   "check": "E_the_proposed_delete_path_closes_it",
+   "check": "E_a_delete_alone_does_NOT_close_it",
    "pass": true,
-   "got": "True"
+   "got": "the rows are gone and the bytes are not"
   },
   {
-   "check": "CONTROL_D_and_E_differ_only_by_the_delete_path",
+   "check": "F_a_delete_plus_VACUUM_does",
    "pass": true,
-   "got": "so D is a measurement, not a broken target"
+   "got": "so the check got stricter rather than unpassable"
+  },
+  {
+   "check": "CONTROL_something_CAN_close_it_so_D_and_E_are_measurements",
+   "pass": true,
+   "got": "D leaks, F does not, and only the VACUUM separates them"
   },
   {
    "check": "OUR_validator_refuses_a_channel_principal_source",
@@ -107,6 +112,10 @@
    "secret_still_in_queue": true
   },
   "with_delete_path": {
+   "complete": false,
+   "secret_still_in_queue": true
+  },
+  "with_delete_and_vacuum": {
    "complete": true,
    "secret_still_in_queue": false
   }
