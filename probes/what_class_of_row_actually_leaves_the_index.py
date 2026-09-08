@@ -25,11 +25,23 @@ FOUR MORE DEFECTS THE FIRST VERSION CARRIED, found by an adversarial pass and ea
     pointed at those rows, so they were never in the live index to be retired from;
   * it never asked how many memory files are in NEITHER index, which is the larger loss.
 
+AND IT NOW ANSWERS THE QUESTION THAT WAS ACTUALLY ASKED. The thread asked for a false-retirement
+fraction: of the retired rows, how many were dropped while something still pointed at them. Memory
+files link to each other with `[[slug]]`, so that has an operational meaning here, and the live index
+is the control. The first draft of the reply called this "not the interesting number" and pivoted to
+a finding I already had, which is answering an easier question and calling the hard one dull.
+
+THE PER-EVENT SPREAD IS TESTED, NOT EYEBALLED. Seven shares that look different can be seven draws
+from one urn. The reply first called the gap Simpson's paradox, which is the wrong name: there is no
+second variable stratifying both arms and no reversal, only heterogeneity with one dominant stratum.
+
 THE CONTROLS:
   * every pointer must resolve to a file that exists, and unresolved ones are counted, not dropped;
   * the classifier must not be constant, so the full distribution is printed;
   * a pointer on both sides at once is a defect in the store: named below 2% of rows, a refusal above
     it, because then the archive is a copy rather than a destination;
+  * the live index is the control for the reference rate and must come out HIGHER; if retired
+    and live rows are equally referenced, the measurement is not seeing reachability;
   * the delivered set is compared against `what_our_own_index_actually_delivers.py`, which has
     measured this file for weeks. Two readings that disagree mean one of them is wrong.
 """
@@ -49,7 +61,12 @@ LINK = re.compile(r"\]\(([^)]+\.md)\)")
 HEADING = re.compile(r"^##+ (.+)$", re.M)
 NOT_A_MEMORY = {"MEMORY.md", "MEMORY_ARCHIVE.md"}
 GUARD_TYPES = {"feedback", "user"}
-NOT_A_RETIREMENT = "reachable again"
+# A section is a retirement only if its rows were ever IN the live index. That is not something a
+# probe can read off prose, so the archive DECLARES it: a section whose rows were never live
+# carries this token in its heading. The first version matched the phrase "reachable again", the
+# next such section was worded differently, and 68 rows at 0% guards became the largest event in
+# the table and moved the pooled figure from 34.8% to 46.9%.
+NOT_A_RETIREMENT = "[never in the live index]"
 
 
 def units(s: str) -> int:
@@ -70,7 +87,12 @@ def type_of(slug: str):
     p = os.path.join(MEM, slug)
     if not os.path.exists(p):
         return None
-    head = io.open(p, encoding="utf-8", errors="replace").read(1200)
+    # THE WHOLE FILE, not the first 1200 bytes. A long `description:` pushes the frontmatter
+    # `type:` past a 1200-byte cut, and 12 files then read as `undeclared` while declaring
+    # `project`. No guard was misread when this was found, by luck rather than by design: all
+    # 259 `feedback` declarations happened to sit inside the window. A check that cannot see
+    # its target reports clean.
+    head = io.open(p, encoding="utf-8", errors="replace").read()
     m = re.search(r"^\s*type:\s*([a-z |]+)\s*$", head, re.M)
     if not m:
         return "undeclared"
@@ -87,9 +109,67 @@ def guard_share(slugs):
     return len(ts), g, 100.0 * g / len(ts)
 
 
+WIKI = re.compile(r"\[\[([^\]|#]+)")
+
+
+def inbound_counts():
+    """How many other memory files link to each file: the proxy for "something still points at it"."""
+    counts = {}
+    for f in os.listdir(MEM):
+        if not f.endswith(".md") or f in NOT_A_MEMORY:
+            continue
+        body = io.open(os.path.join(MEM, f), encoding="utf-8", errors="replace").read()
+        for w in set(WIKI.findall(body)):
+            t = w.strip()
+            t = t if t.endswith(".md") else t + ".md"
+            if t != f:
+                counts[t] = counts.get(t, 0) + 1
+    return counts
+
+
+def heterogeneity(ev):
+    """Are the per-event guard shares seven draws from one urn? Chi-square plus a Monte Carlo."""
+    import random
+    N = sum(n for n, _ in ev)
+    G = sum(g for _, g in ev)
+    if not N or not G or G == N:
+        return None
+    p = G / N
+    chi = sum((g - n * p) ** 2 / (n * p) + ((n - g) - n * (1 - p)) ** 2 / (n * (1 - p)) for n, g in ev)
+    random.seed(7)
+    T, hits = 20000, 0
+    for _ in range(T):
+        sim = [(n, sum(random.random() < p for _ in range(n))) for n, _ in ev]
+        c = sum((g - n * p) ** 2 / (n * p) + ((n - g) - n * (1 - p)) ** 2 / (n * (1 - p)) for n, g in sim)
+        hits += c >= chi
+    return {"chi2": round(chi, 1), "df": len(ev) - 1, "mc_draws": T, "mc_at_or_above": hits,
+            "common_rate": round(100 * p, 1)}
+
+
 def events(text: str):
+    """Each dated section and its rows, with any row an earlier section already counted removed.
+
+    `pointers()` deduplicates WITHIN a section and not across them, so a row that was retired, came
+    back to the live index, and was retired again was counted in two events. That inflated one event
+    from 39 rows to 40 (74.4% reported as 72.5%), the pooled count from 194 to 196, and "rows ever
+    written" from 419 to 421.
+
+    The duplicates are the interesting part, so they are returned rather than quietly dropped: a row
+    in two retirement events is a measured resurrection, which is the failure the design
+    conversation this probe feeds is entirely about. The double count was hiding the finding.
+    """
     parts = HEADING.split(text)
-    return [(parts[i].strip(), pointers(parts[i + 1])) for i in range(1, len(parts), 2)]
+    out, seen, again = [], set(), []
+    for i in range(1, len(parts), 2):
+        rows = []
+        for slug in pointers(parts[i + 1]):
+            if slug in seen:
+                again.append(slug)
+                continue
+            seen.add(slug)
+            rows.append(slug)
+        out.append((parts[i].strip(), rows))
+    return out, again
 
 
 def delivered_pointers(path: str):
@@ -129,15 +209,18 @@ def main():
     ln, lg, lshare = guard_share(live)
     print("\n  live index   %3d pointers, %3d guards, %.1f%%" % (ln, lg, lshare))
 
+    ev_rows, resurrected = events(arch_text)
     print("\n  THE ARCHIVE IS NOT ONE POPULATION. Guard share per dated event:\n")
     print("  %-52s %5s %7s %8s" % ("event", "rows", "guards", "share"))
     rows_out, pooled_n, pooled_g = [], 0, 0
-    for name, slugs in events(arch_text):
+    for name, slugs in ev_rows:
         slugs = [s for s in slugs if s not in set(overlap)]
         n, g, share = guard_share(slugs)
         if not n:
             continue
         retirement = NOT_A_RETIREMENT not in name.lower()
+        if not retirement:
+            name = name.replace("[NEVER IN THE LIVE INDEX] ", "")
         if retirement:
             pooled_n += n
             pooled_g += g
@@ -166,6 +249,39 @@ def main():
           "points at them." % (len(on_disk), len(orphans)))
     print("  Of those, %d are guards (%.1f%%)." % (og, oshare))
 
+    inb = inbound_counts()
+    live_set = set(live)
+    ret, seen = [], set()
+    for name, slugs in ev_rows:
+        if NOT_A_RETIREMENT in name.lower():
+            continue
+        for sl in slugs:
+            if sl not in live_set and sl not in seen:
+                seen.add(sl)
+                ret.append(sl)
+    rr = sum(1 for x in ret if inb.get(x, 0))
+    lr = sum(1 for x in live if inb.get(x, 0))
+    rshare = 100.0 * rr / max(1, len(ret))
+    lref = 100.0 * lr / max(1, len(live))
+    print("\n  RESURRECTED, rows that left the index, came back, and left again: %d" % len(resurrected))
+    for slug in sorted(resurrected):
+        print("    %s" % slug)
+
+    print("\n  THE FALSE-RETIREMENT QUESTION, answered rather than deferred:")
+    print("    retired rows another record still links to : %3d of %3d  %5.1f%%" % (rr, len(ret), rshare))
+    print("    CONTROL, live rows                         : %3d of %3d  %5.1f%%" % (lr, len(live), lref))
+    print("    %s" % ("the control is higher, as it must be" if lref > rshare else
+                      "VOID: live rows are no better referenced than retired ones, so this measures nothing"))
+
+    het = heterogeneity([(e["rows"], e["guards"]) for e in rows_out if e["is_a_retirement"]])
+    if het:
+        print("\n  the shares against ONE common rate of %.1f%%: chi2 %.1f on %d df, and %d of %d Monte "
+              "Carlo draws at the same event sizes reached it"
+              % (het["common_rate"], het["chi2"], het["df"], het["mc_at_or_above"], het["mc_draws"]))
+    ever_n, ever_g = ln + pooled_n, lg + pooled_g
+    print("  every row ever written: %d, of which %d are guards, %.1f%% -- the population that neither "
+          "the live nor the retired share is" % (ever_n, ever_g, 100.0 * ever_g / max(1, ever_n)))
+
     dl = delivered_pointers(LIVE)
     below = [s for s in live if s not in set(dl)]
     print("\n  the live file is %d lines and %d units, against caps of %d and %d"
@@ -183,7 +299,12 @@ def main():
            "orphan_guards": og, "orphan_slugs": orphans,
            "live_lines": len(live_text.splitlines()), "live_units": units(live_text),
            "delivered": len(dl), "below_the_cut": len(below),
-           "duplicated_both_sides": overlap}
+           "duplicated_both_sides": overlap,
+           "retired_rows": len(ret), "retired_still_referenced": rr,
+           "retired_referenced_share": round(rshare, 1),
+           "live_still_referenced": lr, "live_referenced_share": round(lref, 1),
+           "heterogeneity": het, "resurrected": sorted(resurrected), "rows_ever": ever_n, "guards_ever": ever_g,
+           "guard_share_ever": round(100.0 * ever_g / max(1, ever_n), 1)}
     path = os.path.splitext(os.path.abspath(__file__))[0] + ".result.json"
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(out, indent=1))
