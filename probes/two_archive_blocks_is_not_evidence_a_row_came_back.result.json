@@ -1,0 +1,96 @@
+{
+ "probe": "two_archive_blocks_is_not_evidence_a_row_came_back.py",
+ "snapshots": 26,
+ "snapshot_span": [
+  "2026-08-17 19:26",
+  "2026-09-08 20:58"
+ ],
+ "largest_gap_days": 9.5,
+ "archive_blocks": 11,
+ "rows_in_two_or_more_blocks": [
+  {
+   "slug": "real-vector-sampling-cannot-see-a-degeneracy",
+   "archive_blocks": [
+    "Demoted from the index 2026-08-26, to fit the loader window",
+    "Rotated out of the index on 2026-08-31"
+   ],
+   "dated_blocks": [
+    "2026-08-26",
+    "2026-08-31"
+   ],
+   "presence_across_snapshots": "01111111111111111111111100",
+   "snapshots_between_the_two_blocks": [],
+   "a_return_is_visible_in_the_series": false,
+   "verdict": "UNCHECKABLE: no snapshot between the two archive events"
+  },
+  {
+   "slug": "tenant-filtered-view-persisted-drops-everyone-elses-rows",
+   "archive_blocks": [
+    "Older / closed",
+    "Moved from the index 2026-08-17 (the index had reached the read limit)"
+   ],
+   "dated_blocks": [
+    "2026-08-17"
+   ],
+   "presence_across_snapshots": "10000000000000000000000000",
+   "snapshots_between_the_two_blocks": [],
+   "a_return_is_visible_in_the_series": false,
+   "verdict": "UNCHECKABLE: no snapshot between the two archive events"
+  }
+ ],
+ "observed_return": {
+  "slug": "the-index-we-optimised-was-truncated-before-it-was-read",
+  "presence": "00011111111111111111111101",
+  "in_archive_blocks": []
+ },
+ "checks": [
+  {
+   "check": "CONTROL_the_reader_sees_a_slug_that_is_present",
+   "pass": true,
+   "got": "226 slugs in the newest snapshot"
+  },
+  {
+   "check": "CONTROL_a_slug_in_no_snapshot_reads_absent_everywhere",
+   "pass": true,
+   "got": "zqxjv-wrompf-blenkarth-no-such-note"
+  },
+  {
+   "check": "CONTROL_the_series_can_detect_the_one_known_return",
+   "pass": true,
+   "got": "the-index-we-optimised-was-truncated-before-it-was-read -> 00011111111111111111111101"
+  },
+  {
+   "check": "BOTH_PUBLISHED_ROWS_ARE_NAMED_IN_TWO_BLOCKS",
+   "pass": true,
+   "got": "2 rows appear in 2 or more archive blocks"
+  },
+  {
+   "check": "NEITHER_PUBLISHED_ROW_SHOWS_A_RETURN_IN_THE_SERIES",
+   "pass": true,
+   "got": ""
+  },
+  {
+   "check": "AND_THE_SERIES_CANNOT_CHECK_EITHER_ONE",
+   "pass": true,
+   "got": "no snapshot falls between the two archive events, for either row"
+  },
+  {
+   "check": "CONTROL_the_witness_rule_finds_snapshots_over_a_covered_span",
+   "pass": true,
+   "got": "21 snapshots fall strictly inside 2026-08-18..2026-08-22"
+  },
+  {
+   "check": "CONTROL_the_witness_rule_excludes_a_same_day_snapshot",
+   "pass": true,
+   "got": "the 08-26 08:46 pre-trim backup is not a witness to the 08-26 event"
+  },
+  {
+   "check": "THE_OBSERVED_RETURN_IS_IN_NO_ARCHIVE_BLOCK",
+   "pass": true,
+   "got": "the archive instrument structurally cannot see it"
+  }
+ ],
+ "all_passed": true,
+ "finding": "We published that two rows appearing in two archive blocks each is 'only possible if they returned to the live index in between'. The snapshot series cannot check that for either row: no snapshot falls between the two archive events in either case, and the largest gap in the series is 9 days. Neither row shows a return in the series. Meanwhile the one row that demonstrably left and came back appears in no archive block at all. Archive-block membership records what a trim WROTE; snapshot presence records what the index HELD. Neither instrument contains the other, so the 1.0 percent figure rests on an assumption the data does not support.",
+ "scope": "This does not show the two rows did NOT return. It shows the instrument we cited cannot tell a return from a second archive write, and that our series has no observation in the window where it would matter."
+}
