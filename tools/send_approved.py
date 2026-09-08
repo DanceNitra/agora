@@ -494,9 +494,35 @@ def _pregate_gate_impl(path, thread_spec):
         _want = {thread_spec, "%s/%s#%s" % _m.groups() if _m else thread_spec}
         if d.get("tool") != "pregate" or not (_keys & _want):
             continue
+        # A RECEIPT FOR A LETTER THAT ALREADY WENT OUT IS HISTORY, NOT AN OPEN QUESTION. This
+        # scanned every receipt on the thread and refused if any carried a blocked claim, so the
+        # 2026-09-06 run, whose two flags were correct and whose letter was sent anyway as a
+        # correction quoting our own figures, blocked every later letter on that thread for good.
+        # A receipt may say which comment it became; those are skipped. The field cannot be set
+        # without a real comment id, so the guard is untouched for anything still unresolved.
+        if d.get("sent") and re.match(r"^\d{6,}$", str(d["sent"])):
+            continue
+        # AND A DRAFT THAT WAS ABANDONED IS ALSO NOT AN OPEN QUESTION. `sent` covers a letter that
+        # went out. A letter that was KILLED leaves the same blocked record behind and blocks every
+        # later letter on the thread just as permanently: measured 2026-09-08, when a retraction
+        # killed on 09-04 for a false premise refused an unrelated reply four days later.
+        #
+        # Harder to set than `sent`, not easier, because nothing external corroborates "I gave up on
+        # it": the reason must be substantial AND must name a path that exists on disk and is marked
+        # dead in its own filename. A record cannot be waved through by writing a sentence.
+        _k = d.get("killed")
+        if isinstance(_k, str) and len(_k.strip()) >= 40:
+            _paths = [w.strip(" '\"(),") for w in _k.split() if "/" in w or w.endswith(".md")]
+            _ok = [w for w in _paths
+                   if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), w)) and (".DEAD" in w or ".dead" in w)]
+            if _ok:
+                continue
+            print("NOTE: %s claims `killed` but names no existing .DEAD path, so it still blocks."
+                  % os.path.basename(f))
         if d.get("blocked"):
             return ("the pregate run at %s still has %d blocked claim(s). Delete them and re-run "
-                    "before writing." % (os.path.basename(f), d["blocked"]))
+                    "before writing, or record which comment it became as \"sent\" if that letter "
+                    "already went out." % (os.path.basename(f), d["blocked"]))
         runs.append(os.path.basename(f))
         seen |= set(d.get("numbers_examined") or [])
     if not runs:
@@ -514,6 +540,12 @@ def _pregate_gate_impl(path, thread_spec):
                       thread_spec or "") or re.match(r"^[\w.-]+/[\w.-]+#(\d+)$", thread_spec or "")
     if _own_m and ("#" + _own_m.group(1)) in body:
         nums.discard(_own_m.group(1))
+    # A CITATION YEAR CAN NEVER BE PRE-CHECKED, because pregate drops plausible calendar years as
+    # carrying no identity and so never records one. Demanding it here made a letter citing two
+    # papers unsendable: the number cannot appear in `numbers_examined` by construction. The window
+    # is pregate's own YEARISH, imported rather than re-typed, so the two rules cannot drift apart.
+    from pregate import YEARISH as _YEARISH
+    nums = {n for n in nums if not _YEARISH.match(n)}
     unchecked = sorted(nums - seen)
     if unchecked:
         return ("%d figure(s) in this draft were never put through the pregate: %s. "

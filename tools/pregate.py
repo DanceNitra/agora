@@ -88,16 +88,52 @@ RANK_WORD = re.compile(r"\b(percentile|\d+(?:st|nd|rd|th)\b|rank(?:ed|s|ing)?|me
 # cleared the very sentence the check exists for. And a loose `of the <word>` clause cleared "the
 # 97th percentile OF THE 190-pair population", where "of the population" says which set was ranked
 # and nothing at all about what it was ranked on. Only these phrasings name an axis.
+# TWO MORE WAYS A SENTENCE NAMES ITS AXIS, both measured as false stops on 2026-09-07.
+# `(higher|lower|above|below) in <noun>` carries the axis in the comparison itself: "1.52 higher in
+# energy" says what it is higher in, which is the whole question this check asks. And a named rank
+# statistic between two named variables carries its own axis: "the Spearman rank correlation between
+# the valley position and the size imbalance" cannot be read as a bare rank.
+# Deliberately NOT added: a bare "of the <something>" clause, which says which SET was ranked and
+# nothing about what it was ranked on. That was one of the two false passes this vocabulary was
+# built to close, and widening it here would reopen it.
 UNIT_WORD = re.compile(r"(units? per line|bytes? per unit|u/l|b/u|per line|per unit|"
                        r"ranked (?:on|by)|as a fraction of|in absolute terms|"
                        r"absolute (?:deviation|value|terms)|raw (?:deviation|value|score)|"
                        r"normalis(?:ed|ing) by|normaliz(?:ed|ing) by|per unit|"
-                       r"divided by|relative to (?:its|each|the) own)", re.I)
+                       r"divided by|relative to (?:its|each|the) own|"
+                       r"(?:higher|lower|above|below|greater|smaller) in [a-z]+|"
+                       r"(?:spearman|pearson|kendall)[a-z ]{0,12}correlation between|"
+                       # A NAMED TEST STATISTIC IS AN AXIS. "p is below 5e-5" tripped the
+                       # rank rule on the word "below" while naming its axis exactly: the
+                       # quantity is a p-value, from a chi-square named in the same
+                       # sentence. The list was built from ratio units and correlations, so
+                       # it had no entry for the commonest axis in a statistical claim.
+                       # Deliberately narrow: the statistic must be NAMED next to a number,
+                       # so "it is below 5e-5" still fails.
+                       r"\bp\s*(?:is|=|<|>|value)?\s*(?:below|under|above|of)?\s*[<>=]?\s*"
+                       r"\d|chi-?square|chi2|\bz\s*=|standard deviations?\b)", re.I)
 
 STOP = set("""the a an and or but of to in on at by for with from as is are was were be been it its
 this that these those we you i he she they our your their my me us them not no yes if then than so
 such which who whom what when where how why all any both each few more most other some only own same
 too very can will just now also into over under again further once here there when both any""".split())
+
+
+_NUMCACHE: dict = {}
+
+
+def _numbers_of(text: str) -> set:
+    """The numbers IN a text, by the same rule the claims are read with.
+
+    Cached because every claim is tested against every comment, and the extraction is the same work
+    each time.
+    """
+    key = id(text), len(text)
+    hit = _NUMCACHE.get(key)
+    if hit is None:
+        hit = set(NUM.findall(text))
+        _NUMCACHE[key] = hit
+    return hit
 
 
 def refuse(why, out=None):
@@ -257,7 +293,8 @@ def check(claims, thread, archive, receipts, ours):
             # figure is in that comment" but "at least one is". Zero means we are attributing the
             # numbers to the wrong comment, which is the only failure that matters here.
             check_nums = [n for n in nums if n not in quoted]
-            present = [n for n in check_nums if n.replace(",", "") in body.replace(",", "")]
+            _plain = {x.replace(",", "") for x in _numbers_of(body)}
+            present = [n for n in check_nums if n.replace(",", "") in _plain]
             missing = [n for n in check_nums if n not in present]
             results.append({"claim": c,
                             "verdict": "QUOTES US" if present else "MISQUOTES US",
@@ -271,12 +308,15 @@ def check(claims, thread, archive, receipts, ours):
         w = words(c)
         hits = []
         for cid, who, when, body in thread:
-            found = [n for n in nums if n in body]
+            # NOT `n in body`. That is a substring test, and it reported a citation's page number
+            # 3083 as already published because the co-author's comment carried 0.183083. The
+            # extractor's own rule is the right one on both sides.
+            found = [n for n in nums if n in _numbers_of(body)]
             if found:
                 hits.append({"where": "comment %s" % cid, "who": who, "when": when,
                              "numbers": found})
         for rel, text in archive:
-            found = [n for n in nums if n in text]
+            found = [n for n in nums if n in _numbers_of(text)]
             if found:
                 hits.append({"where": "their file %s" % rel, "who": "them", "when": "",
                              "numbers": found})
