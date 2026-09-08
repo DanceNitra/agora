@@ -42,7 +42,7 @@
    "got": "32 of 32 targets present"
   },
   {
-   "check": "THE_DRAGGED_SET_IS_THE_ONE_MEASURED_BY_THE_COMPANION_PROBE",
+   "check": "THE_DRAGGED_SET_IS_THE_PINNED_COHORT",
    "pass": true,
    "got": "replay 16, published 16, symmetric difference none"
   },
@@ -72,9 +72,14 @@
    "got": "none"
   },
   {
-   "check": "CONTROL_the_line_addressed_path_would_fail_that_check",
+   "check": "MUTATION_the_shipped_manifest_labels_16_rows_side_effect_under_the_old_move",
    "pass": true,
-   "got": "the same manifest over the old path carries 16 side-effect rows"
+   "got": "16 side-effect entries, naming the same 16"
+  },
+  {
+   "check": "MUTATION_and_every_one_names_the_row_it_left_with",
+   "pass": true,
+   "got": "each side-effect entry carries the judged row that took it"
   }
  ],
  "all_passed": true,

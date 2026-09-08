@@ -123,7 +123,11 @@ def as_written(lines: list) -> str:
 # `competitors-CAN-erase-revert-inspeximus-moat-is-determinism.md` were both invisible to it. The
 # pointer-set comparison is the one check that makes this tool safe to run, so a reader that cannot
 # see a pointer would have passed a trim that deleted it. Caught by the check refusing its own run.
-POINTER = re.compile(r"\(([A-Za-z0-9._\-]+\.md)\)")
+# CORRECTED AGAIN 2026-09-08: it matched ANY parenthesised name, so a label containing a
+# parenthesis made a phantom pointer. In `[see (foo.md) note](real.md)` it read `foo.md`,
+# and demoting `foo` then swept out the unrelated `real.md` on the same line. A pointer is
+# the target of a markdown link, so the `](` is required.
+POINTER = re.compile(r"\]\(([A-Za-z0-9._\-]+\.md)\)")
 
 
 def pointers(t: str) -> set:
@@ -132,11 +136,14 @@ def pointers(t: str) -> set:
 
 def _reader_control() -> None:
     """The pointer reader must see a mixed-case pointer, or every set comparison below is void."""
-    probe = "- [x](a-lower-case.md) and [y](cascade-fidelity-B-killed-at-gate.md)"
+    probe = ("- [x](a-lower-case.md) and [y](cascade-fidelity-B-killed-at-gate.md)"
+             + ROW_SEP + "[see (phantom.md) note](real.md)")
     seen = pointers(probe)
-    if seen != {"a-lower-case.md", "cascade-fidelity-B-killed-at-gate.md"}:
-        raise SystemExit("REFUSED: the pointer reader saw %r, so it cannot see every pointer and "
-                         "NO_POINTER_WAS_LOST would pass a trim that lost one" % sorted(seen))
+    want = {"a-lower-case.md", "cascade-fidelity-B-killed-at-gate.md", "real.md"}
+    if seen != want:
+        raise SystemExit("REFUSED: the pointer reader saw %r, wanted %r. Missing a pointer makes "
+                         "NO_POINTER_WAS_LOST pass a trim that lost one; an extra one makes the "
+                         "move sweep out an unrelated row." % (sorted(seen), sorted(want)))
 
 
 # --- ROW-ADDRESSABLE MOVE -----------------------------------------------------------------------
@@ -165,24 +172,70 @@ def split_rows(line: str):
 def move_rows(line: str, targets):
     """Move only the named rows off `line`.
 
-    Returns (kept_line_or_None, [moved_row_lines], [dragged_slugs]). `dragged_slugs` is non-empty
-    only when the remainder carries no pointer of its own and therefore cannot stand as a line; the
-    manifest records those honestly rather than silently.
+    Returns (kept_line_or_None, [moved_row_lines]).
+
+    THERE IS NO THIRD "dragged" RETURN, and there was: it was provably always empty. Reaching it
+    required the remainder to carry no pointer, and it was built from exactly those pointers. A
+    check asserting no row was dragged therefore could not fail, and the manifest's "side-effect"
+    vocabulary had no reachable producer. Dead code that looks like a safety net is worse than no
+    safety net. Side-effect labels are produced by the LINE-addressed path, which is what the
+    replay probe mutates in to prove the manifest can emit them.
     """
     prefix, segs = split_rows(line)
     if segs is None:
-        return line, [], []
-    hit = [i for i, s in enumerate(segs)
-           if any("(" + t + ".md)" in s for t in targets)]
+        return line, []
+    # By PARSED pointer, never by substring. A substring test matched a phantom inside a label,
+    # and it also matched a slug that is a prefix of a longer one on the same line.
+    want = set(targets)
+    hit = [i for i, s in enumerate(segs) if {p[:-3] for p in pointers(s)} & want]
     if not hit:
-        return line, [], []
+        return line, []
     rest = [s for i, s in enumerate(segs) if i not in hit]
     moved = [prefix + segs[i] for i in hit]
     if rest and any(POINTER.search(s) for s in rest):
-        return prefix + ROW_SEP.join(rest), moved, []
-    # Nothing pointer-bearing survives, so the whole line leaves. Any residue is named.
-    dragged = sorted({p[:-3] for s in rest for p in pointers(s)})
-    return None, moved + ([prefix + ROW_SEP.join(rest)] if rest else []), dragged
+        return prefix + ROW_SEP.join(rest), moved
+    # Nothing pointer-bearing survives, so the whole line leaves, residue included.
+    return None, moved + ([prefix + ROW_SEP.join(rest)] if rest else [])
+
+
+def demote_rows(lines, targets):
+    """Move `targets` off their lines and record one decision per row that leaves.
+
+    THE WHOLE PATH, in one function, so a probe can exercise what SHIPS. It used to live inline in
+    `main()` and a probe reimplemented it to test it; a sabotage that mislabelled every side-effect
+    row as "judged" in `main()` then passed that probe with exit 0, because the probe never ran the
+    code carrying the defect.
+
+    Returns (kept_lines, demoted_rows, manifest, slugs_seen).
+    """
+    kept, demoted, manifest, seen = [], [], [], set()
+    by_slug = set()
+
+    def record(slug, named, source_line):
+        # ONE ENTRY PER SLUG. The manifest is keyed by row id, and the same target can be linked
+        # from two segments of one line; a fuzz run produced 227 double entries from that shape
+        # alone. A second entry is not a second decision.
+        if slug in by_slug:
+            return
+        by_slug.add(slug)
+        manifest.append({
+            "slug": slug,
+            "decision": "judged" if slug in targets else "side-effect",
+            "of": None if slug in targets else (named[0] if named else None),
+            "line_carried": sorted(q[:-3] for q in pointers(source_line)),
+        })
+
+    for l in lines:
+        keep_line, moved = move_rows(l, targets)
+        for row in moved:
+            demoted.append(row)
+            named = sorted(p[:-3] for p in pointers(row) if p[:-3] in targets)
+            seen.update(named)
+            for p in sorted(pointers(row)):
+                record(p[:-3], named, l)
+        if keep_line is not None:
+            kept.append(keep_line)
+    return kept, demoted, manifest, seen
 
 
 def _move_control() -> None:
@@ -193,18 +246,35 @@ def _move_control() -> None:
     stopped carrying two rows would let the first assertion pass while measuring nothing.
     """
     shared = "- [A](judged-row.md) - hook one" + ROW_SEP + "[B](neighbour-row.md) - hook two"
-    kept, moved, dragged = move_rows(shared, ["judged-row"])
+    kept, moved = move_rows(shared, ["judged-row"])
     if kept is None or "neighbour-row.md" not in kept:
         raise SystemExit("REFUSED: the move dropped the neighbour, so it is still line-addressed")
     if len(moved) != 1 or "judged-row.md" not in moved[0] or "neighbour-row.md" in moved[0]:
         raise SystemExit("REFUSED: the move carried the wrong rows: %r" % (moved,))
-    if dragged:
-        raise SystemExit("REFUSED: a two-pointer line reported drag: %r" % (dragged,))
-    # CONTROL: the old line-move logic must still fail this fixture.
-    old_would_move = any("(" + d + ".md)" in shared for d in ["judged-row"])
-    if not (old_would_move and "neighbour-row.md" in shared):
-        raise SystemExit("REFUSED: the fixture no longer reproduces the line-move drag, so the "
-                         "assertion above proves nothing")
+    # CONTROL, and it must run through move_rows or it proves nothing. The first version compared
+    # two string literals defined two lines apart, referenced neither move_rows nor DEMOTE, and so
+    # could not fail for ANY change to the code it was guarding.
+    #
+    # The property: the fixture carries two rows on one line, so a LINE-addressed move would take
+    # both. Asserted by asking move_rows for the union of what leaves and what stays, and requiring
+    # it to be the whole line -- which is only interesting because the two are different objects.
+    if len(split_rows(shared)[1]) < 2:
+        raise SystemExit("REFUSED: the fixture no longer carries two rows on one line, so the "
+                         "assertions above cannot distinguish a row move from a line move")
+    both = pointers(kept) | {p for m in moved for p in pointers(m)}
+    if both != pointers(shared):
+        raise SystemExit("REFUSED: move_rows lost or invented a pointer: %r vs %r"
+                         % (sorted(both), sorted(pointers(shared))))
+    # A slug that is a strict PREFIX of its neighbour must not drag it.
+    pre = "- [A](row.md) hook" + ROW_SEP + "[B](row-extended.md) hook"
+    k2, m2 = move_rows(pre, ["row"])
+    if k2 is None or "row-extended.md" not in k2 or len(m2) != 1:
+        raise SystemExit("REFUSED: a prefix slug dragged its neighbour: kept=%r moved=%r" % (k2, m2))
+    # A phantom pointer inside a label must not select the row.
+    ph = "- [see (phantom.md) note](real.md) hook"
+    k3, m3 = move_rows(ph, ["phantom"])
+    if m3:
+        raise SystemExit("REFUSED: a parenthesis in a label selected a row: %r" % (m3,))
 
 
 def window(lines: list) -> int:
@@ -237,27 +307,7 @@ def main() -> int:
               "delivered": window(lines), "pointers": pointers(NL.join(lines))}
 
     # --- 1. demote the named entries -------------------------------------------------------------
-    demoted, kept, seen, manifest = [], [], set(), []
-    for l in lines:
-        keep_line, moved, dragged = move_rows(l, DEMOTE)
-        for row in moved:
-            demoted.append(row)
-            named = sorted(p[:-3] for p in pointers(row) if p[:-3] in DEMOTE)
-            seen.update(named)
-            for p in sorted(pointers(row)):
-                slug = p[:-3]
-                manifest.append({
-                    "slug": slug,
-                    "decision": "judged" if slug in DEMOTE else "side-effect",
-                    "of": None if slug in DEMOTE else (named[0] if named else None),
-                    "line_carried": sorted(q[:-3] for q in pointers(l)),
-                })
-        for slug in dragged:
-            if not any(m["slug"] == slug for m in manifest):
-                manifest.append({"slug": slug, "decision": "side-effect", "of": None,
-                                 "line_carried": sorted(q[:-3] for q in pointers(l))})
-        if keep_line is not None:
-            kept.append(keep_line)
+    kept, demoted, manifest, seen = demote_rows(lines, DEMOTE)
     missing = [d for d in DEMOTE if d not in seen]
     if missing:
         raise SystemExit("REFUSED: %d demote targets are not in the index, so the trim is aimed at "
@@ -311,8 +361,9 @@ def main() -> int:
         == sorted({p[:-3] for l in demoted for p in pointers(l)}))
     v["NO_ROW_LEFT_AS_A_SIDE_EFFECT"] = not [m for m in manifest
                                              if m["decision"] != "judged"]
-    v["CONTROL_the_manifest_can_say_side_effect"] = (
-        move_rows("- [A](judged-row.md)" + ROW_SEP + "plain residue", ["judged-row"])[2] == [])
+    # Proved by MUTATION in probes/a_move_that_addresses_rows_must_not_drag_the_line.py: running
+    # the same manifest builder over a line-addressed move produces 16 side-effect entries on the
+    # real 2026-09-04 input. Asserting it here from the row-addressed path could not fail.
     # Seven spare lines is about a week of entries at the current rate, which is the point:
     # enough that the cut does not silently return before anyone looks again.
     v["headroom_is_a_week_not_a_day"] = (

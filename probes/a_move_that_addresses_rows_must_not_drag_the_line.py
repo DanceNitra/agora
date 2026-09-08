@@ -28,10 +28,28 @@ import trim_memory_index as t  # noqa: E402
 PRETRIM = os.path.join(t.MEM, "MEMORY.md.bak-20260904-pretrim")
 # The cohort the companion probe measures. Published as 15 in comment 5588661516; a prefix
 # filter had hidden a 16th, corrected 2026-09-08. The replay must recover exactly this set.
-PUBLISHED_15 = set(json.load(io.open(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                 "packing_the_index_evicted_rows_nobody_judged.result.json"),
-    encoding="utf-8"))["adjacency_slugs"])
+# The cohort, pinned as a LITERAL. This used to read the set out of the sibling probe's
+# .result.json, which that probe rewrites on every run -- so the check compared two live
+# constructions and its name ("the published set") described neither. Published as 15 in comment
+# 5588661516; a prefix filter had hidden the 16th, corrected 2026-09-08.
+COHORT_16 = {
+    "adaptation-corruption-separation-law-breaktruth",
+    "agent-memory-integrity-leaderboard",
+    "agora-defensible-edge-ai-claim-crucible",
+    "agora-seminar",
+    "breaktruth-candidates-liveness-replay-and-behavior-integrity",
+    "campaign-poison-defense-capability-gradient",
+    "consolidation-gate-coupling-breaktruth",
+    "crucible-ragdead-longcontext-probe",
+    "diversity-flip-law-breakthrough",
+    "erasure-selfcheck-tool-published",
+    "frontier-generativity-predictability-ceiling",
+    "gate-decorrelation-adversary-controlled",
+    "graphshift-orthogonal-gate-poison-defense",
+    "memorygraft-crucible-candidate",
+    "ramr-benchmark-published",
+    "seo-program-setup",
+}
 
 
 def line_addressed(lines, demote):
@@ -46,22 +64,13 @@ def line_addressed(lines, demote):
 
 
 def row_addressed(lines, demote):
-    """What it does now: select by row id, rewrite the line."""
-    moved, kept, manifest = [], [], []
-    for l in lines:
-        keep_line, rows, dragged = t.move_rows(l, demote)
-        for row in rows:
-            moved.append(row)
-            named = sorted(p[:-3] for p in t.pointers(row) if p[:-3] in demote)
-            for p in sorted(t.pointers(row)):
-                slug = p[:-3]
-                manifest.append({"slug": slug,
-                                 "decision": "judged" if slug in demote else "side-effect",
-                                 "of": None if slug in demote else (named[0] if named else None)})
-        for slug in dragged:
-            manifest.append({"slug": slug, "decision": "side-effect", "of": None})
-        if keep_line is not None:
-            kept.append(keep_line)
+    """What it does now. Calls the SHIPPED path, never a copy of it.
+
+    This used to reimplement the manifest loop. A sabotage that mislabelled every side-effect row
+    as "judged" inside the real `main()` then passed this probe with exit 0, because the probe never
+    ran the code carrying the defect.
+    """
+    kept, moved, manifest, _seen = t.demote_rows(lines, demote)
     return kept, moved, manifest
 
 
@@ -81,6 +90,23 @@ def main() -> int:
     new_kept, new_moved, manifest = row_addressed(lines, demote)
 
     old_out, new_out = slugs(old_moved), slugs(new_moved)
+
+    # Run the SHIPPED manifest builder over a line-addressed move, by swapping move_rows for the
+    # pre-fix behaviour. Restored in a finally, so a failure here cannot leave the module mutated.
+    real_move = t.move_rows
+    try:
+        def line_move(line, targets):
+            if any("(" + x + ".md)" in line for x in targets):
+                return None, [line]
+            return line, []
+        t.move_rows = line_move
+        _k, _d, mman, _s = t.demote_rows(lines, demote)
+    finally:
+        t.move_rows = real_move
+    if t.move_rows is not real_move:
+        raise SystemExit("REFUSED: the mutation was not undone")
+    mutated = {"side_effect": sorted(m["slug"] for m in mman if m["decision"] == "side-effect"),
+               "of": {m["slug"]: m["of"] for m in mman}}
     dragged = sorted(old_out - demote)
     side_effects = sorted(m["slug"] for m in manifest if m["decision"] != "judged")
 
@@ -89,10 +115,10 @@ def main() -> int:
          "%d rows leave under the line-addressed path that nobody judged" % len(dragged)),
         ("CONTROL_the_demote_list_is_reachable_in_this_input", demote <= before,
          "%d of %d targets present" % (len(demote & before), len(demote))),
-        ("THE_DRAGGED_SET_IS_THE_ONE_MEASURED_BY_THE_COMPANION_PROBE", set(dragged) == PUBLISHED_15,
+        ("THE_DRAGGED_SET_IS_THE_PINNED_COHORT", set(dragged) == COHORT_16,
          "replay %d, published %d, symmetric difference %s"
-         % (len(dragged), len(PUBLISHED_15),
-            sorted(set(dragged) ^ PUBLISHED_15) or "none")),
+         % (len(dragged), len(COHORT_16),
+            sorted(set(dragged) ^ COHORT_16) or "none")),
         ("THE_ROW_ADDRESSED_MOVE_TAKES_ONLY_THE_JUDGED", new_out == demote,
          "moved %d, judged %d, extra %s" % (len(new_out), len(demote),
                                             sorted(new_out - demote) or "none")),
@@ -105,9 +131,19 @@ def main() -> int:
          sorted(m["slug"] for m in manifest) == sorted(new_out),
          "%d decisions for %d archived rows" % (len(manifest), len(new_out))),
         ("NO_ROW_LEFT_AS_A_SIDE_EFFECT", not side_effects, str(side_effects or "none")),
-        ("CONTROL_the_line_addressed_path_would_fail_that_check",
-         len(dragged) > 0,
-         "the same manifest over the old path carries %d side-effect rows" % len(dragged)),
+        # MUTATION CONTROL. Revert move_rows to the line-addressed behaviour and require the
+        # SHIPPED manifest builder to label the 16 as side-effect. This replaces two things that
+        # could not fail: a second check asserting `len(dragged) > 0` under a new name, and an
+        # assertion that no row was a side-effect, made against a code path with no reachable
+        # producer of that label.
+        ("MUTATION_the_shipped_manifest_labels_16_rows_side_effect_under_the_old_move",
+         mutated["side_effect"] == dragged,
+         "%d side-effect entries, naming %s"
+         % (len(mutated["side_effect"]), "the same 16" if mutated["side_effect"] == dragged
+            else mutated["side_effect"][:3])),
+        ("MUTATION_and_every_one_names_the_row_it_left_with",
+         all(mutated["of"].get(x) in demote for x in mutated["side_effect"]),
+         "each side-effect entry carries the judged row that took it"),
     ]
 
     out = {
