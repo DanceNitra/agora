@@ -42,7 +42,7 @@
    "got": "32 of 32 targets present"
   },
   {
-   "check": "THE_DRAGGED_SET_IS_THE_15_PUBLISHED",
+   "check": "THE_DRAGGED_SET_IS_THE_ONE_MEASURED_BY_THE_COMPANION_PROBE",
    "pass": true,
    "got": "replay 16, published 16, symmetric difference none"
   },

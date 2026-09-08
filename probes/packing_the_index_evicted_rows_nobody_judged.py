@@ -45,6 +45,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 
 import trim_memory_index as T  # noqa: E402
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, _self_check  # noqa: E402,F401
+
+
 MEM = os.environ.get(
     "AGORA_MEMORY_DIR",
     os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory"))
@@ -58,12 +62,6 @@ DRAWS = 20000
 # 5588661516 as 15 rows was really 16, and the reference counter could not see citations coming
 # from any of the three files either. A prefix filter aimed at a container silently ate its
 # contents.
-INDEX_FILES = {"memory.md", "memory_archive.md"}
-
-
-def is_index_file(name):
-    n = os.path.basename(name).lower()
-    return n in INDEX_FILES or n.startswith("memory.md.bak")
 
 
 def notes():

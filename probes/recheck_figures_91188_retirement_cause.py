@@ -14,6 +14,10 @@ import sys
 sys.path.insert(0, "tools")
 import trim_memory_index as T  # noqa: E402
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, looks_like_an_index, slug_is_index, _self_check  # noqa: E402,F401
+
+
 D = "drafts/91188_retirement_cause_class.md"
 R = "probes/was_the_row_judged_or_did_the_window_just_end.result.json"
 MEM = os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory")
@@ -51,7 +55,7 @@ def main():
     sec = [s for s in re.split(r"^##\s+", arc, flags=re.M)
            if s.startswith("Demoted from the index 2026-09-04")][0]
     rows = {os.path.splitext(os.path.basename(m))[0] for m in LINK.findall(sec)
-            if not os.path.basename(m).lower().startswith("memory")}
+            if not is_index_file(m)}
     extra = rows - set(T.DEMOTE)
     check("the_section_holds_53_rows", len(rows) == 53 and "holds 53 rows" in draft, len(rows))
     check("32_of_them_are_named_by_the_tool", len(rows & set(T.DEMOTE)) == 32
@@ -64,7 +68,7 @@ def main():
     for ln, line in enumerate(io.open(pre, encoding="utf-8", errors="replace").read().splitlines()):
         for m in LINK.finditer(line):
             s = os.path.splitext(os.path.basename(m.group(1)))[0]
-            if s.lower().startswith("memory") or s in ordinals:
+            if slug_is_index(s) or s in ordinals:
                 continue
             ordinals[s], line_of[s] = k, ln
             k += 1

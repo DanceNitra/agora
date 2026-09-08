@@ -12,8 +12,8 @@
    "purity": 1.0,
    "is_one_event": true,
    "rows_left": 40,
-   "rows_before": 251,
-   "rows_after": 228,
+   "rows_before": 252,
+   "rows_after": 229,
    "runs": 1,
    "largest_run": 40,
    "reaches_the_file_end": false,
@@ -71,8 +71,8 @@
    "purity": 1.0,
    "is_one_event": true,
    "rows_left": 18,
-   "rows_before": 247,
-   "rows_after": 246,
+   "rows_before": 248,
+   "rows_after": 247,
    "runs": 2,
    "largest_run": 13,
    "reaches_the_file_end": false,
@@ -108,8 +108,8 @@
    "purity": 0.543,
    "is_one_event": false,
    "rows_left": 35,
-   "rows_before": 246,
-   "rows_after": 258,
+   "rows_before": 247,
+   "rows_after": 259,
    "runs": 2,
    "largest_run": 33,
    "reaches_the_file_end": false,
@@ -156,14 +156,14 @@
   {
    "from": "MEMORY.md.bak-20260904-pretrim",
    "to": "MEMORY.md",
-   "observed_between": "2026-09-04 20:43 and 2026-09-08 17:45",
+   "observed_between": "2026-09-04 20:43 and 2026-09-08 20:58",
    "archive_event": "Demoted from the index 2026-09-04, to fit the loader window",
-   "rows_of_this_event_seen": "53 of 54",
-   "purity": 0.981,
+   "rows_of_this_event_seen": "54 of 55",
+   "purity": 0.982,
    "is_one_event": true,
-   "rows_left": 54,
-   "rows_before": 258,
-   "rows_after": 225,
+   "rows_left": 55,
+   "rows_before": 259,
+   "rows_after": 226,
    "runs": 13,
    "largest_run": 22,
    "reaches_the_file_end": true,
@@ -205,6 +205,7 @@
     "layer2-veracity-frontier-to-bedrock.md",
     "local-gpu-switch-after-cloud-quota-exhausted.md",
     "match-organ-is-cost-of-rigor-not-leak.md",
+    "memorygraft-crucible-candidate.md",
     "meta-sha-is-wasgeneratedby-not-wasderivedfrom.md",
     "our-pypi-downloads-are-not-people.md",
     "prediction-ledger-is-reliably-worse-than-chance.md",
@@ -231,15 +232,15 @@
   {
    "slug": "the-index-we-optimised-was-truncated-before-it-was-read.md",
    "left_before": "2026-09-04 20:43",
-   "back_at": "2026-09-08 17:45",
+   "back_at": "2026-09-08 20:58",
    "back_in": "MEMORY.md"
   }
  ],
  "checks": [
   {
    "check": "CONTROL_the_last_transition_is_the_09_04_event_not_a_09_08_one",
-   "pass": true,
-   "got": "54 rows, matched to 'Demoted from the index 2026-09-04, to fit the loader'"
+   "pass": false,
+   "got": "55 rows, matched to 'Demoted from the index 2026-09-04, to fit the loader'"
   },
   {
    "check": "CONTROL_a_filename_date_really_does_disagree_with_its_mtime",
@@ -284,15 +285,15 @@
   {
    "check": "CONTROL_note_level_references_are_reported_not_omitted",
    "pass": true,
-   "got": "122 of 196 retired rows are cited by a [[wikilink]] in some note today, which is undated"
+   "got": "125 of 198 retired rows are cited by a [[wikilink]] in some note today, which is undated"
   }
  ],
- "all_passed": true,
+ "all_passed": false,
  "finding": [
   "Moved from the index 2026-08-17 (the index had reached the read limit): 40 rows, one block, not at the end.",
   "Rotated out of the index 2026-08-22 (byte cap, not staleness): 18 rows, scattered, 2 separate runs.",
   "Demoted from the index 2026-08-26, to fit the loader window: 35 rows, WITHHELD: 54% of one event, so the runs span several decisions.",
-  "Demoted from the index 2026-09-04, to fit the loader window: 54 rows, scattered, 13 separate runs."
+  "Demoted from the index 2026-09-04, to fit the loader window: 55 rows, scattered, 13 separate runs."
  ],
  "reference_measure_verdict": "VOID. Zero cross-line references exist anywhere in the 26 snapshots, so the counter never had a target. An injected reference IS found, so the absence is a property of the index rather than of the instrument.",
  "scope": "References are counted from INSIDE the index only. Note files are not versioned, so a [[link]] in a note today cannot be dated to the retirement. This is index-level reference at retirement time, not the full false-retirement rate."

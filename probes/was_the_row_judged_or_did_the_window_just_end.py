@@ -72,6 +72,10 @@ import re
 import sys
 import time
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, looks_like_an_index, slug_is_index, _self_check  # noqa: E402,F401
+
+
 MEM = os.environ.get(
     "AGORA_MEMORY_DIR",
     os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory"))
@@ -107,7 +111,7 @@ def rows_of(path):
     for ln, line in enumerate(text.splitlines()):
         for m in LINK.finditer(line):
             slug = os.path.basename(m.group(1))
-            if slug.lower().startswith("memory"):
+            if is_index_file(slug):
                 continue                       # the archive link is navigation, not a row
             if slug in out:
                 continue
@@ -135,7 +139,7 @@ def archive_events():
     out = {}
     for head, body in zip(parts[1::2], parts[2::2]):
         slugs = {os.path.basename(m) for m in LINK.findall(body)
-                 if not os.path.basename(m).lower().startswith("memory")}
+                 if not is_index_file(m)}
         if slugs:
             out[head.strip()] = slugs
     return out
@@ -150,7 +154,7 @@ def wikilink_referenced(slugs):
     names = {os.path.splitext(s)[0] for s in slugs}
     hit = set()
     for f in glob.glob(os.path.join(MEM, "*.md")):
-        if os.path.basename(f).lower().startswith("memory"):
+        if is_index_file(f):
             continue
         body = io.open(f, encoding="utf-8", errors="replace").read()
         here = set(WIKI.findall(body))

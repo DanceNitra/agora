@@ -71,6 +71,10 @@ import os
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, looks_like_an_index, slug_is_index, _self_check  # noqa: E402,F401
+
+
 sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace", line_buffering=True)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +171,7 @@ def main():
     for dp, dn, fn in os.walk(os.path.expanduser("~")):
         dn[:] = [d for d in dn if d not in (".git", "node_modules", "__pycache__")]
         for f in fn:
-            if f.lower().startswith("memory") and f.lower().endswith(".md"):
+            if looks_like_an_index(f) and f.lower().endswith(".md"):
                 p = os.path.join(dp, f)
                 try:
                     if os.path.getsize(p) > 2_000_000:

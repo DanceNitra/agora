@@ -39,6 +39,10 @@ import re
 import sys
 import time
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, _self_check  # noqa: E402,F401
+
+
 MEM = os.environ.get(
     "AGORA_MEMORY_DIR",
     os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory"))
@@ -47,12 +51,6 @@ LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+\.md)\)")
 # `memorygraft-crucible-candidate`, `memory-scan-product-backlog` and
 # `memory-tipping-ews-killed`, three ordinary data rows. Measured 2026-09-08: the same
 # filter in the companion probe undercounted a publicly cited cohort by one.
-INDEX_FILES = {"memory.md", "memory_archive.md"}
-
-
-def is_index_file(name):
-    n = os.path.basename(name).lower()
-    return n in INDEX_FILES or n.startswith("memory.md.bak")
 
 
 def rows(path):

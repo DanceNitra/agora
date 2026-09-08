@@ -41,23 +41,22 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+from memory_index_files import is_index_file, _self_check  # noqa: E402,F401
+
+
 MEM = os.environ.get(
     "AGORA_MEMORY_DIR",
     os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory"))
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+\.md)\)")
-# EXACT NAMES, never a prefix: a prefix filter on "memory" also eats memorygraft-crucible-candidate.
-INDEX_FILES = {"memory.md", "memory_archive.md"}
+# The index/data test lives in tools/memory_index_files.py, imported above. It is not restated
+# here: four probes each carried their own copy and every copy was the wrong one.
 # The two rows we published as resurrections, and the one the snapshot scan actually found.
 PUBLISHED = ["real-vector-sampling-cannot-see-a-degeneracy",
              "tenant-filtered-view-persisted-drops-everyone-elses-rows"]
 OBSERVED = "the-index-we-optimised-was-truncated-before-it-was-read"
 DATE_IN_HEADING = re.compile(r"(20\d\d)-(\d\d)-(\d\d)")
 WITNESS_POOL = []
-
-
-def is_index_file(name):
-    n = os.path.basename(name).lower()
-    return n in INDEX_FILES or n.startswith("memory.md.bak")
 
 
 def slugs_in(text):
