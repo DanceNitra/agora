@@ -59,8 +59,40 @@ try:
 except ImportError:
     Inspeximus = None
 
-CONNECTOR = os.path.join(tempfile.gettempdir(), "claude", "C--Users-Danculus-agora",
-                         "5d882efe-89a3-4f28-a05d-2f4c4390562b", "scratchpad", "connector")
+def _connector_root():
+    """Where the partner's published client lives, resolved rather than hardcoded.
+
+    An earlier version pinned one session's temp directory, GUID and all, so the probe skipped
+    everywhere except the machine that wrote it and returned 0 while doing so. Order: an installed
+    package first, because that is what a reader will have; then the session path,
+    kept only so this file keeps working where it was written.
+
+    Returns the route as well as the path. The construction gate refused this probe for exposing
+    MEMSTRATA_CONNECTOR without ever stating its value, which is fair: an installed package and a
+    temp directory from one afternoon are very different provenances for the same measurement, so
+    both go into the receipt beside every number.
+    """
+    try:
+        import memstrata_mnemo_connector as _m
+        # THREE levels, not two: the package sits at <root>/src/memstrata_mnemo_connector, and the
+        # fixtures live at <root>/fixtures. Going up two lands in src/ and the probe then reports
+        # CANNOT RUN on the one machine that has the checkout. It said so rather than passing, which
+        # is why the skip was changed from exit 0 to exit 2 an hour before this.
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_m.__file__))))
+        if os.path.isdir(os.path.join(root, "fixtures")):
+            return root, "installed package"
+    except ImportError:
+        pass
+    # NO ENVIRONMENT KNOB. One was added here and the construction gate refused the probe for it:
+    # an exposed switch the published run never varied is an undisclosed degree of freedom, and
+    # recording its value in the receipt does not answer that. `pip install -e <connector>` reaches
+    # the same place with nothing to sweep.
+    return (os.path.join(tempfile.gettempdir(), "claude", "C--Users-Danculus-agora",
+                         "5d882efe-89a3-4f28-a05d-2f4c4390562b", "scratchpad", "connector"),
+            "the session scratchpad, which exists on one machine")
+
+
+CONNECTOR, CONNECTOR_ROUTE = _connector_root()
 SUBJECT = "synthetic-runbook"
 SECRET = "jane@example.com"
 TOKEN = "local-fixture-token-not-a-secret"
@@ -253,8 +285,8 @@ def run_arm(name, deletes, report=None):
 
 def main():
     if Inspeximus is None:
-        print("  SKIPPED: inspeximus is not importable here.")
-        return 0
+        print("  CANNOT RUN: inspeximus is not importable here.")
+        return 2
 
     checks, ok_all = [], True
 
@@ -342,13 +374,20 @@ def main():
                    source={"doc": SUBJECT, "channel": "doc", "principal": SUBJECT})
     erased = store.forget_subject(SUBJECT, request_id="REQ-001", basis="GDPR Art.17",
                                   authorized_by="data-subject")
-    check("a_schema_v0_shaped_source_cannot_be_written_back",
+    # THIS MEASURES OUR VALIDATOR, NOT THEIR WIRE FORMAT, and its first label said the
+    # opposite. Measured end to end: the partner client's `freeze_record` copies the raw
+    # source dict into `writer_metadata`, so a `doc` reaches the receiver intact today. What
+    # fails is writing a {channel, principal} source BACK into inspeximus, because
+    # `_check_source` demands a `doc` key. That is our rule, and the round trip is ours to
+    # fix rather than theirs.
+    check("OUR_validator_refuses_a_channel_principal_source",
           refused is not None and "'doc' key" in refused,
-          "the value survives the hop; the ROLE does not")
+          "our rule, not their format")
     check("CONTROL_with_a_doc_handle_the_same_erasure_works", erased.get("erased", 0) >= 1,
           "erased=%s" % erased.get("erased"))
 
     out = {"probe": os.path.basename(__file__), "checks": checks, "all_passed": ok_all,
+           "connector_root": CONNECTOR, "connector_resolved_by": CONNECTOR_ROUTE,
            "arms": {arm["name"]: {"reported": arm["reported"],
                                   "complete": arm["manifest"].get("complete"),
                                   "residual_targets": arm["manifest"].get("residual_targets")}

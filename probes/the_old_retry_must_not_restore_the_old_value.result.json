@@ -52,6 +52,8 @@
    "got": "so send it once and keep the bytes, or omit the field as his fixtures do"
   }
  ],
+ "connector_root": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\5d882efe-89a3-4f28-a05d-2f4c4390562b\\scratchpad\\connector",
+ "connector_resolved_by": "installed package",
  "all_passed": true,
  "current_value_at_end": {
   "valid_from": 1782700060.0,

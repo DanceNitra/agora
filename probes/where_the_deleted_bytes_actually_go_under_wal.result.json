@@ -1,0 +1,165 @@
+{
+ "probe": "where_the_deleted_bytes_actually_go_under_wal.py",
+ "pragmas": [
+  "journal_mode=WAL",
+  "synchronous=FULL"
+ ],
+ "rows": 30,
+ "arms": [
+  {
+   "arm": "DELETE only",
+   "steps": [],
+   "secure_delete": false,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": 60,
+    "-shm": 0
+   },
+   "residue": [
+    "-wal"
+   ]
+  },
+  {
+   "arm": "DELETE + VACUUM",
+   "steps": [
+    "VACUUM"
+   ],
+   "secure_delete": false,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": 60,
+    "-shm": 0
+   },
+   "residue": [
+    "-wal"
+   ]
+  },
+  {
+   "arm": "DELETE + wal_checkpoint(TRUNCATE)",
+   "steps": [
+    "PRAGMA wal_checkpoint(TRUNCATE)"
+   ],
+   "secure_delete": false,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 30,
+    "-wal": 0,
+    "-shm": 0
+   },
+   "residue": [
+    "db"
+   ]
+  },
+  {
+   "arm": "DELETE + VACUUM + checkpoint",
+   "steps": [
+    "VACUUM",
+    "PRAGMA wal_checkpoint(TRUNCATE)"
+   ],
+   "secure_delete": false,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": 0,
+    "-shm": 0
+   },
+   "residue": []
+  },
+  {
+   "arm": "secure_delete + DELETE + both",
+   "steps": [
+    "VACUUM",
+    "PRAGMA wal_checkpoint(TRUNCATE)"
+   ],
+   "secure_delete": true,
+   "positive_control": true,
+   "negative_control": 0,
+   "rows_after": 0,
+   "before": {
+    "db": 0,
+    "-wal": 30,
+    "-shm": 0
+   },
+   "after": {
+    "db": 0,
+    "-wal": 0,
+    "-shm": 0
+   },
+   "residue": []
+  }
+ ],
+ "checks": [
+  {
+   "check": "CONTROL_every_arm_had_the_canary_before_deleting",
+   "pass": true,
+   "got": "all five"
+  },
+  {
+   "check": "CONTROL_a_string_never_written_counts_zero",
+   "pass": true,
+   "got": ""
+  },
+  {
+   "check": "CONTROL_every_arm_actually_emptied_the_table",
+   "pass": true,
+   "got": ""
+  },
+  {
+   "check": "DELETE_alone_leaves_every_copy_in_the_wal",
+   "pass": true,
+   "got": "{'db': 0, '-wal': 60, '-shm': 0}"
+  },
+  {
+   "check": "VACUUM_does_not_touch_the_wal",
+   "pass": true,
+   "got": "a vacuum rewrites the database, not the log"
+  },
+  {
+   "check": "A_CHECKPOINT_ALONE_MOVES_IT_INTO_THE_DATABASE",
+   "pass": true,
+   "got": "{'db': 30, '-wal': 0, '-shm': 0}"
+  },
+  {
+   "check": "only_vacuum_AND_checkpoint_clears_both",
+   "pass": true,
+   "got": "{'db': 0, '-wal': 0, '-shm': 0}"
+  },
+  {
+   "check": "secure_delete_also_clears_it",
+   "pass": true,
+   "got": ""
+  }
+ ],
+ "all_passed": true,
+ "note": "One filesystem, one SQLite build, one page size, payloads small enough to stay in the b-tree. secure_delete is off by default and changes the answer."
+}
