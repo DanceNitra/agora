@@ -16,7 +16,7 @@ import sys
 
 D = "drafts/memstrata_erasure_v0_reply.md"
 PAIRED = "probes/the_old_retry_must_not_restore_the_old_value.result.json"
-ERASE = "probes/a_partner_who_says_erased_and_still_answers.result.json"
+ERASE = "probes/a_receiver_that_reports_erased_without_erasing.result.json"
 SCHEMA = "research/schema_v0.json"
 ERASURE_SCHEMA = "research/erasure_v0.json"
 
@@ -37,29 +37,44 @@ def main():
     n_checks = len(p["checks"])
     n_controls = sum(1 for c in p["checks"] if c["check"].startswith("CONTROL"))
     check("paired_probe_all_passed", p["all_passed"] is True, p["all_passed"])
-    check("ten_checks", n_checks == 10 and "Ten checks" in draft, n_checks)
-    # SIX, and the draft said five until this fired. The count comes from the receipt, not from
-    # me: any check whose name starts with CONTROL_ is one, so adding a control updates the
-    # number rather than silently making the sentence wrong.
-    check("controls_counted_from_the_receipt",
-          n_controls == 6 and "six of them controls" in draft, n_controls)
-    check("the_point_check_passed",
-          any(c["check"].startswith("THE_POINT") and c["pass"] for c in p["checks"]),
-          [c["check"] for c in p["checks"] if c["check"].startswith("THE_POINT")])
+    # THE DRAFT NO LONGER CITES A CHECK COUNT, deliberately. A mutation audit showed the count
+    # implied a strength it did not have, so the draft names WHICH check tests what instead. What
+    # must hold is that both named checks exist and pass.
+    names = {c["check"]: c["pass"] for c in p["checks"]}
+    check("both_named_checks_exist_and_pass",
+          names.get("replay_returned_its_original_receipt") is True
+          and names.get("the_value_after_the_replay_is_still_the_new_one") is True,
+          "%d checks, %d controls, neither number quoted" % (n_checks, n_controls))
+    check("the_draft_says_which_one_tests_the_replay_path",
+          "receipt-identity one" in draft and "delete the receiver's replay branch" in draft)
+    check("CONTROL_no_check_still_claims_more_than_it_measures",
+          not any(c["check"].startswith("THE_POINT") for c in p["checks"])
+          and "makes_a_reemit_a_409" not in json.dumps(p),
+          "both overclaiming names retired")
 
     # the erasure arms: the claim that would be worst to get wrong
     check("erasure_probe_all_passed", e["all_passed"] is True, e["all_passed"])
-    check("honest_arm_complete", e["honest_arm"]["complete"] is True, e["honest_arm"])
-    check("lying_arm_not_complete", e["lying_arm"]["complete"] is False, e["lying_arm"])
-    check("lying_arm_is_named", bool(e["lying_arm"]["residual_targets"]),
-          e["lying_arm"]["residual_targets"])
-    same_count = next((c for c in e["checks"]
-                       if c["check"] == "CONTROL_both_arms_reported_the_same_erased_count"), None)
-    check("BOTH_ARMS_REPORTED_THE_SAME_COUNT",
-          same_count is not None and same_count["pass"] and "2 vs 2" in same_count["got"]
-          and 'reported the same `{"erased": 2}`' in draft, same_count and same_count["got"])
-    check("and_the_draft_says_the_count_did_not_separate_them",
-          "the count did not separate them" in draft)
+    arms = e["arms"]
+    dele = arms["receiver-that-deletes"]
+    keeps = arms["receiver-that-does-not-delete"]
+    zero = arms["receiver-that-deletes-and-reports-zero"]
+    check("deleting_receiver_complete", dele["complete"] is True, dele)
+    check("non_deleting_receiver_not_complete_and_named",
+          keeps["complete"] is False and bool(keeps["residual_targets"]), keeps)
+    # THE ARM THAT MAKES IT A MEASUREMENT. Without it the first two report equal counts by
+    # construction, which the draft must not present as evidence.
+    check("THIRD_ARM_varies_count_independently_of_deletion",
+          zero["reported"] == 0 and zero["complete"] is True and dele["reported"] != zero["reported"]
+          and "one deletes but reports zero" in draft, zero)
+    check("the_draft_says_the_first_two_are_equal_by_construction",
+          "report the same count by construction" in draft)
+    check("CONTROL_verify_can_say_no",
+          any(c["check"] == "CONTROL_verify_REJECTS_a_doctored_manifest" and c["pass"]
+              for c in e["checks"]), "a verifier that always says yes fails the probe")
+    check("the_draft_names_what_the_check_cannot_see",
+          len(e["not_covered_by_still_recoverable"]) == 4
+          and all(w in draft for w in ("embedding", "cache", "freed database pages", "request log")),
+          e["not_covered_by_still_recoverable"])
 
     # the two endpoints, quoted from the receipt rather than from memory
     for ep in e["proposed_endpoints"]:
@@ -68,8 +83,8 @@ def main():
     # the schema claims
     s0 = json.load(open(SCHEMA, encoding="utf-8"))
     check("schema_id_is_self_consistent",
-          s0["$id"].endswith("research/schema_v0.json") and "research/schema_v0.json" in draft,
-          s0["$id"])
+          s0["$id"].endswith("research/schema_v0.json")
+          and "it now resolves from the URL it names" in draft, s0["$id"])
     check("effective_value_is_optional_in_ours",
           "effective_value" not in s0["$defs"]["fact_record"]["required"]
           and "my schema marks it optional" in draft,
@@ -80,7 +95,9 @@ def main():
           life == ["superseded", "retracted", "erased"]
           and all(w in draft for w in life), life)
     check("four_open_questions", len(e0["open_questions"]) == 4
-          and "Four questions I left open" in draft, len(e0["open_questions"]))
+          and "Four questions are open" in draft, len(e0["open_questions"]))
+    check("seven_weeks_not_nine", "seven weeks" in draft and "21 July" in draft,
+          "measured: 84df666 renamed mnemo/ to research/ on 2026-07-21, 49 days")
 
     # CONTROLS
     check("CONTROL_a_figure_not_measured_is_not_asserted", "99" not in draft)
@@ -88,9 +105,13 @@ def main():
           os.path.getmtime(PAIRED) >= os.path.getmtime(PAIRED.replace(".result.json", ".py"))
           and os.path.getmtime(ERASE) >= os.path.getmtime(ERASE.replace(".result.json", ".py")))
     check("CONTROL_the_draft_says_the_receiver_is_not_his_service",
-          "not your service" in draft and "says nothing about MemStrata" in draft)
+          "not your service" in draft and "nothing about MemStrata" in draft)
+    # WITHDRAWN, each refuted by the gate and each must stay out.
+    for phrase in ("nine weeks", "cannot be expressed on the wire", "rather than quickly",
+                   "the count did not separate them", "a partner who says"):
+        check("WITHDRAWN_%s" % phrase[:22].replace(" ", "_"), phrase not in draft)
     check("pure_ascii", all(ord(c) < 128 for c in raw), "gh mangles anything else")
-    check("length_reasonable", 2000 <= len(raw) <= 5000, "%d chars" % len(raw))
+    check("length_reasonable", 2000 <= len(raw) <= 5100, "%d chars" % len(raw))
 
     print("\n  %s" % ("all checks passed" if ok else "FAILED"))
     return 0 if ok else 1

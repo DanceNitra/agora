@@ -1,32 +1,21 @@
 {
- "measured_at": "2026-09-04T07:10:43Z",
- "records": 256809,
- "source_pct": 87.94,
+ "measured_at": "2026-09-07T11:50:18Z",
+ "records": 227398,
+ "source_pct": 99.43,
  "addressable": 0,
  "fetched": 0,
- "record_addressable": 203,
- "record_retrieved": 203,
- "git_ref_shaped": 209,
- "git_pairs": {
-  ".inspeximus/coding_memory.json": {
-   "records_with_pair": 209,
-   "records_fully_resolved": 203,
-   "pairs": 574,
-   "pairs_in_tree": 552,
-   "distinct_shas": 204,
-   "shas_are_commits": 204,
-   "shas_public": 161,
-   "public_ref": "origin/main"
-  }
- },
+ "record_addressable": 0,
+ "record_retrieved": 0,
+ "git_ref_shaped": 0,
+ "git_pairs": {},
  "fetch_attempts": 0,
- "local_reads": 145,
+ "local_reads": 0,
  "fetch_not_tried_distinct": 0,
- "fetched_is_entailed": false,
+ "fetched_is_entailed": true,
  "recheckable": 0,
  "recheckable_note": "deprecated alias, kept so older scripts still read: it equals addressable, which is what it always measured",
  "full_coverage_stores": 8,
- "full_coverage_records": 225627,
+ "full_coverage_records": 226107,
  "full_coverage_distinct_sources": 8,
  "full_coverage_ratio": 3.5e-05,
  "control": {
@@ -43,7 +32,7 @@
   "distinct_sources": 7,
   "top": [
    [
-    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmp_5juziyz\\runbook.md",
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmpbnek3j_r\\runbook.md",
     1
    ],
    [
@@ -54,44 +43,13 @@
   "ratio_over_sourced": 1.0,
   "ratio_over_all": 1.0
  },
- "unreadable": [],
+ "unreadable": [
+  [
+   ".inspeximus/coding_memory.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x92 in position 27: invalid start byte"
+  ]
+ ],
  "per_store": [
-  {
-   "records": 29891,
-   "with_source": 209,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 203,
-   "record_retrieved": 203,
-   "git_ref_shaped": 209,
-   "recheckable": 0,
-   "distinct_sources": 204,
-   "top": [
-    [
-     "git:162de50e1702",
-     2
-    ],
-    [
-     "git:9b45fa2302df",
-     2
-    ]
-   ],
-   "ratio_over_sourced": 0.976077,
-   "ratio_over_all": 0.006825,
-   "store": ".inspeximus/coding_memory.json",
-   "git_pairs": {
-    "records_with_pair": 209,
-    "records_fully_resolved": 203,
-    "pairs": 574,
-    "pairs_in_tree": 552,
-    "distinct_shas": 204,
-    "shas_are_commits": 204,
-    "shas_public": 161,
-    "public_ref": "origin/main"
-   }
-  },
   {
    "records": 917,
    "with_source": 0,
@@ -127,8 +85,8 @@
    "store": "agora-game-server/.inspeximus/coding_memory.json"
   },
   {
-   "records": 28280,
-   "with_source": 28280,
+   "records": 28340,
+   "with_source": 28340,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -141,7 +99,7 @@
    "top": [
     [
      "agent:artificer",
-     28280
+     28340
     ]
    ],
    "ratio_over_sourced": 3.5e-05,
@@ -149,8 +107,8 @@
    "store": "agora-game-server/.agent_memory/artificer.json"
   },
   {
-   "records": 28258,
-   "with_source": 28258,
+   "records": 28319,
+   "with_source": 28319,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -163,7 +121,7 @@
    "top": [
     [
      "agent:cartographer",
-     28258
+     28319
     ]
    ],
    "ratio_over_sourced": 3.5e-05,
@@ -171,8 +129,8 @@
    "store": "agora-game-server/.agent_memory/cartographer.json"
   },
   {
-   "records": 28221,
-   "with_source": 28221,
+   "records": 28281,
+   "with_source": 28281,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -185,7 +143,7 @@
    "top": [
     [
      "agent:guard_l",
-     28221
+     28281
     ]
    ],
    "ratio_over_sourced": 3.5e-05,
@@ -193,8 +151,8 @@
    "store": "agora-game-server/.agent_memory/guard_l.json"
   },
   {
-   "records": 28304,
-   "with_source": 28304,
+   "records": 28364,
+   "with_source": 28364,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -207,7 +165,7 @@
    "top": [
     [
      "agent:guard_r",
-     28304
+     28364
     ]
    ],
    "ratio_over_sourced": 3.5e-05,
@@ -215,8 +173,8 @@
    "store": "agora-game-server/.agent_memory/guard_r.json"
   },
   {
-   "records": 28126,
-   "with_source": 28126,
+   "records": 28186,
+   "with_source": 28186,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -229,16 +187,16 @@
    "top": [
     [
      "agent:king",
-     28126
+     28186
     ]
    ],
-   "ratio_over_sourced": 3.6e-05,
-   "ratio_over_all": 3.6e-05,
+   "ratio_over_sourced": 3.5e-05,
+   "ratio_over_all": 3.5e-05,
    "store": "agora-game-server/.agent_memory/king.json"
   },
   {
-   "records": 28303,
-   "with_source": 28303,
+   "records": 28362,
+   "with_source": 28362,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -251,7 +209,7 @@
    "top": [
     [
      "agent:priest",
-     28303
+     28362
     ]
    ],
    "ratio_over_sourced": 3.5e-05,
@@ -259,8 +217,8 @@
    "store": "agora-game-server/.agent_memory/priest.json"
   },
   {
-   "records": 27937,
-   "with_source": 27937,
+   "records": 27996,
+   "with_source": 27996,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -273,7 +231,7 @@
    "top": [
     [
      "agent:scholar",
-     27937
+     27996
     ]
    ],
    "ratio_over_sourced": 3.6e-05,
@@ -281,8 +239,8 @@
    "store": "agora-game-server/.agent_memory/scholar.json"
   },
   {
-   "records": 28198,
-   "with_source": 28198,
+   "records": 28259,
+   "with_source": 28259,
    "addressable": 0,
    "fetched": 0,
    "fetch_failed": 0,
@@ -295,7 +253,7 @@
    "top": [
     [
      "agent:thief",
-     28198
+     28259
     ]
    ],
    "ratio_over_sourced": 3.5e-05,

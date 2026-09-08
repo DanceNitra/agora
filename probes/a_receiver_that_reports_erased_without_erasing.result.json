@@ -1,0 +1,86 @@
+{
+ "probe": "a_receiver_that_reports_erased_without_erasing.py",
+ "checks": [
+  {
+   "check": "A_deleting_receiver_is_complete",
+   "pass": true,
+   "got": "True"
+  },
+  {
+   "check": "B_non_deleting_receiver_is_not_complete",
+   "pass": true,
+   "got": "False"
+  },
+  {
+   "check": "B_and_the_manifest_names_it",
+   "pass": true,
+   "got": "['receiver-that-does-not-delete']"
+  },
+  {
+   "check": "C_count_zero_but_data_gone_is_still_complete",
+   "pass": true,
+   "got": "reported=0 complete=True"
+  },
+  {
+   "check": "C_so_the_verdict_does_not_consult_the_count",
+   "pass": true,
+   "got": "A reported 2, C reported 0, both complete"
+  },
+  {
+   "check": "BY_CONSTRUCTION_A_and_B_report_the_same_count",
+   "pass": true,
+   "got": "2 and 2, equal because the fixture counts before it branches"
+  },
+  {
+   "check": "verify_accepts_an_intact_manifest",
+   "pass": true,
+   "got": "[]"
+  },
+  {
+   "check": "CONTROL_verify_REJECTS_a_doctored_manifest",
+   "pass": true,
+   "got": "['`complete` is True but the entries say False \u2014 the verdict does not follow from the evidence', \"`residual_targets` is [] but the entries say ['receiver-that-does-not-delete']\"]"
+  },
+  {
+   "check": "a_schema_v0_shaped_source_cannot_be_written_back",
+   "pass": true,
+   "got": "the value survives the hop; the ROLE does not"
+  },
+  {
+   "check": "CONTROL_with_a_doc_handle_the_same_erasure_works",
+   "pass": true,
+   "got": "erased=1"
+  }
+ ],
+ "all_passed": true,
+ "arms": {
+  "receiver-that-deletes": {
+   "reported": 2,
+   "complete": true,
+   "residual_targets": []
+  },
+  "receiver-that-does-not-delete": {
+   "reported": 2,
+   "complete": false,
+   "residual_targets": [
+    "receiver-that-does-not-delete"
+   ]
+  },
+  "receiver-that-deletes-and-reports-zero": {
+   "reported": 0,
+   "complete": true,
+   "residual_targets": []
+  }
+ },
+ "proposed_endpoints": [
+  "POST /mnemo/v0/erase",
+  "POST /mnemo/v0/still_recoverable"
+ ],
+ "not_covered_by_still_recoverable": [
+  "a value surviving in an embedding",
+  "a response or retrieval cache",
+  "freed database pages before a vacuum",
+  "the receiver's own request log, which this call can write"
+ ],
+ "note": "The receivers are fixtures implementing the proposed contract. They model a failure mode, not any party. Nothing here measures a real service."
+}
