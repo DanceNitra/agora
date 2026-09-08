@@ -111,6 +111,9 @@ def main() -> int:
     ap.add_argument("--evidence", default="",
                     help="path to an artifact the skill run produced (its output/transcript "
                          "file). Required for `record`: a receipt must point at something.")
+    ap.add_argument("--wording-is-final", action="store_true",
+                    help="record a humanizer receipt before redteam and verify have one. Only "
+                         "when the content is frozen and those passes cannot change a word.")
     ap.add_argument("--in-session", action="store_true",
                     help="the skill ran through the Skill tool in this session rather than in a "
                          "subagent; evidence is the harness's own tool_use record, checked by "
@@ -132,6 +135,8 @@ def main() -> int:
 
     if not os.path.exists(a.draft):
         raise SystemExit(f"REFUSED: {a.draft} is absent")
+    if a.action == "record" and not getattr(a, "wording_is_final", False):
+        _humanizer_runs_last(a)
     # An empty --found is the whole failure mode in miniature: a pass recorded without a reading.
     if len(a.found.strip()) < 12:
         raise SystemExit("REFUSED: --found must say what the skill actually found. If it found "
@@ -303,6 +308,34 @@ def main() -> int:
                       # "the session's own summary", which is the point.
                       "tier": "transcript" if not EV_EMPTY else "agent_report",
                       "agent_report": rep_meta})
+
+
+def _humanizer_runs_last(a) -> None:
+    """The humanizer records only after redteam and verify already have receipts on these bytes.
+
+    WHY THIS IS A REFUSAL AND NOT A NOTE. Owner, 2026-09-08: "humanizer sa bude pustat az na uplny
+    koniec naco ho tam stale davas ked to je len textova uprava naco mi minas kredity stale
+    dookola." He was right. I ran the humanizer SKILL on a draft, then a verify panel found six
+    wrong figures, the rewrite invalidated the receipt by content sha, and I ran the whole skill
+    again. The second run was pure waste: the redteam panel was still out, so the text was going to
+    change once more regardless.
+
+    The content-sha binding is correct and stays. The ordering was mine to get right, so it is
+    enforced here rather than remembered: content first, wording last, one pass.
+    """
+    if a.skill != "humanizer":
+        return
+    d = sha(a.draft)
+    missing = [s for s in ("redteam", "verify") if not os.path.exists(receipt_path(d, s))]
+    if missing:
+        raise SystemExit(
+            "REFUSED: the humanizer runs LAST, and %s %s no receipt on these bytes.\n"
+            "  Every edit those passes force invalidates a humanizer receipt by content\n"
+            "  sha, so a humanizer pass before them is one you will pay for twice.\n"
+            "  Order: verify and redteam on the content, apply their corrections, THEN\n"
+            "  one humanizer pass on the final wording.\n"
+            "  Override only when the content is frozen: --wording-is-final."
+            % (" and ".join(missing), "have" if len(missing) > 1 else "has"))
 
 
 def _write(a, evidence):
