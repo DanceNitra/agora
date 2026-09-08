@@ -1,0 +1,43 @@
+{
+ "probe": "the_orbit_result_is_scoped_to_the_uniform_point.py",
+ "pairs": 1106,
+ "pairs_losing_symmetry": 851,
+ "pairs_keeping_full_group": 255,
+ "pairs_collapsing_to_identity": 398,
+ "pairs_gaining_orbits": 851,
+ "checks": [
+  {
+   "check": "CONTROL_K4_has_4_factorial_automorphisms",
+   "pass": true,
+   "got": "24"
+  },
+  {
+   "check": "CONTROL_C5_has_2n_automorphisms",
+   "pass": true,
+   "got": "10"
+  },
+  {
+   "check": "the_weighted_edge_shrinks_the_group_in_most_cases",
+   "pass": true,
+   "got": "851 of 1106 pairs lose symmetry"
+  },
+  {
+   "check": "CONTROL_some_graphs_keep_their_full_group",
+   "pass": true,
+   "got": "255 of 1106 pairs keep it"
+  },
+  {
+   "check": "the_orbit_partition_gets_finer_away_from_the_uniform_point",
+   "pass": true,
+   "got": "851 of 1106 pairs gain orbits"
+  },
+  {
+   "check": "CONTROL_never_more_orbits_than_edges_at_s_equals_1",
+   "pass": true,
+   "got": ""
+  }
+ ],
+ "all_passed": true,
+ "finding": "A single contradiction edge removes symmetry in 851 of 1106 (graph, edge) pairs on 4 to 6 vertices, and makes the edge-orbit partition strictly finer in 851. The premise of the s=1 orbit result, that the Hamiltonian is invariant under the full automorphism group, therefore holds only at the uniform point. A counterexample found at a valley bottom, where s is not 1, is outside that premise and does not bear on it.",
+ "scope": "Group theory on the weighted graph only. This says which symmetry can act, which is the premise of the orbit theorem. It measures nothing about the ground state or the correlations that follow from it."
+}
