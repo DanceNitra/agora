@@ -3,7 +3,7 @@
  "snapshots": 26,
  "snapshot_span": [
   "2026-08-17 19:26",
-  "2026-09-08 20:58"
+  "2026-09-08 21:57"
  ],
  "largest_gap_days": 9.5,
  "archive_blocks": 11,
@@ -47,7 +47,7 @@
   {
    "check": "CONTROL_the_reader_sees_a_slug_that_is_present",
    "pass": true,
-   "got": "226 slugs in the newest snapshot"
+   "got": "227 slugs in the newest snapshot"
   },
   {
    "check": "CONTROL_a_slug_in_no_snapshot_reads_absent_everywhere",
@@ -91,6 +91,6 @@
   }
  ],
  "all_passed": true,
- "finding": "We published that two rows appearing in two archive blocks each is 'only possible if they returned to the live index in between'. The snapshot series cannot check that for either row: no snapshot falls between the two archive events in either case, and the largest gap in the series is 9 days. Neither row shows a return in the series. Meanwhile the one row that demonstrably left and came back appears in no archive block at all. Archive-block membership records what a trim WROTE; snapshot presence records what the index HELD. Neither instrument contains the other, so the 1.0 percent figure rests on an assumption the data does not support.",
+ "finding": "We published that two rows appearing in two archive blocks each is 'only possible if they returned to the live index in between'. The snapshot series cannot check that for either row: no snapshot falls between the two archive events in either case, and the largest gap in the series is 9.5 days. Neither row shows a return in the series. Meanwhile the one row that demonstrably left and came back appears in no archive block at all. Archive-block membership records what a trim WROTE; snapshot presence records what the index HELD. Neither instrument contains the other, so the 1.0 percent figure rests on an assumption the data does not support.",
  "scope": "This does not show the two rows did NOT return. It shows the instrument we cited cannot tell a return from a second archive write, and that our series has no observation in the window where it would matter."
 }

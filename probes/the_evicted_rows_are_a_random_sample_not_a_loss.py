@@ -6,6 +6,12 @@ the 32 the tool judged, permutation p = 0.0073 -- and then read it as "the cap e
 indistinguishable from the ones kept". Three arms below take that reading apart. The numbers stand;
 the conclusion drawn from them does not.
 
+NONE OF THIS WAS EVER PUBLISHED, and the distinction matters. On anthropics/claude-code#91188,
+comment 5588661516 named this as the next open measurement -- "for the 15 adjacency-moved rows,
+whether any was still load-bearing when its neighbour was judged" -- and no result or p-value has
+gone out. So this file answers an open question rather than retracting a public claim. A draft that
+said otherwise would have manufactured an error we did not make.
+
 WHAT SURVIVES, and it is a fact about the code rather than a statistic: 16 rows left the index
 because they shared a physical line with a row the tool judged, and no decision was recorded for any
 of them. That is measured by probes/a_move_that_addresses_rows_must_not_drag_the_line.py against the

@@ -156,14 +156,14 @@
   {
    "from": "MEMORY.md.bak-20260904-pretrim",
    "to": "MEMORY.md",
-   "observed_between": "2026-09-04 20:43 and 2026-09-08 20:58",
+   "observed_between": "2026-09-04 20:43 and 2026-09-08 21:57",
    "archive_event": "Demoted from the index 2026-09-04, to fit the loader window",
    "rows_of_this_event_seen": "54 of 55",
    "purity": 0.982,
    "is_one_event": true,
    "rows_left": 55,
    "rows_before": 259,
-   "rows_after": 226,
+   "rows_after": 227,
    "runs": 13,
    "largest_run": 22,
    "reaches_the_file_end": true,
@@ -232,7 +232,7 @@
   {
    "slug": "the-index-we-optimised-was-truncated-before-it-was-read.md",
    "left_before": "2026-09-04 20:43",
-   "back_at": "2026-09-08 20:58",
+   "back_at": "2026-09-08 21:57",
    "back_in": "MEMORY.md"
   }
  ],

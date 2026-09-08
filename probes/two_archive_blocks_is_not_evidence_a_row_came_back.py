@@ -200,7 +200,7 @@ def main() -> int:
             "We published that two rows appearing in two archive blocks each is 'only possible if "
             "they returned to the live index in between'. The snapshot series cannot check that for "
             "either row: no snapshot falls between the two archive events in either case, and the "
-            "largest gap in the series is %.0f days. Neither row shows a return in the series. "
+            "largest gap in the series is %.1f days. Neither row shows a return in the series. "
             "Meanwhile the one row that demonstrably left and came back appears in no archive block "
             "at all. Archive-block membership records what a trim WROTE; snapshot presence records "
             "what the index HELD. Neither instrument contains the other, so the 1.0 percent figure "
