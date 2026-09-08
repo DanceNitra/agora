@@ -34,6 +34,11 @@ mutation audit replaced that method's body with `return (True, [])` and the prob
 everything, so neither check could see a verifier that had stopped verifying. A corrupted manifest is
 now handed to it, and `verify` must return False on it or this probe fails.
 
+AND THE OUTBOX ARMS REGISTER TWO TARGETS, the receiver and the queue. NO memory store is in them.
+A first version of the reply that cites this probe said "inspeximus erased it" about that arm, which
+described an experiment that was never run. The `Inspeximus(...)` further down is a separate fixture
+for the source-handle check.
+
 WHAT THIS DOES NOT SHOW. `still_recoverable` here greps stored text. It cannot see a value that
 survives in an embedding, in a cache, in freed database pages before a vacuum, or in the receiver's
 own request log, and the last of those can be written by this very call. The manifest's own scope
