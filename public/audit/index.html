@@ -160,7 +160,9 @@
   cell measures. Graphiti config disclosure: ingestion LLM ran on Ollama Cloud (deepseek-v4-flash,
   schema-in-prompt) with local nomic embeddings and RRF search instead of its OpenAI default; the four residue
   surfaces themselves are deterministic neo4j reads, unaffected by the LLM choice. On regulation:
-  GDPR Article 17(3) explicitly permits retention for audit and legal purposes — this cell is an engineering
+  GDPR Article 17(3) disapplies the erasure duty on five listed grounds, and audit is not one of them by name:
+  17(3)(b) covers processing that a Union or Member State law requires, and 17(3)(e) covers the establishment,
+  exercise or defence of legal claims, each only to the extent that ground reaches. This cell is an engineering
   signal about <em>where erased content remains readable</em>, not a compliance assessment, and no system here
   "fails the right to erasure." Prior art, credited: soft-delete and vector residue are a known failure class
   (Ghost&nbsp;Vectors, arXiv:2606.18497; the machine-unlearning literature's core thesis is that delete does not

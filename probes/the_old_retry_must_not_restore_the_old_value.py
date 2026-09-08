@@ -53,8 +53,40 @@ import tempfile
 import threading
 import time
 
-CONNECTOR = os.path.join(tempfile.gettempdir(), "claude", "C--Users-Danculus-agora",
-                         "5d882efe-89a3-4f28-a05d-2f4c4390562b", "scratchpad", "connector")
+def _connector_root():
+    """Where the partner's published client lives, resolved rather than hardcoded.
+
+    An earlier version pinned one session's temp directory, GUID and all, so the probe skipped
+    everywhere except the machine that wrote it and returned 0 while doing so. Order: an installed
+    package first, because that is what a reader will have; then the session path,
+    kept only so this file keeps working where it was written.
+
+    Returns the route as well as the path. The construction gate refused this probe for exposing
+    MEMSTRATA_CONNECTOR without ever stating its value, which is fair: an installed package and a
+    temp directory from one afternoon are very different provenances for the same measurement, so
+    both go into the receipt beside every number.
+    """
+    try:
+        import memstrata_mnemo_connector as _m
+        # THREE levels, not two: the package sits at <root>/src/memstrata_mnemo_connector, and the
+        # fixtures live at <root>/fixtures. Going up two lands in src/ and the probe then reports
+        # CANNOT RUN on the one machine that has the checkout. It said so rather than passing, which
+        # is why the skip was changed from exit 0 to exit 2 an hour before this.
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_m.__file__))))
+        if os.path.isdir(os.path.join(root, "fixtures")):
+            return root, "installed package"
+    except ImportError:
+        pass
+    # NO ENVIRONMENT KNOB. One was added here and the construction gate refused the probe for it:
+    # an exposed switch the published run never varied is an undisclosed degree of freedom, and
+    # recording its value in the receipt does not answer that. `pip install -e <connector>` reaches
+    # the same place with nothing to sweep.
+    return (os.path.join(tempfile.gettempdir(), "claude", "C--Users-Danculus-agora",
+                         "5d882efe-89a3-4f28-a05d-2f4c4390562b", "scratchpad", "connector"),
+            "the session scratchpad, which exists on one machine")
+
+
+CONNECTOR, CONNECTOR_ROUTE = _connector_root()
 TOKEN = "local-fixture-token-not-a-secret"
 
 
@@ -173,14 +205,16 @@ def serve(ledger):
 def main():
     Creds, Outbox, canon = _client()
     if Outbox is None:
-        print("  SKIPPED: his client is not importable here, and this probe never reimplements it.")
-        print("  pip install -e %s" % CONNECTOR)
-        return 0
+        # NOT 0. A receipt that reports success without doing the work is the defect this
+        # repository keeps paying for, and this probe is cited publicly as evidence.
+        print("  CANNOT RUN: the partner client is not importable, and this probe never\n"
+              "  reimplements it. pip install -e <the connector checkout> and run this again.")
+        return 2
 
     fixtures = os.path.join(CONNECTOR, "fixtures")
     if not os.path.isdir(fixtures):
-        print("  SKIPPED: his fixtures are not on this machine: %s" % fixtures)
-        return 0
+        print("  CANNOT RUN: the partner fixtures are not on this machine: %s" % fixtures)
+        return 2
     before = json.load(open(os.path.join(fixtures, "before.json"), encoding="utf-8"))
     after = json.load(open(os.path.join(fixtures, "after.json"), encoding="utf-8"))
     key = before["fact_record"]["key"]
@@ -299,6 +333,7 @@ def main():
 
     srv.shutdown()
     out = {"probe": os.path.basename(__file__), "checks": checks,
+           "connector_root": CONNECTOR, "connector_resolved_by": CONNECTOR_ROUTE,
            "all_passed": ok, "current_value_at_end": ledger.read(key),
            "history_depth": len(ledger.history),
            "connector_commit": "yadu9989/memstrata-inspeximus-connector@HEAD",

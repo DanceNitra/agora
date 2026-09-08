@@ -62,9 +62,9 @@
    "got": "so D is a measurement, not a broken target"
   },
   {
-   "check": "a_schema_v0_shaped_source_cannot_be_written_back",
+   "check": "OUR_validator_refuses_a_channel_principal_source",
    "pass": true,
-   "got": "the value survives the hop; the ROLE does not"
+   "got": "our rule, not their format"
   },
   {
    "check": "CONTROL_with_a_doc_handle_the_same_erasure_works",
@@ -73,6 +73,8 @@
   }
  ],
  "all_passed": true,
+ "connector_root": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\5d882efe-89a3-4f28-a05d-2f4c4390562b\\scratchpad\\connector",
+ "connector_resolved_by": "installed package",
  "arms": {
   "receiver-that-deletes": {
    "reported": 2,
