@@ -152,7 +152,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The stores that still leak, by name. A manifest that is not complete says WHO. Measured on this pair: with a receiver that erases correctly and inspeximus erasing correctly, the value was still readable in the SENDER's durable queue, because producer_outbox retains the whole envelope and the published client has no DELETE. The queue is a target that has to be registered, and it is the write side's to fix."
+          "description": "The stores that still leak, by name. A manifest that is not complete says WHO. Measured with a receiver that erases correctly: the value was still readable in the SENDER's durable queue, because producer_outbox retains the whole envelope and the reference client has no DELETE. The queue is a target that has to be registered. NOTE, corrected 2026-09-08: an earlier version of this line also said inspeximus had erased in that arm. It had not. That arm registers two targets, the receiver and the queue, and no memory store at all."
         },
         "entries": {
           "type": "array",
@@ -232,7 +232,7 @@
   ],
   "open_questions": [
     "fact_record.sources needs a `doc` handle before any of this can address a real write. That is the one schema_v1 change this proposal implies, and it is small: add `doc` alongside `channel` and `principal`.",
-    "The sender's outbox is an erasure target and neither side listed it. It keeps the canonical bytes of every payload, delivered rows included, so a subject erased from both memory stores is still in plaintext in the queue that sent it. probes/a_receiver_that_reports_erased_without_erasing.py runs it both ways: as shipped the manifest reports incomplete and names the queue; with a delete path it closes. That delete path is ours to contribute.",
+    "The sender's outbox is an erasure target, and the reference client's own README says so first: it states that delivered records are retained and that there is no automatic deletion policy, and it assigns retention to the caller. What neither side did was list the queue as a target in an erasure fan-out. And the obvious remedy is worse than it looks: a DELETE leaves the bytes in the database file until a VACUUM, it would drop undelivered rows, and the retained row IS the record that lets the client refuse a changed payload offline. Deleting it removes that guarantee. So the open question is not whether to add a delete, it is what a queue owes a data subject when its retention is load-bearing.",
     "Does the read side purge prior versions of a key on erasure, or only the current row? `history_purged` makes the answer explicit; the two sides may reasonably differ, but the contract must not leave it unstated.",
     "Retraction has no endpoint here on purpose. It belongs in the write envelope as a status, not in the erasure path, and it should not be settled by borrowing this one.",
     "The values sent to still_recoverable are the sensitive strings themselves. That is acceptable only to a party that already holds them, and it should carry an explicit statement to that effect rather than being inferred."
