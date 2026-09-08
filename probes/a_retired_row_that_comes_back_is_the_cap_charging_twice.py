@@ -43,6 +43,16 @@ MEM = os.environ.get(
     "AGORA_MEMORY_DIR",
     os.path.expanduser("~/.claude/projects/C--Users-Danculus-agora/memory"))
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+\.md)\)")
+# EXACT NAMES. A prefix filter on "memory" excludes the index and archive -- and also
+# `memorygraft-crucible-candidate`, `memory-scan-product-backlog` and
+# `memory-tipping-ews-killed`, three ordinary data rows. Measured 2026-09-08: the same
+# filter in the companion probe undercounted a publicly cited cohort by one.
+INDEX_FILES = {"memory.md", "memory_archive.md"}
+
+
+def is_index_file(name):
+    n = os.path.basename(name).lower()
+    return n in INDEX_FILES or n.startswith("memory.md.bak")
 
 
 def rows(path):
@@ -50,7 +60,7 @@ def rows(path):
     for line in io.open(path, encoding="utf-8", errors="replace").read().splitlines():
         for m in LINK.finditer(line):
             s = os.path.splitext(os.path.basename(m.group(1)))[0]
-            if not s.lower().startswith("memory"):
+            if not is_index_file(s + ".md"):
                 out.add(s)
     return out
 

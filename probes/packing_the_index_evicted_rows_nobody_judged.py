@@ -51,12 +51,25 @@ MEM = os.environ.get(
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s#]+\.md)\)")
 SECTION = "Demoted from the index 2026-09-04"
 DRAWS = 20000
+# EXACT NAMES, never a prefix. This used to exclude anything whose name started with "memory",
+# which is the index and archive -- and also `memorygraft-crucible-candidate`,
+# `memory-scan-product-backlog` and `memory-tipping-ews-killed`, three ordinary data rows. The
+# first of those left the index by adjacency on 2026-09-04, so the cohort published in comment
+# 5588661516 as 15 rows was really 16, and the reference counter could not see citations coming
+# from any of the three files either. A prefix filter aimed at a container silently ate its
+# contents.
+INDEX_FILES = {"memory.md", "memory_archive.md"}
+
+
+def is_index_file(name):
+    n = os.path.basename(name).lower()
+    return n in INDEX_FILES or n.startswith("memory.md.bak")
 
 
 def notes():
     return {f: io.open(os.path.join(MEM, f), encoding="utf-8", errors="replace").read()
             for f in os.listdir(MEM)
-            if f.endswith(".md") and not f.lower().startswith("memory")}
+            if f.endswith(".md") and not is_index_file(f)}
 
 
 def rows_of(path):
@@ -65,7 +78,7 @@ def rows_of(path):
     for ln, line in enumerate(io.open(path, encoding="utf-8", errors="replace").read().splitlines()):
         for m in LINK.finditer(line):
             s = os.path.splitext(os.path.basename(m.group(1)))[0]
-            if s.lower().startswith("memory") or s in out:
+            if is_index_file(s + ".md") or s in out:
                 continue
             out[s] = ln
     return out
@@ -102,7 +115,7 @@ def main():
     arc = io.open(os.path.join(MEM, "MEMORY_ARCHIVE.md"), encoding="utf-8", errors="replace").read()
     sec = [x for x in re.split(r"^##\s+", arc, flags=re.M) if x.startswith(SECTION)][0]
     archived = {os.path.splitext(os.path.basename(m))[0] for m in LINK.findall(sec)
-                if not os.path.basename(m).lower().startswith("memory")}
+                if not is_index_file(m)}
 
     named_lines = {line_of[d] for d in T.DEMOTE if d in line_of}
     judged = [d for d in T.DEMOTE if d in line_of]
@@ -155,8 +168,20 @@ def main():
     check("CONTROL_the_permutation_test_can_fail_to_reject",
           self_hits > draws * 0.5,
           "a group against itself: %d of %d shuffles reach a zero gap" % (self_hits, draws))
-    check("CONTROL_the_adjacency_group_is_the_15_named_publicly",
-          len(adjacency) == 15, len(adjacency))
+    # CORRECTED 2026-09-08. This used to assert `len(adjacency) == 15`, the number published in
+    # comment 5588661516, and it passed -- because the count and the expectation came from the same
+    # prefix filter. A control that recomputes the answer the same way tests nothing. It now asserts
+    # the FILTER instead: the exclusion must reach the two index files and no data row.
+    check("CONTROL_the_index_filter_excludes_only_the_index_files",
+          is_index_file("MEMORY.md") and is_index_file("MEMORY_ARCHIVE.md")
+          and not is_index_file("memorygraft-crucible-candidate.md")
+          and not is_index_file("memory-scan-product-backlog.md"),
+          "a prefix filter here hid 3 data rows and undercounted the cohort by one")
+    check("CONTROL_the_row_hidden_by_the_prefix_filter_is_now_in_the_cohort",
+          "memorygraft-crucible-candidate" in adjacency,
+          "it shares a line with folklore-index-hf-published, which the tool judged")
+    check("THE_COHORT_SIZE", len(adjacency) == 16,
+          "%d; published as 15 on 2026-09-08, corrected here" % len(adjacency))
 
     p_ja = (hits_ja + 1.0) / (draws + 1.0)
     p_al = (hits_al + 1.0) / (draws + 1.0)
@@ -171,15 +196,18 @@ def main():
                            "adjacency_vs_live": {"median_gap": obs_al, "p": p_al}},
            "checks": checks, "all_passed": ok,
            "finding": (
-               "The 15 rows that left by sharing a line are cited by other notes at a median of %.1f, "
+               "The %d rows that left by sharing a line are cited by other notes at a median of %.1f, "
                "against %.1f for the 32 the tool judged on content and %.1f for the rows still live. "
                "Judged against adjacency, p = %.4f; adjacency against live, p = %.4f. By this measure "
                "the rows nobody evaluated resemble the rows that stayed, not the rows that were "
                "chosen to go."
-               % (statistics.median(ad), statistics.median(ja), statistics.median(lv), p_ja, p_al)),
+               % (len(adjacency), statistics.median(ad), statistics.median(ja),
+                  statistics.median(lv), p_ja, p_al)),
            "scope": "Note files are not versioned, so a [[wikilink]] present today cannot be dated to "
                     "the retirement. This compares three groups under one undated measure; it does "
-                    "not establish that any row was load-bearing at the moment it left."}
+                    "not establish that any row was load-bearing at the moment it left. "
+                    "The cohort was published as 15 on 2026-09-08; a prefix filter had hidden a "
+                    "16th, and three data files were missing from the reference corpus."}
     print("\n  FINDING: %s" % out["finding"])
     p = os.path.splitext(os.path.abspath(__file__))[0] + ".result.json"
     with io.open(p, "w", encoding="utf-8", newline="\n") as fh:
