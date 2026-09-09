@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hotkey": "ctrl+alt+space",
+  "hotkey_mode": "hold",
+  "engine": "parakeet",
+  "language": "sk",
+  "provider": "cpu",
+  "num_threads": 0,
+  "microphone": null,
+  "insert_mode": "clipboard",
+  "paste_shortcut": "ctrl+v",
+  "clipboard_restore_delay_ms": 300,
+  "prefix_space": "auto",
+  "refocus_original_window": true,
+  "vad_enabled": true,
+  "preroll_ms": 250,
+  "max_record_seconds": 120,
+  "feedback_sound": true,
+  "replacements_file": "slovnik.json",
+  "app_overrides": {},
+  "llm_cleanup": {
+    "enabled": false,
+    "base_url": "http://127.0.0.1:8080/v1",
+    "model": "",
+    "api_key": "",
+    "system_prompt": "Clean up the following dictation transcript. Keep the meaning, fix obvious transcription errors, and return only the corrected text."
+  },
+  "log_level": "INFO"
+}
