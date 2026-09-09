@@ -195,7 +195,12 @@ AI_DISCLOSURE = NL.join([
 ])
 
 DECLARATIONS = NL.join([
-    r"\section*{Declarations}",
+    # THE HEADING SPRINGER NAMES. Their submission guidelines put every one of these under
+    # "Statements and Declarations"; ours said only "Declarations". The five statements were
+    # all present, so this is the label rather than the content, and a desk check looks for
+    # the label. Verified against link.springer.com/journal/10051/submission-guidelines on
+    # 2026-09-09.
+    r"\section*{Statements and Declarations}",
     "",
     # ORCID AS TEXT, and the reason is measured rather than assumed: sn-jnl ships an \orcid macro,
     # but it draws Orcidlogo.eps, which the December 2024 template package does not contain, so the
