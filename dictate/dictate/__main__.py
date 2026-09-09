@@ -45,14 +45,27 @@ def _config_path() -> int:
     return 0
 
 
-def _run_app() -> int:
-    """Start the tray app. Placeholder until phase 5 wires the state machine."""
+def _run_app(config_path: Path | None = None) -> int:
+    """Run the standalone dictation window with hotkey support."""
+    import threading
+
+    from .app import DictationApp
     from .config import load_config
     from .log import setup_logging
+    from .overlay import ControlWindow
 
-    config = load_config()
-    setup_logging(config.log_level)
-    print("Dictate app loop is not wired yet (phase 5).")
+    setup_logging("INFO")
+    app = DictationApp(load_config(config_path))
+
+    stop_event = threading.Event()
+    window = ControlWindow(on_toggle=app.toggle_recording, stop_event=stop_event, app=app)
+    app.add_state_listener(window.set_state)
+    app.add_level_listener(window.set_level)
+    app.add_transcript_listener(window.set_transcript)
+    app.set_target_provider(lambda: window.last_external)
+    worker = threading.Thread(target=app.run_forever, args=(stop_event,), daemon=True)
+    worker.start()
+    window.run()  # blocks the main thread in the Tk loop
     return 0
 
 
@@ -84,6 +97,11 @@ def main(argv: list[str] | None = None) -> int:
         "--probe",
         action="store_true",
         help="Force a microphone probe before --listen takes.",
+    )
+    parser.add_argument(
+        "--app",
+        action="store_true",
+        help="Run the dictation loop with the global hotkey (console output).",
     )
     parser.add_argument(
         "--transcribe",
@@ -122,6 +140,13 @@ def main(argv: list[str] | None = None) -> int:
         from .cli import listen
 
         return listen(args.listen, probe=args.probe or None, config_path=args.config)
+    if args.app:
+        from .app import DictationApp
+        from .config import load_config as _load_config
+        from .log import setup_logging
+
+        setup_logging("INFO")
+        return DictationApp(_load_config(args.config)).run() or 0
     if args.transcribe is not None:
         from .cli import transcribe_file
 
@@ -131,10 +156,14 @@ def main(argv: list[str] | None = None) -> int:
 
         return download_model(config_path=args.config)
 
-    return _run_app()
+    return _run_app(args.config)
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
+
 
 
