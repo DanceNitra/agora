@@ -6,8 +6,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
   html, body {
     width: 100%; height: 100%;
-    background: #14161d;
-    font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    background: #0b0d14;
+    font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
     overflow: hidden;
     display: flex;
     align-items: stretch;
@@ -20,61 +20,135 @@
     background: linear-gradient(160deg, #171922 0%, #12141c 100%);
     border: 1px solid #2b2f3d;
     border-radius: 16px;
-    box-shadow: inset 0 1px 0 #ffffff10;
+    box-shadow:
+      inset 0 1px 0 #ffffff10,
+      0 8px 32px rgba(0,0,0,.45),
+      0 2px 8px rgba(139,92,246,.08);
     padding: 6px 10px 10px;
     color: #eceef6;
+    position: relative;
   }
-  .drag { height: 20px; display: flex; align-items: center; flex-shrink: 0; }
+  .drag {
+    height: 20px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
   .title {
-    font-size: 10px; font-weight: 600; letter-spacing: .4px;
-    color: #6f7484; margin-left: 6px; flex: 1;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .45px;
+    color: #6f7484;
+    margin-left: 6px;
+    flex: 1;
   }
   .btn-icon {
-    width: 24px; height: 24px; border: 0; border-radius: 8px;
-    background: transparent; color: #6f7484; font-size: 12px;
-    cursor: pointer; line-height: 24px; text-align: center;
+    width: 24px; height: 24px;
+    border: 0; border-radius: 8px;
+    background: transparent;
+    color: #6f7484;
+    font-size: 12px;
+    cursor: pointer;
+    line-height: 24px;
+    text-align: center;
     transition: background .15s, color .15s;
   }
   .btn-icon:hover { background: #ffffff12; color: #c9cdd8; }
+
+  /* === WAVEFORM: compact bottom-anchored line === */
+  .scope-wrap {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 44px;
+    margin: 4px 0 2px;
+    position: relative;
+  }
   .scope {
-    flex: 1 1 auto; min-height: 30px;
-    width: 100%; display: block;
-    background: #0d0f15; border: 1px solid #23263a;
+    width: 100%; height: 100%;
+    display: block;
+    background: #0d0f15;
+    border: 1px solid #23263a;
     border-radius: 10px;
   }
-  .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-shrink: 0; }
+
+  /* === TRANSCRIPT: multi-line, scrollable === */
+  .transcript-box {
+    flex: 0 0 auto;
+    min-height: 32px;
+    max-height: 72px;
+    width: 100%;
+    margin: 2px 0 6px;
+    padding: 6px 8px;
+    background: #0d0f15;
+    border: 1px solid #23263a;
+    border-radius: 10px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #c9cdd8;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+    scrollbar-width: thin;
+    scrollbar-color: #2b2f3d #0d0f15;
+  }
+  .transcript-box::-webkit-scrollbar { width: 4px; }
+  .transcript-box::-webkit-scrollbar-thumb { background: #2b2f3d; border-radius: 2px; }
+  .transcript-box:empty::before {
+    content: "—";
+    color: #4a4f5e;
+  }
+
+  /* === STATUS ROW === */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
   .rec {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 0; cursor: pointer; position: relative; flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(145deg, #8b5cf6, #ec4899);
-    color: #fff; font-size: 15px;
+    color: #fff;
+    font-size: 15px;
     box-shadow: 0 4px 14px rgba(139, 92, 246, .4);
     transition: transform .15s, box-shadow .15s;
   }
   .rec:hover { transform: scale(1.06); }
   .rec:active { transform: scale(.97); }
-  .rec.stop { background: linear-gradient(145deg, #ef4444, #f97316); box-shadow: 0 4px 14px rgba(239,68,68,.4); }
+  .rec.stop {
+    background: linear-gradient(145deg, #ef4444, #f97316);
+    box-shadow: 0 4px 14px rgba(239,68,68,.4);
+  }
   .rec:disabled { opacity: .55; cursor: wait; }
-  .pulse::after {
-    content: ""; position: absolute; inset: -5px;
-    border-radius: 50%; border: 2px solid #ec489988;
-    animation: pulse 1.6s ease-out infinite;
+
+  /* Pulse ring – uses box-shadow so it never clips */
+  .pulse {
+    animation: pulse-shadow 1.6s ease-out infinite;
   }
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: .9; }
-    100% { transform: scale(1.45); opacity: 0; }
+  @keyframes pulse-shadow {
+    0%   { box-shadow: 0 0 0 0 rgba(236,72,153,.55); }
+    70%  { box-shadow: 0 0 0 10px rgba(236,72,153,0); }
+    100% { box-shadow: 0 0 0 0 rgba(236,72,153,0); }
   }
+
   .meta { flex: 1 1 auto; min-width: 0; }
   .status {
-    font-size: 11px; font-weight: 600; letter-spacing: .5px;
-    color: #8a8fa0; margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    color: #8a8fa0;
   }
-  .status.rec { color: #ff6b7a; }
+  .status.rec  { color: #ff6b7a; }
   .status.busy { color: #ffb74d; }
-  .transcript {
-    font-size: 11px; color: #c9cdd8; line-height: 1.3;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
 </style>
 </head>
 <body>
@@ -84,21 +158,27 @@
       <button class="btn-icon" id="btnCfg" title="Nastavenia">⚙</button>
       <button class="btn-icon" id="btnExit" title="Zavrieť">✕</button>
     </div>
-    <canvas class="scope" id="scope"></canvas>
+
+    <div class="scope-wrap">
+      <canvas class="scope" id="scope"></canvas>
+    </div>
+
+    <div class="transcript-box" id="transcript"></div>
+
     <div class="row">
       <button class="rec" id="btnRec">●</button>
       <div class="meta">
         <div class="status" id="status">PRIPRAVENÝ</div>
-        <div class="transcript" id="transcript">—</div>
       </div>
     </div>
   </div>
+
 <script>
 const scope = document.getElementById("scope");
 const ctx = scope.getContext("2d");
 const statusEl = document.getElementById("status");
-const transEl = document.getElementById("transcript");
-const btnRec = document.getElementById("btnRec");
+const transEl  = document.getElementById("transcript");
+const btnRec   = document.getElementById("btnRec");
 const history = [];
 let agcTarget = 1;
 let api = null;
@@ -106,7 +186,7 @@ let api = null;
 function resize() {
   const dpr = window.devicePixelRatio || 1;
   const w = scope.clientWidth, h = scope.clientHeight;
-  scope.width = Math.max(1, Math.round(w * dpr));
+  scope.width  = Math.max(1, Math.round(w * dpr));
   scope.height = Math.max(1, Math.round(h * dpr));
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
@@ -117,12 +197,18 @@ resize();
 function draw() {
   const w = scope.clientWidth, h = scope.clientHeight;
   if (w <= 0 || h <= 0) { requestAnimationFrame(draw); return; }
+
   ctx.clearRect(0, 0, w, h);
+
+  /* horizontal mid-line */
   ctx.strokeStyle = "#1c2030";
   ctx.lineWidth = 1;
-  for (const gy of [h * 0.33, h * 0.66]) {
-    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
-  }
+  ctx.beginPath();
+  ctx.moveTo(0, h * 0.5);
+  ctx.lineTo(w, h * 0.5);
+  ctx.stroke();
+
+  /* AGC */
   let rolling = 0.15;
   for (const v of history) if (v > rolling) rolling = v;
   agcTarget = agcTarget + ((0.92 / rolling) - agcTarget) * 0.06;
@@ -142,15 +228,20 @@ function draw() {
     for (let i = 0; i < n; i++) {
       const x = w - (n - 1 - i) * (w / 240);
       const v = Math.max(0.03, Math.min(1, history[i] * scale));
-      const y = h - 3 - v * (h - 8);
+      /* waveform now grows BOTH up AND down from center */
+      const amp = v * (h * 0.42);
+      const y = (h * 0.5) - amp;
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.stroke();
     ctx.shadowBlur = 0;
-    const y = h - 3 - Math.max(0.03, Math.min(1, history[n-1] * scale)) * (h - 8);
+
+    /* trailing dot */
+    const lastV = Math.max(0.03, Math.min(1, history[n-1] * scale));
+    const lastY = (h * 0.5) - lastV * (h * 0.42);
     ctx.fillStyle = "#ff5470";
     ctx.beginPath();
-    ctx.arc(w - 2, y, 2.5, 0, Math.PI * 2);
+    ctx.arc(w - 3, lastY, 2.5, 0, Math.PI * 2);
     ctx.fill();
   }
   requestAnimationFrame(draw);
@@ -161,6 +252,7 @@ window.addEventListener("pywebviewready", () => {
   api = window.pywebview.api;
   setInterval(tick, 60);
 });
+
 async function tick() {
   try {
     const wave = await api.get_wave();
@@ -170,17 +262,29 @@ async function tick() {
     applyStatus(st);
   } catch (e) { /* bridge not ready */ }
 }
+
 function applyStatus(st) {
   statusEl.textContent = st.status;
-  statusEl.className = "status" + (st.state === "RECORDING" ? " rec" : st.state === "TRANSCRIBING" || st.state === "INJECTING" ? " busy" : "");
+  statusEl.className = "status" + (
+    st.state === "RECORDING" ? " rec" :
+    st.state === "TRANSCRIBING" || st.state === "INJECTING" ? " busy" : ""
+  );
+
   if (st.state === "RECORDING") {
-    btnRec.textContent = "■"; btnRec.classList.add("stop", "pulse");
+    btnRec.textContent = "■";
+    btnRec.classList.add("stop", "pulse");
   } else {
-    btnRec.textContent = "●"; btnRec.classList.remove("stop", "pulse");
+    btnRec.textContent = "●";
+    btnRec.classList.remove("stop", "pulse");
     btnRec.disabled = (st.state === "TRANSCRIBING" || st.state === "INJECTING");
   }
-  if (st.transcript) transEl.textContent = st.transcript;
+
+  if (st.transcript) {
+    transEl.textContent = st.transcript;
+    transEl.scrollTop = transEl.scrollHeight;
+  }
 }
+
 btnRec.addEventListener("click", () => {
   if (api) api.toggle_record();
 });
