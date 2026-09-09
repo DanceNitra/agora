@@ -13,7 +13,6 @@ Commands:
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
 from pathlib import Path
 
@@ -53,25 +52,18 @@ def _run_app(config_path: Path | None = None) -> int:
     from .app import DictationApp
     from .config import load_config
     from .log import setup_logging
-    from .overlay import ControlWindow
+    from .overlay import WebViewWindow
 
     setup_logging("INFO")
     app = DictationApp(load_config(config_path))
 
     stop_event = threading.Event()
-    window = ControlWindow(on_toggle=app.toggle_recording, stop_event=stop_event, app=app)
-    app.add_state_listener(window.set_state)
-    app.add_level_listener(window.set_level)
-    app.add_transcript_listener(window.set_transcript)
+    window = WebViewWindow(app, stop_event)
     app.set_target_provider(lambda: window.last_external)
     worker = threading.Thread(target=app.run_forever, args=(stop_event,), daemon=True)
     worker.start()
-    window.run()  # blocks the main thread in the Tk loop
+    window.run()  # blocks the main thread in the webview loop
     return 0
-
-
-logger = logging.getLogger(__name__)
-
 
 def main(argv: list[str] | None = None) -> int:
     """Parse arguments and dispatch to the requested command."""
