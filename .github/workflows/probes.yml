@@ -17,10 +17,12 @@ on:
     branches: [main]
     paths:
       - 'probes/**'
+      - 'tools/**'
       - '.github/workflows/probes.yml'
   pull_request:
     paths:
       - 'probes/**'
+      - 'tools/**'
       - '.github/workflows/probes.yml'
 
 concurrency:
@@ -63,3 +65,10 @@ jobs:
               sys.exit("%d of %d mutations survived" % (total - caught, total))
           print("%d of %d mutations caught" % (caught, total))
           EOF
+
+      # ONE DECISION PER ROW ID. Asked for by @pm25coder on anthropics/claude-code#91188 so that
+      # the manifest cannot regress from addressing rows to addressing pointers. The invariant was
+      # already asserted inside trim_memory_index.main(), which runs only when a trim runs, so it
+      # was true and unwatched. This job also triggers on tools/** for that reason.
+      - name: One manifest entry per row id
+        run: python -X utf8 probes/one_decision_per_row_id_whatever_the_pointers.py

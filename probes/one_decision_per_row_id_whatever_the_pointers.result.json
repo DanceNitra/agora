@@ -1,0 +1,229 @@
+{
+ "probe": "one_decision_per_row_id_whatever_the_pointers.py",
+ "asked_for_by": "pm25coder on anthropics/claude-code#91188",
+ "invariant": "one manifest entry per row id per run, pointer count ignored, asserted against the shipped tools/trim_memory_index.demote_rows",
+ "cases": [
+  {
+   "fixture": "one target linked twice inside one segment",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 1
+   },
+   "exercises_the_defect": false
+  },
+  {
+   "fixture": "one target linked from two segments",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 2
+   },
+   "exercises_the_defect": true
+  },
+  {
+   "fixture": "one target linked from three segments",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 3
+   },
+   "exercises_the_defect": true
+  },
+  {
+   "fixture": "one target reachable from two separate lines",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 2
+   },
+   "exercises_the_defect": true
+  },
+  {
+   "fixture": "a slug that is a prefix of another on the same line",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 1
+   },
+   "exercises_the_defect": false
+  },
+  {
+   "fixture": "a phantom pointer inside a link label",
+   "entries_per_row": {
+    "alpha-row": 1
+   },
+   "row_ids": [
+    "alpha-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 1
+   },
+   "exercises_the_defect": false
+  },
+  {
+   "fixture": "two targets on one line",
+   "entries_per_row": {
+    "alpha-row": 1,
+    "beta-row": 1
+   },
+   "row_ids": [
+    "alpha-row",
+    "beta-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row",
+    "beta-row"
+   ],
+   "pointer_addressed_counts": {
+    "alpha-row": 1,
+    "beta-row": 1
+   },
+   "exercises_the_defect": false
+  }
+ ],
+ "checks": [
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: one target linked twice inside one segment",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target linked twice inside one segment",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: one target linked from two segments",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target linked from two segments",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target linked from two segments",
+   "pass": true,
+   "got": "{\"alpha-row\": 2}"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: one target linked from three segments",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target linked from three segments",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target linked from three segments",
+   "pass": true,
+   "got": "{\"alpha-row\": 3}"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: one target reachable from two separate lines",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target reachable from two separate lines",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target reachable from two separate lines",
+   "pass": true,
+   "got": "{\"alpha-row\": 2}"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: a slug that is a prefix of another on the same line",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: a slug that is a prefix of another on the same line",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: a phantom pointer inside a link label",
+   "pass": true,
+   "got": "{\"alpha-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: a phantom pointer inside a link label",
+   "pass": true,
+   "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: two targets on one line",
+   "pass": true,
+   "got": "{\"alpha-row\": 1, \"beta-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: two targets on one line",
+   "pass": true,
+   "got": "['alpha-row', 'beta-row'] against ['alpha-row', 'beta-row']"
+  },
+  {
+   "check": "CONTROL_THE_SUITE_RAN_ITS_FIXTURES",
+   "pass": true,
+   "got": "7 fixtures"
+  },
+  {
+   "check": "CONTROL_AT_LEAST_TWO_FIXTURES_REACH_THE_DEFECT",
+   "pass": true,
+   "got": "3 of 7 reach it: ['one target linked from two segments', 'one target linked from three segments', 'one target reachable from two separate lines']"
+  }
+ ],
+ "all_passed": true,
+ "fixtures_reaching_the_defect": [
+  "one target linked from two segments",
+  "one target linked from three segments",
+  "one target reachable from two separate lines"
+ ],
+ "mutations_caught": 3,
+ "mutations_run": 3,
+ "scope": "Synthetic index lines only. This asserts the manifest's row-id keying and the fixtures that broke it; it says nothing about whether a trim should have demoted a given row."
+}
