@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,9 @@ except ImportError:  # pragma: no cover - Windows dependency
 
 # Window classes that are never valid paste targets.
 _NON_TARGET_CLASSES = ("#32768", "Shell_TrayWnd", "Shell_SecondaryTrayWnd")
+
+VK_MENU = 0x12
+KEYEVENTF_KEYUP = 0x0002
 
 
 def get_foreground_window() -> int:
@@ -57,13 +61,37 @@ def process_name(hwnd: int) -> str:
 
 
 def restore_focus(hwnd: int) -> bool:
-    """Bring a previously captured window back to the foreground."""
+    """Bring ``hwnd`` to the foreground and verify it actually moved.
+
+    Windows blocks SetForegroundWindow from background processes; a
+    brief synthetic ALT press unlocks it. The result is verified against
+    the real foreground window after the call.
+    """
     if not _WIN32_OK or not hwnd:
         return False
+    import ctypes
+
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
     try:
+        # Synthetic ALT press satisfies the foreground-lock check.
+        user32.keybd_event(VK_MENU, 0, 0, 0)
+        user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.05)
+        actual = win32gui.GetForegroundWindow()
+        if actual == hwnd:
+            return True
+        # One retry with a window-show nudge.
         win32gui.ShowWindow(hwnd, 9)  # SW_RESTORE
         win32gui.SetForegroundWindow(hwnd)
-        return True
+        time.sleep(0.05)
+        actual = win32gui.GetForegroundWindow()
+        ok = actual == hwnd
+        if not ok:
+            logger.warning(
+                "restore_focus: wanted hwnd=%s, foreground stayed hwnd=%s", hwnd, actual
+            )
+        return ok
     except Exception:
         logger.warning("Could not restore focus to hwnd=%s", hwnd, exc_info=True)
         return False

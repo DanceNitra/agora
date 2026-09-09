@@ -8,11 +8,14 @@ even though clicking this window (or the tray) stole focus.
 
 from __future__ import annotations
 
+import logging
 import queue
 import tkinter as tk
 
 from .app import IDLE, RECORDING
 from .inject import focus
+
+logger = logging.getLogger(__name__)
 
 WIDTH = 380
 HEIGHT = 210
@@ -120,6 +123,7 @@ class ControlWindow:
     # -- internals ------------------------------------------------------------
 
     def _on_toggle(self) -> None:
+        logger.info("Window: record button clicked")
         if self.on_toggle is not None:
             self.on_toggle()
 
