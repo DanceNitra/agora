@@ -390,6 +390,80 @@ def main() -> int:
     else:
         fixed_table_ref = False
 
+    # --- 4f. the three things Li Guanghao delegated on 2026-09-09 -------------------------
+    # He asked us to apply our own proposal directly and not to ask again:
+    # "請您按照您的方案直接修改" and "不必再徵求我的意見". Each edit is anchored and refuses on a
+    # missing target, because a delegated edit that silently no-ops is worse than one we skipped.
+    #
+    # HIS POINT 1 NEEDS NO EDIT, and saying so is the honest answer rather than manufacturing one.
+    # The involutive-automorphism claim he withdrew was a proposed INSERTION discussed in the
+    # issue; it never entered the manuscript. Asserted below rather than assumed.
+    if "involut" in body.lower():
+        refuse("the involutive-automorphism claim is in the body after all, so his withdrawal "
+               "needs an edit here rather than the note that it needs none")
+
+    # HIS POINT 3. The finite-size paragraph promised a separate scaling paper. Two converged
+    # sizes do not determine a trend, and the promise is the kind of sentence a referee holds
+    # the paper to. The measured L1 and L2 numbers and the inconclusive verdict stay.
+    fs_old = ("A systematic finite-size scaling across L1, L2, and L3 will be reported "
+              "separately.")
+    if fs_old not in body:
+        refuse("the finite-size promise sentence was not found, so his point 3 cannot be applied")
+    body = body.replace(
+        fs_old,
+        "Two converged sizes do not determine a trend in $N$. We report the values we have and "
+        "make no extrapolation.", 1)
+
+    # HIS POINT 4. The withdrawals were made in public as they happened, which was right at the
+    # time and reads as a diary inside the paper. They move to one short subsection at the end of
+    # the limitations, one sentence each.
+    #
+    # NO DATES. He asked for date order. Two of the withdrawals are datable from the issue thread
+    # and two are not: the W-structure and PXP-jump withdrawal predates this thread, and the record
+    # here cannot fix it. A date I cannot evidence is not going into a submitted paper, so the
+    # order is preserved and the dates are omitted. This is the one instruction of his four that is
+    # not followed to the letter, and the letter to him says so.
+    lim_old = ("(vi) earlier W-structure and PXP jump reports were withdrawn as artifacts; "
+               "(vii) the earlier control edge $(0,1)$ is not present in the Sierpi" + BS +
+               "'{n}ski gasket, and a full edge scan shows no flat edge, so no direct "
+               "symmetric-injection control is available;")
+    lim_new = ("(vi) no direct symmetric-injection control is available for this geometry, since "
+               "edge $(0,1)$ is not an edge of the Sierpi" + BS + "'{n}ski gasket and a full "
+               "edge-resolved scan finds no flat edge;")
+    if lim_old not in body:
+        refuse("the limitations items (vi) and (vii) were not found verbatim, so the withdrawal "
+               "items cannot be moved without renumbering by guesswork")
+    body = body.replace(lim_old, lim_new, 1)
+    # The list is now (i)..(ix). Renumber what followed, once each, asserting every target.
+    for was, now in ((r"(viii) edge $(7,8)$", r"(vii) edge $(7,8)$"),
+                     (r"(ix) the control-graph scans", r"(viii) the control-graph scans"),
+                     (r"(x) the non-trivial default observable control",
+                      r"(ix) the non-trivial default observable control")):
+        if was not in body:
+            refuse("limitations renumbering found no target: %r" % was)
+        body = body.replace(was, now, 1)
+
+    # The body sentence that announced the withdrawal in place.
+    wd_old = (" Therefore the previous statement of a completely flat control edge is withdrawn.")
+    if wd_old not in body:
+        refuse("the in-body withdrawal sentence was not found, so his point 4 is incomplete")
+    body = body.replace(wd_old, "", 1)
+
+    lim_tail = ("extension to other graphs is needed.")
+    if lim_tail not in body:
+        refuse("the end of the limitations list was not found, so the corrections subsection has "
+               "nowhere to attach")
+    corrections = (
+        lim_tail + NL + NL +
+        BS + "subsection*{Corrections to earlier reports}" + NL + NL +
+        "Two statements made in earlier versions of this work do not survive the checks reported "
+        "here. A W-structure reported in an early scan, and a jump reported for the PXP model, "
+        "were both artifacts of a non-Hermitian Hamiltonian construction in an early script. "
+        "Edge $(0,1)$ was described as a flat symmetric control; it is not an edge of the level-2 "
+        "Sierpi" + BS + "'{n}ski gasket, and the full edge-resolved scan of all 27 edges finds "
+        "no flat edge.")
+    body = body.replace(lim_tail, corrections, 1)
+
     # --- 4e. the acknowledgements repeat the contributions, differently -----
     # His acknowledgements name what two of us contributed. The Declarations section now carries an
     # Author contributions statement, which is what the journal asks for, so the paper stated our

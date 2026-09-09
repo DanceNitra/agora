@@ -52,13 +52,16 @@ Our decisions, not the journal's:
 | two contribution sentences removed from the acknowledgements | the Declarations statement covers them, in the journal's form |
 | author contributions narrowed | the gasket controls in Sec. 6.1 are his; ours is the thirty-graph replication |
 | the AI disclosure rewritten | it had understated our role and claimed a page-number correction that was ours to make |
+| the finite-size promise removed | the paragraph pledged a separate L1-L2-L3 scaling paper; two converged sizes do not determine a trend, and a promise is a thing a referee holds the paper to. Delegated by Li Guanghao on 2026-09-09 |
+| the withdrawals moved to one subsection | they were scattered through the body and the limitations and read as a diary. Now `Corrections to earlier reports` at the end of the limitations, and the list renumbered (i) to (ix). Delegated the same day |
+| no dates on the withdrawals | he asked for date order. Two of the withdrawals are datable from the issue thread and two are not, so the order is preserved and the dates are omitted rather than guessed. This is the one instruction not followed to the letter, and the thread says so |
 
 ## 4. Open, and not ours to close
 
 - **The corresponding-author role.** Accepted in the owner's name on 2026-09-01 at 07:18 UTC in a
   comment he had not seen, confirmed publicly by Guanghao at 08:04. It cannot change after
   acceptance, so submitting is the act that settles it.
-- **Co-author approval.** Neither Guanghao nor Marat has seen this package. Nothing in the
+- **Co-author approval.** Li Guanghao approved on 2026-09-09 in writing, delegating the four edits and stating the paper can be submitted once they are made. **Marat Sultanov has not seen this package.** Nothing in the
   manuscript or the cover letter asserts that they have.
 - **Two co-author e-mail addresses**, optional but worth deciding deliberately.
 
