@@ -1,0 +1,163 @@
+{
+ "probe": "the_provenance_annotation_puts_the_identity_in_three_places.py",
+ "repo": "https://github.com/yadu9989/memstrata-inspeximus-connector.git",
+ "tags": [
+  "v0.1.0",
+  "v0.1.1"
+ ],
+ "arms": {
+  "v0.1.0": {
+   "version": "0.1.0",
+   "primary_channel": "doc",
+   "sources_len": 1,
+   "primary_doc_hits": 1,
+   "linked_doc_hits": 0,
+   "absent_marker_hits": 0,
+   "principal_hits": 2,
+   "principal_hits_after_stripping_sources": 1,
+   "linked_doc_hits_after_stripping_sources": 0,
+   "has_source_provenance": false,
+   "bytes_one_link": 459,
+   "linked_text_hits": 0,
+   "associations_under_duplicate_links": null,
+   "index_before": {},
+   "principal_at_index_before": {},
+   "principal_at_index_after_compacting_erasure": {},
+   "links_at_first_freeze_refusal": null,
+   "envelope_bytes_by_links": {
+    "1": 660,
+    "10": 660,
+    "50": 660,
+    "171": 660,
+    "400": 660
+   },
+   "links_at_first_envelope_over_64KiB": null
+  },
+  "v0.1.1": {
+   "version": "0.1.1",
+   "primary_channel": "unknown",
+   "sources_len": 1,
+   "primary_doc_hits": 2,
+   "linked_doc_hits": 1,
+   "absent_marker_hits": 0,
+   "principal_hits": 4,
+   "principal_hits_after_stripping_sources": 3,
+   "linked_doc_hits_after_stripping_sources": 1,
+   "has_source_provenance": true,
+   "bytes_one_link": 970,
+   "linked_text_hits": 0,
+   "associations_under_duplicate_links": 2,
+   "index_before": {
+    "primary-1": 0,
+    "support-0": 1,
+    "support-1": 2
+   },
+   "principal_at_index_before": {
+    "primary-1": "erase-me-team",
+    "support-0": "keep-me-team",
+    "support-1": "third-team"
+   },
+   "principal_at_index_after_compacting_erasure": {
+    "primary-1": "keep-me-team",
+    "support-0": "third-team",
+    "support-1": null
+   },
+   "links_at_first_freeze_refusal": 171,
+   "envelope_bytes_by_links": {
+    "1": 1573,
+    "10": 4948,
+    "50": 20028
+   },
+   "links_at_first_envelope_over_64KiB": null
+  }
+ },
+ "bytes_for_one_linked_source": {
+  "v0.1.0": 459,
+  "v0.1.1": 970
+ },
+ "checks": [
+  {
+   "check": "CONTROL_each_arm_imported_the_tag_it_claims",
+   "pass": true,
+   "got": "0.1.0 and 0.1.1"
+  },
+  {
+   "check": "CONTROL_the_counter_finds_a_marker_that_IS_in_the_linked_source",
+   "pass": true,
+   "got": "1 hits for the linked doc handle under 0.1.1"
+  },
+  {
+   "check": "CONTROL_the_counter_finds_zero_for_a_marker_in_no_record",
+   "pass": true,
+   "got": "0 hits in both arms"
+  },
+  {
+   "check": "CONTROL_0_1_0_STILL_REPRODUCES_THE_DEFECT_WE_REPORTED",
+   "pass": true,
+   "got": "0.1.0: linked doc 0 hits, primary channel 'doc'"
+  },
+  {
+   "check": "THE_LINKED_DOCUMENT_HANDLE_SURVIVES_AT_0_1_1",
+   "pass": true,
+   "got": "1 hits, annotation present"
+  },
+  {
+   "check": "THE_CHANNEL_IS_NO_LONGER_INFERRED_FROM_AN_ACCOMPANYING_DOC",
+   "pass": true,
+   "got": "primary channel 'unknown' at 0.1.1 against 'doc' at 0.1.0"
+  },
+  {
+   "check": "THE_COMPACT_SOURCE_LIST_IS_UNCHANGED_IN_LENGTH",
+   "pass": true,
+   "got": "one reported source in both arms, as his notes state"
+  },
+  {
+   "check": "THE_IDENTITY_APPEARS_IN_MORE_PLACES_AT_0_1_1",
+   "pass": true,
+   "got": "4 occurrences of the principal at 0.1.1 against 2 at 0.1.0"
+  },
+  {
+   "check": "AN_ERASURE_AIMED_AT_sources_LEAVES_MORE_BEHIND_AT_0_1_1",
+   "pass": true,
+   "got": "3 left at 0.1.1 against 1 at 0.1.0"
+  },
+  {
+   "check": "LINKED_RECORD_TEXT_DOES_NOT_TRAVEL_IN_EITHER_ARM",
+   "pass": true,
+   "got": "0 hits for the linked record's text in both arms"
+  },
+  {
+   "check": "A_REPEATED_OR_SELF_LINK_ADDS_NO_ASSOCIATION",
+   "pass": true,
+   "got": "2 associations for a primary plus one link named three times"
+  },
+  {
+   "check": "THE_64KiB_CEILING_IS_ENFORCED_AT_FREEZE_ONLY_AT_0_1_1",
+   "pass": true,
+   "got": "0.1.1 refuses to freeze at 171 links; 0.1.0 never refuses at freeze up to 400"
+  },
+  {
+   "check": "CONTROL_THE_SAME_RECORD_IS_ACCEPTED_BY_0_1_0",
+   "pass": true,
+   "got": "at 171 links 0.1.0 freezes to 660 bytes while 0.1.1 refuses at 171 links"
+  },
+  {
+   "check": "A_COMPACTING_ERASURE_SILENTLY_REPOINTS_A_LATER_source_index",
+   "pass": true,
+   "got": "the association for support-0 resolved to 'keep-me-team' before the removal and to 'third-team' after it, with no error raised"
+  },
+  {
+   "check": "CONTROL_THE_INDEX_RESOLVED_CORRECTLY_BEFORE_THE_ERASURE",
+   "pass": true,
+   "got": "each of the three associations resolved to its own principal before the removal"
+  },
+  {
+   "check": "THE_ENVELOPE_GROWS_WITH_LINKS_ONLY_AT_0_1_1",
+   "pass": true,
+   "got": "0.1.0 660 bytes at 1 and at 171 links; 0.1.1 1573 -> 20028 bytes from 1 to 50 links"
+  }
+ ],
+ "all_passed": true,
+ "finding": "Connector 0.1.1 fixes both defects we reported. The linked record's document handle survives in writer_metadata.source_provenance, and the primary record's channel is no longer inferred as 'doc' when an explicit principal supplied the identity. The compact sources list still reports one source, as his notes say. What the annotation also does is copy the identity: the principal string appears 4 times in a one-link envelope at 0.1.1 against 2 at 0.1.0, and an erasure that clears sources[] leaves 3 of them against 1 before. The linked record's text does not travel, so the widening is confined to what a writer put in `source`. Separately, 0.1.1 enforces the 64 KiB limit inside freeze_record, so a record that froze on 0.1.0 and failed only at enqueue now raises ProducerError at freeze: with 200-byte source annotations that happens at 171 links, where 0.1.0 freezes the same record to 660 bytes because it deduplicates every source by principal and its envelope does not grow with links. And `source_index` is positional under an operation designed to remove entries: with three sources, removing the first by compaction leaves the association for the second record resolving to the third record's principal, 'third-team' instead of 'keep-me-team', with no error.",
+ "scope": "Synthetic records only, one level of links, one principal shared by every source, and 200-byte source annotations in the size sweep. Occurrence counts are over the canonical JSON of the envelope, so they count the string wherever it appears, in a key or a value. The erasure arm models the narrowest plausible erasure, clearing sources[]; it is not a claim about what any receiver actually deletes."
+}
