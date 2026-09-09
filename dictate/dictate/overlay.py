@@ -91,15 +91,37 @@ class WebViewWindow:
 
     # -- lifecycle ---------------------------------------------------------------
 
+    @staticmethod
+    def _window_size() -> tuple[int, int]:
+        """Return the physical window size for the current display scaling."""
+        import ctypes
+
+        try:
+            user32 = ctypes.WinDLL("user32", use_last_error=True)
+            dpi = int(user32.GetDpiForSystem())
+        except Exception:
+            dpi = 96
+        scale = dpi / 96
+        return round(404 * scale), round(168 * scale)
+
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
+        import ctypes
+
+        try:
+            # Per-monitor DPI awareness: crisp rendering and correct CSS
+            # viewport size on displays scaled above 100%.
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)
+        except Exception:
+            logger.debug("SetProcessDpiAwareness failed", exc_info=True)
         threading.Thread(target=self._track_foreground, daemon=True).start()
+        width, height = self._window_size()
         self._window = webview.create_window(
             "Dictate",
             str(UI_FILE),
             js_api=self,
-            width=404,
-            height=158,
+            width=width,
+            height=height,
             frameless=True,
             on_top=True,
             easy_drag=False,
