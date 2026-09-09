@@ -102,7 +102,7 @@ class WebViewWindow:
         except Exception:
             dpi = 96
         scale = dpi / 96
-        return round(404 * scale), round(168 * scale)
+        return round(404 * scale), round(132 * scale)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
@@ -148,4 +148,5 @@ class WebViewWindow:
             if focus.is_external_window(hwnd):
                 self.last_external = hwnd
         self.quit()
+
 
