@@ -1,7 +1,7 @@
 """CLI helpers for test-mic, transcribe, and download-model.
 
-Phase 1 implements only the parts that do not need the ASR engine yet.
-The remaining commands raise a clear error until their phase lands.
+Phase 2 implements ``--test-mic`` with the recorder. The remaining
+commands raise a clear error until their phase lands.
 """
 
 from __future__ import annotations
@@ -9,6 +9,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import numpy as np
+
+from .audio.recorder import Recorder, resolve_device
+from .audio.wav import write_wav
 from .config import DictateConfig, load_config
 
 
@@ -17,13 +21,26 @@ def _load(config_path: Path | None) -> DictateConfig:
 
 
 def test_mic(seconds: int, config_path: Path | None = None) -> int:
-    """Record ``seconds`` from the microphone and transcribe to console.
+    """Record ``seconds`` from the microphone and save a wav file.
 
-    Implemented in phase 2 (recorder) and phase 3 (ASR).
+    Phase 2 does not transcribe yet; it verifies sample rate and range.
     """
-    _load(config_path)
-    print("--test-mic is not implemented yet (phase 2).", file=sys.stderr)
-    return 1
+    config = _load(config_path)
+    device = resolve_device(config.microphone)
+    recorder = Recorder(device=device)
+    print(f"Recording {seconds} s from device {device or 'default'}...")
+    audio = recorder.record(float(seconds))
+    if audio.size == 0:
+        print("No audio captured.", file=sys.stderr)
+        return 1
+
+    out_path = Path("test_mic.wav")
+    write_wav(out_path, audio, recorder.sample_rate)
+    duration = len(audio) / recorder.sample_rate
+    peak = float(np.max(np.abs(audio)))
+    print(f"Captured {duration:.2f} s, {len(audio)} samples, peak {peak:.4f}")
+    print(f"Saved {out_path}")
+    return 0
 
 
 def transcribe_file(path: Path, config_path: Path | None = None) -> int:
