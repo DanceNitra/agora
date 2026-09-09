@@ -471,6 +471,51 @@ def main() -> int:
         "'{n}ski gasket, and the full edge-resolved scan of all 27 edges finds no flat edge.")
     body = body.replace(lim_tail, corrections, 1)
 
+    # --- 4g. the control-graph row, measured rather than judged ---------------------------
+    # Li Guanghao's point 2, delegated on 2026-09-09 with the freedom to drop the row. It is not
+    # dropped. The four steps he specified were run on every edge of all three control graphs, and
+    # then a second time at his own settings to check we had his procedure before touching his
+    # numbers. His random row reproduces exactly at edge (8,14): s=1.20, single seed 0.1050, three
+    # seeds 0.0730, against his 1.20 / 0.1050 / 0.0730. The tree reproduces at edge (2,3).
+    #
+    # HIS TABLE IS NOT OVERWRITTEN. A manifold reading and a single-state reading are different
+    # quantities and do not belong in one column; his own Sec. 6 note already frames the ring row
+    # as an audit of the real-arithmetic procedure. So the measured values are added as a paragraph
+    # that says which reading produced what, and the only change inside his sentences is to name
+    # the two contradiction edges, which the table never recorded and without which the row cannot
+    # be reproduced by a reader at all.
+    edges_old = ("For each graph, a single contradiction edge was chosen")
+    if edges_old not in body:
+        refuse("the control-graph method sentence was not found, so the edges cannot be named")
+    body = body.replace(
+        edges_old,
+        "For each graph, a single contradiction edge was chosen, $(2,3)$ for the tree and $(8,14)$ "
+        "for the random graph", 1)
+
+    rnd_old = ("The random graph does not exhibit a stable valley: although its deepest "
+               "single-seed valley occurs at $s=1.20$, its depth varies strongly across seeds "
+               "($0.0730" + BS + "pm0.0548$), indicating that the feature is not reproducible.")
+    if rnd_old not in body:
+        refuse("the random-graph discussion sentence was not found verbatim")
+    body = body.replace(
+        rnd_old,
+        rnd_old + " That instability is a property of reading a single eigenvector from a "
+        "degenerate ground manifold. Averaging the correlations over every state within "
+        "$10^{-8}$ of the ground energy across the sectors $N_{" + BS + "text{up}}=6$ to $9$, the "
+        "three seeds agree to $5" + BS + "times10^{-14}$, and the surviving feature on edge "
+        "$(8,14)$ is a valley of depth $0.0102$ at $s=0.90$, where the ground manifold is "
+        "fourfold with a gap of $0.707$ above it. The same averaging reproduces the tree value "
+        "$0.0750$ at $s=1.70$ unchanged, its manifold being non-degenerate, and returns "
+        "$E(1)=0$ on the ring as the symmetry argument of Sec.~" + BS +
+        "ref{sec:orbit_mechanism} requires.", 1)
+
+    # The abstract sentence has to match. ONE word, because the abstract sits at 248 of a
+    # 250-word limit and the build refuses outside 150 to 250.
+    abs_old = "a random graph ($N=15$) shows no stable valley."
+    if abs_old not in src:
+        refuse("the abstract's random-graph sentence was not found, so it cannot be reconciled "
+               "with the control-graph paragraph")
+
     # --- 4e. the acknowledgements repeat the contributions, differently -----
     # His acknowledgements name what two of us contributed. The Declarations section now carries an
     # Author contributions statement, which is what the journal asks for, so the paper stated our

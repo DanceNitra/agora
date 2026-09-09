@@ -1,8 +1,8 @@
 {
  "probe": "what_the_epjb_submission_still_needs.py",
- "when_utc": "2026-09-09T11:43:20Z",
+ "when_utc": "2026-09-09T13:38:16Z",
  "manuscript": "agora_output/edrn_submission/manuscript.tex",
- "manuscript_bytes": 39661,
+ "manuscript_bytes": 40368,
  "rules_checked": 16,
  "satisfied": 16,
  "todo": 0,
@@ -17,7 +17,7 @@
    "rule": "abstract-length",
    "requirement": "abstract of 150 to 250 words",
    "satisfied": true,
-   "detail": "248 words (guideline: 150 to 250)"
+   "detail": "249 words (guideline: 150 to 250)"
   },
   {
    "rule": "corresponding-email",
