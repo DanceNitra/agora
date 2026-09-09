@@ -58,12 +58,20 @@ Our decisions, not the journal's:
 
 ## 4. Open, and not ours to close
 
-- **The corresponding-author role.** Accepted in the owner's name on 2026-09-01 at 07:18 UTC in a
+- **The corresponding-author role: SETTLED.** Both co-authors agreed to it on 2026-09-09. Original note: Accepted in the owner's name on 2026-09-01 at 07:18 UTC in a
   comment he had not seen, confirmed publicly by Guanghao at 08:04. It cannot change after
   acceptance, so submitting is the act that settles it.
-- **Co-author approval.** Li Guanghao approved on 2026-09-09 in writing, delegating the four edits and stating the paper can be submitted once they are made. **Marat Sultanov has not seen this package.** Nothing in the
+- **Co-author approval: BOTH, in writing, 2026-09-09.** Li Guanghao delegated the four edits, then
+  confirmed the built result: no objection to the changes, the involution content stays out of the
+  paper entirely, the abstract change to "none seed-stable" is agreed, the control-graph paragraph
+  with the manifold values and the (8,14) note is kept, and he agrees to Rastislav Drahos as
+  corresponding author (comment 5603357851). Marat Sultanov re-confirmed his 1 September approval
+  against the changed package, said both his corrections are in place, and agreed to the
+  corresponding-author role (comment 5603312791). Nothing in the
   manuscript or the cover letter asserts that they have.
-- **Two co-author e-mail addresses**, optional but worth deciding deliberately.
+- **Marat Sultanov's e-mail is still not held.** He offered it twice, on 1 September and again on
+  2026-09-09, and GitHub redacts it in both the notification and the API. Ask him for it by
+  another channel if the journal form wants it; only the corresponding author's is required.
 
 ## 5. How it was checked
 
