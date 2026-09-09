@@ -1,0 +1,18 @@
+{
+ "source_set": [
+  "manuscript.tex",
+  "sn-jnl.cls",
+  "bst\\sn-mathphys-num.bst",
+  "Fig1.pdf",
+  "Fig2.pdf",
+  "Fig3.pdf",
+  "Fig4.pdf"
+ ],
+ "passes": 3,
+ "shipped_text_chars": 36114,
+ "rebuilt_text_chars": 36114,
+ "undefined_mentions_in_log": 0,
+ "text_identical": true,
+ "control_without_Fig1_fails_as_it_must": true,
+ "verdict": "PASS"
+}
