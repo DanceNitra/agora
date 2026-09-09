@@ -54,6 +54,9 @@ class DictateConfig(BaseModel):
     replacements_file: str = "slovnik.json"
     app_overrides: dict[str, dict[str, Any]] = Field(default_factory=dict)
     llm_cleanup: LLMCleanupConfig = Field(default_factory=LLMCleanupConfig)
+    whisper_model: str = "large-v3-turbo"
+    whisper_device: str = "cuda"
+    typing_delay_ms: int = Field(default=2, ge=0)
     log_level: str = "INFO"
 
     @field_validator("language")

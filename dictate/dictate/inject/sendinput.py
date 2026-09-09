@@ -29,9 +29,26 @@ class KEYBDINPUT(ctypes.Structure):
     ]
 
 
+class MOUSEINPUT(ctypes.Structure):
+    _fields_ = [
+        ("dx", wintypes.LONG),
+        ("dy", wintypes.LONG),
+        ("mouseData", wintypes.DWORD),
+        ("dwFlags", wintypes.DWORD),
+        ("time", wintypes.DWORD),
+        ("dwExtraInfo", ctypes.POINTER(wintypes.ULONG)),
+    ]
+
+
 class INPUT(ctypes.Structure):
+    """Win32 INPUT: the union must include MOUSEINPUT (largest member).
+
+    Without it, ``sizeof`` is 32 instead of the required 40 on x64 and
+    every SendInput call fails with zero events sent.
+    """
+
     class _INPUT(ctypes.Union):
-        _fields_ = [("ki", KEYBDINPUT)]
+        _fields_ = [("ki", KEYBDINPUT), ("mi", MOUSEINPUT)]
 
     _anonymous_ = ("u",)
     _fields_ = [("type", wintypes.DWORD), ("u", _INPUT)]
@@ -86,8 +103,13 @@ def _key_event(vk: int, keyup: bool) -> INPUT:
 
 
 def send_unicode(text: str, delay_ms: int = 0) -> None:
-    """Type ``text`` character by character via KEYEVENTF_UNICODE."""
+    """Type ``text`` via KEYEVENTF_UNICODE events in one batched call.
+
+    A single SendInput call is atomic and reliable; a per-event delay
+    slows it down for apps that drop very fast events (some terminals).
+    """
     user32 = _user32()
+    events: list[INPUT] = []
     for char in text:
         code = ord(char)
         parts = [code]
@@ -97,11 +119,25 @@ def send_unicode(text: str, delay_ms: int = 0) -> None:
                 0xDC00 + ((code - 0x10000) & 0x3FF),
             ]
         for part in parts:
-            for keyup in (False, True):
-                event = _unicode_input(part, keyup=keyup)
-                user32.SendInput(1, ctypes.byref(event), ctypes.sizeof(INPUT))
-                if delay_ms:
-                    time.sleep(delay_ms / 1000)
+            events.append(_unicode_input(part, keyup=False))
+            events.append(_unicode_input(part, keyup=True))
+    if not events:
+        return
+    if delay_ms:
+        for event in events:
+            user32.SendInput(1, ctypes.byref(event), ctypes.sizeof(INPUT))
+            time.sleep(delay_ms / 1000)
+        return
+    buffer = (INPUT * len(events))(*events)
+    ctypes.set_last_error(0)
+    sent = user32.SendInput(len(events), buffer, ctypes.sizeof(INPUT))
+    if sent != len(events):
+        logger.error(
+            "SendInput sent %d of %d unicode events (last error %d)",
+            sent,
+            len(events),
+            ctypes.get_last_error(),
+        )
 
 
 def send_combo(combo: str, delay_ms: int = 0) -> None:
@@ -132,7 +168,7 @@ class SendInputInjector(TextInjector):
         self.prefix_space = prefix_space
 
     def insert(self, text: str, target_hwnd: int = 0) -> None:
-        """Type ``text`` into ``target_hwnd`` (0 = current foreground)."""
+        """Type ``text`` directly at the cursor of ``target_hwnd``."""
         if not text:
             return
         if target_hwnd:
@@ -140,9 +176,12 @@ class SendInputInjector(TextInjector):
 
             ok = focus.restore_focus(target_hwnd)
             logger.info("SendInput: refocus hwnd=%s ok=%s", target_hwnd, ok)
+            if not ok:
+                logger.error("SendInput: target window is not focused; typing anyway")
         payload = self._prefixed(text)
         time.sleep(0.05)  # let focus settle
         send_unicode(payload, self.delay_ms)
+        logger.info("SendInput: typed %d chars", len(payload))
 
     def _prefixed(self, text: str) -> str:
         """Apply the prefix-space policy."""

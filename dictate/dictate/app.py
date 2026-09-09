@@ -15,7 +15,7 @@ from collections.abc import Callable
 
 import numpy as np
 
-from .asr.parakeet import ParakeetEngine
+from .asr.factory import build_engine
 from .audio.recorder import Recorder
 from .audio.vad import SileroVAD
 from .config import DictateConfig, load_config
@@ -98,7 +98,7 @@ class DictationApp:
         self._record_started = 0.0
         self._target_hwnd = 0
         self._target_process = ""
-        self._engine: ParakeetEngine | None = None
+        self._engine = None
         self._vad: SileroVAD | None = None
         self._pipeline_running = False
         self._hotkey: HotkeyListener | None = None
@@ -322,7 +322,10 @@ class DictationApp:
         if mode == "sendinput":
             from .inject.sendinput import SendInputInjector
 
-            return SendInputInjector(prefix_space=self.config.prefix_space)
+            return SendInputInjector(
+                delay_ms=self.config.typing_delay_ms,
+                prefix_space=self.config.prefix_space,
+            )
         return ClipboardInjector(
             paste_shortcut=override.get("paste_shortcut", self.config.paste_shortcut),
             restore_delay_ms=self.config.clipboard_restore_delay_ms,
@@ -335,12 +338,9 @@ class DictationApp:
             self._vad = SileroVAD()
         return self._vad
 
-    def _load_engine(self) -> ParakeetEngine:
+    def _load_engine(self):
         if self._engine is None:
-            self._engine = ParakeetEngine(
-                num_threads=self.config.num_threads,
-                provider=self.config.provider,
-            )
+            self._engine = build_engine(self.config)
             self._engine.load()
         return self._engine
 
@@ -351,4 +351,5 @@ def audio_size(capture: _LiveCapture | None) -> int:
         return 0
     with capture._lock:
         return sum(chunk.size for chunk in capture._chunks)
+
 
