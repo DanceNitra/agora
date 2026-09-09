@@ -73,16 +73,17 @@ def restore_focus(hwnd: int) -> bool:
 
     user32 = ctypes.WinDLL("user32", use_last_error=True)
     try:
-        # Synthetic ALT press satisfies the foreground-lock check.
-        user32.keybd_event(VK_MENU, 0, 0, 0)
-        user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
+        # Already in the foreground: nothing to do, and an ALT tap here
+        # would open the target window menu bar instead.
+        if win32gui.GetForegroundWindow() == hwnd:
+            return True
         win32gui.SetForegroundWindow(hwnd)
         time.sleep(0.05)
-        actual = win32gui.GetForegroundWindow()
-        if actual == hwnd:
+        if win32gui.GetForegroundWindow() == hwnd:
             return True
-        # One retry with a window-show nudge.
-        win32gui.ShowWindow(hwnd, 9)  # SW_RESTORE
+        # Blocked: the synthetic ALT press unlocks SetForegroundWindow.
+        user32.keybd_event(VK_MENU, 0, 0, 0)
+        user32.keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0)
         win32gui.SetForegroundWindow(hwnd)
         time.sleep(0.05)
         actual = win32gui.GetForegroundWindow()
