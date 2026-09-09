@@ -61,6 +61,7 @@ def _run_app(config_path: Path | None = None) -> int:
     window = ControlWindow(on_toggle=app.toggle_recording, stop_event=stop_event, app=app)
     app.add_state_listener(window.set_state)
     app.add_level_listener(window.set_level)
+    app.add_wave_listener(window.set_wave)
     app.add_transcript_listener(window.set_transcript)
     app.set_target_provider(lambda: window.last_external)
     worker = threading.Thread(target=app.run_forever, args=(stop_event,), daemon=True)
