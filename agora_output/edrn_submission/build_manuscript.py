@@ -456,12 +456,17 @@ def main() -> int:
     corrections = (
         lim_tail + NL + NL +
         BS + "subsection*{Corrections to earlier reports}" + NL + NL +
+        # TWO ITEMS, AND THE PXP JUMP IS NOT ONE OF THEM. The first version of this paragraph
+        # also carried the PXP jump, which the PXP section already explains in place as the
+        # reason for its negative result: "the corrected Hermitian construction eliminates it
+        # entirely". That sentence is a result, not a diary entry, so repeating it here
+        # duplicated it in the paper. It stays where it explains something and is dropped here.
+        # The count in the opening sentence was also wrong: it said two and listed three.
         "Two statements made in earlier versions of this work do not survive the checks reported "
-        "here. A W-structure reported in an early scan, and a jump reported for the PXP model, "
-        "were both artifacts of a non-Hermitian Hamiltonian construction in an early script. "
-        "Edge $(0,1)$ was described as a flat symmetric control; it is not an edge of the level-2 "
-        "Sierpi" + BS + "'{n}ski gasket, and the full edge-resolved scan of all 27 edges finds "
-        "no flat edge.")
+        "here. A W-structure reported in an early scan was an artifact of a non-Hermitian "
+        "Hamiltonian construction, the same defect the PXP section describes. Edge $(0,1)$ was "
+        "described as a flat symmetric control; it is not an edge of the level-2 Sierpi" + BS +
+        "'{n}ski gasket, and the full edge-resolved scan of all 27 edges finds no flat edge.")
     body = body.replace(lim_tail, corrections, 1)
 
     # --- 4e. the acknowledgements repeat the contributions, differently -----

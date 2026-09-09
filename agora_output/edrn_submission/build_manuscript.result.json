@@ -1,12 +1,12 @@
 {
  "script": "build_manuscript.py",
- "when_utc": "2026-09-09T10:31:02Z",
+ "when_utc": "2026-09-09T11:43:07Z",
  "source": "manuscript_2026-08-29_asreceived.tex",
  "output": "manuscript.tex",
- "output_bytes": 39681,
+ "output_bytes": 39661,
  "abstract_words": 248,
  "body_words_source": 4446,
- "body_words_output": 4697,
+ "body_words_output": 4692,
  "figures_converted": 4,
  "dois_added": 6,
  "owner_placeholders_remaining": 0,
@@ -20,7 +20,7 @@
   "abstract_within_limit": true,
   "every_number_in_his_body_survives": true,
   "abstract_keeps_every_stated_result": true,
-  "body_word_drift_pct": 5.65,
+  "body_word_drift_pct": 5.53,
   "orbit_arithmetic_applied": true,
   "ai_disclosure_in_method_section": true
  }

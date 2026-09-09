@@ -1,8 +1,8 @@
 {
  "probe": "what_the_epjb_submission_still_needs.py",
- "when_utc": "2026-09-09T10:35:22Z",
+ "when_utc": "2026-09-09T11:43:20Z",
  "manuscript": "agora_output/edrn_submission/manuscript.tex",
- "manuscript_bytes": 39681,
+ "manuscript_bytes": 39661,
  "rules_checked": 16,
  "satisfied": 16,
  "todo": 0,

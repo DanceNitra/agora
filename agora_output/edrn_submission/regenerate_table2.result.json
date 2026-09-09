@@ -1,0 +1,991 @@
+{
+ "script": "regenerate_table2.py",
+ "when_utc": "2026-09-03T20:52:40Z",
+ "networkx": "3.6.1",
+ "grid": "linspace(0,3,61)",
+ "workers": 4,
+ "calibration": {
+  "edge": [
+   1,
+   10
+  ],
+  "expected": 0.058909125,
+  "standard": {
+   "E0": 0.29031598331958375,
+   "valley_s": 1.9000000000000001,
+   "E_min": 0.23140685827507704,
+   "depth": 0.05890912504450671,
+   "degeneracy_at_valley": 2
+  },
+  "theory": {
+   "E0": 0.2903159833195839,
+   "valley_s": 1.9000000000000001,
+   "E_min": 0.23140685827507748,
+   "depth": 0.05890912504450643,
+   "degeneracy_at_valley": 2
+  },
+  "off_by": 4.450643326103787e-11
+ },
+ "rows": [
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    6
+   ],
+   "standard": {
+    "E0": 0.30609008909541796,
+    "valley_s": 0.9500000000000001,
+    "E_min": 0.25020141725888895,
+    "depth": 0.055888671836529014,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.30609008909541796,
+    "valley_s": 0.9500000000000001,
+    "E_min": 0.25020141725888945,
+    "depth": 0.055888671836528514,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    12
+   ],
+   "standard": {
+    "E0": 0.30609008909541674,
+    "valley_s": 0.9500000000000001,
+    "E_min": 0.25020141725889034,
+    "depth": 0.055888671836526405,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.30609008909541785,
+    "valley_s": 0.9500000000000001,
+    "E_min": 0.25020141725888984,
+    "depth": 0.055888671836528014,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    11
+   ],
+   "standard": {
+    "E0": 0.29411822169301316,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.2333908157733288,
+    "depth": 0.06072740591968437,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2941182216930132,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.23339081577332993,
+    "depth": 0.060727405919683286,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    0,
+    7
+   ],
+   "standard": {
+    "E0": 0.3662135429514948,
+    "valley_s": 0.1,
+    "E_min": 0.21939718313241474,
+    "depth": 0.14681635981908003,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2648734236740512,
+    "valley_s": 0.1,
+    "E_min": 0.21939718313241538,
+    "depth": 0.04547624054163582,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    1,
+    10
+   ],
+   "standard": {
+    "E0": 0.29031598331958375,
+    "valley_s": 1.9000000000000001,
+    "E_min": 0.23140685827507704,
+    "depth": 0.05890912504450671,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2903159833195839,
+    "valley_s": 1.9000000000000001,
+    "E_min": 0.23140685827507748,
+    "depth": 0.05890912504450643,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    3
+   ],
+   "standard": {
+    "E0": 0.30567699822478306,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.23069971696121358,
+    "depth": 0.07497728126356948,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.3056769982247826,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.2306997169612133,
+    "depth": 0.07497728126356931,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    2,
+    11
+   ],
+   "standard": {
+    "E0": 0.242201249282419,
+    "valley_s": 0.30000000000000004,
+    "E_min": 0.20703357643529366,
+    "depth": 0.03516767284712535,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2422012492824182,
+    "valley_s": 0.30000000000000004,
+    "E_min": 0.20703357643529316,
+    "depth": 0.03516767284712505,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    4
+   ],
+   "standard": {
+    "E0": 0.2951795249453668,
+    "valley_s": 1.9500000000000002,
+    "E_min": 0.22548872345672513,
+    "depth": 0.06969080148864168,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.29517952494536787,
+    "valley_s": 1.9500000000000002,
+    "E_min": 0.22548872345672458,
+    "depth": 0.06969080148864329,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    3,
+    9
+   ],
+   "standard": {
+    "E0": 0.25065887381318075,
+    "valley_s": 0.25,
+    "E_min": 0.20776893196709892,
+    "depth": 0.04288994184608183,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2506588738131833,
+    "valley_s": 0.25,
+    "E_min": 0.20776893196709842,
+    "depth": 0.042889941846084884,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    10,
+    11
+   ],
+   "standard": {
+    "E0": 0.2900683992550205,
+    "valley_s": 1.6,
+    "E_min": 0.23909288841540716,
+    "depth": 0.050975510839613325,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2900683992550207,
+    "valley_s": 1.6,
+    "E_min": 0.2390928884154061,
+    "depth": 0.0509755108396146,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    4,
+    8
+   ],
+   "standard": {
+    "E0": 0.386806662520491,
+    "valley_s": 0.05,
+    "E_min": 0.21380238365666446,
+    "depth": 0.17300427886382655,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2582683830764959,
+    "valley_s": 0.05,
+    "E_min": 0.2138023836566653,
+    "depth": 0.04446599941983062,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    5,
+    10
+   ],
+   "standard": {
+    "E0": 0.3767418942744366,
+    "valley_s": 0.15000000000000002,
+    "E_min": 0.21654152161641096,
+    "depth": 0.16020037265802564,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2610676777203405,
+    "valley_s": 0.15000000000000002,
+    "E_min": 0.21654152161641055,
+    "depth": 0.04452615610392996,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    11,
+    14
+   ],
+   "standard": {
+    "E0": 0.2941182216930135,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.23339081577333007,
+    "depth": 0.060727405919683425,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.29411822169301366,
+    "valley_s": 1.7000000000000002,
+    "E_min": 0.23339081577332976,
+    "depth": 0.0607274059196839,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "tree",
+   "edge": [
+    13,
+    14
+   ],
+   "standard": {
+    "E0": 0.3662135429514955,
+    "valley_s": 0.1,
+    "E_min": 0.21939718313241655,
+    "depth": 0.14681635981907895,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.264873423674052,
+    "valley_s": 0.1,
+    "E_min": 0.2193971831324173,
+    "depth": 0.04547624054163468,
+    "degeneracy_at_valley": 2
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    6
+   ],
+   "standard": {
+    "E0": 0.3169059783182719,
+    "valley_s": 1.4500000000000002,
+    "E_min": 0.2725333837201435,
+    "depth": 0.04437259459812837,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.26754526293258934,
+    "valley_s": 1.4000000000000001,
+    "E_min": 0.2571008292819468,
+    "depth": 0.01044443365064257,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    11
+   ],
+   "standard": {
+    "E0": 0.2735067839510156,
+    "valley_s": 0.05,
+    "E_min": 0.2748853535828149,
+    "depth": -0.0013785696317993312,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2372689104636957,
+    "valley_s": 0.05,
+    "E_min": 0.23812779769136297,
+    "depth": -0.0008588872276672765,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    1
+   ],
+   "standard": {
+    "E0": 0.28848759899488463,
+    "valley_s": 0.05,
+    "E_min": 0.29043437973681663,
+    "depth": -0.0019467807419319971,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.24818701716170044,
+    "valley_s": 0.05,
+    "E_min": 0.24931686325206825,
+    "depth": -0.0011298460903678142,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    8
+   ],
+   "standard": {
+    "E0": 0.3076475795699189,
+    "valley_s": 3.0,
+    "E_min": 0.29284521961108845,
+    "depth": 0.014802359958830447,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26223310026829993,
+    "valley_s": 0.05,
+    "E_min": 0.2624259987965193,
+    "depth": -0.00019289852821935405,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    0,
+    12
+   ],
+   "standard": {
+    "E0": 0.3042197899989419,
+    "valley_s": 0.05,
+    "E_min": 0.30451860939887987,
+    "depth": -0.00029881939993797735,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26923228428787627,
+    "valley_s": 1.55,
+    "E_min": 0.26205589872429175,
+    "depth": 0.00717638556358452,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    10
+   ],
+   "standard": {
+    "E0": 0.31616666559649675,
+    "valley_s": 1.9500000000000002,
+    "E_min": 0.3101261872652962,
+    "depth": 0.006040478331200527,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2648093924473683,
+    "valley_s": 0.75,
+    "E_min": 0.26354686640971764,
+    "depth": 0.0012625260376506464,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    11
+   ],
+   "standard": {
+    "E0": 0.3165543761826643,
+    "valley_s": 1.9500000000000002,
+    "E_min": 0.2717660526216734,
+    "depth": 0.044788323560990884,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26732480845378764,
+    "valley_s": 1.9500000000000002,
+    "E_min": 0.2355898810072743,
+    "depth": 0.03173492744651335,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    9
+   ],
+   "standard": {
+    "E0": 0.3016753973972453,
+    "valley_s": 0.05,
+    "E_min": 0.30244476992773756,
+    "depth": -0.0007693725304922516,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2681524567178528,
+    "valley_s": 1.05,
+    "E_min": 0.26370974883628895,
+    "depth": 0.004442707881563868,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    1,
+    6
+   ],
+   "standard": {
+    "E0": 0.2842688402468521,
+    "valley_s": 0.05,
+    "E_min": 0.28612792614202104,
+    "depth": -0.0018590858951689215,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2490231426581367,
+    "valley_s": 0.05,
+    "E_min": 0.2497612937697329,
+    "depth": -0.0007381511115962247,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    3
+   ],
+   "standard": {
+    "E0": 0.3095802069659218,
+    "valley_s": 0.30000000000000004,
+    "E_min": 0.3092590600980353,
+    "depth": 0.0003211468678865348,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2657930444599406,
+    "valley_s": 0.65,
+    "E_min": 0.26221320118619096,
+    "depth": 0.003579843273749661,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    2,
+    12
+   ],
+   "standard": {
+    "E0": 0.31536069086731006,
+    "valley_s": 1.25,
+    "E_min": 0.312428137532836,
+    "depth": 0.002932553334474064,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.27196894446866676,
+    "valley_s": 1.0,
+    "E_min": 0.2637151122882309,
+    "depth": 0.00825383218043585,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    4
+   ],
+   "standard": {
+    "E0": 0.3231861164063453,
+    "valley_s": 1.1500000000000001,
+    "E_min": 0.31248613990580043,
+    "depth": 0.010699976500544883,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.27585918367909756,
+    "valley_s": 1.05,
+    "E_min": 0.2637092932749531,
+    "depth": 0.012149890404144437,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    11
+   ],
+   "standard": {
+    "E0": 0.3424384765657263,
+    "valley_s": 2.7,
+    "E_min": 0.26616265940610334,
+    "depth": 0.07627581715962295,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.28061043448845596,
+    "valley_s": 2.6,
+    "E_min": 0.22937410712276352,
+    "depth": 0.05123632736569245,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    3,
+    7
+   ],
+   "standard": {
+    "E0": 0.32052493409990573,
+    "valley_s": 0.7000000000000001,
+    "E_min": 0.31061414276703947,
+    "depth": 0.009910791332866264,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.272777396477132,
+    "valley_s": 0.8500000000000001,
+    "E_min": 0.26311932982721337,
+    "depth": 0.00965806664991864,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    9
+   ],
+   "standard": {
+    "E0": 0.3320770483502142,
+    "valley_s": 1.4000000000000001,
+    "E_min": 0.28425945660678265,
+    "depth": 0.04781759174343153,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2754576252235105,
+    "valley_s": 1.35,
+    "E_min": 0.25771844174235503,
+    "depth": 0.017739183481155496,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    5
+   ],
+   "standard": {
+    "E0": 0.2759232234014245,
+    "valley_s": 0.05,
+    "E_min": 0.2772645605662263,
+    "depth": -0.0013413371648017813,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2540703271516483,
+    "valley_s": 0.05,
+    "E_min": 0.2542268021900451,
+    "depth": -0.00015647503839683052,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    4,
+    12
+   ],
+   "standard": {
+    "E0": 0.3050197973730736,
+    "valley_s": 0.05,
+    "E_min": 0.3060824872885432,
+    "depth": -0.0010626899154695946,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2595462241452857,
+    "valley_s": 0.05,
+    "E_min": 0.2598874454601354,
+    "depth": -0.0003412213148497045,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    12
+   ],
+   "standard": {
+    "E0": 0.32268599079394306,
+    "valley_s": 1.9000000000000001,
+    "E_min": 0.26396614860789147,
+    "depth": 0.058719842186051585,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2719594149424367,
+    "valley_s": 1.75,
+    "E_min": 0.2474134540035283,
+    "depth": 0.0245459609389084,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    13
+   ],
+   "standard": {
+    "E0": 0.27782913818877525,
+    "valley_s": 0.05,
+    "E_min": 0.2793205863799955,
+    "depth": -0.0014914481912202682,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26720408534844275,
+    "valley_s": 0.45,
+    "E_min": 0.25875904650797876,
+    "depth": 0.008445038840463992,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    5,
+    9
+   ],
+   "standard": {
+    "E0": 0.3027713422920215,
+    "valley_s": 0.05,
+    "E_min": 0.30381567361867007,
+    "depth": -0.001044331326648551,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2704103392900931,
+    "valley_s": 1.3,
+    "E_min": 0.2616591701022548,
+    "depth": 0.008751169187838304,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    8
+   ],
+   "standard": {
+    "E0": 0.296569046568152,
+    "valley_s": 0.05,
+    "E_min": 0.29763233335311967,
+    "depth": -0.0010632867849676986,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2579469400467799,
+    "valley_s": 0.05,
+    "E_min": 0.2582549305085724,
+    "depth": -0.00030799046179247336,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    6,
+    11
+   ],
+   "standard": {
+    "E0": 0.29048600482949744,
+    "valley_s": 0.05,
+    "E_min": 0.29298962861490263,
+    "depth": -0.0025036237854051957,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.24978474148523536,
+    "valley_s": 0.05,
+    "E_min": 0.2513523414701317,
+    "depth": -0.001567599984896334,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    7,
+    8
+   ],
+   "standard": {
+    "E0": 0.28820980964936344,
+    "valley_s": 0.30000000000000004,
+    "E_min": 0.28451674692096574,
+    "depth": 0.0036930627283977002,
+    "degeneracy_at_valley": 2
+   },
+   "theory": {
+    "E0": 0.2882098096493623,
+    "valley_s": 1.0,
+    "E_min": 0.2637151122882309,
+    "depth": 0.024494697361131412,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    14
+   ],
+   "standard": {
+    "E0": 0.29157522831648014,
+    "valley_s": 0.05,
+    "E_min": 0.2930992941019836,
+    "depth": -0.001524065785503459,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.27384416054329846,
+    "valley_s": 0.9,
+    "E_min": 0.2636812238506856,
+    "depth": 0.010162936692612867,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    10,
+    11
+   ],
+   "standard": {
+    "E0": 0.2981412863168686,
+    "valley_s": 0.05,
+    "E_min": 0.29842673255440494,
+    "depth": -0.00028544623753634646,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26231732147357245,
+    "valley_s": 0.35000000000000003,
+    "E_min": 0.26174587791135245,
+    "depth": 0.0005714435622199976,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    8,
+    9
+   ],
+   "standard": {
+    "E0": 0.30284445156296125,
+    "valley_s": 0.05,
+    "E_min": 0.30365499730788975,
+    "depth": -0.0008105457449285036,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.2603192064790256,
+    "valley_s": 0.05,
+    "E_min": 0.26038901866762276,
+    "depth": -6.981218859714033e-05,
+    "degeneracy_at_valley": 4
+   }
+  },
+  {
+   "graph": "random",
+   "edge": [
+    12,
+    13
+   ],
+   "standard": {
+    "E0": 0.3054241084407441,
+    "valley_s": 0.05,
+    "E_min": 0.30542895046559343,
+    "depth": -4.842024849349702e-06,
+    "degeneracy_at_valley": 4
+   },
+   "theory": {
+    "E0": 0.26831124609373264,
+    "valley_s": 0.75,
+    "E_min": 0.26305658264882886,
+    "depth": 0.005254663444903773,
+    "degeneracy_at_valley": 4
+   }
+  }
+ ],
+ "max_view_difference": 0.12853827944399593,
+ "tree_orbits": [
+  {
+   "members": [
+    [
+     0,
+     7
+    ],
+    [
+     13,
+     14
+    ]
+   ],
+   "theory_depths": [
+    0.04547624054163582,
+    0.04547624054163468
+   ],
+   "spread": 1.1379786002407855e-15
+  },
+  {
+   "members": [
+    [
+     0,
+     11
+    ],
+    [
+     11,
+     14
+    ]
+   ],
+   "theory_depths": [
+    0.060727405919683286,
+    0.0607274059196839
+   ],
+   "spread": 6.106226635438361e-16
+  },
+  {
+   "members": [
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     12
+    ]
+   ],
+   "theory_depths": [
+    0.055888671836528514,
+    0.055888671836528014
+   ],
+   "spread": 4.996003610813204e-16
+  }
+ ],
+ "worst_within_orbit_spread": 1.1379786002407855e-15,
+ "negative_theory_depth": [
+  [
+   0,
+   11
+  ],
+  [
+   0,
+   1
+  ],
+  [
+   0,
+   8
+  ],
+  [
+   1,
+   6
+  ],
+  [
+   4,
+   5
+  ],
+  [
+   4,
+   12
+  ],
+  [
+   6,
+   8
+  ],
+  [
+   6,
+   11
+  ],
+  [
+   8,
+   9
+  ]
+ ],
+ "controls": {
+  "calibrated_before_anything_was_reported": true,
+  "two_views_proved_to_differ": true,
+  "orbit_claim_checked_not_assumed": true,
+  "signs_reported_so_ineligible_edges_are_visible": true
+ }
+}

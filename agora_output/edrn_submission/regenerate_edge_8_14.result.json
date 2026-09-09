@@ -1,0 +1,59 @@
+{
+ "script": "regenerate_edge_8_14.py",
+ "when_utc": "2026-09-03T16:57:16Z",
+ "networkx": "3.6.1",
+ "grid": "linspace(0,2,41)",
+ "calibration": {
+  "edge": [
+   1,
+   10
+  ],
+  "expected": 0.058909125,
+  "standard": {
+   "E0": 0.2903159833195835,
+   "valley_s": 1.9000000000000001,
+   "E_min": 0.23140685827507732,
+   "depth": 0.05890912504450621,
+   "degeneracy_at_valley": 2
+  },
+  "theory": {
+   "E0": 0.2903159833195846,
+   "valley_s": 1.9000000000000001,
+   "E_min": 0.2314068582750763,
+   "depth": 0.05890912504450829,
+   "degeneracy_at_valley": 2
+  },
+  "off_by": 4.4506211216432945e-11
+ },
+ "target": {
+  "edge": [
+   8,
+   14
+  ],
+  "standard": {
+   "E0": 0.2915752283164796,
+   "valley_s": 0.05,
+   "E_min": 0.2930992941019844,
+   "depth": -0.0015240657855047912,
+   "degeneracy_at_valley": 4
+  },
+  "theory": {
+   "E0": 0.2738441605432983,
+   "valley_s": 0.9,
+   "E_min": 0.2636812238506863,
+   "depth": 0.010162936692611979,
+   "degeneracy_at_valley": 4
+  }
+ },
+ "on_record": {
+  "theory view (his)": 0.010163,
+  "repaired CSV": 0.050837,
+  "standard view (his)": 0.073017
+ },
+ "controls": {
+  "calibrated_on_an_edge_all_three_sources_agree_on": true,
+  "every_magnetisation_sector_scanned": true,
+  "degeneracy_reported_at_the_valley": true,
+  "generators_checked_against_the_published_edge_counts": true
+ }
+}
