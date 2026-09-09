@@ -1,0 +1,15 @@
+Ranked by citation count, one wikilink from another note counted per citer, the 16 rows that left by sharing a physical line have a median of 3.0 against 0.5 for the 32 rows the tool judged.
+Judged against adjacency gives a permutation p of 0.0073 over 20000 relabellings.
+Judged against the rows that stayed live gives the same gap of 2.5 and a p of 0.0071, so the statistic is measuring the tool's selection of the 32.
+A random draw of 16 rows from the live index, ranked by the same citation count, reaches the adjacency median of 3.0 in 69% of 20000 draws.
+Kolmogorov-Smirnov cannot separate the adjacency rows from the live rows: D = 0.200, p = 0.5208.
+Counting only citers still in the index, the adjacency rows and the judged rows both sit at a median of 0, and adjacency against live gives p = 0.0691.
+Age predicts citation count in this store, Spearman rho = 0.46 over 276 rows.
+Ranked by file creation age in days, the 32 judged rows have a median of 40.7 against 64.3 for the 16 adjacency rows.
+Inside an age-matched band the citation gap gives p = 0.147, against 0.0073 unmatched, so the gap is not robust to age.
+At n = 16 the adjacency arm detects a true two-citation shift only 32% of the time, so this is not strong enough to call a null.
+The re-creation metric measures 1 of 93 rows that have a later snapshot reappearing in the live index.
+Replaying the real 2026-09-04 input, line-addressed archives 48 rows with 16 never judged, and row-addressed archives 32 with 0 never judged.
+Four figures in our previous comment are wrong: the section holds 54 rows not 53, 22 not 21, 16 not 15, and 25 runs not 24.
+In the note corpus 125 of 198 retired rows are cited by a wikilink in another note today.
+Neither of the two rows appearing in two archive blocks shows a return in the 26 dated snapshots, and the largest gap in that series is 9.5 days.
