@@ -3,7 +3,8 @@
 Commands:
     python -m dictate                 Run the app (tray + hotkey).
     python -m dictate --list-mics     List available microphones.
-    python -m dictate --test-mic 3    Record 3 s and transcribe to console.
+    python -m dictate --test-mic 3    Record 3 s with beeps and transcribe.
+    python -m dictate --listen 3      Probe mics, then record and transcribe 3 takes.
     python -m dictate --transcribe file.wav   Transcribe a wav file.
     python -m dictate --download-model        Download the default model.
     python -m dictate --config-path          Print the config path.
@@ -30,8 +31,9 @@ def _list_mics() -> int:
         if device["max_input_channels"] > 0:
             name = device["name"]
             channels = device["max_input_channels"]
-            default = " (default)" if device.get("is_default_input") else ""
-            print(f"  [{index}] {name} ({channels} ch){default}")
+            host = sd.query_hostapis(device["hostapi"])["name"]
+            default = " (default)" if index == sd.default.device[0] else ""
+            print(f"  [{index}] {name} ({channels} ch) [{host}]{default}")
     return 0
 
 
@@ -44,14 +46,13 @@ def _config_path() -> int:
 
 
 def _run_app() -> int:
-    """Start the tray app. Phase 1 only prints a placeholder."""
+    """Start the tray app. Placeholder until phase 5 wires the state machine."""
     from .config import load_config
     from .log import setup_logging
 
     config = load_config()
     setup_logging(config.log_level)
-    print("Dictate is not yet wired to the tray in phase 1.")
-    print(f"Config: {config.model_dump_json(indent=2)}")
+    print("Dictate app loop is not wired yet (phase 5).")
     return 0
 
 
@@ -69,7 +70,20 @@ def main(argv: list[str] | None = None) -> int:
         type=int,
         nargs="?",
         const=3,
-        help="Record N seconds and transcribe to console (no injection).",
+        help="Record N seconds with beeps and a live meter, then transcribe.",
+    )
+    parser.add_argument(
+        "--listen",
+        metavar="TAKES",
+        type=int,
+        nargs="?",
+        const=3,
+        help="Record and transcribe TAKES takes with beeps."
+    )
+    parser.add_argument(
+        "--probe",
+        action="store_true",
+        help="Force a microphone probe before --listen takes.",
     )
     parser.add_argument(
         "--transcribe",
@@ -104,6 +118,10 @@ def main(argv: list[str] | None = None) -> int:
         from .cli import test_mic
 
         return test_mic(args.test_mic, config_path=args.config)
+    if args.listen is not None:
+        from .cli import listen
+
+        return listen(args.listen, probe=args.probe or None, config_path=args.config)
     if args.transcribe is not None:
         from .cli import transcribe_file
 
@@ -118,3 +136,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
