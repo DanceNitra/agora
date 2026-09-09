@@ -12,6 +12,7 @@ authors = [{ name = "Agora" }]
 keywords = ["dictation", "speech-to-text", "sherpa-onnx", "parakeet", "windows"]
 dependencies = [
     "sherpa-onnx>=1.10.0",
+    "sherpa-onnx-core>=1.10.0",
     "sounddevice>=0.4.6",
     "numpy>=1.26",
     "pynput>=1.7.6",
@@ -20,6 +21,9 @@ dependencies = [
     "pyperclip>=1.8.2",
     "pywin32>=306",
     "pydantic>=2.5",
+    "onnxruntime>=1.29.0",
+    "pycaw>=20251023",
+    "comtypes>=1.4.16",
 ]
 
 [project.optional-dependencies]
@@ -46,3 +50,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[dependency-groups]
+dev = [
+    "onnx>=1.22.0",
+]

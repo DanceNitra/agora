@@ -1,0 +1,1 @@
+take1 peak=0.237 rtf=0.114 TEXT: Raz, dva, tri, štyri, pé, slow, teraz jazykom niečítani diakriticky znadlo.

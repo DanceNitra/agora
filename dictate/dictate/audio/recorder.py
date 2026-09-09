@@ -1,11 +1,12 @@
 """Microphone recording with sounddevice.
 
-Captures audio at 16 kHz mono float32. Supports device selection by
-index or by substring of the device name.
+Records at the device's native sample rate; sherpa-onnx resamples
+internally, so no manual resampling is needed.
 """
 
 from __future__ import annotations
 
+import logging
 import queue
 import threading
 import time
@@ -14,7 +15,8 @@ from dataclasses import dataclass
 import numpy as np
 import sounddevice as sd
 
-SAMPLE_RATE = 16000
+logger = logging.getLogger(__name__)
+
 CHANNELS = 1
 DTYPE = "float32"
 
@@ -28,26 +30,43 @@ class AudioChunk:
 
 
 class Recorder:
-    """Record microphone audio into a ring buffer.
+    """Record microphone audio into a queue.
 
-    The recorder runs a background sounddevice stream. Callers read
-    accumulated audio with :meth:`drain`.
+    The recorder runs a background sounddevice stream at the device's
+    native sample rate. Callers read accumulated audio with
+    :meth:`drain`.
     """
 
     def __init__(
         self,
-        sample_rate: int = SAMPLE_RATE,
+        sample_rate: int | None = None,
         channels: int = CHANNELS,
         device: str | int | None = None,
-        blocksize: int = 1024,
+        blocksize: int = 0,
     ) -> None:
-        self.sample_rate = sample_rate
+        self.requested_rate = sample_rate
         self.channels = channels
         self.device = device
         self.blocksize = blocksize
         self._queue: queue.Queue[np.ndarray] = queue.Queue()
         self._stream: sd.InputStream | None = None
         self._lock = threading.Lock()
+        self._native_rate = self._query_native_rate()
+
+    def _query_native_rate(self) -> int:
+        """Return the device's default input sample rate."""
+        if self.device is None:
+            info = sd.query_devices(kind="input")
+        else:
+            info = sd.query_devices(self.device)
+        rate = int(info["default_samplerate"])
+        logger.info("Device %s native sample rate: %d Hz", info["name"], rate)
+        return rate
+
+    @property
+    def sample_rate(self) -> int:
+        """The sample rate of recorded audio."""
+        return self._native_rate
 
     def _callback(
         self,
@@ -58,9 +77,7 @@ class Recorder:
     ) -> None:
         del frames, time_info
         if status:
-            # Logging is not available here; surface the status via the queue.
-            pass
-        # indata is (frames, channels). Copy so the buffer is not reused.
+            logger.warning("Audio callback status: %s", status)
         self._queue.put(indata[:, 0].copy())
 
     def start(self) -> None:
@@ -69,7 +86,7 @@ class Recorder:
             if self._stream is not None:
                 return
             self._stream = sd.InputStream(
-                samplerate=self.sample_rate,
+                samplerate=self._native_rate,
                 channels=self.channels,
                 dtype=DTYPE,
                 device=self.device,
@@ -77,6 +94,7 @@ class Recorder:
                 callback=self._callback,
             )
             self._stream.start()
+            logger.info("Recording started: device=%s rate=%d", self.device, self._native_rate)
 
     def stop(self) -> None:
         """Stop and close the input stream."""
@@ -86,6 +104,7 @@ class Recorder:
             self._stream.stop()
             self._stream.close()
             self._stream = None
+            logger.info("Recording stopped")
 
     def drain(self) -> np.ndarray:
         """Return all queued audio as a single 1-D float32 array."""
@@ -100,17 +119,42 @@ class Recorder:
         return np.concatenate(chunks)
 
     def record(self, seconds: float) -> np.ndarray:
-        """Record for ``seconds`` and return the audio.
-
-        Convenience method for CLI use. Starts the stream, waits, stops,
-        and returns the captured audio.
-        """
+        """Record for ``seconds`` and return the audio."""
         self.start()
         try:
             time.sleep(seconds)
             return self.drain()
         finally:
             self.stop()
+
+    def record_with_meter(self, seconds: float, width: int = 48) -> np.ndarray:
+        """Record for ``seconds`` while printing a live level bar.
+
+        Returns the full recording. The bar shows the peak level of the
+        last 100 ms so the speaker can see the microphone is listening.
+        """
+        self.start()
+        chunks: list[np.ndarray] = []
+        start = time.perf_counter()
+        try:
+            while time.perf_counter() - start < seconds:
+                time.sleep(0.1)
+                got = self.drain()
+                if got.size:
+                    chunks.append(got)
+                    peak = float(np.max(np.abs(got)))
+                    filled = int(width * min(1.0, peak * 5.0))
+                    bar = "#" * filled + "." * (width - filled)
+                    print(f"\r  [{bar}] {peak:.3f}", end="", flush=True)
+            got = self.drain()
+            if got.size:
+                chunks.append(got)
+        finally:
+            self.stop()
+        print()
+        if not chunks:
+            return np.zeros(0, dtype=np.float32)
+        return np.concatenate(chunks)
 
 
 def resolve_device(device: str | int | None) -> str | int | None:
