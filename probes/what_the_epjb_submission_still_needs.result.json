@@ -1,8 +1,8 @@
 {
  "probe": "what_the_epjb_submission_still_needs.py",
- "when_utc": "2026-09-03T21:11:58Z",
+ "when_utc": "2026-09-09T10:35:22Z",
  "manuscript": "agora_output/edrn_submission/manuscript.tex",
- "manuscript_bytes": 39317,
+ "manuscript_bytes": 39681,
  "rules_checked": 16,
  "satisfied": 16,
  "todo": 0,
@@ -65,7 +65,7 @@
    "rule": "heading-depth",
    "requirement": "decimal headings, no more than three levels",
    "satisfied": true,
-   "detail": "sections 8, subsections 19, subsubsections 0, paragraphs 0 (max 3 levels)"
+   "detail": "sections 8, subsections 20, subsubsections 0, paragraphs 0 (max 3 levels)"
   },
   {
    "rule": "reference-dois",
