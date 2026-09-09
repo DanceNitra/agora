@@ -33,7 +33,7 @@ Required by the journal:
 | change | the rule |
 |---|---|
 | `revtex4-2 [aps,prb]` to `sn-jnl [iicol]` | his file was formatted for Physical Review B |
-| abstract 334 to 248 words | the stated limit is 150 to 250 |
+| abstract 331 to 248 words | the stated limit is 150 to 250 |
 | four inline TikZ pictures became `Fig1`-`Fig4` | the template: figures are attached, not embedded |
 | an artificial-intelligence subsection in Method | Springer requires it there; COPE requires it to name the tool and the use |
 | a Declarations section | eight statements; submissions without them are returned as incomplete |

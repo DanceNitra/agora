@@ -1,0 +1,72 @@
+{
+ "probe": "the_ring_row_is_his_own_note_and_the_gap_at_the_manifold_valley.py",
+ "his_note": "Real-arithmetic Lanczos searches converge to real superpositions whose E(1) can be as large as 0.1310, while the symmetric mixed density matrix returns zero. The value 0.0993 +- 0.0286 reported in Table 3 likely arises from a mixture of different S_z sectors.",
+ "ring_pooled": {
+  "valley_s": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "depth": [
+   0.07707215481219529,
+   0.0770721548121929,
+   0.07707215481219515
+  ],
+  "depth_spread": 1.0940004867947003e-15
+ },
+ "ring_fixed_sector": {
+  "valley_s": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "depth": [
+   0.07707215481219437,
+   0.07707215481214136,
+   0.07707215481221186
+  ],
+  "depth_spread": 2.997459423188433e-14
+ },
+ "ring_manifold_E1": 3.941012615695047e-12,
+ "ring_ground_degeneracy_at_s1": 4,
+ "random_8_14_gaps": {
+  "s=0.90": {
+   "gap": 0.7072941957088297,
+   "ground_degeneracy": 4
+  },
+  "s=1.20": {
+   "gap": 0.6238133944844719,
+   "ground_degeneracy": 4
+  }
+ },
+ "checks": [
+  {
+   "check": "CONTROL_POOLING_CHANGES_THE_RING_READING",
+   "pass": false,
+   "got": "largest pooled-minus-fixed difference on the ring is 0.0000"
+  },
+  {
+   "check": "CONTROL_THE_MANIFOLD_STILL_GIVES_E1_ZERO_UNDER_POOLING",
+   "pass": true,
+   "got": "E(1) averaged over 4 degenerate states is 3.941e-12"
+  },
+  {
+   "check": "CONTROL_THE_GAP_INSTRUMENT_SEES_THE_RING_DEGENERACY_AT_s_1",
+   "pass": true,
+   "got": "4 states at the ground energy at s=1 and a gap of 2.2075 above them"
+  },
+  {
+   "check": "POOLING_PRODUCES_A_CROSS_SEED_SPREAD_ON_THE_RING",
+   "pass": false,
+   "got": "pooled depths [0.0771, 0.0771, 0.0771], spread 0.0000; fixed-sector depths [0.0771, 0.0771, 0.0771], spread 0.0000; his row is 0.0993 +- 0.0286"
+  },
+  {
+   "check": "THE_MANIFOLD_VALLEY_ON_8_14_SITS_AT_A_NON_ZERO_GAP",
+   "pass": true,
+   "got": "gap 0.707294 with ground degeneracy 4 at s=0.90, against gap 0.623813 and degeneracy 4 at s=1.20"
+  }
+ ],
+ "all_passed": false,
+ "elapsed_s": 476.7,
+ "scope": "One ring edge, which suffices because the ring is edge-transitive, 61 points over s in [0,3], three seeds, all sixteen magnetisation sectors pooled against N_up=7 fixed. The gap on random edge (8,14) is measured over N_up 6 to 9 at two positions only, not scanned."
+}

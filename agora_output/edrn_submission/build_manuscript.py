@@ -9,7 +9,9 @@ WHAT IT CHANGES, and every item is a stated EPJ B requirement rather than a pref
      Review B format. EPJ B asks for the Springer Nature template with the [iicol] option.
   2. Title page. sn-jnl marks the corresponding author with \\author* and requires \\email; the
      affiliation is structured (\\orgname, \\orgaddress).
-  3. Abstract. The original runs 334 words against a stated limit of 150 to 250.
+  3. Abstract. The original runs 331 words against a stated limit of 150 to 250, counted by
+#     words() below on the span between the abstract tags. 334 was written here by hand and
+#     appeared in no receipt; a verification pass re-ran the counter and found 331.
   4. Figures. The four pictures were drawn inline with tikz. The template's own first page says
      figures must be attached separately, so they are now \\includegraphics of the files that
      extract_figures.py produced.
@@ -137,7 +139,7 @@ def words(s: str) -> int:
 # red-team diff against the author's abstract found seven of eight checked items gone: the three
 # representative small-world edges, the tree depth 0.0750, the "not a degeneracy artifact"
 # conclusion, the solver-dependence clause, "full-body scan", the word "small-world", and "exact at
-# the scan grid node". Cutting 334 words to 250 is a compression problem, and it was solved by
+# the scan grid node". Cutting 331 words to 250 is a compression problem, and it was solved by
 # deleting findings. This version compresses the prose instead and carries every result he stated.
 # American spelling is kept throughout, because the body is American and the first version
 # anglicised the abstract alone.
