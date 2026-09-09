@@ -1,12 +1,11 @@
 """Model download and verification.
 
-Downloads the int8 Parakeet TDT v3 bundle into
+Downloads the int8 Parakeet TDT v3 bundle and the Silero VAD model into
 ``%LOCALAPPDATA%/Dictate/models/`` and verifies the extracted files.
 """
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import shutil
 import tarfile
@@ -19,7 +18,6 @@ from ..config import app_data_dir
 logger = logging.getLogger(__name__)
 
 MODELS_DIR_NAME = "models"
-MODEL_NAME = "parakeet-tdt-0.6b-v3-int8"
 ARCHIVE_DIR_NAME = "sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8"
 MODEL_URL = (
     "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/"
@@ -32,6 +30,12 @@ REQUIRED_FILES = (
     "decoder.int8.onnx",
     "joiner.int8.onnx",
     "tokens.txt",
+)
+
+VAD_MODEL_FILE = "silero_vad.onnx"
+VAD_MODEL_URL = (
+    "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/"
+    "silero_vad.onnx"
 )
 
 
@@ -58,15 +62,6 @@ def model_dir() -> Path:
     We keep the extracted name and expose it as the model directory.
     """
     return models_dir() / ARCHIVE_DIR_NAME
-
-
-def _sha256(path: Path) -> str:
-    """Return the SHA256 of a file."""
-    digest = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def is_model_installed() -> bool:
@@ -101,35 +96,60 @@ def model_paths() -> ModelPaths:
     )
 
 
-def download_model(progress_callback=None) -> Path:
-    """Download and extract the default model.
+def is_vad_installed() -> bool:
+    """Return True if the Silero VAD model file exists and is non-empty."""
+    path = models_dir() / VAD_MODEL_FILE
+    return path.is_file() and path.stat().st_size > 0
 
-    Returns the model directory. Skips the download if the model is
-    already installed.
+
+def vad_model_path() -> Path:
+    """Return the path to the Silero VAD model.
+
+    Raises FileNotFoundError if the model is not installed.
+    """
+    path = models_dir() / VAD_MODEL_FILE
+    if not path.is_file() or path.stat().st_size == 0:
+        raise FileNotFoundError(
+            f"VAD model not installed. Run `python -m dictate --download-model` "
+            f"to download it into {path}"
+        )
+    return path
+
+
+def _download(url: str, destination: Path, progress_callback=None) -> Path:
+    """Download ``url`` into ``destination``."""
+    logger.info("Downloading %s", url)
+    urllib.request.urlretrieve(url, destination, reporthook=progress_callback)
+    return destination
+
+
+def download_model(progress_callback=None) -> Path:
+    """Download and extract the default ASR model plus the VAD model.
+
+    Returns the ASR model directory. Skips anything already installed.
     """
     directory = model_dir()
-    if is_model_installed():
-        logger.info("Model already installed at %s", directory)
-        return directory
-
-    models_dir().mkdir(parents=True, exist_ok=True)
-    archive_path = models_dir() / ARCHIVE_NAME
-
-    logger.info("Downloading %s", MODEL_URL)
-    urllib.request.urlretrieve(MODEL_URL, archive_path, reporthook=progress_callback)
-
-    logger.info("Extracting %s", archive_path)
-    with tarfile.open(archive_path, "r:bz2") as tar:
-        tar.extractall(models_dir(), filter="data")
-
-    archive_path.unlink(missing_ok=True)
-
     if not is_model_installed():
-        raise RuntimeError(
-            f"Model extraction failed: expected files missing in {directory}"
-        )
+        models_dir().mkdir(parents=True, exist_ok=True)
+        archive_path = models_dir() / ARCHIVE_NAME
 
-    logger.info("Model installed at %s", directory)
+        _download(MODEL_URL, archive_path, progress_callback)
+        logger.info("Extracting %s", archive_path)
+        with tarfile.open(archive_path, "r:bz2") as tar:
+            tar.extractall(models_dir(), filter="data")
+        archive_path.unlink(missing_ok=True)
+
+        if not is_model_installed():
+            raise RuntimeError(
+                f"Model extraction failed: expected files missing in {directory}"
+            )
+        logger.info("Model installed at %s", directory)
+    else:
+        logger.info("ASR model already installed at %s", directory)
+
+    if not is_vad_installed():
+        _download(VAD_MODEL_URL, models_dir() / VAD_MODEL_FILE, progress_callback)
+        logger.info("VAD model installed at %s", models_dir() / VAD_MODEL_FILE)
     return directory
 
 
