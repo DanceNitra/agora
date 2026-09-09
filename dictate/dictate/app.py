@@ -33,6 +33,19 @@ TRANSCRIBING = "TRANSCRIBING"
 INJECTING = "INJECTING"
 
 
+def _envelope(chunk: np.ndarray, points: int = 8) -> list[float]:
+    """Downsample a chunk to per-slice peak values for the oscilloscope."""
+    if chunk.size == 0:
+        return [0.0] * points
+    size = chunk.size // points
+    if size == 0:
+        size = 1
+    trimmed = chunk[: size * points]
+    return [
+        float(np.max(np.abs(part))) for part in np.split(trimmed, points)
+    ]
+
+
 class _LiveCapture:
     """Drain the recorder on a timer, keep the buffer, report levels."""
 
@@ -40,10 +53,14 @@ class _LiveCapture:
         self,
         recorder: Recorder,
         on_level: Callable[[float], None],
+        on_wave: Callable[[list[float]], None] | None = None,
+        envelope_points: int = 8,
         poll_s: float = 0.05,
     ) -> None:
         self.recorder = recorder
         self.on_level = on_level
+        self.on_wave = on_wave
+        self.envelope_points = envelope_points
         self.poll_s = poll_s
         self._chunks: list[np.ndarray] = []
         self._lock = threading.Lock()
@@ -65,6 +82,11 @@ class _LiveCapture:
                     self.on_level(peak)
                 except Exception:
                     logger.debug("level callback failed", exc_info=True)
+                if self.on_wave is not None:
+                    try:
+                        self.on_wave(_envelope(got, self.envelope_points))
+                    except Exception:
+                        logger.debug("wave callback failed", exc_info=True)
             hwnd = focus.get_foreground_window()
             if focus.is_external_window(hwnd):
                 self.last_external = hwnd
@@ -104,6 +126,7 @@ class DictationApp:
         self._hotkey: HotkeyListener | None = None
         self._listeners: list[Callable[[str], None]] = []
         self._level_listeners: list[Callable[[float], None]] = []
+        self._wave_listeners: list[Callable[[list[float]], None]] = []
         self._transcript_listeners: list[Callable[[str], None]] = []
         self._target_provider: Callable[[], int] | None = None
         self.on_text = self._inject_text
@@ -117,6 +140,10 @@ class DictationApp:
     def add_level_listener(self, listener: Callable[[float], None]) -> None:
         """Register a callback for live microphone levels."""
         self._level_listeners.append(listener)
+
+    def add_wave_listener(self, listener: Callable[[list[float]], None]) -> None:
+        """Register a callback for waveform envelope batches."""
+        self._wave_listeners.append(listener)
 
     def add_transcript_listener(self, listener: Callable[[str], None]) -> None:
         """Register a callback that receives every final transcript."""
@@ -203,7 +230,9 @@ class DictationApp:
                 self._set_state(IDLE)
                 self._beep("error")
                 return
-            self._capture = _LiveCapture(self._recorder, self._notify_level)
+            self._capture = _LiveCapture(
+                self._recorder, self._notify_level, self._notify_wave
+            )
             self._capture.start()
             self._beep("start")
 
@@ -291,6 +320,13 @@ class DictationApp:
                 callback(peak)
             except Exception:
                 logger.debug("level listener failed", exc_info=True)
+
+    def _notify_wave(self, envelope: list[float]) -> None:
+        for callback in list(self._wave_listeners):
+            try:
+                callback(envelope)
+            except Exception:
+                logger.debug("wave listener failed", exc_info=True)
 
     def _beep(self, kind: str) -> None:
         enabled = self.config.feedback_sound
