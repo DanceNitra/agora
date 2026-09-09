@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dictate"
+version = "0.1.0"
+description = "Local Windows dictation app (Slovak / Czech / English) using NVIDIA Parakeet TDT 0.6B v3 via sherpa-onnx."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Agora" }]
+keywords = ["dictation", "speech-to-text", "sherpa-onnx", "parakeet", "windows"]
+dependencies = [
+    "sherpa-onnx>=1.10.0",
+    "sounddevice>=0.4.6",
+    "numpy>=1.26",
+    "pynput>=1.7.6",
+    "pystray>=0.19.5",
+    "Pillow>=10.0",
+    "pyperclip>=1.8.2",
+    "pywin32>=306",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+whisper = ["faster-whisper>=1.0.0"]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+dictate = "dictate.__main__:main"
+
+[tool.setuptools]
+packages = ["dictate", "dictate.audio", "dictate.asr", "dictate.inject", "dictate.postprocess"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
