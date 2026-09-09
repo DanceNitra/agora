@@ -17,26 +17,6 @@ import sys
 from pathlib import Path
 
 
-import ctypes
-
-_SINGLE_INSTANCE_MUTEX = None
-
-def _ensure_single_instance():
-    global _SINGLE_INSTANCE_MUTEX
-    kernel32 = ctypes.windll.kernel32
-    mutex_name = "DictateSingleInstance_7f3a9b2e"
-    _SINGLE_INSTANCE_MUTEX = kernel32.CreateMutexW(None, 0, mutex_name)
-    if ctypes.get_last_error() == 183:  # ERROR_ALREADY_EXISTS
-        print("Dictate is already running. Bringing existing window to front.", file=sys.stderr)
-        try:
-            user32 = ctypes.windll.user32
-            hwnd = user32.FindWindowW(None, "Dictate")
-            if hwnd:
-                user32.SetForegroundWindow(hwnd)
-        except Exception:
-            pass
-        sys.exit(0)
-
 def _list_mics() -> int:
     """Print available input devices and return 0."""
     import sounddevice as sd
@@ -86,7 +66,6 @@ def _run_app(config_path: Path | None = None) -> int:
     return 0
 
 def main(argv: list[str] | None = None) -> int:
-    _ensure_single_instance()
     """Parse arguments and dispatch to the requested command."""
     parser = argparse.ArgumentParser(prog="dictate", description="Local Windows dictation app.")
     parser.add_argument(
@@ -178,7 +157,6 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
 
 
 
