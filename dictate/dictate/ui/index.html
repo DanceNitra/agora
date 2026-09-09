@@ -9,9 +9,14 @@
     background: #14161d;
     font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
     overflow: hidden;
+    display: flex;
+    align-items: stretch;
   }
   .pill {
-    width: 388px;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
     background: linear-gradient(160deg, #171922 0%, #12141c 100%);
     border: 1px solid #2b2f3d;
     border-radius: 16px;
@@ -19,7 +24,7 @@
     padding: 6px 10px 10px;
     color: #eceef6;
   }
-  .drag { height: 20px; display: flex; align-items: center; }
+  .drag { height: 20px; display: flex; align-items: center; flex-shrink: 0; }
   .title {
     font-size: 10px; font-weight: 600; letter-spacing: .4px;
     color: #6f7484; margin-left: 6px; flex: 1;
@@ -32,16 +37,17 @@
   }
   .btn-icon:hover { background: #ffffff12; color: #c9cdd8; }
   .scope {
-    width: 100%; height: 46px; display: block;
+    flex: 1 1 auto; min-height: 30px;
+    width: 100%; display: block;
     background: #0d0f15; border: 1px solid #23263a;
     border-radius: 10px;
   }
-  .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-shrink: 0; }
   .rec {
-    width: 38px; height: 38px; border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     border: 0; cursor: pointer; position: relative; flex-shrink: 0;
     background: linear-gradient(145deg, #8b5cf6, #ec4899);
-    color: #fff; font-size: 14px;
+    color: #fff; font-size: 15px;
     box-shadow: 0 4px 14px rgba(139, 92, 246, .4);
     transition: transform .15s, box-shadow .15s;
   }
@@ -50,7 +56,7 @@
   .rec.stop { background: linear-gradient(145deg, #ef4444, #f97316); box-shadow: 0 4px 14px rgba(239,68,68,.4); }
   .rec:disabled { opacity: .55; cursor: wait; }
   .pulse::after {
-    content: ""; position: absolute; inset: -4px;
+    content: ""; position: absolute; inset: -5px;
     border-radius: 50%; border: 2px solid #ec489988;
     animation: pulse 1.6s ease-out infinite;
   }
@@ -58,7 +64,7 @@
     0% { transform: scale(1); opacity: .9; }
     100% { transform: scale(1.45); opacity: 0; }
   }
-  .meta { flex: 1; min-width: 0; }
+  .meta { flex: 1 1 auto; min-width: 0; }
   .status {
     font-size: 11px; font-weight: 600; letter-spacing: .5px;
     color: #8a8fa0; margin-bottom: 2px;
@@ -99,22 +105,24 @@ let api = null;
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
-  scope.width = scope.clientWidth * dpr;
-  scope.height = scope.clientHeight * dpr;
+  const w = scope.clientWidth, h = scope.clientHeight;
+  scope.width = Math.max(1, Math.round(w * dpr));
+  scope.height = Math.max(1, Math.round(h * dpr));
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 window.addEventListener("resize", resize);
+new ResizeObserver(resize).observe(scope);
 resize();
 
 function draw() {
   const w = scope.clientWidth, h = scope.clientHeight;
+  if (w <= 0 || h <= 0) { requestAnimationFrame(draw); return; }
   ctx.clearRect(0, 0, w, h);
   ctx.strokeStyle = "#1c2030";
   ctx.lineWidth = 1;
   for (const gy of [h * 0.33, h * 0.66]) {
     ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
   }
-  // auto-gain: recent peaks fill the full scope height
   let rolling = 0.15;
   for (const v of history) if (v > rolling) rolling = v;
   agcTarget = agcTarget + ((0.92 / rolling) - agcTarget) * 0.06;

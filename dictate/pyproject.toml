@@ -58,4 +58,5 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [dependency-groups]
 dev = [
     "onnx>=1.22.0",
+    "playwright>=1.62.0",
 ]
