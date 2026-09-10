@@ -35,7 +35,7 @@ class DictateConfig(BaseModel):
     """Validated configuration for the dictation app."""
 
     version: int = CONFIG_VERSION
-    hotkey: str = "ctrl+alt+space"
+    hotkey: str = "ctrl+shift+r"
     hotkey_mode: Literal["hold", "toggle"] = "hold"
     engine: Literal["parakeet", "whisper"] = "whisper"
     language: str = "sk"
@@ -130,4 +130,5 @@ def save_config(config: DictateConfig, path: Path | None = None) -> Path:
         encoding="utf-8",
     )
     return config_path
+
 
