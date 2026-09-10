@@ -12,8 +12,8 @@
      to show. */
   :root {
     --ground: #0a0a0d;
-    --line:   #1ab5c2;   /* the accent at rest: clearly cyan, not a muddy teal that
-                            reads as grey in a 2 px line on black */
+    --line:   #0a0a0d;   /* the ground: at rest the ring is invisible, and it appears
+                            only while the microphone is open */
     --accent: #2bf4ff;   /* fluorescent cyan; it has to read from across the desk */
     --accent-dim: #0d5b63;
     --idle:   #3f3f49;
@@ -59,8 +59,10 @@
     0%, 100% { box-shadow: inset 0 0 0 2px var(--accent); }
     50%      { box-shadow: inset 0 0 0 2px var(--accent-dim); }
   }
-  /* Working, not listening: the ring holds still, dimmer, so the states cannot be confused. */
-  .ring.busy { box-shadow: inset 0 0 0 2px var(--accent-dim); }
+  /* The ring means one thing: the microphone is open. While the model runs it goes back to the
+     ground like the rest of the time, because the owner asked for an edge that appears when he
+     holds the key and at no other moment. */
+  .ring.busy { box-shadow: inset 0 0 0 2px var(--line); }
   /* Transcribing and injecting: the mark holds still and turns red, the meter is frozen. */
   .busy .mark { opacity: 1; filter: hue-rotate(-28deg) saturate(1.5); }
   .meter { flex: 1 1 auto; height: 24px; display: block; min-width: 0; }
