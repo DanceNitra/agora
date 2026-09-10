@@ -25,7 +25,8 @@ def _css() -> str:
 
 
 def test_clip_radius_matches_the_stylesheet():
-    m = re.search(r"\.pill\s*\{[^}]*?border-radius:\s*(\d+)px", _css(), re.S)
+    # `0` carries no unit, so the pattern must not demand one.
+    m = re.search(r"\.pill\s*\{[^}]*?border-radius:\s*(\d+)(?:px)?\s*;", _css(), re.S)
     assert m, "no border-radius found on .pill; the clip has nothing to agree with"
     assert int(m.group(1)) == WebViewWindow.CSS_RADIUS, (
         "the window is clipped at %d px and the pill is drawn at %s px"

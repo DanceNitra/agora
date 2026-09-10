@@ -12,7 +12,7 @@
      to show. */
   :root {
     --ground: #0a0a0d;
-    --line:   #24242c;
+    --line:   #12464c;   /* the accent at rest, not a grey */
     --accent: #2bf4ff;   /* fluorescent cyan; it has to read from across the desk */
     --accent-dim: #0d5b63;
     --idle:   #3f3f49;
@@ -28,8 +28,13 @@
     flex: 1 1 auto; min-width: 0;
     display: flex; align-items: center; gap: 8px;
     background: var(--ground);
+    /* SQUARE, and that is the point. With rounded corners the window's own square corner showed
+       through outside the arc: photographed on the running window, the first six pixels at the
+       corners were rgb(32,32,32), a grey from nowhere in this palette, with the cyan arc behind
+       it. Clipping the window to a rounded region did not remove it. A rectangle has one edge and
+       the ring runs along all of it. */
     border: 2px solid var(--line);
-    border-radius: 13px;
+    border-radius: 0;
     /* The same 8 px on every side, so the mark sits in an even frame. */
     padding: 8px;
     cursor: grab;
@@ -47,13 +52,15 @@
      The border is the one element visible from across the desk. */
   .live .mark { animation: breathe 1.9s ease-in-out infinite; }
   @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  /* No inset glow: it drew a second ring just inside the border, and two rings with slightly
+     different corners read as a window inside a window. */
   .live { animation: edge 1.4s ease-in-out infinite; }
   @keyframes edge {
-    0%, 100% { border-color: var(--accent); box-shadow: 0 0 9px #2bf4ff66, inset 0 0 5px #2bf4ff22; }
-    50%      { border-color: var(--accent-dim); box-shadow: 0 0 0 #2bf4ff00, inset 0 0 0 #2bf4ff00; }
+    0%, 100% { border-color: var(--accent); }
+    50%      { border-color: var(--accent-dim); }
   }
-  /* Working, not listening: the edge holds still so the two states cannot be confused. */
-  .busy { border-color: #4a4a55; box-shadow: none; }
+  /* Working, not listening: the edge holds still, dimmer, so the states cannot be confused. */
+  .busy { border-color: var(--accent-dim); }
   /* Transcribing and injecting: the mark holds still and turns red, the meter is frozen. */
   .busy .mark { opacity: 1; filter: hue-rotate(-28deg) saturate(1.5); }
   .meter { flex: 1 1 auto; height: 24px; display: block; min-width: 0; }

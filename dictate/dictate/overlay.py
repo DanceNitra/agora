@@ -95,7 +95,7 @@ class WebViewWindow:
     # The page is laid out at these CSS pixels. Physical size is this times the DPI scale of the
     # monitor the window is actually on, which is not always the system's.
     LOGICAL_SIZE = (144, 45)
-    CSS_RADIUS = 13          # must equal border-radius on .pill in ui/index.html
+    CSS_RADIUS = 0           # must equal border-radius on .pill in ui/index.html
 
     @staticmethod
     def _window_size() -> tuple[int, int]:
@@ -170,7 +170,6 @@ class WebViewWindow:
             user32.GetWindowRect(hwnd, ctypes.byref(rect))
             got = (rect.right - rect.left, rect.bottom - rect.top)
             if got == (want_w, want_h):
-                self._round_corners(hwnd, want_w, want_h, scale)
                 logger.info("Window settled at %dx%d physical (%dx%d css at %d dpi) after %d tries",
                             got[0], got[1], *self.LOGICAL_SIZE, dpi, attempt + 1)
                 return
