@@ -34,24 +34,31 @@ def test_clip_radius_matches_the_stylesheet():
     )
 
 
-def test_the_accent_is_one_hue():
-    """Every colour in the window is the accent's hue, a neutral, or white.
+def test_the_window_carries_two_named_hues_and_no_others():
+    """Every colour is the accent, the working colour, a neutral, or white.
 
-    The first version of this asked that every bright literal BE the accent, which was too blunt:
-    the ring at rest is a dimmer shade of the same cyan and the check called it a stray colour.
-    What matters is that the window carries one hue, not one value of it.
+    This began as "one hue" and the window now has two on purpose: cyan says the microphone is
+    open, orange says the model is running, and the owner asked for them to be told apart at a
+    glance. Widening the rule is the honest move; deleting it would not be. A third hue still
+    fails, which is what the check is for.
+
+    The first version asked that every bright literal BE the accent, which called the ring's own
+    dimmer shade a stray colour. Hue is the thing that matters, not value.
     """
     import colorsys
 
     css = _css()
-    m = re.search(r"--accent:\s*(#[0-9a-fA-F]{6})", css)
-    assert m, "no --accent token in the stylesheet"
+    tokens = {}
+    for name in ("accent", "work"):
+        m = re.search(r"--%s:\s*(#[0-9a-fA-F]{6})" % name, css)
+        assert m, "no --%s token in the stylesheet" % name
+        tokens[name] = m.group(1)
 
     def hsv(hexstr):
         r, g, b = (int(hexstr[i:i + 2], 16) / 255 for i in (1, 3, 5))
         return colorsys.rgb_to_hsv(r, g, b)
 
-    accent_h = hsv(m.group(1))[0]
+    allowed = [hsv(v)[0] for v in tokens.values()]
     stray = []
     for c in {c.lower() for c in re.findall(r"#[0-9a-fA-F]{6}", css)}:
         h, sat, val = hsv(c)
@@ -59,11 +66,10 @@ def test_the_accent_is_one_hue():
         # which is 23% saturated by the formula and black to the eye.
         if sat < 0.15 or val < 0.12:
             continue
-        # hue distance on the circle
-        d = min(abs(h - accent_h), 1 - abs(h - accent_h))
-        if d > 0.04:                         # about 14 degrees
+        d = min(min(abs(h - a), 1 - abs(h - a)) for a in allowed)
+        if d > 0.04:                         # about 14 degrees from either
             stray.append((c, round(d * 360)))
-    assert not stray, "colours off the accent hue: %s" % sorted(stray)
+    assert not stray, "colours off both named hues: %s" % sorted(stray)
 
 
 def test_the_window_is_wide_enough_for_its_contents():
