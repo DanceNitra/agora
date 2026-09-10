@@ -21,10 +21,10 @@ logger = logging.getLogger(__name__)
 UI_FILE = Path(__file__).parent / "ui" / "index.html"
 
 STATUS_LABELS = {
-    "IDLE": "PRIPRAVENÝ",
-    "RECORDING": "NAHRÁVAM",
-    "TRANSCRIBING": "PREPISUJEM…",
-    "INJECTING": "VKLÁDAM…",
+    "IDLE": "Pripravený",
+    "RECORDING": "Nahrávam",
+    "TRANSCRIBING": "Prepisujem",
+    "INJECTING": "Vkladám",
 }
 
 
@@ -102,7 +102,10 @@ class WebViewWindow:
         except Exception:
             dpi = 96
         scale = dpi / 96
-        return round(404 * scale), round(168 * scale)
+        # 168 px carried a waveform that took half the window. The meter is 34 px and the
+        # transcript runs to two lines. Measured from the rendered page rather than added up by
+        # hand: at 116 the second transcript line was clipped, and the content settles at 128.
+        return round(404 * scale), round(128 * scale)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
@@ -125,7 +128,7 @@ class WebViewWindow:
             frameless=True,
             on_top=True,
             easy_drag=False,
-            background_color="#12141c",
+            background_color="#0b0b0c",
             transparent=False,
             resizable=False,
         )

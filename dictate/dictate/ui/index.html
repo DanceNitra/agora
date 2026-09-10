@@ -3,155 +3,179 @@
 <head>
 <meta charset="utf-8">
 <style>
+  /* Dictate overlay.
+     Ground is near-black and the accent is a single warm amber, taken from broadcast level
+     meters rather than from any dictation app: bars sit grey until the signal is loud, and the
+     only red in the window is the tally dot that means the microphone is live. The previous
+     version carried three colour families in a window the size of a business card, a purple to
+     pink gradient button, a red to orange one while recording, and a teal waveform, each with its
+     own coloured glow.
+     Body and pill share one background colour so a GPU that bleeds the rounded corner has nothing
+     white to show. */
+  :root {
+    --ground:  #0b0b0c;
+    --raise:   #141416;
+    --line:    #232326;
+    --ink:     #e8e6e1;
+    --ink-dim: #7d7b76;
+    --amber:   #e0a33c;
+    --tally:   #d8434b;
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
   html, body {
     width: 100%; height: 100%;
-    background: #14161d;
-    font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+    background: var(--ground);
+    font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
     overflow: hidden;
-    display: flex;
-    align-items: stretch;
+    display: flex; align-items: stretch;
   }
   .pill {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(160deg, #171922 0%, #12141c 100%);
-    border: 1px solid #2b2f3d;
-    border-radius: 16px;
-    box-shadow: inset 0 1px 0 #ffffff10;
-    padding: 6px 10px 10px;
-    color: #eceef6;
+    flex: 1 1 auto; min-width: 0;
+    display: flex; flex-direction: column;
+    background: var(--ground);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 7px 11px 9px;
+    color: var(--ink);
   }
-  .drag { height: 20px; display: flex; align-items: center; flex-shrink: 0; }
-  .title {
-    font-size: 10px; font-weight: 600; letter-spacing: .4px;
-    color: #6f7484; margin-left: 6px; flex: 1;
+
+  /* Machine state is set in mono, human words in the sans above. The rule has a reason: it tells
+     you at a glance which strings the app chose and which ones you said. */
+  .mono {
+    font-family: "Cascadia Mono", Consolas, ui-monospace, monospace;
+    font-size: 9.5px; letter-spacing: .8px; text-transform: uppercase;
   }
+
+  .drag { height: 18px; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .mark {
+    width: 7px; height: 7px; border-radius: 2px;
+    background: var(--ink-dim); flex-shrink: 0;
+    transition: background .18s;
+  }
+  .title { color: var(--ink-dim); flex: 1; }
   .btn-icon {
-    width: 24px; height: 24px; border: 0; border-radius: 8px;
-    background: transparent; color: #6f7484; font-size: 12px;
-    cursor: pointer; line-height: 24px; text-align: center;
+    width: 20px; height: 20px; border: 0; border-radius: 6px;
+    background: transparent; color: var(--ink-dim); font-size: 11px;
+    cursor: pointer; line-height: 20px; text-align: center;
     transition: background .15s, color .15s;
   }
-  .btn-icon:hover { background: #ffffff12; color: #c9cdd8; }
-  .scope {
-    flex: 1 1 auto; min-height: 30px;
-    width: 100%; display: block;
-    background: #0d0f15; border: 1px solid #23263a;
-    border-radius: 10px;
+  .btn-icon:hover { background: #ffffff10; color: var(--ink); }
+
+  .meter {
+    height: 34px; width: 100%; display: block; margin-top: 5px;
+    background: var(--raise);
+    border: 1px solid var(--line);
+    border-radius: 8px;
   }
-  .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-shrink: 0; }
-  .rec {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 0; cursor: pointer; position: relative; flex-shrink: 0;
-    background: linear-gradient(145deg, #8b5cf6, #ec4899);
-    color: #fff; font-size: 15px;
-    box-shadow: 0 4px 14px rgba(139, 92, 246, .4);
-    transition: transform .15s, box-shadow .15s;
+
+  .row { display: flex; align-items: center; gap: 9px; margin-top: 7px; flex-shrink: 0; }
+  /* A rounded square, not a circle, so nothing has to be concentric with anything and no ring
+     needs room to expand past the window edge. */
+  button.rec {
+    width: 30px; height: 30px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--raise);
+    cursor: pointer; flex-shrink: 0; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .15s, background .15s;
   }
-  .rec:hover { transform: scale(1.06); }
-  .rec:active { transform: scale(.97); }
-  .rec.stop { background: linear-gradient(145deg, #ef4444, #f97316); box-shadow: 0 4px 14px rgba(239,68,68,.4); }
-  .rec:disabled { opacity: .55; cursor: wait; }
-  .pulse::after {
-    content: ""; position: absolute; inset: -5px;
-    border-radius: 50%; border: 2px solid #ec489988;
-    animation: pulse 1.6s ease-out infinite;
-  }
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: .9; }
-    100% { transform: scale(1.45); opacity: 0; }
-  }
+  button.rec:hover { border-color: #3a3a3e; background: #191919; }
+  button.rec:disabled { opacity: .45; cursor: wait; }
+  .glyph { width: 10px; height: 10px; border-radius: 50%; background: var(--tally); }
+  button.rec.stop .glyph { border-radius: 2px; width: 9px; height: 9px; background: var(--ink); }
+
   .meta { flex: 1 1 auto; min-width: 0; }
-  .status {
-    font-size: 11px; font-weight: 600; letter-spacing: .5px;
-    color: #8a8fa0; margin-bottom: 2px;
-  }
-  .status.rec { color: #ff6b7a; }
-  .status.busy { color: #ffb74d; }
+  .status { color: var(--ink-dim); }
+  .status.is-recording { color: var(--tally); }
+  .status.is-busy { color: var(--amber); }
+  /* Two lines and then it scrolls, rather than an ellipsis that hides the end of what you said. */
   .transcript {
-    font-size: 11px; color: #c9cdd8; line-height: 1.3;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 11px; color: var(--ink); line-height: 1.32; margin-top: 2px;
+    max-height: 29px; overflow-y: auto; overflow-x: hidden;
+    overflow-wrap: anywhere;
   }
+  .transcript::-webkit-scrollbar { width: 3px; }
+  .transcript::-webkit-scrollbar-thumb { background: #303034; border-radius: 3px; }
+  .transcript.empty { color: var(--ink-dim); }
+
+  /* The tally dot blinks in place. Nothing scales, so nothing is clipped by the window edge. */
+  .live .mark { background: var(--tally); animation: tally 1.5s steps(1, end) infinite; }
+  @keyframes tally { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .25; } }
 </style>
 </head>
 <body>
-  <div class="pill">
+  <div class="pill" id="pill">
     <div class="drag pywebview-drag-region">
-      <span class="title">DICTATE · Ctrl+Shift+R</span>
-      <button class="btn-icon" id="btnCfg" title="Nastavenia">⚙</button>
-      <button class="btn-icon" id="btnExit" title="Zavrieť">✕</button>
+      <span class="mark" id="mark"></span>
+      <span class="title mono">Dictate &middot; Ctrl+Shift+R</span>
+      <button class="btn-icon" id="btnCfg" title="Nastavenia">&#9881;</button>
+      <button class="btn-icon" id="btnExit" title="Zavrieť">&#10005;</button>
     </div>
-    <canvas class="scope" id="scope"></canvas>
+    <canvas class="meter" id="meter"></canvas>
     <div class="row">
-      <button class="rec" id="btnRec">●</button>
+      <button class="rec" id="btnRec" title="Nahrávať"><span class="glyph"></span></button>
       <div class="meta">
-        <div class="status" id="status">PRIPRAVENÝ</div>
-        <div class="transcript" id="transcript">—</div>
+        <div class="status mono" id="status">Pripravený</div>
+        <div class="transcript empty" id="transcript">Podrž Ctrl+Shift+R a hovor</div>
       </div>
     </div>
   </div>
 <script>
-const scope = document.getElementById("scope");
-const ctx = scope.getContext("2d");
+const meter = document.getElementById("meter");
+const ctx = meter.getContext("2d");
 const statusEl = document.getElementById("status");
 const transEl = document.getElementById("transcript");
 const btnRec = document.getElementById("btnRec");
+const pill = document.getElementById("pill");
 const history = [];
 let agcTarget = 1;
 let api = null;
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
-  const w = scope.clientWidth, h = scope.clientHeight;
-  scope.width = Math.max(1, Math.round(w * dpr));
-  scope.height = Math.max(1, Math.round(h * dpr));
+  const w = meter.clientWidth, h = meter.clientHeight;
+  meter.width = Math.max(1, Math.round(w * dpr));
+  meter.height = Math.max(1, Math.round(h * dpr));
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 window.addEventListener("resize", resize);
-new ResizeObserver(resize).observe(scope);
+new ResizeObserver(resize).observe(meter);
 resize();
 
+// A SEGMENTED LEVEL METER, not a waveform. Each column quantises to whole segments, so the
+// display reads as an instrument rather than as an audio visualiser, and a column near the top
+// warms to amber the way a meter's headroom band does.
+const COL_W = 3, COL_GAP = 2, SEG_H = 3, SEG_GAP = 1.6;
+
 function draw() {
-  const w = scope.clientWidth, h = scope.clientHeight;
+  const w = meter.clientWidth, h = meter.clientHeight;
   if (w <= 0 || h <= 0) { requestAnimationFrame(draw); return; }
   ctx.clearRect(0, 0, w, h);
-  ctx.strokeStyle = "#1c2030";
-  ctx.lineWidth = 1;
-  for (const gy of [h * 0.33, h * 0.66]) {
-    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
-  }
+
+  const pad = 4;
+  const inner = h - pad * 2;
+  const segs = Math.max(3, Math.floor((inner + SEG_GAP) / (SEG_H + SEG_GAP)));
+  const cols = Math.max(1, Math.floor((w - pad * 2 + COL_GAP) / (COL_W + COL_GAP)));
+
   let rolling = 0.15;
   for (const v of history) if (v > rolling) rolling = v;
   agcTarget = agcTarget + ((0.92 / rolling) - agcTarget) * 0.06;
   const scale = Math.max(1, Math.min(4, agcTarget));
 
-  const n = history.length;
-  if (n > 1) {
-    const grad = ctx.createLinearGradient(0, 0, w, 0);
-    grad.addColorStop(0, "#22d3aa");
-    grad.addColorStop(1, "#22d3ee");
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
-    ctx.shadowColor = "#22d3aa55";
-    ctx.shadowBlur = 5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      const x = w - (n - 1 - i) * (w / 240);
-      const v = Math.max(0.03, Math.min(1, history[i] * scale));
-      const y = h - 3 - v * (h - 8);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  for (let c = 0; c < cols; c++) {
+    const idx = history.length - cols + c;
+    const raw = idx >= 0 ? history[idx] : 0;
+    const v = Math.max(0, Math.min(1, raw * scale));
+    const lit = Math.round(v * segs);
+    const x = pad + c * (COL_W + COL_GAP);
+    for (let s = 0; s < segs; s++) {
+      const y = h - pad - (s + 1) * SEG_H - s * SEG_GAP;
+      if (s < lit) {
+        ctx.fillStyle = (s / segs) > 0.78 ? "#e0a33c" : "#9a9791";
+      } else {
+        ctx.fillStyle = "#1e1e21";
+      }
+      ctx.fillRect(x, y, COL_W, SEG_H);
     }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    const y = h - 3 - Math.max(0.03, Math.min(1, history[n-1] * scale)) * (h - 8);
-    ctx.fillStyle = "#ff5470";
-    ctx.beginPath();
-    ctx.arc(w - 2, y, 2.5, 0, Math.PI * 2);
-    ctx.fill();
   }
   requestAnimationFrame(draw);
 }
@@ -172,24 +196,21 @@ async function tick() {
 }
 function applyStatus(st) {
   statusEl.textContent = st.status;
-  statusEl.className = "status" + (st.state === "RECORDING" ? " rec" : st.state === "TRANSCRIBING" || st.state === "INJECTING" ? " busy" : "");
-  if (st.state === "RECORDING") {
-    btnRec.textContent = "■"; btnRec.classList.add("stop", "pulse");
-  } else {
-    btnRec.textContent = "●"; btnRec.classList.remove("stop", "pulse");
-    btnRec.disabled = (st.state === "TRANSCRIBING" || st.state === "INJECTING");
+  const busy = st.state === "TRANSCRIBING" || st.state === "INJECTING";
+  statusEl.className = "status mono" + (st.state === "RECORDING" ? " is-recording" : busy ? " is-busy" : "");
+  pill.classList.toggle("live", st.state === "RECORDING");
+  btnRec.classList.toggle("stop", st.state === "RECORDING");
+  btnRec.disabled = busy;
+  btnRec.title = st.state === "RECORDING" ? "Zastaviť" : "Nahrávať";
+  if (st.transcript) {
+    transEl.textContent = st.transcript;
+    transEl.classList.remove("empty");
+    transEl.scrollTop = transEl.scrollHeight;
   }
-  if (st.transcript) transEl.textContent = st.transcript;
 }
-btnRec.addEventListener("click", () => {
-  if (api) api.toggle_record();
-});
-document.getElementById("btnCfg").addEventListener("click", () => {
-  if (api) api.open_config();
-});
-document.getElementById("btnExit").addEventListener("click", () => {
-  if (api) api.exit();
-});
+btnRec.addEventListener("click", () => { if (api) api.toggle_record(); });
+document.getElementById("btnCfg").addEventListener("click", () => { if (api) api.open_config(); });
+document.getElementById("btnExit").addEventListener("click", () => { if (api) api.exit(); });
 </script>
 </body>
 </html>
