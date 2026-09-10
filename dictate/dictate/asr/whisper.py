@@ -1,8 +1,8 @@
-"""faster-whisper ASR engine (CUDA on desktop, int8_float16 by default).
+"""faster-whisper ASR engine (CUDA, int8_float16 by default).
 
-Whisper supports explicit language forcing, which matters for Slovak:
-the multilingual Parakeet auto-detect sometimes drifts to Polish
-orthography on short takes.
+Whisper forces the language explicitly, which is why it is the only engine here. The
+Parakeet engine this replaced auto-detected Slovak as Polish and wrote Polish
+orthography, and no amount of post-processing recovers that.
 """
 
 from __future__ import annotations
@@ -58,6 +58,20 @@ class WhisperEngine(ASREngine):
         self._model = None
         self._load_seconds = 0.0
 
+    def _model_source(self) -> str:
+        """Return the installed model directory, or the alias when nothing is installed.
+
+        The installer downloads the weights into the app's own models directory, so a
+        machine that never ran faster-whisper before still starts offline. Falling back
+        to the alias keeps a development checkout working against the Hugging Face cache.
+        """
+        from .models import is_model_installed, model_dir
+
+        if is_model_installed():
+            return str(model_dir())
+        logger.info("No installed weights; falling back to the alias %s", self.model_name)
+        return self.model_name
+
     def load(self) -> None:
         """Load the model (downloads on first run)."""
         _register_cuda_dll_dirs()
@@ -65,7 +79,7 @@ class WhisperEngine(ASREngine):
 
         start = time.perf_counter()
         self._model = WhisperModel(
-            self.model_name,
+            self._model_source(),
             device=self.device,
             compute_type=self.compute_type,
         )

@@ -2,7 +2,7 @@
 
 Local Windows dictation app for Slovak, Czech, and English. Runs in the
 system tray, records while a global hotkey is held, and transcribes offline
-with NVIDIA Parakeet TDT 0.6B v3 via sherpa-onnx.
+with Whisper large-v3-turbo on the GPU. Silero VAD trims silence.
 
 ## Status
 

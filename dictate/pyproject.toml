@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dictate"
 version = "0.1.0"
-description = "Local Windows dictation app (Slovak / Czech / English) using NVIDIA Parakeet TDT 0.6B v3 via sherpa-onnx."
+description = "Local Windows dictation app (Slovak / Czech / English) using Whisper large-v3-turbo on the GPU."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Agora" }]
-keywords = ["dictation", "speech-to-text", "sherpa-onnx", "parakeet", "windows"]
+keywords = ["dictation", "speech-to-text", "whisper", "cuda", "windows"]
 dependencies = [
     "sherpa-onnx>=1.10.0",
     "sherpa-onnx-core>=1.10.0",

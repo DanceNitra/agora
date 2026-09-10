@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 
 from .asr.models import download_model as _download_model
-from .asr.parakeet import ParakeetEngine
+from .asr.factory import build_engine
 from .audio.recorder import Recorder, resolve_device
 from .audio.wav import write_wav
 from .config import DictateConfig, load_config, save_config
@@ -129,7 +129,7 @@ def test_mic(seconds: int, config_path: Path | None = None) -> int:
 
     out_path = Path("test_mic.wav")
     write_wav(out_path, audio, recorder.sample_rate)
-    engine = ParakeetEngine(num_threads=config.num_threads, provider=config.provider)
+    engine = build_engine(config)
     result = engine.transcribe(audio, recorder.sample_rate, language=config.language)
     print(f"  load={result.load_seconds:.2f}s rtf={result.rtf:.3f}")
     print(f"  TEXT: {result.text}")
@@ -147,10 +147,10 @@ def listen(
     The user hears beeps that mark each phase: two beeps start a device
     scan, three beeps start a recording take, and a long beep stops it.
     """
-    engine = ParakeetEngine(num_threads=0, provider="cpu")
+    config = _load(config_path)
+    engine = build_engine(config)
     engine.load()
 
-    config = _load(config_path)
     do_probe = probe if probe is not None else config.microphone is None
     best = config.microphone if isinstance(config.microphone, int) else None
     if do_probe:
@@ -195,7 +195,7 @@ def transcribe_file(path: Path, config_path: Path | None = None) -> int:
     """Transcribe a wav file and print timing and text."""
     config = _load(config_path)
     audio, sample_rate = _read_wav(path)
-    engine = ParakeetEngine(num_threads=config.num_threads, provider=config.provider)
+    engine = build_engine(config)
     result = engine.transcribe(audio, sample_rate, language=config.language)
     print(
         f"Audio: {result.duration_seconds:.2f} s | Load: {result.load_seconds:.2f} s"
