@@ -37,7 +37,7 @@ class DictateConfig(BaseModel):
     version: int = CONFIG_VERSION
     hotkey: str = "ctrl+alt+space"
     hotkey_mode: Literal["hold", "toggle"] = "hold"
-    engine: Literal["parakeet", "whisper"] = "parakeet"
+    engine: Literal["parakeet", "whisper"] = "whisper"
     language: str = "sk"
     provider: Literal["cpu", "cuda"] = "cpu"
     num_threads: int = Field(default=0, ge=0)
@@ -130,3 +130,4 @@ def save_config(config: DictateConfig, path: Path | None = None) -> Path:
         encoding="utf-8",
     )
     return config_path
+
