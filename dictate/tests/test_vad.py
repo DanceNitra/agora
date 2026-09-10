@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pathlib
 import wave
 
 import numpy as np
@@ -17,20 +18,27 @@ requires_vad = pytest.mark.skipif(
 )
 
 
-def _require_sample() -> None:
-    """Skip rather than fail when the sample that ships with the model is not on disk.
+SAMPLE = pathlib.Path(__file__).parent.parent / "assets" / "selftest.wav"
 
-    These need `test_wavs/en.wav` out of the parakeet archive, so they measure whether the model
-    is downloaded, not whether the VAD works. They had been failing for that reason.
+
+def _require_sample() -> None:
+    """Skip rather than fail when no speech sample is on disk.
+
+    These tests need real speech, and no speech clip is committed: the only recordings on
+    hand are the owner's voice and this repository is public. They used to read
+    `test_wavs/en.wav` out of the parakeet archive, which no longer exists now that the
+    Parakeet engine is gone, so the skip reason named a file nobody could produce.
+
+    To run them, put any 16 kHz mono wav of speech at ``assets/selftest.wav``.
     """
-    if not (models.model_dir() / "test_wavs" / "en.wav").is_file():
-        pytest.skip("the parakeet sample is not installed; run --download-model")
+    if not SAMPLE.is_file():
+        pytest.skip("no speech sample at %s" % SAMPLE)
 
 
 def _load_model_test_wav() -> tuple[np.ndarray, int]:
     _require_sample()
     """Load a real speech sample shipped with the ASR model bundle."""
-    wave_path = models.model_dir() / "test_wavs" / "en.wav"
+    wave_path = SAMPLE
     with wave.open(str(wave_path), "rb") as wav_file:
         channels = wav_file.getnchannels()
         sample_rate = wav_file.getframerate()

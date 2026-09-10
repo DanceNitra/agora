@@ -71,10 +71,13 @@ begin
     // this box and waited, because MsgBox does not care how the uninstaller was started.
     if DirExists(DataDir) and not UninstallSilent then
     begin
-      if MsgBox('Delete the downloaded models and settings too?' + #13#10 + #13#10 +
-                DataDir + #13#10 + #13#10 +
-                'Keep them to avoid a 2 GB download if you reinstall.',
-                mbConfirmation, MB_YESNO) = IDYES then
+      // Default is No. Answering Yes here once deleted the settings file holding the
+      // chosen hotkey and microphone, and the app came back on its factory key.
+      if MsgBox('Delete the downloaded model, the settings and the chosen microphone?'
+                + #13#10 + #13#10 + DataDir + #13#10 + #13#10 +
+                'Choose No to keep them. A reinstall then needs no 1.6 GB download and '
+                + 'keeps your hotkey and microphone.',
+                mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
         DelTree(DataDir, True, True, True);
     end;
   end;

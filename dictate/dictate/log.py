@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -14,11 +16,28 @@ MAX_BYTES = 1_000_000
 BACKUP_COUNT = 5
 
 
+def ensure_streams() -> None:
+    """Give the process a stdout and a stderr, even when Windows gave it none.
+
+    A windowed executable has no console, so ``sys.stdout`` and ``sys.stderr`` are None.
+    Every ``print``, every ``logging.StreamHandler``, and every library that draws a
+    progress bar then fails with "NoneType object has no attribute write".
+
+    MEASURED: the packaged setup wizard died with exactly that on its download page,
+    while the same code passed from a terminal, because a captured pipe is still a
+    stream. Anything that only runs without a console needs this called first.
+    """
+    for name in ("stdout", "stderr"):
+        if getattr(sys, name, None) is None:
+            setattr(sys, name, open(os.devnull, "w", encoding="utf-8"))
+
+
 def setup_logging(level: str = "INFO", log_dir: Path | None = None) -> logging.Logger:
     """Configure the root logger and return it.
 
     Writes to a rotating file in the app data directory and to stderr.
     """
+    ensure_streams()
     logger = logging.getLogger("dictate")
     logger.setLevel(level.upper())
     logger.propagate = False
