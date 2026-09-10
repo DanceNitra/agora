@@ -19,6 +19,7 @@ from .inject import focus
 logger = logging.getLogger(__name__)
 
 UI_FILE = Path(__file__).parent / "ui" / "index.html"
+ICON_FILE = Path(__file__).parent.parent / "assets" / "dictate.ico"
 
 STATUS_LABELS = {
     "IDLE": "Pripravený",
@@ -117,6 +118,14 @@ class WebViewWindow:
             ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except Exception:
             logger.debug("SetProcessDpiAwareness failed", exc_info=True)
+        try:
+            # Without its own AppUserModelID the taskbar files this window under pythonw.exe and
+            # shows the Python logo, which is the multicoloured icon the owner saw.
+            shell32 = ctypes.WinDLL("shell32", use_last_error=True)
+            shell32.SetCurrentProcessExplicitAppUserModelID.argtypes = [ctypes.c_wchar_p]
+            shell32.SetCurrentProcessExplicitAppUserModelID("Agora.Dictate")
+        except Exception:
+            logger.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
         threading.Thread(target=self._track_foreground, daemon=True).start()
         width, height = self._window_size()
         self._window = webview.create_window(
@@ -132,7 +141,12 @@ class WebViewWindow:
             transparent=False,
             resizable=False,
         )
-        webview.start()
+        if ICON_FILE.exists():
+            webview.start(icon=str(ICON_FILE))
+        else:
+            logger.warning("Window icon missing at %s; the taskbar will fall back to "
+                           "the interpreter's own icon", ICON_FILE)
+            webview.start()
         logger.info("WebView window closed")
 
     def quit(self) -> None:
