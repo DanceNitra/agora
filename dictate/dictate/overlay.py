@@ -107,10 +107,10 @@ class WebViewWindow:
         # stops the run, and config, reload and exit are in the tray, so the status line, the
         # transcript and the two title-bar buttons all went. What is left is a mark and a meter.
         #
-        # The height is the 25 px mark plus about 2 mm of margin above and below, which at this
-        # display's scaling is roughly 7 logical px each, measured from the rendered page.
-        # The meter is 93 px against the 140 it had, which is the third off that was asked for.
-        return round(144 * scale), round(40 * scale)
+        # The height is the 25 px mark plus 2 px of margin above and below plus the pill's own
+        # 1 px border, so 31. Measured from the rendered page rather than added up by hand.
+        # The meter is 93 px against the 140 it started with, a third off.
+        return round(144 * scale), round(31 * scale)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
