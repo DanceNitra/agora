@@ -5,7 +5,7 @@
     "hooks": [
      {
       "type": "command",
-      "command": "python -m inspeximus.claude_code"
+      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
      }
     ]
    },
@@ -24,7 +24,7 @@
     "hooks": [
      {
       "type": "command",
-      "command": "python -m inspeximus.claude_code"
+      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
      }
     ]
    }
@@ -34,7 +34,7 @@
     "hooks": [
      {
       "type": "command",
-      "command": "python -m inspeximus.claude_code"
+      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
      }
     ]
    }
@@ -45,7 +45,7 @@
     "hooks": [
      {
       "type": "command",
-      "command": "python -m inspeximus.claude_code"
+      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
      },
      {
       "type": "command",
