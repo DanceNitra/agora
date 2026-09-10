@@ -28,12 +28,11 @@
     flex: 1 1 auto; min-width: 0;
     display: flex; align-items: center; gap: 8px;
     background: var(--ground);
-    /* SQUARE, and that is the point. With rounded corners the window's own square corner showed
-       through outside the arc: photographed on the running window, the first six pixels at the
-       corners were rgb(32,32,32), a grey from nowhere in this palette, with the cyan arc behind
-       it. Clipping the window to a rounded region did not remove it. A rectangle has one edge and
-       the ring runs along all of it. */
-    border: 2px solid var(--line);
+    /* No border here. A border is part of the layout, so a fraction of a pixel of overflow
+       pushed the bottom edge out of the viewport: the owner saw a line on the left, top and
+       right only, cut off square at the corners. The ring below is painted on a fixed overlay
+       instead, which the content cannot move. */
+    border: 0;
     border-radius: 0;
     /* The same 8 px on every side, so the mark sits in an even frame. */
     padding: 8px;
@@ -54,19 +53,28 @@
   @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
   /* No inset glow: it drew a second ring just inside the border, and two rings with slightly
      different corners read as a window inside a window. */
-  .live { animation: edge 1.4s ease-in-out infinite; }
+  .ring.live { animation: edge 1.4s ease-in-out infinite; }
   @keyframes edge {
-    0%, 100% { border-color: var(--accent); }
-    50%      { border-color: var(--accent-dim); }
+    0%, 100% { box-shadow: inset 0 0 0 2px var(--accent); }
+    50%      { box-shadow: inset 0 0 0 2px var(--accent-dim); }
   }
-  /* Working, not listening: the edge holds still, dimmer, so the states cannot be confused. */
-  .busy { border-color: var(--accent-dim); }
+  /* Working, not listening: the ring holds still, dimmer, so the states cannot be confused. */
+  .ring.busy { box-shadow: inset 0 0 0 2px var(--accent-dim); }
   /* Transcribing and injecting: the mark holds still and turns red, the meter is frozen. */
   .busy .mark { opacity: 1; filter: hue-rotate(-28deg) saturate(1.5); }
   .meter { flex: 1 1 auto; height: 24px; display: block; min-width: 0; }
+
+  /* The ring. `position: fixed` pins it to the viewport, so no amount of content can push an
+     edge out of view, and an inset shadow paints inward from all four sides at once, corners
+     included. 2 css px, which is 3 physical at this scaling. */
+  .ring {
+    position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    box-shadow: inset 0 0 0 2px var(--line);
+  }
 </style>
 </head>
 <body>
+  <div class="ring" id="ring"></div>
   <div class="pill pywebview-drag-region" id="pill">
     <div class="mark"></div>
     <canvas class="meter" id="meter"></canvas>
@@ -75,6 +83,7 @@
 const meter = document.getElementById("meter");
 const ctx = meter.getContext("2d");
 const pill = document.getElementById("pill");
+const ring = document.getElementById("ring");
 const history = [];
 let agcTarget = 1;
 let api = null;
@@ -141,8 +150,9 @@ async function tick() {
     const st = await api.get_status();
     if (st.state !== state) {
       state = st.state;
+      ring.classList.toggle("live", state === "RECORDING");
+      ring.classList.toggle("busy", state === "TRANSCRIBING" || state === "INJECTING");
       pill.classList.toggle("live", state === "RECORDING");
-      pill.classList.toggle("busy", state === "TRANSCRIBING" || state === "INJECTING");
       // Nothing is heard while the model runs, so the meter should not pretend otherwise.
       if (state === "TRANSCRIBING" || state === "IDLE") history.length = 0;
     }
