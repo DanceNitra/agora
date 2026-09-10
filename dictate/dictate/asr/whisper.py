@@ -24,7 +24,7 @@ class WhisperEngine(ASREngine):
         self,
         model_name: str = "large-v3-turbo",
         device: str = "cuda",
-        compute_type: str = "int8_float16",
+        compute_type: str = "auto",
         language: str | None = "sk",
         num_threads: int = 0,
     ) -> None:
@@ -50,16 +50,48 @@ class WhisperEngine(ASREngine):
         logger.info("No installed weights; falling back to the alias %s", self.model_name)
         return self.model_name
 
+    # Best first. int8_float16 is the fastest on a card with real fp16 throughput; a
+    # Pascal card such as the GTX 1080 has fp16 at a sixty-fourth of fp32, so CTranslate2
+    # refuses it outright and int8_float32 is the right choice there.
+    COMPUTE_PREFERENCE = ("int8_float16", "int8_bfloat16", "int8_float32", "int8",
+                          "float16", "float32")
+
+    def _resolve_compute_type(self) -> str:
+        """Return a compute type this device actually supports.
+
+        MEASURED on a GTX 1080: a hardcoded int8_float16 raised "Requested int8_float16
+        compute type, but the target device or backend do not support efficient
+        int8_float16 computation" and the setup stopped after the whole model had
+        downloaded. Asking CTranslate2 what the card supports costs one call.
+        """
+        if self.compute_type and self.compute_type != "auto":
+            return self.compute_type
+        try:
+            import ctranslate2
+
+            supported = set(ctranslate2.get_supported_compute_types(self.device))
+        except Exception:
+            logger.debug("Could not read the supported compute types", exc_info=True)
+            return "int8"
+        for candidate in self.COMPUTE_PREFERENCE:
+            if candidate in supported:
+                logger.info("Compute type %s, chosen from %s",
+                            candidate, sorted(supported))
+                return candidate
+        return "int8"
+
     def load(self) -> None:
         """Load the model (downloads on first run)."""
         from faster_whisper import WhisperModel
 
+        compute_type = self._resolve_compute_type()
         start = time.perf_counter()
         self._model = WhisperModel(
             self._model_source(),
             device=self.device,
-            compute_type=self.compute_type,
+            compute_type=compute_type,
         )
+        self.compute_type = compute_type
         self._load_seconds = time.perf_counter() - start
         self._refuse_a_silent_cpu_fallback()
         logger.info(

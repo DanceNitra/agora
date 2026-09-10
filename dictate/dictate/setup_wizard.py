@@ -22,6 +22,7 @@ from __future__ import annotations
 import logging
 import queue
 import threading
+import time
 import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
@@ -101,23 +102,25 @@ class SetupWizard:
     def _page_system(self) -> None:
         self._title(
             "System check",
-            "Dictate transcribes with Whisper on the graphics card. It needs an NVIDIA "
-            "GPU: the CPU engine that used to be here read Slovak as Polish, so it was "
-            "removed rather than kept as a fallback.")
-        from .asr.gpu import has_nvidia_gpu
+            "Dictate transcribes with Whisper on the graphics card. Everything below has "
+            "to pass before the model is worth downloading.")
+        from .preflight import WEBVIEW2_URL, run_all
 
-        self.gpu_ok, detail = has_nvidia_gpu()
+        results = run_all()
+        self.gpu_ok = all(ok for _, ok, _ in results)
+        for label, ok, detail in results:
+            self._line("%s%s: %s" % ("" if ok else "PROBLEM  ", label, detail),
+                       ACCENT if ok else BAD, 10)
         if self.gpu_ok:
-            self._line("GPU: " + detail, ACCENT, 11)
-            self._line("Windows: ready", FG)
             self.status.config(text="")
             self.next_button.config(state="normal")
-        else:
-            self._line("No NVIDIA GPU found.", BAD, 11)
-            self._line(detail or "nvidia-smi reported nothing.", DIM)
-            self._line("Install the NVIDIA driver and run this setup again.", FG)
-            self.next_button.config(state="disabled")
-            self.status.config(text="Setup cannot continue on this machine.")
+            return
+
+        self.next_button.config(state="disabled")
+        self.status.config(text="Fix the lines marked PROBLEM, then run the setup again.")
+        if not dict((label, ok) for label, ok, _ in results).get("WebView2 runtime", True):
+            self._line("", DIM)
+            self._line(WEBVIEW2_URL, ACCENT, 10)
 
     # -- page 2: download ------------------------------------------------------
 
@@ -141,8 +144,25 @@ class SetupWizard:
                 self._queue.put(("detail", "The model is already installed."))
                 self._queue.put(("progress", (0.5, "Checking the GPU...")))
             else:
+                # Report bytes, not a spinner. On a second machine this page looked hung
+                # for the whole download, because the bar only moved once it finished.
+                last = [0.0]
+
+                def report(progress) -> None:
+                    now = time.monotonic()
+                    if now - last[0] < 0.2 and progress.done < progress.total:
+                        return
+                    last[0] = now
+                    left = progress.seconds_left
+                    eta = ("%d min %02d s" % divmod(int(left), 60)) if left else "..."
+                    self._queue.put(("progress", (
+                        progress.fraction * 0.5,
+                        "%s: %.0f of %.0f MB  ·  %.1f MB/s  ·  %s left"
+                        % (progress.file, progress.done / 1e6, progress.total / 1e6,
+                           progress.bytes_per_second / 1e6, eta))))
+
                 self._queue.put(("detail", "Downloading Whisper large-v3-turbo, 1.6 GB"))
-                models.download_model()
+                models.download_model(progress_callback=report)
                 self._queue.put(("progress", (0.5, "Model installed. Checking the GPU...")))
 
             # The self-test is the acceptance criterion, not the download. CTranslate2

@@ -78,3 +78,37 @@ def test_the_help_page_names_the_key_the_app_listens_on(tmp_path, monkeypatch):
     assert "Scroll Lock" in joined, "the page does not name the configured key: %s" % joined
     assert "Ctrl+Shift+R" not in joined
     assert json.loads(config_path.read_text(encoding="utf-8"))["hotkey"] == "scroll lock"
+
+
+def test_the_system_page_shows_every_failed_check(monkeypatch):
+    """A failing check must reach the screen and must block Next.
+
+    Written against a fabricated failure rather than this machine, which passes
+    everything: a page that only ever renders green has not been tested.
+    """
+    from dictate import setup_wizard
+
+    monkeypatch.setattr(setup_wizard, "_wizard_checks", None, raising=False)
+    monkeypatch.setattr("dictate.preflight.run_all", lambda: [
+        ("Graphics card", True, "NVIDIA Test Card"),
+        ("Driver", False, "driver 442.19 is older than 527.41"),
+        ("WebView2 runtime", False, "The WebView2 runtime is missing"),
+        ("Disk space", True, "40.0 GB free"),
+    ])
+
+    shown, buttons = [], []
+    monkeypatch.setattr(setup_wizard.SetupWizard, "_line",
+                        lambda self, text, colour=None, size=10: shown.append(text))
+    monkeypatch.setattr(setup_wizard.SetupWizard, "_title",
+                        lambda self, text, subtitle="": None)
+
+    wizard = setup_wizard.SetupWizard.__new__(setup_wizard.SetupWizard)
+    wizard.next_button = type("Button", (), {
+        "config": lambda self, **kw: buttons.append(kw)})()
+    wizard.status = type("Label", (), {"config": lambda self, **kw: None})()
+    setup_wizard.SetupWizard._page_system(wizard)
+
+    joined = " ".join(shown)
+    assert "442.19" in joined and "WebView2 runtime is missing" in joined
+    assert wizard.gpu_ok is False
+    assert {"state": "disabled"} in buttons, "a failed check must block Next"

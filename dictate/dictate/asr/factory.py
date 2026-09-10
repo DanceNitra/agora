@@ -18,7 +18,7 @@ def build_engine(config: DictateConfig) -> ASREngine:
     return WhisperEngine(
         model_name=config.whisper_model,
         device=config.whisper_device,
-        compute_type="int8_float16",
+        compute_type=config.whisper_compute_type,
         language=config.language,
         num_threads=config.num_threads,
     )

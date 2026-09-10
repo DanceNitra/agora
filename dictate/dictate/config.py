@@ -61,6 +61,9 @@ class DictateConfig(BaseModel):
     llm_cleanup: LLMCleanupConfig = Field(default_factory=LLMCleanupConfig)
     whisper_model: str = "large-v3-turbo"
     whisper_device: str = "cuda"
+    # "auto" asks CTranslate2 what the card supports. A fixed int8_float16
+    # stopped the setup dead on a GTX 1080, which has no usable fp16.
+    whisper_compute_type: str = "auto"
     typing_delay_ms: int = Field(default=2, ge=0)
     log_level: str = "INFO"
 
