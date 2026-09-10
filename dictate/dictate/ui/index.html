@@ -76,16 +76,22 @@
      Same box, so nothing shifts. */
   .work {
     flex: 1 1 auto; min-width: 0; height: 24px; display: none;
-    flex-direction: column; justify-content: center; gap: 1px;
+    flex-direction: column; justify-content: center; align-items: center; gap: 0;
     font-family: "Cascadia Mono", Consolas, ui-monospace, monospace;
     /* Two rows in the 24 px the meter occupies, and the longer one is 15 glyphs against 95 px
        of width. At 11 px it ran under the mark and lost its last dot. */
-    font-size: 7.5px; letter-spacing: .2px; text-transform: uppercase;
-    white-space: nowrap; line-height: 1.35;
+    /* Two rows have to fit 25 px of content height, so 10 px at 1.2 is the ceiling. Width is no
+       longer the binding constraint once the mark is out of the way. */
+    font-size: 10px; letter-spacing: .4px; text-transform: uppercase; font-weight: 600;
+    white-space: nowrap; line-height: 1.12; text-align: center;
     text-shadow: 0 1px 3px rgba(0,0,0,.9);
   }
   .busy-state .meter { display: none; }
   .busy-state .work  { display: flex; }
+  /* The mark says nothing while the model runs, and hiding it lets the two steps sit in the
+     middle of the window rather than in the middle of the space left over beside a logo. It
+     also buys 33 px, which is what makes the type bigger. */
+  .busy-state .mark  { display: none; }
   /* Both steps are listed, so the window shows where it is in the run rather than only what it
      is doing. The step underway is the bright one. */
   .work div { color: var(--work); opacity: .3; transition: opacity .12s; }
