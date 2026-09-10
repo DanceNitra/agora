@@ -80,11 +80,7 @@ class DictateConfig(BaseModel):
 
 def app_data_dir() -> Path:
     """Return the per-user data directory for Dictate."""
-    local_app_data = os.environ.get("LOCALAPPDATA")
-    if not local_app_data:
-        home = Path.home()
-        local_app_data = home / "AppData" / "Local"
-    return Path(local_app_data) / APP_DIR_NAME
+    return Path.home() / "AppData" / "Local" / APP_DIR_NAME
 
 
 def default_config_path() -> Path:
@@ -131,6 +127,7 @@ def save_config(config: DictateConfig, path: Path | None = None) -> Path:
         encoding="utf-8",
     )
     return config_path
+
 
 
 
