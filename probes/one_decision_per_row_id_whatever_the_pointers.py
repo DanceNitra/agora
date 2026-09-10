@@ -151,8 +151,24 @@ def everything_judged(manifest):
     return {slug: ("judged", None) for slug in labels_of(manifest)}
 
 
+def only_decision_rewritten(manifest):
+    """Sabotage ONE field: rewrite `decision`, leave `of` alone.
+
+    @pm25coder, #91188: `everything_judged` nulls `of` while it rewrites `decision`, so a fixture
+    that differs proves the suite reads A label field, not that it reads `of`. Splitting the
+    sabotage per field is what makes the two answers separable.
+    """
+    return {slug: ("judged", of) for slug, (_decision, of) in labels_of(manifest).items()}
+
+
+def only_of_nulled(manifest):
+    """Sabotage the other field: null `of`, leave `decision` alone."""
+    return {slug: (decision, None) for slug, (decision, _of) in labels_of(manifest).items()}
+
+
 def main():
     checks, cases, exercised, label_exercised = [], [], [], []
+    decision_exercised, of_exercised = [], []
     survivors = 0
     label_survivors = 0
 
@@ -175,9 +191,23 @@ def main():
         # suite where every row is legitimately judged asserts labels vacuously: mislabelling every
         # row "judged" changes nothing it looks at. So a fixture reaches it only when it expects a
         # row that is NOT judged, and a control below requires at least one.
-        sabotaged = everything_judged(manifest)
-        if sabotaged != want_labels:
+        # MEASURED AGAINST got_labels, NOT want_labels, and the difference is the whole point.
+        # @pm25coder, #91188: comparing the mutant to the EXPECTATION asks a question whose two
+        # sides come from one source, which is the defect this file exists to stop. A fixture whose
+        # manifest is missing a slug already makes `everything_judged(manifest) != want_labels`
+        # true on the key sets alone, so it was recorded as reaching the label sabotage while every
+        # label the equality reads was still "judged". Reproduced before changing it: inject a
+        # keying defect into "two targets on one line" and the old form says True, this form says
+        # False. Comparing against the artifact's own output measures only what the control is
+        # named for: did the sabotage change a label the suite reads.
+        if everything_judged(manifest) != got_labels:
             label_exercised.append(name)
+        # PER FIELD, because the combined sabotage rewrites `decision` and nulls `of` at once and
+        # so cannot say which field is read.
+        if only_decision_rewritten(manifest) != got_labels:
+            decision_exercised.append(name)
+        if only_of_nulled(manifest) != got_labels:
+            of_exercised.append(name)
 
         # THE SAME FIXTURE THROUGH THE OLD BUILDER. Not every fixture can exercise the defect,
         # and the first version of this file scored them as if they all could: it reported "1 of 5
@@ -230,6 +260,18 @@ def main():
                    "pass": len(label_exercised) >= 1,
                    "got": "%d of %d reach it: %s" % (len(label_exercised), len(cases),
                                                      label_exercised)})
+    # AND EACH FIELD SEPARATELY. The combined sabotage above changes `decision` and `of` together,
+    # so it cannot distinguish "the suite reads a label" from "the suite reads `of`". These two
+    # attack one field each, so a fixture reaches them only where that field carries something a
+    # single-field rewrite would change.
+    checks.append({"check": "CONTROL_A_FIXTURE_REACHES_THE_DECISION_SABOTAGE",
+                   "pass": len(decision_exercised) >= 1,
+                   "got": "%d of %d reach it: %s" % (len(decision_exercised), len(cases),
+                                                     decision_exercised)})
+    checks.append({"check": "CONTROL_A_FIXTURE_REACHES_THE_OF_SABOTAGE",
+                   "pass": len(of_exercised) >= 1,
+                   "got": "%d of %d reach it: %s" % (len(of_exercised), len(cases),
+                                                     of_exercised)})
 
     out = {
         "probe": os.path.basename(__file__),
@@ -241,6 +283,8 @@ def main():
         "all_passed": all(c["pass"] for c in checks),
         "fixtures_reaching_the_defect": exercised,
         "fixtures_reaching_the_label_sabotage": label_exercised,
+        "fixtures_reaching_the_decision_sabotage": decision_exercised,
+        "fixtures_reaching_the_of_sabotage": of_exercised,
         "mutations_caught": len(exercised) - survivors,
         "mutations_run": len(exercised),
         "scope": ("Synthetic index lines only. This asserts the manifest's row-id keying AND the "
