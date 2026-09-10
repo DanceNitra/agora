@@ -94,7 +94,8 @@ class WebViewWindow:
 
     # The page is laid out at these CSS pixels. Physical size is this times the DPI scale of the
     # monitor the window is actually on, which is not always the system's.
-    LOGICAL_SIZE = (144, 43)
+    LOGICAL_SIZE = (144, 45)
+    CSS_RADIUS = 13          # must equal border-radius on .pill in ui/index.html
 
     @staticmethod
     def _window_size() -> tuple[int, int]:
@@ -169,10 +170,34 @@ class WebViewWindow:
             user32.GetWindowRect(hwnd, ctypes.byref(rect))
             got = (rect.right - rect.left, rect.bottom - rect.top)
             if got == (want_w, want_h):
+                self._round_corners(hwnd, want_w, want_h, scale)
                 logger.info("Window settled at %dx%d physical (%dx%d css at %d dpi) after %d tries",
                             got[0], got[1], *self.LOGICAL_SIZE, dpi, attempt + 1)
                 return
         logger.warning("Window will not hold %dx%d; it sits at %dx%d", want_w, want_h, *got)
+
+    def _round_corners(self, hwnd: int, width: int, height: int, scale: float) -> None:
+        """Clip the window itself to the pill's outline.
+
+        The page draws a rounded rectangle; the window around it is a square. At the corners the
+        square showed through, which reads as a second frame around the app rather than as the
+        app's own edge lighting up. Clipping the window to the same radius makes the glowing
+        border the window's actual silhouette, so there is one outline and it is the one that
+        pulses.
+
+        The radius here must track `border-radius` in the stylesheet. They are the same shape
+        described twice, and if they drift the corners either clip the border or leave a sliver
+        of square behind it.
+        """
+        import ctypes
+
+        radius = round(self.CSS_RADIUS * scale)
+        rgn = ctypes.windll.gdi32.CreateRoundRectRgn(0, 0, width + 1, height + 1,
+                                                     radius * 2, radius * 2)
+        if not rgn:
+            logger.debug("CreateRoundRectRgn failed; the window keeps square corners")
+            return
+        ctypes.windll.user32.SetWindowRgn(hwnd, rgn, True)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
