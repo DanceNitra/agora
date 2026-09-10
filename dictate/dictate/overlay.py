@@ -106,7 +106,11 @@ class WebViewWindow:
         # The window shows one thing: that the microphone is hearing you. The hotkey starts and
         # stops the run, and config, reload and exit are in the tray, so the status line, the
         # transcript and the two title-bar buttons all went. What is left is a mark and a meter.
-        return round(196 * scale), round(58 * scale)
+        #
+        # The height is the 25 px mark plus about 2 mm of margin above and below, which at this
+        # display's scaling is roughly 7 logical px each, measured from the rendered page.
+        # The meter is 93 px against the 140 it had, which is the third off that was asked for.
+        return round(144 * scale), round(40 * scale)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
