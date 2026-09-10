@@ -9,34 +9,12 @@ from __future__ import annotations
 
 import logging
 import time
-from pathlib import Path
 
 import numpy as np
 
 from .base import ASREngine, TranscriptionResult
 
 logger = logging.getLogger(__name__)
-
-
-def _register_cuda_dll_dirs() -> None:
-    """Make cuBLAS/cuDNN DLLs from pip wheels visible to CTranslate2."""
-    try:
-        import site
-
-        for site_dir in site.getsitepackages():
-            nvidia_dir = Path(site_dir) / "nvidia"
-            if not nvidia_dir.is_dir():
-                continue
-            for dll_dir in sorted(nvidia_dir.glob("*/bin")):
-                try:
-                    import os
-
-                    os.add_dll_directory(str(dll_dir))
-                    logger.debug("Added CUDA DLL dir: %s", dll_dir)
-                except OSError:
-                    pass
-    except Exception:
-        logger.debug("CUDA DLL dir registration failed", exc_info=True)
 
 
 class WhisperEngine(ASREngine):
@@ -74,7 +52,6 @@ class WhisperEngine(ASREngine):
 
     def load(self) -> None:
         """Load the model (downloads on first run)."""
-        _register_cuda_dll_dirs()
         from faster_whisper import WhisperModel
 
         start = time.perf_counter()
@@ -84,12 +61,29 @@ class WhisperEngine(ASREngine):
             compute_type=self.compute_type,
         )
         self._load_seconds = time.perf_counter() - start
+        self._refuse_a_silent_cpu_fallback()
         logger.info(
             "Loaded whisper %s device=%s in %.2f s",
             self.model_name,
             self.device,
             self._load_seconds,
         )
+
+    def _refuse_a_silent_cpu_fallback(self) -> None:
+        """Fail loudly when CUDA was asked for and CPU was given.
+
+        CTranslate2 does not raise when it cannot reach the GPU: it loads on the CPU and
+        keeps going. A transcript that arrives normally but came from the wrong device is
+        the worst failure this app has, because the user only finds out by reading it.
+        """
+        if self.device != "cuda":
+            return
+        actual = getattr(getattr(self._model, "model", None), "device", None)
+        if actual is not None and str(actual).lower().startswith("cpu"):
+            self._model = None
+            raise RuntimeError(
+                "Whisper fell back to the CPU, so the GPU is not reachable. Check that "
+                "the NVIDIA driver is installed and that nvidia-smi lists the card.")
 
     def transcribe(
         self,
@@ -120,7 +114,10 @@ class WhisperEngine(ASREngine):
             audio_16k,
             language=language or self.language,
             beam_size=1,
-            vad_filter=True,
+            # The app trims silence with Silero through sherpa-onnx before the audio ever
+            # reaches this call, so faster-whisper's own VAD would run the same model a
+            # second time and pull a second onnxruntime into the build.
+            vad_filter=False,
         )
         text = " ".join(segment.text.strip() for segment in segments).strip()
         transcribe_seconds = time.perf_counter() - start
