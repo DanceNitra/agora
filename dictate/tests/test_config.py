@@ -12,9 +12,11 @@ from dictate.config import DictateConfig, load_config, save_config
 
 def test_defaults() -> None:
     config = DictateConfig()
-    assert config.hotkey == "ctrl+alt+space"
+    # These track the defaults in config.py. They drifted when the hotkey and the engine
+    # changed and nobody updated the assertion, so the test had been red for a while.
+    assert config.hotkey == "ctrl+shift+r"
     assert config.hotkey_mode == "hold"
-    assert config.engine == "parakeet"
+    assert config.engine == "whisper"
     assert config.language == "sk"
     assert config.insert_mode == "clipboard"
     assert config.vad_enabled is True
