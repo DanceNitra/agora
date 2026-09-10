@@ -64,14 +64,26 @@ def model_dir() -> Path:
     return models_dir() / ARCHIVE_DIR_NAME
 
 
+# A weight file that is a few bytes is not a weight file. The check used to ask only that the
+# size was non-zero, and four one-byte stubs left behind by a test passed it: `--download-model`
+# skipped the download and printed "Model installed at ...". An installer that reports success
+# over a stub is worse than one that fails.
+MIN_FILE_BYTES = {
+    "encoder.int8.onnx": 1_000_000,
+    "decoder.int8.onnx": 100_000,
+    "joiner.int8.onnx": 10_000,
+    "tokens.txt": 1_000,
+}
+
+
 def is_model_installed() -> bool:
-    """Return True if the model directory exists and has all required files."""
+    """Return True if the model directory holds every required file at a plausible size."""
     directory = model_dir()
     if not directory.is_dir():
         return False
     for name in REQUIRED_FILES:
         path = directory / name
-        if not path.is_file() or path.stat().st_size == 0:
+        if not path.is_file() or path.stat().st_size < MIN_FILE_BYTES.get(name, 1):
             return False
     return True
 

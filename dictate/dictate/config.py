@@ -79,7 +79,17 @@ class DictateConfig(BaseModel):
 
 
 def app_data_dir() -> Path:
-    """Return the per-user data directory for Dictate."""
+    """Return the per-user data directory for Dictate.
+
+    Path.home(), not LOCALAPPDATA. That was decided in 5824b58 and it stays: the launcher sets
+    LOCALAPPDATA itself, and honouring the variable meant the directory moved with whatever
+    happened to be in the environment.
+
+    The model tests monkeypatch LOCALAPPDATA, which therefore does nothing, and every run of them
+    wrote its fixtures into the REAL directory: four one-byte files named encoder.int8.onnx and
+    friends, over which the installer then reported the model as present. The tests patch this
+    function now instead of the variable.
+    """
     return Path.home() / "AppData" / "Local" / APP_DIR_NAME
 
 
