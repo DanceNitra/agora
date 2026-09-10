@@ -12,10 +12,13 @@ from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
 ROOT = Path(SPECPATH).parent
 
-datas = [
-    (str(ROOT / "dictate" / "ui" / "index.html"), "dictate/ui"),
-    (str(ROOT / "assets"), "assets"),
-]
+# Every asset except selftest.wav. That clip is a recording of the owner's voice, kept
+# locally so the VAD tests have real speech; it must not travel inside an executable that
+# gets handed to someone else. Without it the self-test uses synthetic audio, which still
+# answers the question that matters: which device the model loaded on.
+datas = [(str(ROOT / "dictate" / "ui" / "index.html"), "dictate/ui")]
+datas += [(str(path), "assets") for path in sorted((ROOT / "assets").iterdir())
+          if path.is_file() and path.name != "selftest.wav"]
 datas += collect_data_files("sherpa_onnx")
 datas += collect_data_files("webview")
 

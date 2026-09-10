@@ -26,6 +26,8 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
+from .config import default_config_path
+
 logger = logging.getLogger(__name__)
 
 BG = "#0f1116"
@@ -147,21 +149,15 @@ class SetupWizard:
             # runs on the CPU without complaining when CUDA is unavailable, and this
             # model on the CPU returns noise, so an install is not finished until a real
             # transcription has come back off the GPU.
-            from .cli import selftest
+            from .cli import run_selftest
 
-            code = selftest(self.config_path)
-            import json
-
-            from .config import app_data_dir
-
-            report = json.loads(
-                (app_data_dir() / "selftest.json").read_text(encoding="utf-8"))
+            code, report = run_selftest(self.config_path)
             if code == 0:
-                self._queue.put(("done", "GPU %s, %.2f s of audio work per second."
+                self._queue.put(("done", "Running on the %s at %.0f seconds of audio "
+                                 "per second of work."
                                  % (report["device"], 1 / max(report["rtf"], 1e-6))))
             else:
-                self._queue.put(("error", "The test transcription ran on %s."
-                                 % report.get("device", "an unknown device")))
+                self._queue.put(("error", report["failure"]))
         except Exception as exc:                       # surfaced on the page, not hidden
             logger.exception("setup download failed")
             self._queue.put(("error", f"{type(exc).__name__}: {exc}"))
@@ -280,9 +276,17 @@ class SetupWizard:
     # -- page 4: how it works --------------------------------------------------
 
     def _page_help(self) -> None:
+        from .config import load_config
+
+        # Read the key from the config rather than writing it into the sentence. It was
+        # hardcoded here as Ctrl+Shift+R while the app listened on right Ctrl, so the
+        # page taught the wrong key with complete confidence.
+        hotkey = load_config(self.config_path).hotkey
+        pretty = " + ".join(part.strip().title() for part in hotkey.split("+"))
+
         self._title("How it works", "")
         for text, colour in (
-            ("Hold Ctrl+Shift+R and speak. Release the keys to transcribe.", FG),
+            ("Hold %s and speak. Release it to transcribe." % pretty, FG),
             ("While the microphone is open the window's edge glows cyan.", DIM),
             ("Then it shows TRANSCRIBING and PASTING while the model runs.", DIM),
             ("The text is pasted into whatever window you were in before.", DIM),
@@ -293,6 +297,7 @@ class SetupWizard:
              "same Exit item.", DIM),
             ("", DIM),
             ("To move the window, drag it. It stays on top of other windows.", DIM),
+            ("To change the key, edit %s." % (default_config_path()), DIM),
         ):
             self._line(text, colour)
         self.next_button.config(text="Finish")

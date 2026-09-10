@@ -14,7 +14,7 @@ def test_defaults() -> None:
     config = DictateConfig()
     # These track the defaults in config.py. They drifted when the hotkey and the engine
     # changed and nobody updated the assertion, so the test had been red for a while.
-    assert config.hotkey == "ctrl+shift+r"
+    assert config.hotkey == "right ctrl"
     assert config.hotkey_mode == "hold"
     assert config.engine == "whisper"
     assert config.language == "sk"

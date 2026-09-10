@@ -2,7 +2,11 @@
 
 import sys
 
-from dictate.setup_wizard import main
+from dictate.log import ensure_streams
+
+ensure_streams()
+
+from dictate.setup_wizard import main  # noqa: E402  streams first
 
 if __name__ == "__main__":
     # --help-page opens the instructions directly, for the Start menu shortcut.

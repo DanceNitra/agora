@@ -35,7 +35,11 @@ class DictateConfig(BaseModel):
     """Validated configuration for the dictation app."""
 
     version: int = CONFIG_VERSION
-    hotkey: str = "ctrl+shift+r"
+    # Right Ctrl, held. Chosen because nothing else claims it: Ctrl+Shift+R reloads the
+    # browser, and the owner dictates into a browser. The running app has used right ctrl
+    # all along through a config file; the default here said otherwise and the packaged
+    # copy, which starts with no config, therefore came up on the wrong key.
+    hotkey: str = "right ctrl"
     hotkey_mode: Literal["hold", "toggle"] = "hold"
     # One engine: Whisper on the GPU. The field stays so old config files still load.
     engine: Literal["whisper"] = "whisper"

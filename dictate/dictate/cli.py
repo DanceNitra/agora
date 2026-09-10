@@ -222,12 +222,15 @@ def download_model(config_path: Path | None = None) -> int:
 
 
 
-def selftest(config_path: Path | None = None) -> int:
-    """Transcribe a bundled clip and report the device, the timing, and the text.
+def run_selftest(config_path: Path | None = None) -> tuple[int, dict]:
+    """Transcribe a clip and return an exit code with the report, printing nothing.
 
     The point is the device. CTranslate2 does not raise when CUDA is unavailable, it runs
-    on the CPU, so an install can look healthy and quietly produce bad transcripts. This
-    writes a report next to the config and returns non-zero when the GPU was not used.
+    on the CPU, so an install can look healthy and quietly produce bad transcripts.
+
+    This returns rather than prints because the setup wizard calls it, and a windowed
+    executable has no stdout. A print here killed the packaged wizard with
+    "NoneType object has no attribute write" before it downloaded anything.
     """
     import json
 
@@ -246,6 +249,7 @@ def selftest(config_path: Path | None = None) -> int:
         sample_rate = 16000
         audio = (np.random.default_rng(0).standard_normal(sample_rate * 2) * 0.01
                  ).astype(np.float32)
+
     engine = build_engine(config)
     result = engine.transcribe(audio, sample_rate, language=config.language)
     device = str(getattr(getattr(getattr(engine, "_model", None), "model", None),
@@ -263,12 +267,23 @@ def selftest(config_path: Path | None = None) -> int:
     path = app_data_dir() / "selftest.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps(report, ensure_ascii=False, indent=2))
-    print(f"Report written to {path}")
+    report["report_path"] = str(path)
+
     if device != "cuda":
-        print(f"FAILED: the model ran on {device}, not on the GPU.", file=sys.stderr)
-        return 1
+        report["failure"] = f"the model ran on {device}, not on the GPU"
+        return 1, report
     if clip.is_file() and len(result.text) < 20:
-        print(f"FAILED: the transcript is {len(result.text)} characters.", file=sys.stderr)
-        return 1
-    return 0
+        report["failure"] = f"the transcript is {len(result.text)} characters"
+        return 1, report
+    return 0, report
+
+
+def selftest(config_path: Path | None = None) -> int:
+    """Run the self-test and print its report."""
+    import json
+
+    code, report = run_selftest(config_path)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if code:
+        print("FAILED: " + report["failure"], file=sys.stderr)
+    return code
