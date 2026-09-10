@@ -123,26 +123,120 @@ def vad_model_path() -> Path:
     return path
 
 
-def _download(url: str, destination: Path, progress_callback=None) -> Path:
-    """Download ``url`` into ``destination``."""
-    logger.info("Downloading %s", url)
-    urllib.request.urlretrieve(url, destination, reporthook=progress_callback)
+class Progress:
+    """What a download has done so far, in bytes.
+
+    The wizard needs bytes, not a spinner: a 1.6 GB file on a slow line takes long enough
+    that a bar which only moves at the end is indistinguishable from a hung program. That
+    is exactly what the first version showed on a second machine.
+    """
+
+    __slots__ = ("file", "file_done", "file_total", "done", "total", "bytes_per_second")
+
+    def __init__(self, file, file_done, file_total, done, total, bytes_per_second):
+        self.file = file
+        self.file_done = file_done
+        self.file_total = file_total
+        self.done = done
+        self.total = total
+        self.bytes_per_second = bytes_per_second
+
+    @property
+    def fraction(self) -> float:
+        return self.done / self.total if self.total else 0.0
+
+    @property
+    def seconds_left(self) -> float | None:
+        if not self.bytes_per_second or not self.total:
+            return None
+        return max(self.total - self.done, 0) / self.bytes_per_second
+
+
+def _content_length(url: str, timeout: float = 30.0) -> int:
+    """Return the size of a URL, following redirects. Zero when the server will not say."""
+    request = urllib.request.Request(url, method="HEAD")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return int(response.headers.get("Content-Length") or 0)
+    except Exception:
+        logger.debug("HEAD failed for %s", url, exc_info=True)
+        return 0
+
+
+def _stream_to_file(url: str, destination: Path, on_chunk=None,
+                    timeout: float = 60.0) -> Path:
+    """Download ``url`` to ``destination``, resuming a partial file if one is there.
+
+    ``on_chunk(file_done, file_total)`` is called as bytes arrive. The socket carries a
+    timeout so a stalled connection raises instead of hanging the setup forever.
+    """
+    partial = destination.with_suffix(destination.suffix + ".part")
+    have = partial.stat().st_size if partial.is_file() else 0
+    total = _content_length(url, timeout=timeout)
+
+    headers = {"Range": f"bytes={have}-"} if have else {}
+    request = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        if have and response.status != 206:
+            # The server ignored the range, so start over rather than append to a prefix.
+            have = 0
+            partial.unlink(missing_ok=True)
+        if not total:
+            total = have + int(response.headers.get("Content-Length") or 0)
+        mode = "ab" if have else "wb"
+        with open(partial, mode) as sink:
+            while True:
+                chunk = response.read(1 << 20)
+                if not chunk:
+                    break
+                sink.write(chunk)
+                have += len(chunk)
+                if on_chunk is not None:
+                    on_chunk(have, total)
+
+    partial.replace(destination)
     return destination
 
 
+def _whisper_file_url(name: str) -> str:
+    """Return the direct URL of one file in the pinned Whisper repository."""
+    return f"https://huggingface.co/{WHISPER_REPO}/resolve/main/{name}"
+
+
 def _download_whisper(progress_callback=None) -> Path:
-    """Download the Whisper snapshot into the app's own models directory."""
-    from huggingface_hub import snapshot_download
+    """Download the Whisper files into the app's own models directory.
+
+    Downloads them directly rather than through ``snapshot_download``, because that call
+    reports progress only to a terminal, and this app has no terminal.
+    """
+    import time
 
     directory = model_dir()
     directory.mkdir(parents=True, exist_ok=True)
-    snapshot_download(
-        WHISPER_REPO,
-        local_dir=str(directory),
-        allow_patterns=list(WHISPER_FILES),
-    )
-    if progress_callback is not None:
-        progress_callback(1, 1, 1)
+
+    wanted = [name for name, floor in WHISPER_FILES.items()
+              if not (directory / name).is_file()
+              or (directory / name).stat().st_size < floor]
+    sizes = {name: _content_length(_whisper_file_url(name)) for name in wanted}
+    total = sum(sizes.values()) or sum(WHISPER_FILES[name] for name in wanted)
+    finished = 0
+    started = time.monotonic()
+
+    for name in wanted:
+        logger.info("Downloading %s (%.1f MB)", name, sizes.get(name, 0) / 1e6)
+
+        def on_chunk(file_done, file_total, name=name):
+            if progress_callback is None:
+                return
+            elapsed = max(time.monotonic() - started, 1e-6)
+            done = finished + file_done
+            progress_callback(Progress(name, file_done, file_total, done, total,
+                                       done / elapsed))
+
+        _stream_to_file(_whisper_file_url(name), directory / name, on_chunk)
+        finished += (directory / name).stat().st_size
+        logger.info("Installed %s", name)
+
     return directory
 
 
@@ -170,7 +264,7 @@ def download_model(progress_callback=None) -> Path:
 
     if not is_vad_installed():
         models_dir().mkdir(parents=True, exist_ok=True)
-        _download(VAD_MODEL_URL, models_dir() / VAD_MODEL_FILE, progress_callback)
+        _stream_to_file(VAD_MODEL_URL, models_dir() / VAD_MODEL_FILE)
         if not is_vad_installed():
             raise RuntimeError(f"VAD download failed: {models_dir() / VAD_MODEL_FILE}")
         logger.info("VAD model installed at %s", models_dir() / VAD_MODEL_FILE)
