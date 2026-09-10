@@ -34,18 +34,36 @@ def test_clip_radius_matches_the_stylesheet():
     )
 
 
-def test_the_accent_is_one_colour():
+def test_the_accent_is_one_hue():
+    """Every colour in the window is the accent's hue, a neutral, or white.
+
+    The first version of this asked that every bright literal BE the accent, which was too blunt:
+    the ring at rest is a dimmer shade of the same cyan and the check called it a stray colour.
+    What matters is that the window carries one hue, not one value of it.
+    """
+    import colorsys
+
     css = _css()
     m = re.search(r"--accent:\s*(#[0-9a-fA-F]{6})", css)
     assert m, "no --accent token in the stylesheet"
-    accent = m.group(1).lower()
 
-    # The canvas cannot read a CSS custom property, so the meter repeats the literal. Every other
-    # literal of a full-brightness colour in the file should be that same accent.
-    literals = {c.lower() for c in re.findall(r"#[0-9a-fA-F]{6}", css)}
-    bright = {c for c in literals if int(c[1:3], 16) + int(c[3:5], 16) + int(c[5:7], 16) > 400}
-    stray = bright - {accent, "#ffffff"}
-    assert not stray, "colours that are neither the accent nor white: %s" % sorted(stray)
+    def hsv(hexstr):
+        r, g, b = (int(hexstr[i:i + 2], 16) / 255 for i in (1, 3, 5))
+        return colorsys.rgb_to_hsv(r, g, b)
+
+    accent_h = hsv(m.group(1))[0]
+    stray = []
+    for c in {c.lower() for c in re.findall(r"#[0-9a-fA-F]{6}", css)}:
+        h, sat, val = hsv(c)
+        # A near-black counts as neutral however saturated it computes: #0a0a0d is (10,10,13),
+        # which is 23% saturated by the formula and black to the eye.
+        if sat < 0.15 or val < 0.12:
+            continue
+        # hue distance on the circle
+        d = min(abs(h - accent_h), 1 - abs(h - accent_h))
+        if d > 0.04:                         # about 14 degrees
+            stray.append((c, round(d * 360)))
+    assert not stray, "colours off the accent hue: %s" % sorted(stray)
 
 
 def test_the_window_is_wide_enough_for_its_contents():

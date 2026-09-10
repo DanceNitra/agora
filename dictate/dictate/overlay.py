@@ -236,6 +236,12 @@ class WebViewWindow:
             background_color="#0b0b0c",
             transparent=False,
             resizable=False,
+            # THE GREY FRAME. `shadow` defaults to True and we never set it. On a frameless
+            # window Windows draws that as a thin light border OUTSIDE the window rect, which is
+            # why every capture of the window itself came back clean while the owner kept seeing
+            # a grey ring around a coloured one. A screenshot of a window cannot show what is
+            # painted outside it.
+            shadow=False,
         )
         if ICON_FILE.exists():
             webview.start(icon=str(ICON_FILE))
