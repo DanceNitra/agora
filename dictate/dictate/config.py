@@ -37,7 +37,8 @@ class DictateConfig(BaseModel):
     version: int = CONFIG_VERSION
     hotkey: str = "ctrl+shift+r"
     hotkey_mode: Literal["hold", "toggle"] = "hold"
-    engine: Literal["parakeet", "whisper"] = "whisper"
+    # One engine: Whisper on the GPU. The field stays so old config files still load.
+    engine: Literal["whisper"] = "whisper"
     language: str = "sk"
     provider: Literal["cpu", "cuda"] = "cpu"
     num_threads: int = Field(default=0, ge=0)
