@@ -92,9 +92,18 @@ class WebViewWindow:
 
     # -- lifecycle ---------------------------------------------------------------
 
+    # The page is laid out at these CSS pixels. Physical size is this times the DPI scale of the
+    # monitor the window is actually on, which is not always the system's.
+    LOGICAL_SIZE = (144, 43)
+
     @staticmethod
     def _window_size() -> tuple[int, int]:
-        """Return the physical window size for the current display scaling."""
+        """Return the window size in physical pixels for the SYSTEM scaling.
+
+        Only used for the initial create_window call. `_force_size` sets the real size from the
+        window's own monitor, because GetDpiForSystem reports the primary display: here it says
+        96 while the window sits on a 144 dpi screen, and the window came out at two thirds size.
+        """
         import ctypes
 
         try:
@@ -111,6 +120,59 @@ class WebViewWindow:
         # 1 px border, so 31. Measured from the rendered page rather than added up by hand.
         # The meter is 93 px against the 140 it started with, a third off.
         return round(144 * scale), round(31 * scale)
+
+    def _force_size(self) -> None:
+        """Set the window to the exact pixel size, over pywebview's own arithmetic.
+
+        MEASURED, because three rounds of changing the requested height changed nothing on
+        screen. On this display pywebview maps a request to `1.5 * asked - 22` wide and
+        `1.5 * asked - 56` tall, an exact fit over three probe sizes: (144,31) became (194,1),
+        (216,46) became (302,13) and (300,120) became (428,124). The 1.5 is the DPI scale; the
+        subtractions are window-frame insets on a window that has no frame. Asking for 31 px of
+        height therefore asked for a negative number and got whatever the minimum was.
+
+        So the size is set on the real window handle instead. Win32 takes physical pixels and
+        applies no arithmetic of its own.
+        """
+        import ctypes
+
+        class RECT(ctypes.Structure):
+            _fields_ = [("left", ctypes.c_long), ("top", ctypes.c_long),
+                        ("right", ctypes.c_long), ("bottom", ctypes.c_long)]
+
+        user32 = ctypes.windll.user32
+        hwnd = 0
+        for _ in range(120):                       # the window appears a moment after start()
+            hwnd = user32.FindWindowW(None, "Dictate")
+            if hwnd or self.stop_event.wait(0.1):
+                break
+        if not hwnd:
+            logger.warning("Never found the window to size it; it keeps pywebview's own size")
+            return
+
+        dpi = int(user32.GetDpiForWindow(hwnd)) or 96
+        scale = dpi / 96
+        want_w = round(self.LOGICAL_SIZE[0] * scale)
+        want_h = round(self.LOGICAL_SIZE[1] * scale)
+        SWP_NOMOVE, SWP_NOZORDER, SWP_NOACTIVATE = 0x0002, 0x0004, 0x0010
+
+        # SET, THEN READ BACK, AND REPEAT UNTIL IT STICKS. The first version set the size once and
+        # logged success: it really did call SetWindowPos with 216x46, and the window measured
+        # 144x31 a moment later, because pywebview applies its own size after the window appears.
+        # A log line saying what was asked for is not a measurement of what happened.
+        rect = RECT()
+        for attempt in range(40):
+            user32.SetWindowPos(hwnd, 0, 0, 0, want_w, want_h,
+                                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE)
+            if self.stop_event.wait(0.15):
+                return
+            user32.GetWindowRect(hwnd, ctypes.byref(rect))
+            got = (rect.right - rect.left, rect.bottom - rect.top)
+            if got == (want_w, want_h):
+                logger.info("Window settled at %dx%d physical (%dx%d css at %d dpi) after %d tries",
+                            got[0], got[1], *self.LOGICAL_SIZE, dpi, attempt + 1)
+                return
+        logger.warning("Window will not hold %dx%d; it sits at %dx%d", want_w, want_h, *got)
 
     def run(self) -> None:
         """Open the pill window and block until the user exits."""
@@ -131,6 +193,7 @@ class WebViewWindow:
         except Exception:
             logger.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
         threading.Thread(target=self._track_foreground, daemon=True).start()
+        threading.Thread(target=self._force_size, daemon=True).start()
         width, height = self._window_size()
         self._window = webview.create_window(
             "Dictate",
@@ -138,6 +201,11 @@ class WebViewWindow:
             js_api=self,
             width=width,
             height=height,
+            # THE HEIGHT WAS NEVER APPLIED. pywebview's min_size defaults to (200, 100) and clamps
+            # anything smaller, so three rounds of cutting the CSS and the requested height changed
+            # nothing: the live window measured 201x100 physical while 216x46 was being asked for.
+            # Found by reading the window rect off the running window instead of trusting the call.
+            min_size=(1, 1),
             frameless=True,
             on_top=True,
             easy_drag=False,
