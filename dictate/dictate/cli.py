@@ -162,7 +162,10 @@ def listen(
         if best is None:
             print("No microphone produced a signal.")
             return 1
-        config.microphone = best
+        # Persist the name, not the probe index: see setup_wizard._save_microphone.
+        import sounddevice as sd
+
+        config.microphone = str(sd.query_devices(best)["name"])
         save_config(config, config_path)
 
     transcripts: list[str] = []

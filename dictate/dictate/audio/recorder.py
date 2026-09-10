@@ -162,7 +162,9 @@ def resolve_device(device: str | int | None) -> str | int | None:
 
     ``None`` returns the default input device. An integer is returned
     unchanged. A string is matched case-insensitively as a substring of
-    the device name; the first match wins.
+    the device name; the first match wins. A string that matches nothing
+    logs a warning and returns ``None``, so a missing microphone degrades
+    to the system default instead of stopping the app.
     """
     if device is None or isinstance(device, int):
         return device
@@ -171,4 +173,12 @@ def resolve_device(device: str | int | None) -> str | int | None:
     for index, dev in enumerate(devices):
         if dev["max_input_channels"] > 0 and needle in dev["name"].lower():
             return index
-    raise ValueError(f"No input device matches {device!r}")
+    # The configured microphone is not plugged in, or Windows renamed it. Fall
+    # back to the system default so dictation still works, and say so: a wrong
+    # microphone records silence, which is indistinguishable from a quiet room.
+    logger.warning(
+        "Configured microphone %r is not present; falling back to the system default. "
+        "Run the setup wizard to pick it again.",
+        device,
+    )
+    return None

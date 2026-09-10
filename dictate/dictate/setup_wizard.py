@@ -72,6 +72,7 @@ class SetupWizard:
         self.page = 0
         self.gpu_ok = False
         self.mic_index: int | None = None
+        self.mic_name: str | None = None
         self._queue: queue.Queue = queue.Queue()
         self._meter_stream = None
         self._render()
@@ -249,8 +250,9 @@ class SetupWizard:
         if not self.inputs:
             self.level_text.config(text="No input device found.", fg=BAD)
             return
-        index = self.inputs[self.choice.current()][0]
+        index, info = self.inputs[self.choice.current()]
         self.mic_index = index
+        self.mic_name = str(info["name"])
 
         def callback(indata, _frames, _time, _status):
             peak = float(np.max(np.abs(indata))) if indata.size else 0.0
@@ -289,9 +291,16 @@ class SetupWizard:
                 logger.debug("meter close failed", exc_info=True)
             self._meter_stream = None
         config = load_config(self.config_path)
-        config.microphone = self.mic_index
+        # Store the NAME, never the index. Device indexes are assigned at
+        # enumeration and shift whenever another input appears or disappears,
+        # so a saved index silently starts meaning a different microphone.
+        # Measured 2026-09-10: index 5 was the HyperX Quadcast until 13:09 and
+        # the M-Audio line input at 13:25, either side of one reboot. The config
+        # was intact; it just no longer named the same device, and three
+        # recordings captured silence with no error.
+        config.microphone = self.mic_name or self.mic_index
         save_config(config, self.config_path)
-        logger.info("Microphone set to device %s", self.mic_index)
+        logger.info("Microphone set to %r (index %s at setup)", self.mic_name, self.mic_index)
 
     # -- page 4: how it works --------------------------------------------------
 
