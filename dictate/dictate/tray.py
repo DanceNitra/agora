@@ -1,7 +1,7 @@
 """System tray icon with states and a settings menu.
 
-The icon is the app's logo, tinted by state: amber at rest, red while the
-microphone is open, off-white while the model runs. It is the same mark the
+The icon is the app's logo, tinted by state: cyan at rest, white while the
+microphone is open, grey while the model runs. It is the same mark the
 overlay and the taskbar icon use, so the app looks like one thing everywhere.
 
 The colour lives here and the shape lives in ``assets/mark_mask.png``, an
@@ -28,10 +28,10 @@ from .config import default_config_path, save_config
 logger = logging.getLogger(__name__)
 
 STATE_COLORS = {
-    "IDLE": (232, 163, 60),          # amber, the app's accent
-    "RECORDING": (216, 67, 75),      # the tally red the overlay uses
-    "TRANSCRIBING": (232, 230, 225),
-    "INJECTING": (232, 230, 225),
+    "IDLE": (43, 244, 255),          # the app's accent, a fluorescent cyan
+    "RECORDING": (255, 255, 255),    # brightest while the microphone is open
+    "TRANSCRIBING": (110, 110, 122),
+    "INJECTING": (110, 110, 122),
 }
 
 MASK_PATH = Path(__file__).parent.parent / "assets" / "mark_mask.png"
