@@ -41,18 +41,18 @@ async def main():
         browser = await p.chromium.launch(channel="msedge", headless=True)
 
         # IDLE state
-        page = await browser.new_page(viewport={"width": 404, "height": 132})
+        page = await browser.new_page(viewport={"width": 404, "height": 116})
         await page.goto(f"file:///{UI_HTML}")
         await page.wait_for_timeout(200)
-        await screenshot_state(page, OUT_IDLE, "IDLE", "PRIPRAVENÝ")
+        await screenshot_state(page, OUT_IDLE, "IDLE", "Pripravený")
         await page.close()
 
         # RECORDING state with waveform
-        page = await browser.new_page(viewport={"width": 404, "height": 132})
+        page = await browser.new_page(viewport={"width": 404, "height": 116})
         await page.goto(f"file:///{UI_HTML}")
         await page.wait_for_timeout(200)
         wave = [0.05,0.12,0.28,0.55,0.82,0.64,0.45,0.30,0.18,0.10,0.06,0.15,0.35,0.60,0.78,0.50,0.25,0.12,0.08,0.05]*12
-        await screenshot_state(page, OUT_REC, "RECORDING", "NAHRÁVAM",
+        await screenshot_state(page, OUT_REC, "RECORDING", "Nahrávam",
             "Toto je testovací prepis slovenského textu v aplikácii Dictate.",
             wave)
         await page.close()
