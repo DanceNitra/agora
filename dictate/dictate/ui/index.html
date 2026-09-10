@@ -30,8 +30,8 @@
     background: var(--ground);
     border: 1px solid var(--line);
     border-radius: 12px;
-    /* About 2 mm of breathing room around the mark at this display's scaling, and no more. */
-    padding: 0 8px;
+    /* The same 8 px on every side, so the mark sits in an even frame. */
+    padding: 8px;
     cursor: grab;
   }
   .pill:active { cursor: grabbing; }
@@ -42,10 +42,18 @@
     opacity: .92;
     transition: opacity .2s;
   }
-  /* While the microphone is open the mark breathes, so the pill says "listening" even in a
-     silent room, where every bar would otherwise sit flat. */
+  /* While the microphone is open the mark breathes and the window's own edge carries the accent,
+     so the pill says "listening" even in a silent room, where every bar would otherwise sit flat.
+     The border is the one element visible from across the desk. */
   .live .mark { animation: breathe 1.9s ease-in-out infinite; }
   @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  .live { animation: edge 1.9s ease-in-out infinite; }
+  @keyframes edge {
+    0%, 100% { border-color: var(--accent); }
+    50%      { border-color: #6b4d1c; }
+  }
+  /* Working, not listening: the edge holds still so the two states cannot be confused. */
+  .busy { border-color: #55545c; }
   /* Transcribing and injecting: the mark holds still and turns red, the meter is frozen. */
   .busy .mark { opacity: 1; filter: hue-rotate(-28deg) saturate(1.5); }
   .meter { flex: 1 1 auto; height: 24px; display: block; min-width: 0; }
