@@ -1,8 +1,15 @@
 """System tray icon with states and a settings menu.
 
-States render as coloured circles: green idle, red recording, orange
-transcribing, amber injecting. The menu carries the record button,
-"Open config" (plain JSON file), reload, and exit.
+The icon is the app's logo, tinted by state: amber at rest, red while the
+microphone is open, off-white while the model runs. It is the same mark the
+overlay and the taskbar icon use, so the app looks like one thing everywhere.
+
+The colour lives here and the shape lives in ``assets/mark_mask.png``, an
+alpha-only master. Baking a picture per state would have put the palette in
+four files.
+
+The menu carries the record button, "Open config" (plain JSON file), reload,
+and exit. Those left the overlay window, which now shows only the meter.
 """
 
 from __future__ import annotations
@@ -10,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
+from pathlib import Path
 
 import pystray
 from PIL import Image, ImageDraw
@@ -20,22 +28,39 @@ from .config import default_config_path, save_config
 logger = logging.getLogger(__name__)
 
 STATE_COLORS = {
-    "IDLE": (76, 175, 80),
-    "RECORDING": (244, 67, 54),
-    "TRANSCRIBING": (255, 152, 0),
-    "INJECTING": (255, 193, 7),
+    "IDLE": (232, 163, 60),          # amber, the app's accent
+    "RECORDING": (216, 67, 75),      # the tally red the overlay uses
+    "TRANSCRIBING": (232, 230, 225),
+    "INJECTING": (232, 230, 225),
 }
+
+MASK_PATH = Path(__file__).parent.parent / "assets" / "mark_mask.png"
+_MASK: Image.Image | None = None
+
+
+def _mask() -> Image.Image | None:
+    """Load the alpha-only logo once, or None if it is missing."""
+    global _MASK
+    if _MASK is None and MASK_PATH.exists():
+        _MASK = Image.open(MASK_PATH).convert("RGBA").resize((64, 64), Image.LANCZOS)
+    return _MASK
 
 
 def _state_image(state: str) -> Image.Image:
-    """Render a filled circle for the state."""
+    """Return the logo tinted for the state.
+
+    Falls back to a filled circle if the mask is missing, because a tray icon that
+    fails to load should still tell you which state the app is in.
+    """
     color = STATE_COLORS.get(state, STATE_COLORS["IDLE"])
-    image = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-    draw.ellipse((8, 8, 56, 56), fill=color)
-    if state == RECORDING:
-        draw.ellipse((26, 26, 38, 38), fill=(255, 255, 255, 230))
-    return image
+    mask = _mask()
+    if mask is None:
+        image = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+        ImageDraw.Draw(image).ellipse((8, 8, 56, 56), fill=color)
+        return image
+    tinted = Image.new("RGBA", mask.size, color + (255,))
+    tinted.putalpha(mask.getchannel("A"))
+    return tinted
 
 
 class TrayUI:
