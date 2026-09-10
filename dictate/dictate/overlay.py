@@ -94,7 +94,7 @@ class WebViewWindow:
 
     # The page is laid out at these CSS pixels. Physical size is this times the DPI scale of the
     # monitor the window is actually on, which is not always the system's.
-    LOGICAL_SIZE = (144, 45)
+    LOGICAL_SIZE = (144, 41)
     CSS_RADIUS = 0           # must equal border-radius on .pill in ui/index.html
 
     @staticmethod

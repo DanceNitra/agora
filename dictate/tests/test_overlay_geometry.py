@@ -49,8 +49,9 @@ def test_the_accent_is_one_colour():
 
 
 def test_the_window_is_wide_enough_for_its_contents():
-    # mark 25 + gap 8 + padding 8 twice + border 2 twice leaves this much for the meter.
+    # The ring is a fixed overlay and takes no layout space, so the box is the mark, the gap and
+    # 8 px of padding on each side. Nothing else.
     width, height = WebViewWindow.LOGICAL_SIZE
-    meter = width - 25 - 8 - 16 - 4
+    meter = width - 25 - 8 - 16
     assert meter > 40, "only %d px left for the meter at %d px wide" % (meter, width)
-    assert height >= 25 + 16 + 4, "the mark and its margins do not fit in %d px" % height
+    assert height == 25 + 16, "the mark and its margins want %d px, the window is %d" % (41, height)
