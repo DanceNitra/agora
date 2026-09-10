@@ -111,6 +111,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Download the default ASR model and exit.",
     )
     parser.add_argument(
+        "--selftest",
+        action="store_true",
+        help="Transcribe a bundled clip and check that the GPU was used.",
+    )
+    parser.add_argument(
         "--config-path",
         action="store_true",
         help="Print the config file path and exit.",
@@ -147,6 +152,10 @@ def main(argv: list[str] | None = None) -> int:
         from .cli import transcribe_file
 
         return transcribe_file(args.transcribe, config_path=args.config)
+    if args.selftest:
+        from .cli import selftest
+
+        return selftest(config_path=args.config)
     if args.download_model:
         from .cli import download_model
 

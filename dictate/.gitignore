@@ -11,3 +11,8 @@ build/
 # Runtime
 *.wav
 *.log
+
+# PyInstaller and Inno Setup outputs
+build_dist/
+build_work/
+build_installer/
