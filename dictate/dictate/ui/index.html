@@ -76,19 +76,24 @@
      Same box, so nothing shifts. */
   .work {
     flex: 1 1 auto; min-width: 0; height: 24px; display: none;
-    align-items: center; justify-content: center; gap: 1px;
+    flex-direction: column; justify-content: center; gap: 1px;
     font-family: "Cascadia Mono", Consolas, ui-monospace, monospace;
-    /* 15 glyphs have to fit the 95 px the meter occupies. At 11 px with 1.4 px of tracking the
-       word ran under the mark and lost its last dot. */
-    font-size: 8.5px; letter-spacing: .2px; text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--work); text-shadow: 0 1px 3px rgba(0,0,0,.85);
+    /* Two rows in the 24 px the meter occupies, and the longer one is 15 glyphs against 95 px
+       of width. At 11 px it ran under the mark and lost its last dot. */
+    font-size: 7.5px; letter-spacing: .2px; text-transform: uppercase;
+    white-space: nowrap; line-height: 1.35;
+    text-shadow: 0 1px 3px rgba(0,0,0,.9);
   }
   .busy-state .meter { display: none; }
   .busy-state .work  { display: flex; }
-  .work i { font-style: normal; animation: dot 1.05s ease-in-out infinite; }
-  .work i:nth-child(2) { animation-delay: .18s; }
-  .work i:nth-child(3) { animation-delay: .36s; }
+  /* Both steps are listed, so the window shows where it is in the run rather than only what it
+     is doing. The step underway is the bright one. */
+  .work div { color: var(--work); opacity: .3; transition: opacity .12s; }
+  .work .on { opacity: 1; }
+  .work i { font-style: normal; opacity: 0; }
+  .work .on i { animation: dot 1.05s ease-in-out infinite; }
+  .work .on i:nth-of-type(2) { animation-delay: .18s; }
+  .work .on i:nth-of-type(3) { animation-delay: .36s; }
   @keyframes dot { 0%, 100% { opacity: .15; } 45% { opacity: 1; } }
 
   /* The ring. `position: fixed` pins it to the viewport, so no amount of content can push an
@@ -105,7 +110,10 @@
   <div class="pill pywebview-drag-region" id="pill">
     <div class="mark"></div>
     <canvas class="meter" id="meter"></canvas>
-    <div class="work" id="work">Transcribing<i>.</i><i>.</i><i>.</i></div>
+    <div class="work" id="work">
+      <div id="stepT">Transcribing<i>.</i><i>.</i><i>.</i></div>
+      <div id="stepP">Pasting<i>.</i><i>.</i><i>.</i></div>
+    </div>
   </div>
 <script>
 const meter = document.getElementById("meter");
@@ -184,6 +192,8 @@ async function tick() {
       ring.classList.toggle("busy", busy);
       pill.classList.toggle("live", state === "RECORDING");
       pill.classList.toggle("busy-state", busy);
+      document.getElementById("stepT").classList.toggle("on", state === "TRANSCRIBING");
+      document.getElementById("stepP").classList.toggle("on", state === "INJECTING");
       // Nothing is heard while the model runs, so the meter should not pretend otherwise, and
       // the next run starts from an empty meter rather than the tail of the last one.
       if (busy || state === "IDLE") history.length = 0;
