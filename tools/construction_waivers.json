@@ -77,5 +77,16 @@
   ],
   "reason": "AGORA_MEMORY_DIR selects WHICH store is read, so it can change every number and is disclosed rather than dismissed: the published run used the default, ~/.claude/projects/C--Users-Danculus-agora/memory, holding 26 dated copies of MEMORY.md and MEMORY_ARCHIVE.md with 11 dated sections. It cannot be swept, because the claim is about that one store's own retirement history and no second store has one. The resolved path is written into the receipt as memory_dir on every run.",
   "dated": "2026-09-08"
+ },
+ "drafts/email_epjb_which_submission_route.md": {
+  "date": "2026-09-09",
+  "reason": "No artifact of ours stands behind any figure in this draft. It carries two numbers: an HTTP 404 returned by articlestatus.edpsciences.org/is/epjb/ and a journal identifier. Both were fetched directly in this session and neither is produced by code we wrote, so the construction gate has nothing to audit and refuses on an empty target set, which is its correct behaviour. The three checkable facts are verified against the live pages instead, recorded in the verify receipt."
+ },
+ "C:/Users/Danculus/inspeximus-repo/probes/integrity_bench_revert.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "OPENAI_API_KEY selects the judge and CAN change a measured value, so it is disclosed rather than dismissed. The two numbers this artifact backs on DanceNitra/inspeximus#1 are timings of the refusal path, and the draft states the value both arms ran at, OPENAI_API_KEY=sk-test-not-a-real-key, beside every figure. The arms differ only in the commit, ad75c7a against 4b407a9, with the same key and the same endpoint, which is what makes the 46.74 s against 0.67 s a property of the short-circuit rather than of the key. The published 0.75 and 0.20 benchmark scores are a different matter and already carry their instrument, gpt-4o-mini at temperature 0.0, on the site.",
+  "dated": "2026-09-11"
  }
 }
