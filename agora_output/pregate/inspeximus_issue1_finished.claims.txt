@@ -1,0 +1,8 @@
+A judge status that cannot succeed, being 400, 401, 403 or 404, is now attempted once per case instead of six times, and every other failure keeps the previous backoff.
+The run still issues one call per case, so an unusable key at twenty cases still makes twenty requests.
+With an unusable OPENAI_API_KEY the benchmark took 46.74 seconds at one case and 139.20 seconds at three cases before the fix at ad75c7a, and 0.67 seconds and 0.99 seconds after it at 4b407a9.
+The gap is not network variance, because the old loop slept three times attempt plus one seconds between six attempts, giving a deterministic floor of 45 seconds per case, and the measured 46.74 seconds is that floor plus about 1.7 seconds of round trips.
+At the published twenty cases the fixed path takes 4.02 seconds, exits 1, and reports errors=20 of 20.
+The dotenv candidate under the current working directory is still read, and the keyless refusal now prints all three candidates as absolute paths and says which one is under the reader's current directory.
+A key taken from a file is announced with its absolute path on stderr before anything runs, demonstrated from a directory that is not the repository and holds its own server/.env.
+The file tests/test_a_judge_that_cannot_succeed_is_not_retried.py holds 13 tests, three of which are controls: one restores the old retry loop, one requires a retryable status to still be retried, and one requires a key from the process environment not to be announced.

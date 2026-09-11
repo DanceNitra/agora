@@ -1,0 +1,6 @@
+EPJ B assigned manuscript number EPJB-S-26-00839 on 11 September 2026, and the portal lists the paper under Submissions Being Processed.
+The article type in the submission is Research rather than Review, and the portal's own reminder says colloquia and reviews are by invitation only.
+The requested editor is Ferenc Igloi rather than no request, because that field is required, and his own work is on random quantum spin chains and critical behaviour.
+The suggested reviewers entered in the form are Haiyuan Zou and Piotr Tomczak, not Gendiar and Schnack, and Zou wrote Ref. 11 while Tomczak co-authored Refs. 8 to 10 including the one that appeared in this journal.
+The cover letter names those two referees with their reasons and requests no exclusions.
+The submission is 16 pages and contains the paper, 11 references, Figs. 1 to 4, the cover letter, and the graphical abstract and supplementary material as separate items.

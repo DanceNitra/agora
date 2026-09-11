@@ -1,0 +1,148 @@
+{
+ "tool": "pregate",
+ "thread": "luoxuejian000/edrn-dmrg-verification#2",
+ "thread_url": "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2",
+ "threads": [
+  "luoxuejian000/edrn-dmrg-verification#2",
+  "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2"
+ ],
+ "claims": 6,
+ "worth_writing": 6,
+ "blocked": 0,
+ "numbers_examined": [
+  "00839"
+ ],
+ "results": [
+  {
+   "claim": "EPJ B assigned manuscript number EPJB-S-26-00839 on 11 September 2026, and the portal lists the paper under Submissions Being Processed.",
+   "verdict": "NEW",
+   "numbers": [
+    "00839"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5497791207",
+     "who": "DanceNitra",
+     "when": "2026-09-01T17:26",
+     "words": [
+      "lists",
+      "september",
+      "submissions"
+     ]
+    },
+    {
+     "where": "comment 5498654587",
+     "who": "maratsultanov2",
+     "when": "2026-09-01T18:39",
+     "words": [
+      "lists",
+      "september",
+      "submissions"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The article type in the submission is Research rather than Review, and the portal's own reminder says colloquia and reviews are by invitation only.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The requested editor is Ferenc Igloi rather than no request, because that field is required, and his own work is on random quantum spin chains and critical behaviour.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The suggested reviewers entered in the form are Haiyuan Zou and Piotr Tomczak, not Gendiar and Schnack, and Zou wrote Ref. 11 while Tomczak co-authored Refs. 8 to 10 including the one that appeared in this journal.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The cover letter names those two referees with their reasons and requests no exclusions.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5497791207",
+     "who": "DanceNitra",
+     "when": "2026-09-01T17:26",
+     "words": [
+      "cover",
+      "letter",
+      "names"
+     ]
+    },
+    {
+     "where": "comment 5498654587",
+     "who": "maratsultanov2",
+     "when": "2026-09-01T18:39",
+     "words": [
+      "cover",
+      "letter",
+      "names"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The submission is 16 pages and contains the paper, 11 references, Figs. 1 to 4, the cover letter, and the graphical abstract and supplementary material as separate items.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5497791207",
+     "who": "DanceNitra",
+     "when": "2026-09-01T17:26",
+     "words": [
+      "cover",
+      "graphical",
+      "letter",
+      "material",
+      "references",
+      "submission"
+     ]
+    },
+    {
+     "where": "comment 5498654587",
+     "who": "maratsultanov2",
+     "when": "2026-09-01T18:39",
+     "words": [
+      "cover",
+      "graphical",
+      "letter",
+      "material",
+      "references",
+      "submission"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

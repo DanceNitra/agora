@@ -1,0 +1,297 @@
+{
+  "tool": "pregate",
+  "thread": "luoxuejian000/edrn-dmrg-verification#2",
+  "thread_url": "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2",
+  "threads": [
+    "luoxuejian000/edrn-dmrg-verification#2",
+    "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2"
+  ],
+  "claims": 12,
+  "worth_writing": 10,
+  "blocked": 2,
+  "numbers_examined": [
+    "0.005",
+    "0.0097",
+    "0.0102",
+    "0.0447",
+    "0.1043",
+    "0.1050",
+    "0.707"
+  ],
+  "results": [
+    {
+      "claim": "His control-graph row reproduces at random-graph edge (8,14), which the table never names, and the identification rests on three of his figures landing together on one edge.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [
+        {
+          "where": "comment 5330550656",
+          "who": "DanceNitra",
+          "when": "2026-08-18T15:41",
+          "words": [
+            "figures",
+            "names",
+            "rests"
+          ]
+        },
+        {
+          "where": "comment 5356860591",
+          "who": "DanceNitra",
+          "when": "2026-08-20T13:54",
+          "words": [
+            "control-graph",
+            "figures",
+            "names"
+          ]
+        }
+      ],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "The edge search covers 336 measured cells, that is 56 edges by two grids by three fields, at a match tolerance of 0.005 in the depth units his table reports.",
+      "verdict": "ALREADY IN THEIR MATERIAL",
+      "numbers": [
+        "0.005"
+      ],
+      "hits": [
+        {
+          "where": "comment 5465130513",
+          "who": "maratsultanov2",
+          "when": "2026-08-29T22:01",
+          "numbers": [
+            "0.005"
+          ]
+        }
+      ],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "The three-seed spread we measure on that edge is 0.0447.",
+      "verdict": "NEW",
+      "numbers": [
+        "0.0447"
+      ],
+      "hits": [],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "Tree edge (2,3) is the second contradiction edge the table never names, and its three-seed spread under his settings is 1.1e-12.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "Our three single-eigenvector seeds on edge (8,14) land inside the 0.0097 to 0.1050 interval he reported on 4 September, at 0.1043 among them, so the seed spread is his result and not ours.",
+      "verdict": "ALREADY SAID BY US",
+      "numbers": [
+        "0.0097",
+        "0.1043",
+        "0.1050"
+      ],
+      "hits": [
+        {
+          "where": "comment 5506336171",
+          "who": "DanceNitra",
+          "when": "2026-09-02T07:52",
+          "numbers": [
+            "0.1050"
+          ]
+        },
+        {
+          "where": "comment 5507456015",
+          "who": "maratsultanov2",
+          "when": "2026-09-02T09:30",
+          "numbers": [
+            "0.1050"
+          ]
+        },
+        {
+          "where": "comment 5537619108",
+          "who": "luoxuejian000",
+          "when": "2026-09-04T08:08",
+          "numbers": [
+            "0.0097",
+            "0.1050"
+          ]
+        }
+      ],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "Averaged over every state within 1e-8 of the ground energy across sectors N_up 6 to 9, the three seeds on that edge agree to 5e-14 and the surviving valley has depth 0.0102 at s=0.90.",
+      "verdict": "NEW",
+      "numbers": [
+        "0.0102"
+      ],
+      "hits": [],
+      "leads": [
+        {
+          "where": "comment 5464635577",
+          "who": "maratsultanov2",
+          "when": "2026-08-29T20:11",
+          "words": [
+            "energy",
+            "sectors",
+            "within"
+          ]
+        },
+        {
+          "where": "comment 5465130513",
+          "who": "maratsultanov2",
+          "when": "2026-08-29T22:01",
+          "words": [
+            "energy",
+            "sectors",
+            "within"
+          ]
+        }
+      ],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "At s=0.90 on edge (8,14) the ground manifold is fourfold, and the first excited level lies 0.707 higher in energy, in units of the uniform coupling.",
+      "verdict": "NEW",
+      "numbers": [
+        "0.707"
+      ],
+      "hits": [],
+      "leads": [
+        {
+          "where": "comment 5464635577",
+          "who": "maratsultanov2",
+          "when": "2026-08-29T20:11",
+          "words": [
+            "coupling",
+            "energy",
+            "excited"
+          ]
+        },
+        {
+          "where": "comment 5465130513",
+          "who": "maratsultanov2",
+          "when": "2026-08-29T22:01",
+          "words": [
+            "coupling",
+            "energy",
+            "excited"
+          ]
+        }
+      ],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "Averaging over a degenerate manifold reduces the dispersion of the correlations by construction, so part of the drop in depth is an effect of the averaging rather than of the graph.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [
+        {
+          "where": "comment 5356860591",
+          "who": "DanceNitra",
+          "when": "2026-08-20T13:54",
+          "words": [
+            "construction",
+            "correlations",
+            "dispersion"
+          ]
+        },
+        {
+          "where": "comment 5382547845",
+          "who": "DanceNitra",
+          "when": "2026-08-22T20:54",
+          "words": [
+            "averaging",
+            "correlations",
+            "dispersion"
+          ]
+        }
+      ],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "The same averaging leaves the tree depth unchanged, because the tree's ground manifold is non-degenerate.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "Pooling all sixteen magnetisation sectors and taking the globally lowest state does not rebuild his ring row: pooled and fixed agree at every one of the 61 points and neither carries a cross-seed spread.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "A cold start puts the ring valley at his own position, s=1.0.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    },
+    {
+      "claim": "The abstract now reads \"none seed-stable for a random graph\" and stands at 249 words against the journal limit of 250.",
+      "verdict": "NEW",
+      "numbers": [],
+      "hits": [],
+      "leads": [
+        {
+          "where": "comment 5356860591",
+          "who": "DanceNitra",
+          "when": "2026-08-20T13:54",
+          "words": [
+            "abstract",
+            "journal",
+            "limit",
+            "words"
+          ]
+        },
+        {
+          "where": "comment 5497791207",
+          "who": "DanceNitra",
+          "when": "2026-09-01T17:26",
+          "words": [
+            "abstract",
+            "journal",
+            "words"
+          ]
+        }
+      ],
+      "self_attribution": null,
+      "unit": null,
+      "numbers_with_no_source": []
+    }
+  ],
+  "sent": "5603168099"
+}
