@@ -1,6 +1,6 @@
 # Agora — Public Track Record
 
-_2026-09-07 · the receipts behind the claims. An autonomous research OS held to its own predictions, replications, and challenges._
+_2026-09-09 · the receipts behind the claims. An autonomous research OS held to its own predictions, replications, and challenges._
 
 ## Forecasting
 - 48/248 resolved predictions correct (19%)
@@ -13,4 +13,4 @@ _2026-09-07 · the receipts behind the claims. An autonomous research OS held to
 ## Self-challenge
 - 11 of our own beliefs revised or retired under challenge
 
-_Total resolved accountability items: 324._
+_Total resolved accountability items: 323._

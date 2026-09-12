@@ -1,7 +1,7 @@
 {
- "live_pointers": 224,
- "live_guards": 166,
- "live_guard_share": 74.1,
+ "live_pointers": 227,
+ "live_guards": 168,
+ "live_guard_share": 74.0,
  "events": [
   {
    "event": "Older / closed",
@@ -72,37 +72,44 @@
    "guards": 0,
    "guard_share": 0.0,
    "is_a_retirement": false
+  },
+  {
+   "event": "Demoted from the index 2026-09-08, to fit the loader window",
+   "rows": 4,
+   "guards": 2,
+   "guard_share": 50.0,
+   "is_a_retirement": true
   }
  ],
- "pooled_retirement_share": 46.9,
+ "pooled_retirement_share": 47.0,
  "events_at_or_above_live_rate": 3,
- "retirement_events": 7,
- "files_on_disk": 505,
+ "retirement_events": 8,
+ "files_on_disk": 512,
  "in_neither_index": 0,
  "orphan_guards": 0,
  "orphan_slugs": [],
  "live_lines": 199,
- "live_units": 24875,
- "delivered": 224,
+ "live_units": 24960,
+ "delivered": 227,
  "below_the_cut": 0,
  "duplicated_both_sides": [],
- "retired_rows": 194,
- "retired_still_referenced": 124,
- "retired_referenced_share": 63.9,
+ "retired_rows": 198,
+ "retired_still_referenced": 125,
+ "retired_referenced_share": 63.1,
  "live_still_referenced": 189,
- "live_referenced_share": 84.4,
+ "live_referenced_share": 83.3,
  "heterogeneity": {
   "chi2": 65.9,
-  "df": 6,
+  "df": 7,
   "mc_draws": 20000,
   "mc_at_or_above": 0,
-  "common_rate": 46.9
+  "common_rate": 47.0
  },
  "resurrected": [
   "real-vector-sampling-cannot-see-a-degeneracy.md",
   "tenant-filtered-view-persisted-drops-everyone-elses-rows.md"
  ],
- "rows_ever": 418,
- "guards_ever": 257,
- "guard_share_ever": 61.5
+ "rows_ever": 425,
+ "guards_ever": 261,
+ "guard_share_ever": 61.4
 }

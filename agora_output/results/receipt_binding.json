@@ -1,0 +1,79 @@
+{
+  "fixture": "receipt_binding",
+  "bound_source": "runbook.md",
+  "unbound_source": "changelog.md",
+  "query": "what is the staging database host?",
+  "required": {
+    "S1_no_change": "VALID",
+    "S2_bound_changed": "STALE",
+    "S3_unbound_changed": "VALID",
+    "S4_semantic_noop": "STALE"
+  },
+  "iso": "2026-08-21T20:04:01Z",
+  "rows": {
+    "ledger": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "VALID",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "VALID",
+      "S6_cites_an_unobserved_source": "UNSUPPORTED"
+    },
+    "ledger+gen": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "VALID",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "STALE",
+      "S6_cites_an_unobserved_source": "UNSUPPORTED"
+    },
+    "inspeximus": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "VALID",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "VALID",
+      "S6_cites_an_unobserved_source": "UNSUPPORTED"
+    },
+    "noreceipt": {
+      "S1_no_change": "UNSUPPORTED",
+      "S2_bound_changed": "UNSUPPORTED",
+      "S3_unbound_changed": "UNSUPPORTED",
+      "S4_semantic_noop": "UNSUPPORTED",
+      "S5_returned_to_original": "UNSUPPORTED",
+      "S6_cites_an_unobserved_source": "UNSUPPORTED"
+    },
+    "_always_valid": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "VALID",
+      "S3_unbound_changed": "VALID",
+      "S4_semantic_noop": "VALID",
+      "S5_returned_to_original": "VALID",
+      "S6_cites_an_unobserved_source": "VALID"
+    },
+    "_always_stale": {
+      "S1_no_change": "STALE",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "STALE",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "STALE",
+      "S6_cites_an_unobserved_source": "STALE"
+    },
+    "_underbound": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "VALID",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "VALID",
+      "S6_cites_an_unobserved_source": "VALID"
+    },
+    "_unscoped": {
+      "S1_no_change": "VALID",
+      "S2_bound_changed": "STALE",
+      "S3_unbound_changed": "STALE",
+      "S4_semantic_noop": "STALE",
+      "S5_returned_to_original": "VALID",
+      "S6_cites_an_unobserved_source": "VALID"
+    }
+  }
+}

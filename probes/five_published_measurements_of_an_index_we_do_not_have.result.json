@@ -1,0 +1,150 @@
+{
+ "script": "the_figures_i_attributed_to_us_were_never_ours.py",
+ "now": {
+  "lines": 198,
+  "bytes": 25014,
+  "units": 24875,
+  "bpu": 1.0055879396984924,
+  "upl": 125.63131313131314,
+  "crlf": 0,
+  "non_ascii": 95,
+  "mtime": "2026-09-08 20:58"
+ },
+ "history_tail": [
+  {
+   "lines": 200,
+   "bytes": 24389,
+   "units": 24173,
+   "bpu": 1.0089355892938403,
+   "upl": 120.865,
+   "crlf": 198,
+   "non_ascii": 137,
+   "mtime": "2026-08-21 09:08",
+   "path": "MEMORY.md.bak-20260819-prewindowfit-16"
+  },
+  {
+   "lines": 207,
+   "bytes": 26000,
+   "units": 25774,
+   "bpu": 1.0087685264219757,
+   "upl": 124.512077294686,
+   "crlf": 0,
+   "non_ascii": 143,
+   "mtime": "2026-08-22 21:37",
+   "path": "MEMORY.md.bak-20260822-preindextrim"
+  },
+  {
+   "lines": 209,
+   "bytes": 27319,
+   "units": 27094,
+   "bpu": 1.0083044216431682,
+   "upl": 129.63636363636363,
+   "crlf": 209,
+   "non_ascii": 143,
+   "mtime": "2026-08-26 08:46",
+   "path": "MEMORY.md.bak-20260826-084608"
+  },
+  {
+   "lines": 224,
+   "bytes": 29061,
+   "units": 28910,
+   "bpu": 1.0052231061916292,
+   "upl": 129.0625,
+   "crlf": 224,
+   "non_ascii": 105,
+   "mtime": "2026-09-04 20:43",
+   "path": "MEMORY.md.bak-20260904-pretrim"
+  }
+ ],
+ "claims": [
+  {
+   "comment": "5495840695",
+   "date": "2026-09-01",
+   "published": {
+    "lines": 15,
+    "bytes": 2081
+   },
+   "nearest_backup": "2026-09-04 20:43",
+   "actual_lines": 224,
+   "actual_bytes": 29061,
+   "actual_bpu": 1.0052231061916292,
+   "line_ratio": 14.933333333333334
+  },
+  {
+   "comment": "5498341230",
+   "date": "2026-09-01",
+   "published": {
+    "lines": 15,
+    "bytes": 2090,
+    "units": 2070,
+    "upl": 138.0,
+    "bpu": 1.01
+   },
+   "nearest_backup": "2026-09-04 20:43",
+   "actual_lines": 224,
+   "actual_bytes": 29061,
+   "actual_bpu": 1.0052231061916292,
+   "line_ratio": 14.933333333333334
+  },
+  {
+   "comment": "5522927403",
+   "date": "2026-09-03",
+   "published": {
+    "lines": 15,
+    "units": 2070,
+    "upl": 138.0
+   },
+   "nearest_backup": "2026-09-04 20:43",
+   "actual_lines": 224,
+   "actual_bytes": 29061,
+   "actual_bpu": 1.0052231061916292,
+   "line_ratio": 14.933333333333334
+  },
+  {
+   "comment": "5533605446",
+   "date": "2026-09-03",
+   "published": {
+    "lines": 20,
+    "units": 6768
+   },
+   "nearest_backup": "2026-09-04 20:43",
+   "actual_lines": 224,
+   "actual_bytes": 29061,
+   "actual_bpu": 1.0052231061916292,
+   "line_ratio": 11.2
+  },
+  {
+   "comment": "5538716005",
+   "date": "2026-09-04",
+   "published": {
+    "lines": 21,
+    "bytes": 11132,
+    "units": 8774,
+    "upl": 417.8,
+    "bpu": 1.269
+   },
+   "nearest_backup": "2026-09-04 20:43",
+   "actual_lines": 224,
+   "actual_bytes": 29061,
+   "actual_bpu": 1.0052231061916292,
+   "line_ratio": 10.666666666666666
+  }
+ ],
+ "files_searched": 49,
+ "matches": 0,
+ "files_above_bpu_1_15": 3,
+ "real_indexes_above_bpu_1_15": 0,
+ "high_bpu_paths": [
+  "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-claude-C--Users-Danculus-agora-d58cd2cd-56c1-4dbb-973e-94c1b0a34285-scratchpad--armB\\memory\\MEMORY.md",
+  "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-claude-C--Users-Danculus-agora-d58cd2cd-56c1-4dbb-973e-94c1b0a34285-scratchpad--armC\\memory\\MEMORY.md",
+  "C:\\Users\\Danculus\\AppData\\Local\\hermes\\hermes-agent\\website\\i18n\\zh-Hans\\docusaurus-plugin-content-docs\\current\\user-guide\\features\\memory.md"
+ ],
+ "worst_line_ratio": 14.933333333333334,
+ "best_line_ratio": 10.666666666666666,
+ "verdict": "NONE_OF_THE_FIVE_DESCRIBES_OUR_INDEX",
+ "controls": {
+  "every_figure_fetched_from_its_comment": true,
+  "ground_truth_from_dated_backups": true,
+  "search_finds_the_current_file": true
+ }
+}
