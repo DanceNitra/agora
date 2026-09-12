@@ -1,0 +1,71 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe -m inspeximus.claude_code"
+          },
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe C:/Users/Danculus/agora/.codex/hooks/outbound_gate.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe C:/Users/Danculus/agora/.codex/hooks/subagent_boundary.py"
+          },
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe C:/Users/Danculus/agora/.codex/hooks/agent_budget.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe -m inspeximus.claude_code"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe C:/Users/Danculus/agora/.codex/hooks/instrument_control.py"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe -m inspeximus.claude_code"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c C:/Users/Danculus/AppData/Local/Programs/Python/Python312/python.exe -m inspeximus.claude_code"
+          }
+        ]
+      }
+    ]
+  }
+}

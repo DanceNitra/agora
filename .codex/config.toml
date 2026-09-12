@@ -1,0 +1,6 @@
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+INSPEXIMUS_AGENT_ID = "codex"
+INSPEXIMUS_DECISION_STORE = "C:/Users/Danculus/.inspeximus/mcp_memory.json"
