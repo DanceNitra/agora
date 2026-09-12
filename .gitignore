@@ -335,3 +335,37 @@ probes/.cache_marat_tat*
 probes/*marats_*
 probes/*his_importance_table*
 probes/*his_heaviest_feature*
+
+# Revisions of a collaborator's paper that he has not seen yet. The published version is CC-BY on
+# Zenodo, so the manuscript is not the secret; a draft edit made ON his paper before he has read it
+# is simply not ours to publish first.
+agora_output/edrn_guanghao_edits/
+
+# The Selenium worker that drove the EPJ B submission wizard. Never committable: edgeprofile2 is a
+# full Edge profile, 457 MB, and it holds Network/Cookies and Login Data for a logged-in Editorial
+# Manager session. It sat untracked for days, one `git add -A` away from publishing a live session.
+tools/epjb_worker/
+
+# THIS REPOSITORY IS PUBLIC. Everything below stays on disk and out of it.
+#
+# Store backups from the row-format migration: 4 MB of the brain's own memory, and nobody outside
+# needs a copy of what we remembered.
+server/*.pre-rows.bak
+
+# Internal strategy and working documents. Not secret, but publishing them is a decision the owner
+# makes deliberately rather than one a `git add` makes for him.
+MARKETING_CONTEXT.md
+agora_output/MARKETING_PLAN_*.md
+agora_output/DANCHI_*.md
+agora_output/BRIEF_*.md
+agora_output/PLAYBOOK_*.md
+agora_output/RESTART_PROMPT_*.md
+
+# Hook debug trace, rewritten on every run.
+HOOK-TRACE.log
+
+# The EPJ B submission working directory, while the paper is under review. The screenshots are of a
+# logged-in Editorial Manager session showing the account name and the manuscript, and the cover
+# letter names the suggested reviewers, which is confidential between an author and an editor.
+# Revisit after the paper is published; the build scripts can be committed on their own then.
+agora_output/edrn_submission/
