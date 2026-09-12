@@ -369,3 +369,8 @@ HOOK-TRACE.log
 # letter names the suggested reviewers, which is confidential between an author and an editor.
 # Revisit after the paper is published; the build scripts can be committed on their own then.
 agora_output/edrn_submission/
+
+# A third-party clone (coreyhaines31/marketingskills), not ours to vendor. It was committed once as
+# a gitlink by a `git add .agents`, which is a submodule reference with no submodule behind it: a
+# fresh clone gets an empty directory and no way to fill it.
+.agents/marketingskills-source/
