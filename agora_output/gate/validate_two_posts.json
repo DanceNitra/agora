@@ -1,0 +1,89 @@
+{
+ "gate_step": "1 VALIDATE",
+ "when": "2026-09-04",
+ "drafts": [
+  "public/posts/src/provenance-vs-inference.en.md",
+  "public/posts/src/supersession-footgun.en.md"
+ ],
+ "re_run_this_cycle": {
+  "v0.2 shortcut floor": {
+   "published": "97.2% over 96.0%",
+   "measured": "97.2% over 96.0%",
+   "verdict": "CONFIRMED"
+  },
+  "v0.5 shortcut floor": {
+   "published": "40.0% over 1.7%",
+   "measured": "40.0% over 1.7% (leak:id-outlier)",
+   "verdict": "CONFIRMED"
+  },
+  "string rule 204/207": {
+   "published": "98.6%, 204 of 207",
+   "measured": "content:value-echo fired 207, acc 0.98551, hits 204",
+   "verdict": "CONFIRMED"
+  }
+ },
+ "matches_a_stored_receipt_but_needs_a_model_to_re_run": {
+  "deepseek-v4-flash": {
+   "published": "138/210 = 65.7%",
+   "receipt": "138/210 = 0.65714",
+   "verdict": "MATCHES"
+  },
+  "deepseek-v4-pro": {
+   "published": "64/105 = 61.0%",
+   "receipt": "64/105 = 0.60952",
+   "verdict": "MATCHES"
+  },
+  "glm-5.2": {
+   "published": "55/90 = 61.1%",
+   "receipt": "55/90 = 0.61111",
+   "verdict": "MATCHES"
+  },
+  "non-answers": {
+   "published": "59 of 269 (30 rate-limit, 20 timeout, 9 empty)",
+   "receipt": "empty 59, pairs 269, http-429 30, TimeoutError 20, empty-or-unparseable 9",
+   "verdict": "MATCHES"
+  },
+  "graphiti/mem0 rows": {
+   "published": "86.7% / 0 of 26 / 53.3% / 46.7% CI [30.0,63.3]",
+   "receipt": "identical in echo_resistance_backends_result.json",
+   "verdict": "MATCHES"
+  },
+  "factorial cells": {
+   "published": "100.0 / 93.3 / 0.0 / 0.0 / 100",
+   "receipt": "identical in ramr_echo_factorial_result.json",
+   "verdict": "MATCHES"
+  },
+  "note": "Ollama quota is exhausted, so no model number was re-run this cycle. Each matches its stored receipt exactly."
+ },
+ "findings": [
+  {
+   "id": 1,
+   "severity": "BLOCKING",
+   "draft": "supersession-footgun",
+   "what": "The draft tells the reader to run ramr_echo_factorial.py and cites ramr_echo_factorial_result.json as the raw data. Both return HTTP 404 on github.com/DanceNitra/ramr main. Both are untracked locally.",
+   "fix": "Commit and push them to the RAMR repo, then re-check the URLs, or remove the run-it-yourself section."
+  },
+  {
+   "id": 2,
+   "severity": "BLOCKING",
+   "draft": "provenance-vs-inference",
+   "what": "The opening paragraph claims 'the gap to a recorded link is about 35 points'. That subtracts 65.7% on the v0.5 traces corpus (300 traces, hard) from 100% on the echo fixture (n=30, easy). The supersession-footgun draft names this exact subtraction as an error it retracts: 'a 35-point gap that was a subtraction across two fixtures of different difficulty'.",
+   "evidence": "echo_resistance_result.json: both arms have forget_precision 1.0, so the key is ON in both; only the guard differs (0.0 vs 1.0). The key is held constant, so the fixture cannot measure the key at all.",
+   "fix": "Drop the 35-point claim and the provenance-beats-inference framing, or do not publish this draft."
+  },
+  {
+   "id": 3,
+   "severity": "CORRECTION",
+   "draft": "provenance-vs-inference",
+   "what": "'reading nothing but the id format solved 205 of 300 traces' does not reproduce. Rebuilt the corpus deterministically with the sib-<chain_id> id scheme the comments describe: the cue lands on 204 of 300 traces, and memaudit's leak:id-outlier fires on 46.7% (140 traces) at 99.3% accuracy, null 0.1%.",
+   "caveat": "This is a reconstruction, not the original run. The original corpus no longer exists on disk, so the correct statement is 'does not reproduce', not 'the original was wrong'.",
+   "also_in": [
+    "memaudit.py:173",
+    "ramr_traces_v03_recut.py:204",
+    "README.md:76"
+   ],
+   "fix": "Replace with the measured pair, or state the number as unreproducible."
+  }
+ ],
+ "verdict": "VALIDATE FAILED. Two blocking findings. The gate does not proceed to STORM until they are resolved."
+}

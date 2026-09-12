@@ -14,10 +14,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 1
    },
-   "exercises_the_defect": false
+   "exercises_the_defect": false,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "one target linked from two segments",
@@ -30,10 +43,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 2
    },
-   "exercises_the_defect": true
+   "exercises_the_defect": true,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "one target linked from three segments",
@@ -46,10 +72,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 3
    },
-   "exercises_the_defect": true
+   "exercises_the_defect": true,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "one target reachable from two separate lines",
@@ -62,10 +101,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 2
    },
-   "exercises_the_defect": true
+   "exercises_the_defect": true,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "a slug that is a prefix of another on the same line",
@@ -78,10 +130,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 1
    },
-   "exercises_the_defect": false
+   "exercises_the_defect": false,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "a phantom pointer inside a link label",
@@ -94,10 +159,23 @@
    "expected_row_ids": [
     "alpha-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 1
    },
-   "exercises_the_defect": false
+   "exercises_the_defect": false,
+   "reaches_the_label_sabotage": false
   },
   {
    "fixture": "two targets on one line",
@@ -113,11 +191,73 @@
     "alpha-row",
     "beta-row"
    ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ],
+    "beta-row": [
+     "judged",
+     null
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ],
+    "beta-row": [
+     "judged",
+     null
+    ]
+   },
    "pointer_addressed_counts": {
     "alpha-row": 1,
     "beta-row": 1
    },
-   "exercises_the_defect": false
+   "exercises_the_defect": false,
+   "reaches_the_label_sabotage": false
+  },
+  {
+   "fixture": "an untargeted row dragged out by a targeted one it shares a segment with",
+   "entries_per_row": {
+    "alpha-row": 1,
+    "beta-row": 1
+   },
+   "row_ids": [
+    "alpha-row",
+    "beta-row"
+   ],
+   "expected_row_ids": [
+    "alpha-row",
+    "beta-row"
+   ],
+   "labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ],
+    "beta-row": [
+     "side-effect",
+     "alpha-row"
+    ]
+   },
+   "expected_labels": {
+    "alpha-row": [
+     "judged",
+     null
+    ],
+    "beta-row": [
+     "side-effect",
+     "alpha-row"
+    ]
+   },
+   "pointer_addressed_counts": {
+    "alpha-row": 1,
+    "beta-row": 1
+   },
+   "exercises_the_defect": false,
+   "reaches_the_label_sabotage": true
   }
  ],
  "checks": [
@@ -132,6 +272,11 @@
    "got": "['alpha-row'] against ['alpha-row']"
   },
   {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: one target linked twice inside one segment",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
+  },
+  {
    "check": "ONE_ENTRY_PER_ROW_ID: one target linked from two segments",
    "pass": true,
    "got": "{\"alpha-row\": 1}"
@@ -140,6 +285,11 @@
    "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target linked from two segments",
    "pass": true,
    "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: one target linked from two segments",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
   },
   {
    "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target linked from two segments",
@@ -157,6 +307,11 @@
    "got": "['alpha-row'] against ['alpha-row']"
   },
   {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: one target linked from three segments",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
+  },
+  {
    "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target linked from three segments",
    "pass": true,
    "got": "{\"alpha-row\": 3}"
@@ -170,6 +325,11 @@
    "check": "THE_ROWS_ARE_THE_RIGHT_ONES: one target reachable from two separate lines",
    "pass": true,
    "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: one target reachable from two separate lines",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
   },
   {
    "check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: one target reachable from two separate lines",
@@ -187,6 +347,11 @@
    "got": "['alpha-row'] against ['alpha-row']"
   },
   {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: a slug that is a prefix of another on the same line",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
+  },
+  {
    "check": "ONE_ENTRY_PER_ROW_ID: a phantom pointer inside a link label",
    "pass": true,
    "got": "{\"alpha-row\": 1}"
@@ -195,6 +360,11 @@
    "check": "THE_ROWS_ARE_THE_RIGHT_ONES: a phantom pointer inside a link label",
    "pass": true,
    "got": "['alpha-row'] against ['alpha-row']"
+  },
+  {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: a phantom pointer inside a link label",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None))] against [('alpha-row', ('judged', None))]"
   },
   {
    "check": "ONE_ENTRY_PER_ROW_ID: two targets on one line",
@@ -207,14 +377,49 @@
    "got": "['alpha-row', 'beta-row'] against ['alpha-row', 'beta-row']"
   },
   {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: two targets on one line",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None)), ('beta-row', ('judged', None))] against [('alpha-row', ('judged', None)), ('beta-row', ('judged', None))]"
+  },
+  {
+   "check": "ONE_ENTRY_PER_ROW_ID: an untargeted row dragged out by a targeted one it shares a segment with",
+   "pass": true,
+   "got": "{\"alpha-row\": 1, \"beta-row\": 1}"
+  },
+  {
+   "check": "THE_ROWS_ARE_THE_RIGHT_ONES: an untargeted row dragged out by a targeted one it shares a segment with",
+   "pass": true,
+   "got": "['alpha-row', 'beta-row'] against ['alpha-row', 'beta-row']"
+  },
+  {
+   "check": "THE_LABELS_ARE_THE_RIGHT_ONES: an untargeted row dragged out by a targeted one it shares a segment with",
+   "pass": true,
+   "got": "[('alpha-row', ('judged', None)), ('beta-row', ('side-effect', 'alpha-row'))] against [('alpha-row', ('judged', None)), ('beta-row', ('side-effect', 'alpha-row'))]"
+  },
+  {
    "check": "CONTROL_THE_SUITE_RAN_ITS_FIXTURES",
    "pass": true,
-   "got": "7 fixtures"
+   "got": "8 fixtures"
   },
   {
    "check": "CONTROL_AT_LEAST_TWO_FIXTURES_REACH_THE_DEFECT",
    "pass": true,
-   "got": "3 of 7 reach it: ['one target linked from two segments', 'one target linked from three segments', 'one target reachable from two separate lines']"
+   "got": "3 of 8 reach it: ['one target linked from two segments', 'one target linked from three segments', 'one target reachable from two separate lines']"
+  },
+  {
+   "check": "CONTROL_A_FIXTURE_REACHES_THE_LABEL_SABOTAGE",
+   "pass": true,
+   "got": "1 of 8 reach it: ['an untargeted row dragged out by a targeted one it shares a segment with']"
+  },
+  {
+   "check": "CONTROL_A_FIXTURE_REACHES_THE_DECISION_SABOTAGE",
+   "pass": true,
+   "got": "1 of 8 reach it: ['an untargeted row dragged out by a targeted one it shares a segment with']"
+  },
+  {
+   "check": "CONTROL_A_FIXTURE_REACHES_THE_OF_SABOTAGE",
+   "pass": true,
+   "got": "1 of 8 reach it: ['an untargeted row dragged out by a targeted one it shares a segment with']"
   }
  ],
  "all_passed": true,
@@ -223,7 +428,16 @@
   "one target linked from three segments",
   "one target reachable from two separate lines"
  ],
+ "fixtures_reaching_the_label_sabotage": [
+  "an untargeted row dragged out by a targeted one it shares a segment with"
+ ],
+ "fixtures_reaching_the_decision_sabotage": [
+  "an untargeted row dragged out by a targeted one it shares a segment with"
+ ],
+ "fixtures_reaching_the_of_sabotage": [
+  "an untargeted row dragged out by a targeted one it shares a segment with"
+ ],
  "mutations_caught": 3,
  "mutations_run": 3,
- "scope": "Synthetic index lines only. This asserts the manifest's row-id keying and the fixtures that broke it; it says nothing about whether a trim should have demoted a given row."
+ "scope": "Synthetic index lines only. This asserts the manifest's row-id keying AND the decision labels, each against a mutation that could break it; it says nothing about whether a trim should have demoted a given row in the first place."
 }

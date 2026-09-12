@@ -12,7 +12,7 @@
  "numbers_examined": [],
  "results": [
   {
-   "claim": "His published client sent our paired-write fixture over real HTTP and ten checks passed, five of them controls.",
+   "claim": "His published client sent our paired-write fixture over real HTTP and it behaved as he reported.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -22,6 +22,7 @@
      "who": "yadu9989",
      "when": "2026-09-08T03:08",
      "words": [
+      "behaved",
       "client",
       "fixture",
       "published"
@@ -33,28 +34,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "After a restarted sender resent the old record's exact bytes, the current value was still the new one.",
-   "verdict": "NEW",
-   "numbers": [],
-   "hits": [],
-   "leads": [
-    {
-     "where": "comment 18340917",
-     "who": "yadu9989",
-     "when": "2026-09-08T03:08",
-     "words": [
-      "after",
-      "bytes",
-      "sender"
-     ]
-    }
-   ],
-   "self_attribution": null,
-   "unit": null,
-   "numbers_with_no_source": []
-  },
-  {
-   "claim": "The $id inside our schema_v0 named inspeximus/schema_v0.json while the file is at research/schema_v0.json, so it returned 404.",
+   "claim": "Under his own PRAGMA journal_mode=WAL a DELETE leaves every copy of the payload in the -wal sidecar file.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -64,7 +44,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Our effective_value is value times 0.5 to the power of age over half_life with the clock reset on access, so it is time dependent and a re-emit changes the bytes under one source id.",
+   "claim": "A VACUUM does not remove the deleted payload from the -wal file.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -74,7 +54,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "His fixtures omit effective_value and our schema marks it optional, so omitting it on the wire is conformant.",
+   "claim": "A wal_checkpoint TRUNCATE on its own moves the deleted payload into the durable database file.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -84,7 +64,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "His client raises SourceConflict before any network call when the same source id is enqueued with different content.",
+   "claim": "Only a VACUUM and a checkpoint together clear the payload from both files, and secure_delete ON also clears it.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -94,7 +74,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "His receiver answers 409 for changed content under an existing id when the sender has no local record of that id.",
+   "claim": "His _claim selects only rows in state pending, so a delivered row is never resent by his client.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -104,28 +84,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "A bitemporal ledger keeps the earlier record in history, and an erasure request requires that record not to remain.",
-   "verdict": "NEW",
-   "numbers": [],
-   "hits": [],
-   "leads": [
-    {
-     "where": "comment 18340917",
-     "who": "yadu9989",
-     "when": "2026-09-08T03:08",
-     "words": [
-      "earlier",
-      "history",
-      "keeps"
-     ]
-    }
-   ],
-   "self_attribution": null,
-   "unit": null,
-   "numbers_with_no_source": []
-  },
-  {
-   "claim": "Our draft carries three operations where schema_v0 has one: superseded, retracted and erased.",
+   "claim": "The retention of a delivered row is what lets his enqueue refuse a changed payload under an existing source id offline.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -135,7 +94,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "The erasure extension is two endpoints, POST /mnemo/v0/erase and POST /mnemo/v0/still_recoverable, matching the ErasureTarget protocol inspeximus already implements.",
+   "claim": "Our deletion manifest never registered his outbox as an erasure target, although his README says retention belongs to the caller.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -145,7 +104,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Two partner fixtures answered identical erase requests and both reported an erased count of 2.",
+   "claim": "His freeze_record copies the raw source dict into writer_metadata, so a doc identifier reaches his receiver intact today.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -155,7 +114,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "The honest partner produced a complete deletion manifest and the lying partner produced an incomplete manifest naming the leaking store.",
+   "claim": "Writing a channel and principal source back into inspeximus fails because our own _check_source demands a doc key.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -165,7 +124,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "The erased count did not separate the two partners; only the post-erasure recheck did.",
+   "claim": "When a source carries both doc and principal his _normal_source keeps principal and drops the doc value while the channel still reads doc.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -175,7 +134,7 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "schema_v0 carries sources as channel and principal, and inspeximus refuses a source without a doc key because doc is what erasure resolves on.",
+   "claim": "Our erasure_v0 file carries three operations where schema_v0 has one, superseded, retracted and erased.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],
@@ -185,7 +144,27 @@
    "numbers_with_no_source": []
   },
   {
-   "claim": "Adding doc alongside channel and principal is the only schema_v1 change this proposal requires.",
+   "claim": "The two proposed endpoints are POST /mnemo/v0/erase and POST /mnemo/v0/still_recoverable.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Under GDPR Article 17(3)(b) a controller under a retention duty can lawfully refuse to erase, to the extent that duty reaches.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The schema_v0 id was a 404 because we renamed a folder on 21 July, which is seven weeks ago, and it is now fixed.",
    "verdict": "NEW",
    "numbers": [],
    "hits": [],

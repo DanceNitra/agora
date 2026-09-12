@@ -22,23 +22,30 @@ logic it was meant to test, and a sabotage that mislabelled every side-effect ro
 with exit 0 because the probe never ran the code carrying the defect. This imports the shipped
 function from tools/trim_memory_index.py.
 
-SEVEN FIXTURES, each an adversarial shape rather than a happy path: a target linked twice inside
+EIGHT FIXTURES, each an adversarial shape rather than a happy path: a target linked twice inside
 one segment; the same target reachable from two segments of one line, and from three; the same
 target reachable from two separate lines; a slug that is a prefix of another on the same line,
 which is the case the substring reader got wrong; a phantom pointer inside a link label, which must
-not become an entry; and two targets on one line, which must give two entries rather than one
-merged row.
+not become an entry; two targets on one line, which must give two entries rather than one merged
+row; and an untargeted row dragged out by a targeted one it shares a segment with, which is the
+only shape that produces a row labelled "side-effect".
 
-CONTROLS, AND THE FIRST VERSION GOT THEM WRONG IN A WAY WORTH KEEPING WRITTEN DOWN. Every fixture
-is also run through a MUTATED builder that appends per pointer instead of per row id. The first
-version then demanded that the mutation break every fixture, reported "1 of 5 mutations caught" and
-failed the run. Four of those five have no shape the old builder reads differently: `pointers()`
-returns a SET, so a target linked twice inside ONE segment gives one entry either way. The defect
-needs the same target reachable from two MOVED rows. So a fixture counts as a mutation target only
-where the two builders actually differ, which is measured per fixture rather than assumed, and a
-separate control requires at least two fixtures to reach the defect. A suite the old builder reads
-identically would otherwise pass while testing nothing, which is the shape this file exists to
-stop.
+TWO MUTATIONS, BECAUSE THE MANIFEST HAS TWO HALVES. Every fixture runs through a builder that
+appends per pointer instead of per row id, which attacks the KEYING. Every fixture also runs
+through a sabotage that labels every row "judged", which attacks the LABELS. The second was added
+after a verifier applied exactly that sabotage to the shipped function and this file passed with
+exit 0: nothing here read `decision` or `of`, and no fixture produced a side-effect row to read.
+
+A fixture counts as a mutation target only where the mutated and real builders actually differ,
+measured per fixture rather than assumed, and a control requires at least two to reach the keying
+defect and at least one to reach the label sabotage. A suite the mutation reads identically would
+otherwise pass while testing nothing, which is the shape this file exists to stop. The first
+version of the keying control got this wrong in the other direction: it demanded the mutation break
+every fixture, reported "1 of 5 mutations caught" and failed the run. That figure is a self-report,
+since the version producing it was never committed. The reason four fixtures do not reach the
+keying defect is per-fixture rather than one mechanism: `pointers()` returns a SET, which explains
+the twice-in-one-segment case, and the other three agree because each moved row carries exactly one
+pointer. The defect needs the same slug reachable from two MOVED rows.
 """
 import io
 import json
@@ -58,7 +65,19 @@ RESULT = os.path.splitext(os.path.abspath(__file__))[0] + ".result.json"
 
 
 def fixtures():
-    """(name, lines, targets, expected_row_ids)."""
+    """(name, lines, targets, expected_row_ids, expected_labels).
+
+    `expected_labels` maps each row id to (decision, of). It exists because a verifier sabotaged
+    the shipped `demote_rows` to label every row "judged" and this suite passed with exit 0: no
+    check read `decision` or `of`, and no fixture produced a side-effect row at all. The suite
+    asserted the KEYING and nothing about the LABELS, while paragraph 3 of the reply it supported
+    invited a reader to think otherwise.
+
+    A second reader then argued the side-effect path was unreachable after the row-addressed fix,
+    which would have made the gap moot. Measured instead of chosen: calling the shipped function on
+    a single segment carrying two slugs, one of them targeted, returns beta-row labelled
+    "side-effect" with `of` naming alpha-row. It is reachable, so the last fixture below builds it.
+    """
     twice = ("- [first look](alpha-row.md) and again [second look](alpha-row.md) in one segment")
     two_segments = ("- [a](alpha-row.md)" + ROW_SEP + "[a again](alpha-row.md)")
     prefix = ("- [short](alpha-row.md)" + ROW_SEP + "[long](alpha-row-extended.md)")
@@ -69,17 +88,26 @@ def fixtures():
                       + "[a third time](alpha-row.md)")
     across_lines = ["- [a](alpha-row.md)" + ROW_SEP + "[b](beta-row.md)",
                     "- [a elsewhere](alpha-row.md)"]
+    dragged = "- [a](alpha-row.md) hook and [b](beta-row.md) hook, one segment"
+    judged = ("judged", None)
     return [
-        ("one target linked twice inside one segment", [twice], {"alpha-row"}, {"alpha-row"}),
-        ("one target linked from two segments", [two_segments], {"alpha-row"}, {"alpha-row"}),
-        ("one target linked from three segments", [three_segments], {"alpha-row"}, {"alpha-row"}),
+        ("one target linked twice inside one segment", [twice], {"alpha-row"}, {"alpha-row"},
+         {"alpha-row": judged}),
+        ("one target linked from two segments", [two_segments], {"alpha-row"}, {"alpha-row"},
+         {"alpha-row": judged}),
+        ("one target linked from three segments", [three_segments], {"alpha-row"}, {"alpha-row"},
+         {"alpha-row": judged}),
         ("one target reachable from two separate lines", across_lines, {"alpha-row"},
-         {"alpha-row"}),
+         {"alpha-row"}, {"alpha-row": judged}),
         ("a slug that is a prefix of another on the same line", [prefix], {"alpha-row"},
-         {"alpha-row"}),
-        ("a phantom pointer inside a link label", [phantom], {"alpha-row"}, {"alpha-row"}),
+         {"alpha-row"}, {"alpha-row": judged}),
+        ("a phantom pointer inside a link label", [phantom], {"alpha-row"}, {"alpha-row"},
+         {"alpha-row": judged}),
         ("two targets on one line", [two_targets], {"alpha-row", "beta-row"},
-         {"alpha-row", "beta-row"}),
+         {"alpha-row", "beta-row"}, {"alpha-row": judged, "beta-row": judged}),
+        ("an untargeted row dragged out by a targeted one it shares a segment with",
+         [dragged], {"alpha-row"}, {"alpha-row", "beta-row"},
+         {"alpha-row": judged, "beta-row": ("side-effect", "alpha-row")}),
     ]
 
 
@@ -110,16 +138,76 @@ def mutated_manifest(lines, targets):
     return manifest
 
 
-def main():
-    checks, cases, exercised = [], [], []
-    survivors = 0
+def labels_of(manifest):
+    """slug -> (decision, of), the half the keying checks never look at."""
+    return {m["slug"]: (m.get("decision"), m.get("of")) for m in manifest}
 
-    for name, lines, targets, want_rows in fixtures():
+
+def everything_judged(manifest):
+    """The label sabotage: call every row judged, exactly as the defect in `main()` once did.
+
+    Only used to prove the label check can go red. It never produces a reported number.
+    """
+    return {slug: ("judged", None) for slug in labels_of(manifest)}
+
+
+def only_decision_rewritten(manifest):
+    """Sabotage ONE field: rewrite `decision`, leave `of` alone.
+
+    @pm25coder, #91188: `everything_judged` nulls `of` while it rewrites `decision`, so a fixture
+    that differs proves the suite reads A label field, not that it reads `of`. Splitting the
+    sabotage per field is what makes the two answers separable.
+    """
+    return {slug: ("judged", of) for slug, (_decision, of) in labels_of(manifest).items()}
+
+
+def only_of_nulled(manifest):
+    """Sabotage the other field: null `of`, leave `decision` alone."""
+    return {slug: (decision, None) for slug, (decision, _of) in labels_of(manifest).items()}
+
+
+def main():
+    checks, cases, exercised, label_exercised = [], [], [], []
+    decision_exercised, of_exercised = [], []
+    survivors = 0
+    label_survivors = 0
+
+    for name, lines, targets, want_rows, want_labels in fixtures():
         _, demoted, manifest, _ = demote_rows(list(lines), set(targets))
         counts = entries_per_row(manifest)
         ids = set(counts)
         one_each = all(n == 1 for n in counts.values())
         rows_right = ids == want_rows
+        got_labels = labels_of(manifest)
+        labels_right = got_labels == want_labels
+
+        # THE LABEL SABOTAGE, and the first attempt at this control could not fail. It asked
+        # whether the sabotage differs from what we expect, then called that "caught", which is the
+        # same expression twice: the check IS an equality against want_labels, so it catches the
+        # sabotage exactly when the sabotage differs. Writing a guard whose two sides are one
+        # statement is the defect this file exists to stop, in the file itself.
+        #
+        # What is actually worth measuring is whether any fixture reaches the sabotage at all. A
+        # suite where every row is legitimately judged asserts labels vacuously: mislabelling every
+        # row "judged" changes nothing it looks at. So a fixture reaches it only when it expects a
+        # row that is NOT judged, and a control below requires at least one.
+        # MEASURED AGAINST got_labels, NOT want_labels, and the difference is the whole point.
+        # @pm25coder, #91188: comparing the mutant to the EXPECTATION asks a question whose two
+        # sides come from one source, which is the defect this file exists to stop. A fixture whose
+        # manifest is missing a slug already makes `everything_judged(manifest) != want_labels`
+        # true on the key sets alone, so it was recorded as reaching the label sabotage while every
+        # label the equality reads was still "judged". Reproduced before changing it: inject a
+        # keying defect into "two targets on one line" and the old form says True, this form says
+        # False. Comparing against the artifact's own output measures only what the control is
+        # named for: did the sabotage change a label the suite reads.
+        if everything_judged(manifest) != got_labels:
+            label_exercised.append(name)
+        # PER FIELD, because the combined sabotage rewrites `decision` and nulls `of` at once and
+        # so cannot say which field is read.
+        if only_decision_rewritten(manifest) != got_labels:
+            decision_exercised.append(name)
+        if only_of_nulled(manifest) != got_labels:
+            of_exercised.append(name)
 
         # THE SAME FIXTURE THROUGH THE OLD BUILDER. Not every fixture can exercise the defect,
         # and the first version of this file scored them as if they all could: it reported "1 of 5
@@ -138,12 +226,18 @@ def main():
 
         cases.append({"fixture": name, "entries_per_row": counts,
                       "row_ids": sorted(ids), "expected_row_ids": sorted(want_rows),
+                      "labels": {k: list(v) for k, v in sorted(got_labels.items())},
+                      "expected_labels": {k: list(v) for k, v in sorted(want_labels.items())},
                       "pointer_addressed_counts": mut_counts,
-                      "exercises_the_defect": exercises})
+                      "exercises_the_defect": exercises,
+                      "reaches_the_label_sabotage": name in label_exercised})
         checks.append({"check": "ONE_ENTRY_PER_ROW_ID: %s" % name, "pass": one_each,
                        "got": json.dumps(counts, sort_keys=True)})
         checks.append({"check": "THE_ROWS_ARE_THE_RIGHT_ONES: %s" % name, "pass": rows_right,
                        "got": "%s against %s" % (sorted(ids), sorted(want_rows))})
+        checks.append({"check": "THE_LABELS_ARE_THE_RIGHT_ONES: %s" % name, "pass": labels_right,
+                       "got": "%s against %s" % (sorted(got_labels.items()),
+                                                 sorted(want_labels.items()))})
         if exercises:
             checks.append({"check": "CONTROL_THE_POINTER_ADDRESSED_BUILDER_BREAKS_IT: %s" % name,
                            "pass": mutation_caught,
@@ -159,6 +253,25 @@ def main():
     checks.append({"check": "CONTROL_AT_LEAST_TWO_FIXTURES_REACH_THE_DEFECT",
                    "pass": len(exercised) >= 2,
                    "got": "%d of %d reach it: %s" % (len(exercised), len(cases), exercised)})
+    # AND AT LEAST ONE MUST CARRY A ROW THAT IS NOT JUDGED. Without it the label assertion is
+    # vacuous: mislabelling every row "judged" would change nothing the suite reads. A verifier
+    # sabotaged the shipped function exactly that way and this file passed with exit 0.
+    checks.append({"check": "CONTROL_A_FIXTURE_REACHES_THE_LABEL_SABOTAGE",
+                   "pass": len(label_exercised) >= 1,
+                   "got": "%d of %d reach it: %s" % (len(label_exercised), len(cases),
+                                                     label_exercised)})
+    # AND EACH FIELD SEPARATELY. The combined sabotage above changes `decision` and `of` together,
+    # so it cannot distinguish "the suite reads a label" from "the suite reads `of`". These two
+    # attack one field each, so a fixture reaches them only where that field carries something a
+    # single-field rewrite would change.
+    checks.append({"check": "CONTROL_A_FIXTURE_REACHES_THE_DECISION_SABOTAGE",
+                   "pass": len(decision_exercised) >= 1,
+                   "got": "%d of %d reach it: %s" % (len(decision_exercised), len(cases),
+                                                     decision_exercised)})
+    checks.append({"check": "CONTROL_A_FIXTURE_REACHES_THE_OF_SABOTAGE",
+                   "pass": len(of_exercised) >= 1,
+                   "got": "%d of %d reach it: %s" % (len(of_exercised), len(cases),
+                                                     of_exercised)})
 
     out = {
         "probe": os.path.basename(__file__),
@@ -169,11 +282,14 @@ def main():
         "checks": checks,
         "all_passed": all(c["pass"] for c in checks),
         "fixtures_reaching_the_defect": exercised,
+        "fixtures_reaching_the_label_sabotage": label_exercised,
+        "fixtures_reaching_the_decision_sabotage": decision_exercised,
+        "fixtures_reaching_the_of_sabotage": of_exercised,
         "mutations_caught": len(exercised) - survivors,
         "mutations_run": len(exercised),
-        "scope": ("Synthetic index lines only. This asserts the manifest's row-id keying and the "
-                  "fixtures that broke it; it says nothing about whether a trim should have "
-                  "demoted a given row."),
+        "scope": ("Synthetic index lines only. This asserts the manifest's row-id keying AND the "
+                  "decision labels, each against a mutation that could break it; it says nothing "
+                  "about whether a trim should have demoted a given row in the first place."),
     }
     with io.open(RESULT, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)

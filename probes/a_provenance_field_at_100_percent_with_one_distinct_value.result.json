@@ -1,7 +1,7 @@
 {
- "measured_at": "2026-09-07T11:50:18Z",
- "records": 227398,
- "source_pct": 99.43,
+ "measured_at": "2026-09-08T19:54:17Z",
+ "records": 1291,
+ "source_pct": 0.0,
  "addressable": 0,
  "fetched": 0,
  "record_addressable": 0,
@@ -14,10 +14,10 @@
  "fetched_is_entailed": true,
  "recheckable": 0,
  "recheckable_note": "deprecated alias, kept so older scripts still read: it equals addressable, which is what it always measured",
- "full_coverage_stores": 8,
- "full_coverage_records": 226107,
- "full_coverage_distinct_sources": 8,
- "full_coverage_ratio": 3.5e-05,
+ "full_coverage_stores": 0,
+ "full_coverage_records": 0,
+ "full_coverage_distinct_sources": 0,
+ "full_coverage_ratio": null,
  "control": {
   "records": 7,
   "with_source": 7,
@@ -32,7 +32,7 @@
   "distinct_sources": 7,
   "top": [
    [
-    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmpbnek3j_r\\runbook.md",
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmp9s75syj8\\runbook.md",
     1
    ],
    [
@@ -46,7 +46,39 @@
  "unreadable": [
   [
    ".inspeximus/coding_memory.json",
-   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x92 in position 27: invalid start byte"
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/artificer.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/cartographer.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/guard_l.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc3 in position 31: invalid continuation byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/guard_r.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf0 in position 31: invalid continuation byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/king.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/priest.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc6 in position 31: invalid continuation byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/scholar.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
+  ],
+  [
+   "agora-game-server/.agent_memory/thief.json",
+   "UnicodeDecodeError: 'utf-8' codec can't decode byte 0x86 in position 98: invalid start byte"
   ]
  ],
  "per_store": [
@@ -83,182 +115,6 @@
    "ratio_over_sourced": null,
    "ratio_over_all": 0.0,
    "store": "agora-game-server/.inspeximus/coding_memory.json"
-  },
-  {
-   "records": 28340,
-   "with_source": 28340,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:artificer",
-     28340
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/artificer.json"
-  },
-  {
-   "records": 28319,
-   "with_source": 28319,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:cartographer",
-     28319
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/cartographer.json"
-  },
-  {
-   "records": 28281,
-   "with_source": 28281,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:guard_l",
-     28281
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/guard_l.json"
-  },
-  {
-   "records": 28364,
-   "with_source": 28364,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:guard_r",
-     28364
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/guard_r.json"
-  },
-  {
-   "records": 28186,
-   "with_source": 28186,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:king",
-     28186
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/king.json"
-  },
-  {
-   "records": 28362,
-   "with_source": 28362,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:priest",
-     28362
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/priest.json"
-  },
-  {
-   "records": 27996,
-   "with_source": 27996,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:scholar",
-     27996
-    ]
-   ],
-   "ratio_over_sourced": 3.6e-05,
-   "ratio_over_all": 3.6e-05,
-   "store": "agora-game-server/.agent_memory/scholar.json"
-  },
-  {
-   "records": 28259,
-   "with_source": 28259,
-   "addressable": 0,
-   "fetched": 0,
-   "fetch_failed": 0,
-   "fetch_not_tried": 0,
-   "record_addressable": 0,
-   "record_retrieved": 0,
-   "git_ref_shaped": 0,
-   "recheckable": 0,
-   "distinct_sources": 1,
-   "top": [
-    [
-     "agent:thief",
-     28259
-    ]
-   ],
-   "ratio_over_sourced": 3.5e-05,
-   "ratio_over_all": 3.5e-05,
-   "store": "agora-game-server/.agent_memory/thief.json"
   }
  ]
 }
