@@ -1,0 +1,114 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#70555",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/70555",
+ "threads": [
+  "anthropics/claude-code#70555",
+  "https://github.com/anthropics/claude-code/issues/70555"
+ ],
+ "claims": 7,
+ "worth_writing": 7,
+ "blocked": 0,
+ "numbers_examined": [
+  "0.216",
+  "0.343"
+ ],
+ "results": [
+  {
+   "claim": "A richer per-observation validity record competes for the auto-memory window rather than adding to it.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Our index today sits at 198 lines of a 200-line cap and 24,875 UTF-16 units of a 25,000-unit cap.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5461436478",
+     "who": "tonydzi",
+     "when": "2026-08-29T09:01",
+     "words": [
+      "index",
+      "lines",
+      "units",
+      "utf-16"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Headroom is 126 units and 2 lines.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "227 pointers sit inside the window, 0 outside, 0 dead.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "One entry per line scores recall@3 0.343 against 0.216 for two or three entries per line.",
+   "verdict": "NEW",
+   "numbers": [
+    "0.216",
+    "0.343"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "More pointers inside the window is not automatically better retrieval.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Keep the content fingerprint out of the always-loaded index and in the record the index points at.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5651393624",
+     "who": "kyle641320",
+     "when": "2026-09-13T05:29",
+     "words": [
+      "content",
+      "fingerprint",
+      "record"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

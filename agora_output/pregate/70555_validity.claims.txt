@@ -1,0 +1,7 @@
+A richer per-observation validity record competes for the auto-memory window rather than adding to it.
+Our index today sits at 198 lines of a 200-line cap and 24,875 UTF-16 units of a 25,000-unit cap.
+Headroom is 126 units and 2 lines.
+227 pointers sit inside the window, 0 outside, 0 dead.
+One entry per line scores recall@3 0.343 against 0.216 for two or three entries per line.
+More pointers inside the window is not automatically better retrieval.
+Keep the content fingerprint out of the always-loaded index and in the record the index points at.
