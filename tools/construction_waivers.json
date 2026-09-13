@@ -88,5 +88,12 @@
   ],
   "reason": "OPENAI_API_KEY selects the judge and CAN change a measured value, so it is disclosed rather than dismissed. The two numbers this artifact backs on DanceNitra/inspeximus#1 are timings of the refusal path, and the draft states the value both arms ran at, OPENAI_API_KEY=sk-test-not-a-real-key, beside every figure. The arms differ only in the commit, ad75c7a against 4b407a9, with the same key and the same endpoint, which is what makes the 46.74 s against 0.67 s a property of the short-circuit rather than of the key. The published 0.75 and 0.20 benchmark scores are a different matter and already carry their instrument, gpt-4o-mini at temperature 0.0, on the site.",
   "dated": "2026-09-11"
+ },
+ "drafts/edrn_guanghao_pdf_published.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-12",
+  "reason": "A 144-word status reply to co-authors. It publishes no number this project computed, so there is no runnable model to audit and the empty target set is correct rather than a miss. The one figure in it, 142 graphs, is the collaborator OWN count, verified live against his comment 5581194066 where he writes \"in 142 graphs, 84 counterexample edge pairs in total\". The two sha256 values on the linked page were recomputed from the files and match."
  }
 }
