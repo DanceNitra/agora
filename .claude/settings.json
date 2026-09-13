@@ -1,71 +1,79 @@
 {
- "hooks": {
-  "PostToolUse": [
-   {
-    "hooks": [
-     {
-      "type": "command",
-      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-     }
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/instrument_control.py\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/hooks/memory_index_receipt.py\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/outbound_gate.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/subagent_boundary.py\""
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent_budget.py\""
+          }
+        ]
+      }
     ]
-   },
-   {
-    "matcher": "Bash",
-    "hooks": [
-     {
-      "type": "command",
-      "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/instrument_control.py\""
-     }
-    ]
-   }
-  ],
-  "UserPromptSubmit": [
-   {
-    "hooks": [
-     {
-      "type": "command",
-      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-     }
-    ]
-   }
-  ],
-  "SessionStart": [
-   {
-    "hooks": [
-     {
-      "type": "command",
-      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-     }
-    ]
-   }
-  ],
-  "PreToolUse": [
-   {
-    "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
-    "hooks": [
-     {
-      "type": "command",
-      "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-     },
-     {
-      "type": "command",
-      "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/outbound_gate.py\""
-     }
-    ]
-   },
-   {
-    "matcher": "Agent|Task",
-    "hooks": [
-     {
-      "type": "command",
-      "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/subagent_boundary.py\""
-     },
-     {
-      "type": "command",
-      "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent_budget.py\""
-     }
-    ]
-   }
-  ]
- }
+  }
 }
