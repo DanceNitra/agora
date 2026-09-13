@@ -89,6 +89,13 @@ def window(text: str) -> str:
 
 
 def main() -> int:
+    # `--file <path>` measures a saved copy of the index instead of the live one. Added so a
+    # before/after of one compaction can be taken by the SAME instrument on the SAME day: the
+    # first before/after we published rested on a receipt of unknown vintage, which a reader on
+    # anthropics/claude-code#70555 correctly declined to draw a cost figure from.
+    global INDEX
+    if "--file" in sys.argv:
+        INDEX = sys.argv[sys.argv.index("--file") + 1]
     if not os.path.exists(INDEX):
         raise SystemExit(f"REFUSED: {INDEX} is absent; every check below would pass vacuously")
     raw = io.open(INDEX, "rb").read()
@@ -155,7 +162,10 @@ def main() -> int:
                "units_a_text_mode_read_reports": naive, "crlf_terminators": crlf,
                "lines_seen": seen, "units_seen": u16(win),
                "pointers_seen": len(in_win), "pointers_outside": len(out_win),
-               "headroom_units": UNIT_CAP - len(win), "headroom_lines": LINE_CAP - seen,
+               # u16, NOT len. The line printed above uses u16(win) and this one used len(win), so the
+               # receipt and the console disagree the moment the index contains one astral character.
+               # They agree today only because astral_chars is 0, which is luck rather than agreement.
+               "headroom_units": UNIT_CAP - u16(win), "headroom_lines": LINE_CAP - seen,
                "dead_pointers": missing, "outside": out_win,
                "cap_source": "measured on the wire in "
                              "the_memory_cap_is_25000_utf16_units_not_bytes.py: 25,000 UTF-16 units, "
@@ -163,9 +173,12 @@ def main() -> int:
                "layout_note": "one entry per line scores recall@3 0.343 against 0.216 for two or "
                               "three, so more pointers inside the window is NOT automatically "
                               "better -- see our-own-index-crowding-costs-6x-on-retrieval",
-               "platform": sys.platform},
+               "measured_file": INDEX, "platform": sys.platform},
               io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                   "what_our_own_index_actually_delivers.result.json"),
+                                   "what_our_own_index_actually_delivers"
+                                   + ("" if "--file" not in sys.argv else
+                                      "." + re.sub(r"[^A-Za-z0-9_.-]", "_", os.path.basename(INDEX)))
+                                   + ".result.json"),
                       "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     return 0 if all(v.values()) else 1
 
