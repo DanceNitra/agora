@@ -525,6 +525,9 @@ def _pregate_gate_impl(path, thread_spec):
                     "already went out." % (os.path.basename(f), d["blocked"]))
         runs.append(os.path.basename(f))
         seen |= set(d.get("numbers_examined") or [])
+        # The pregate's own exemption, read from its receipt rather than re-derived here: a figure
+        # the thread carries in half its comments is the thread's fingerprint, not our claim.
+        seen |= set(d.get("numbers_ignored_as_thread_fingerprints") or [])
     if not runs:
         return ("no pregate receipt for %s. Run it on the CLAIMS before the prose: "
                 "python tools/pregate.py claims.md --thread %s --archive <their files> "

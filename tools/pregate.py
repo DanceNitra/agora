@@ -499,7 +499,15 @@ def main():
         json.dump({"tool": "pregate", "thread": _short, "thread_url": _url,
                    "threads": [x for x in (_short, _url) if x], "claims": len(res),
                    "worth_writing": len(res) - bad, "blocked": bad,
-                   "numbers_examined": examined, "results": res},
+                   "numbers_examined": examined,
+                   # Figures the thread itself carries in half its comments or more: a PR number, an
+                   # issue number, a version everyone quotes. check() ignores them as fingerprints of
+                   # the thread rather than claims about the world, and until 2026-09-13 it said so
+                   # only on the console. send_approved.py then refused a letter for citing #67938,
+                   # the PR the whole thread is about, because the receipt carried no trace of the
+                   # decision. Recorded now, so the two tools read one decision.
+                   "numbers_ignored_as_thread_fingerprints": sorted(ubiquitous_numbers(thread)),
+                   "results": res},
                   io.open(out, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
         print("  written: %s" % out)
     if bad:
