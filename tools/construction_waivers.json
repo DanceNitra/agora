@@ -1,99 +1,120 @@
 {
- "_README": [
-  "Dated exceptions to the construction gate (tools/publish_gate.py). A waiver is not a way to make",
-  "a finding quiet: every one is PRINTED on every publish run with its reason and its date. If a",
-  "reason cannot be written down, the artifact is not ready to back a public number.",
-  "Keys are repo-relative paths; 'kinds' are construction_audit.py finding kinds.",
-  "UNSWEPT-KNOB is the disclosure class: an exposed env knob the published run never varied. The",
-  "waiver must either say why the knob cannot change a measured value (an output or cache location)",
-  "or state the value the published run actually used."
- ],
- "research/probes/ragdead/exp_ragdead_A.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
+  "_README": [
+    "Dated exceptions to the construction gate (tools/publish_gate.py). A waiver is not a way to make",
+    "a finding quiet: every one is PRINTED on every publish run with its reason and its date. If a",
+    "reason cannot be written down, the artifact is not ready to back a public number.",
+    "Keys are repo-relative paths; 'kinds' are construction_audit.py finding kinds.",
+    "UNSWEPT-KNOB is the disclosure class: an exposed env knob the published run never varied. The",
+    "waiver must either say why the knob cannot change a measured value (an output or cache location)",
+    "or state the value the published run actually used."
   ],
-  "reason": "RAGDEAD_OUT names the directory the result JSON is written to. A destination cannot change a measured value; there is no other knob in this file.",
-  "dated": "2026-08-08"
- },
- "research/probes/reversibility_predictability_probe.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "TE_CORPUS selects the input corpus and CAN change the numbers, so it is disclosed rather than dismissed: the published run used the default, research/probes/data/toolemu_all_toolkits.json.",
-  "dated": "2026-08-08"
- },
- "research/probes/locomo_retrieval_map.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
-  "dated": "2026-08-08"
- },
- "C:/Users/Danculus/ramr-pub/ramr_trace_export.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "TRACES sets how many chains are exported and CAN change a measured value, so it is swept rather than dismissed: ramr_traces_knob_sweep.py runs it at 50/150/300/600 and records ramr_traces_knob_sweep_result.json. The positional invariant Marat Sultanov found is 100% at every size, so it is a property of the generator and not of the sample. The published run used TRACES=300 (the corpus holds exactly 300 chains). The sweep also found a real defect the intuition would have missed -- TRACES=600 silently produced 300 -- and the export now prints a NOTE when the corpus is exhausted.",
-  "dated": "2026-08-12"
- },
- "agora_output/lab/memops/pilot.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "Scoped to the ORACLE arms only (oracle_state / oracle_evidence / oracle_evidence_neutral / oracle_current), which are the arms any public number from this file cites. Those arms build their context from the probe's own gold record (ctx_oracle_* at lines 313-367) and never call recall(), so MEMOPS_TOPK -- used solely at line 206 inside m.recall(k=TOPK), and documented at line 34 as 'the retrieval depth of the turn-level arms' -- is outside their causal path. MEMOPS_CONCURRENCY is a ThreadPoolExecutor width (line 562) and changes wall-clock, not accuracy; the observable that would catch a concurrency-induced loss is dropped rows, and the run records zero drops over 216. MEMOPS_MEM0_MODEL (line 220) selects the model for the mem0 comparison arm, which is not an oracle arm. Values as run are stated beside the numbers wherever they are quoted: TOPK=20, CONCURRENCY=8, MEM0_MODEL=glm-5.2. This waiver does NOT cover the turn-level or mem0 arms -- citing those requires sweeping TOPK first.",
-  "dated": "2026-08-18"
- },
- "C:/Users/Danculus/inspeximus-repo/probes/does_the_headline_number_depend_on_who_judges_it.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "OPENAI_API_KEY is a credential, not an experimental parameter: it selects WHO is billed, never what is measured, and the probe refuses with exit 2 when it is absent rather than silently producing a number. The degree of freedom this gate is right to worry about here is the JUDGE, and that one is swept explicitly -- five models, with the temperature recorded per model because two of them refuse 0.0 -- which is the subject of the probe rather than an undisclosed knob.",
-  "dated": "2026-08-22"
- },
- "C:/Users/Danculus/inspeximus-repo/probes/the_judge_is_not_deterministic_at_temperature_zero.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "OPENAI_API_KEY is a credential and cannot change a measured value; the probe exits 2 without it. Every knob that CAN move the number is pinned and printed beside it: judge_model gpt-4o-mini, judge_temperature 0.0, n 20, runs 30, and the fixture is committed in the file. The whole point of the probe is that the remaining variation is the model's own non-determinism, so there is no unswept parameter left to blame.",
-  "dated": "2026-08-22"
- },
- "agora_output/edrn_submission/regenerate_table2.py": {
-  "kinds": [
-   "DEAD-COUNTER-GUARD"
-  ],
-  "reason": "The guard is `d_std <= CAL['tol'] or d_thy <= CAL['tol']`, and the gate flags CAL['tol'] for never advancing. It is a tolerance: the constant side is what a tolerance is, and the moving side is d_std and d_thy, both computed from the run and both printed. The guard does fire: pointing the calibration at a wrong expected value makes it refuse, which is how the identical guard in regenerate_edge_8_14.py was exercised, and that file passes the gate clean with the same shape. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
-  "dated": "2026-09-03"
- },
- "probes/the_definitive_decomposition_of_the_8_14_disagreement.py": {
-  "kinds": [
-   "DEAD-COUNTER-GUARD"
-  ],
-  "reason": "The gate flags CONTROL['expected'] and CONTROL['tol'] for never advancing. Both are the constant side of a tolerance comparison; the moving side is the manifold-average depth computed by the run. The control was proved able to fire rather than argued: a copy with expected set to 0.077000000 instead of the agreed 0.058909125 REFUSED with exit 2 and the message 'control cell his sector gives 0.058909125 against the agreed 0.077000000'. Same shape and same reasoning as the waiver already recorded for agora_output/edrn_submission/regenerate_table2.py. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
-  "dated": "2026-09-03"
- },
- "probes/was_the_row_judged_or_did_the_window_just_end.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "AGORA_MEMORY_DIR selects WHICH store is read, so it can change every number and is disclosed rather than dismissed: the published run used the default, ~/.claude/projects/C--Users-Danculus-agora/memory, holding 26 dated copies of MEMORY.md and MEMORY_ARCHIVE.md with 11 dated sections. It cannot be swept, because the claim is about that one store's own retirement history and no second store has one. The resolved path is written into the receipt as memory_dir on every run.",
-  "dated": "2026-09-08"
- },
- "drafts/email_epjb_which_submission_route.md": {
-  "date": "2026-09-09",
-  "reason": "No artifact of ours stands behind any figure in this draft. It carries two numbers: an HTTP 404 returned by articlestatus.edpsciences.org/is/epjb/ and a journal identifier. Both were fetched directly in this session and neither is produced by code we wrote, so the construction gate has nothing to audit and refuses on an empty target set, which is its correct behaviour. The three checkable facts are verified against the live pages instead, recorded in the verify receipt."
- },
- "C:/Users/Danculus/inspeximus-repo/probes/integrity_bench_revert.py": {
-  "kinds": [
-   "UNSWEPT-KNOB"
-  ],
-  "reason": "OPENAI_API_KEY selects the judge and CAN change a measured value, so it is disclosed rather than dismissed. The two numbers this artifact backs on DanceNitra/inspeximus#1 are timings of the refusal path, and the draft states the value both arms ran at, OPENAI_API_KEY=sk-test-not-a-real-key, beside every figure. The arms differ only in the commit, ad75c7a against 4b407a9, with the same key and the same endpoint, which is what makes the 46.74 s against 0.67 s a property of the short-circuit rather than of the key. The published 0.75 and 0.20 benchmark scores are a different matter and already carry their instrument, gpt-4o-mini at temperature 0.0, on the site.",
-  "dated": "2026-09-11"
- },
- "drafts/edrn_guanghao_pdf_published.md": {
-  "kinds": [
-   "NO-ARTIFACT"
-  ],
-  "date": "2026-09-12",
-  "reason": "A 144-word status reply to co-authors. It publishes no number this project computed, so there is no runnable model to audit and the empty target set is correct rather than a miss. The one figure in it, 142 graphs, is the collaborator OWN count, verified live against his comment 5581194066 where he writes \"in 142 graphs, 84 counterexample edge pairs in total\". The two sha256 values on the linked page were recomputed from the files and match."
- }
+  "research/probes/ragdead/exp_ragdead_A.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "RAGDEAD_OUT names the directory the result JSON is written to. A destination cannot change a measured value; there is no other knob in this file.",
+    "dated": "2026-08-08"
+  },
+  "research/probes/reversibility_predictability_probe.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "TE_CORPUS selects the input corpus and CAN change the numbers, so it is disclosed rather than dismissed: the published run used the default, research/probes/data/toolemu_all_toolkits.json.",
+    "dated": "2026-08-08"
+  },
+  "research/probes/locomo_retrieval_map.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
+    "dated": "2026-08-08"
+  },
+  "C:/Users/Danculus/ramr-pub/ramr_trace_export.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "TRACES sets how many chains are exported and CAN change a measured value, so it is swept rather than dismissed: ramr_traces_knob_sweep.py runs it at 50/150/300/600 and records ramr_traces_knob_sweep_result.json. The positional invariant Marat Sultanov found is 100% at every size, so it is a property of the generator and not of the sample. The published run used TRACES=300 (the corpus holds exactly 300 chains). The sweep also found a real defect the intuition would have missed -- TRACES=600 silently produced 300 -- and the export now prints a NOTE when the corpus is exhausted.",
+    "dated": "2026-08-12"
+  },
+  "agora_output/lab/memops/pilot.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "Scoped to the ORACLE arms only (oracle_state / oracle_evidence / oracle_evidence_neutral / oracle_current), which are the arms any public number from this file cites. Those arms build their context from the probe's own gold record (ctx_oracle_* at lines 313-367) and never call recall(), so MEMOPS_TOPK -- used solely at line 206 inside m.recall(k=TOPK), and documented at line 34 as 'the retrieval depth of the turn-level arms' -- is outside their causal path. MEMOPS_CONCURRENCY is a ThreadPoolExecutor width (line 562) and changes wall-clock, not accuracy; the observable that would catch a concurrency-induced loss is dropped rows, and the run records zero drops over 216. MEMOPS_MEM0_MODEL (line 220) selects the model for the mem0 comparison arm, which is not an oracle arm. Values as run are stated beside the numbers wherever they are quoted: TOPK=20, CONCURRENCY=8, MEM0_MODEL=glm-5.2. This waiver does NOT cover the turn-level or mem0 arms -- citing those requires sweeping TOPK first.",
+    "dated": "2026-08-18"
+  },
+  "C:/Users/Danculus/inspeximus-repo/probes/does_the_headline_number_depend_on_who_judges_it.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "OPENAI_API_KEY is a credential, not an experimental parameter: it selects WHO is billed, never what is measured, and the probe refuses with exit 2 when it is absent rather than silently producing a number. The degree of freedom this gate is right to worry about here is the JUDGE, and that one is swept explicitly -- five models, with the temperature recorded per model because two of them refuse 0.0 -- which is the subject of the probe rather than an undisclosed knob.",
+    "dated": "2026-08-22"
+  },
+  "C:/Users/Danculus/inspeximus-repo/probes/the_judge_is_not_deterministic_at_temperature_zero.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "OPENAI_API_KEY is a credential and cannot change a measured value; the probe exits 2 without it. Every knob that CAN move the number is pinned and printed beside it: judge_model gpt-4o-mini, judge_temperature 0.0, n 20, runs 30, and the fixture is committed in the file. The whole point of the probe is that the remaining variation is the model's own non-determinism, so there is no unswept parameter left to blame.",
+    "dated": "2026-08-22"
+  },
+  "agora_output/edrn_submission/regenerate_table2.py": {
+    "kinds": [
+      "DEAD-COUNTER-GUARD"
+    ],
+    "reason": "The guard is `d_std <= CAL['tol'] or d_thy <= CAL['tol']`, and the gate flags CAL['tol'] for never advancing. It is a tolerance: the constant side is what a tolerance is, and the moving side is d_std and d_thy, both computed from the run and both printed. The guard does fire: pointing the calibration at a wrong expected value makes it refuse, which is how the identical guard in regenerate_edge_8_14.py was exercised, and that file passes the gate clean with the same shape. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
+    "dated": "2026-09-03"
+  },
+  "probes/the_definitive_decomposition_of_the_8_14_disagreement.py": {
+    "kinds": [
+      "DEAD-COUNTER-GUARD"
+    ],
+    "reason": "The gate flags CONTROL['expected'] and CONTROL['tol'] for never advancing. Both are the constant side of a tolerance comparison; the moving side is the manifold-average depth computed by the run. The control was proved able to fire rather than argued: a copy with expected set to 0.077000000 instead of the agreed 0.058909125 REFUSED with exit 2 and the message 'control cell his sector gives 0.058909125 against the agreed 0.077000000'. Same shape and same reasoning as the waiver already recorded for agora_output/edrn_submission/regenerate_table2.py. Recorded rather than silenced because the finding class is real and this instance is the false positive.",
+    "dated": "2026-09-03"
+  },
+  "probes/was_the_row_judged_or_did_the_window_just_end.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "AGORA_MEMORY_DIR selects WHICH store is read, so it can change every number and is disclosed rather than dismissed: the published run used the default, ~/.claude/projects/C--Users-Danculus-agora/memory, holding 26 dated copies of MEMORY.md and MEMORY_ARCHIVE.md with 11 dated sections. It cannot be swept, because the claim is about that one store's own retirement history and no second store has one. The resolved path is written into the receipt as memory_dir on every run.",
+    "dated": "2026-09-08"
+  },
+  "drafts/email_epjb_which_submission_route.md": {
+    "date": "2026-09-09",
+    "reason": "No artifact of ours stands behind any figure in this draft. It carries two numbers: an HTTP 404 returned by articlestatus.edpsciences.org/is/epjb/ and a journal identifier. Both were fetched directly in this session and neither is produced by code we wrote, so the construction gate has nothing to audit and refuses on an empty target set, which is its correct behaviour. The three checkable facts are verified against the live pages instead, recorded in the verify receipt."
+  },
+  "C:/Users/Danculus/inspeximus-repo/probes/integrity_bench_revert.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "reason": "OPENAI_API_KEY selects the judge and CAN change a measured value, so it is disclosed rather than dismissed. The two numbers this artifact backs on DanceNitra/inspeximus#1 are timings of the refusal path, and the draft states the value both arms ran at, OPENAI_API_KEY=sk-test-not-a-real-key, beside every figure. The arms differ only in the commit, ad75c7a against 4b407a9, with the same key and the same endpoint, which is what makes the 46.74 s against 0.67 s a property of the short-circuit rather than of the key. The published 0.75 and 0.20 benchmark scores are a different matter and already carry their instrument, gpt-4o-mini at temperature 0.0, on the site.",
+    "dated": "2026-09-11"
+  },
+  "drafts/edrn_guanghao_pdf_published.md": {
+    "kinds": [
+      "NO-ARTIFACT"
+    ],
+    "date": "2026-09-12",
+    "reason": "A 144-word status reply to co-authors. It publishes no number this project computed, so there is no runnable model to audit and the empty target set is correct rather than a miss. The one figure in it, 142 graphs, is the collaborator OWN count, verified live against his comment 5581194066 where he writes \"in 142 graphs, 84 counterexample edge pairs in total\". The two sha256 values on the linked page were recomputed from the files and match."
+  },
+  "drafts/agno_issue_inspeximus_cookbook.md": {
+    "kinds": [
+      "NO-ARTIFACT"
+    ],
+    "date": "2026-09-13",
+    "reason": "A 378-word tracking issue on agno-agi/agno, opened because their triage bot requires one for PR #10146. It publishes no number this project computed: the only figures are a count of files in their cookbook directory (four) and a count of asserts in the example (two), both read directly from their tree and the PR head, not produced by a probe. There is no runnable model to audit and the empty target set is correct rather than a miss. The counts are checked by the verify pass against the live repository."
+  },
+  "C:/Users/Danculus/inspeximus-repo/probes/does_a_wider_change_signature_stop_the_silent_loss.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "date": "2026-09-14",
+    "reason": "PYTEST_CURRENT_TEST is the suite's smoke switch: under pytest it drops --trials to 1 and disables the non-zero exit, so the suite does not measure sample size. Every published run was standalone with the switch unset and the trial count recorded in the receipt (30 on Windows at 2e8483a and 180fb1b, 80 on Linux 2 CPUs at 180fb1b) and stated next to each number in the article. The knob was never varied because it has one non-default value and that value is 'smoke test'."
+  },
+  "C:/Users/Danculus/inspeximus-repo/probes/what_a_concurrent_writer_is_told_against_what_the_store_keeps.py": {
+    "kinds": [
+      "UNSWEPT-KNOB"
+    ],
+    "date": "2026-09-14",
+    "reason": "PYTEST_CURRENT_TEST is the suite's smoke switch: under pytest it drops --trials to 1 and disables the non-zero exit, so the suite does not measure sample size. Every published run was standalone with the switch unset and the trial count recorded in the receipt (30 on Windows at 2e8483a and 180fb1b, 80 on Linux 2 CPUs at 180fb1b) and stated next to each number in the article. The knob was never varied because it has one non-default value and that value is 'smoke test'."
+  }
 }

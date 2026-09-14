@@ -21,6 +21,23 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "a-guard-stamped-after-the-read": {
+        "slug": "a-guard-stamped-after-the-read",
+        "title": "Twelve concurrent writers, 9 records lost out of 2,880, every one reported as stored",
+        "title_sk": "Dvanásť súbežných zapisovateľov, 9 záznamov stratených z 2 880, každý nahlásený ako uložený",
+        "desc": "A change-detection signature stamped after the read instead of before let a concurrent "
+                "writer's record vanish while the writer was told it was stored. Two causes measured and "
+                "refuted, one that held, a second call site, and a creation race that CI had been reporting "
+                "the whole time. Receipts and a deterministic test for each.",
+        "desc_sk": "Podpis zmeny opečiatkovaný po čítaní namiesto pred ním nechal zmiznúť záznam súbežného "
+                   "zapisovateľa, ktorému bolo povedané, že je uložený. Dve zmerané a vyvrátené príčiny, "
+                   "jedna, ktorá obstála, druhé miesto volania a rasa pri vytváraní, ktorú CI hlásilo celý čas. "
+                   "Receipty a deterministický test pre každú.",
+        "date": "2026-09-14", "modified": "2026-09-14",
+        "tags": "Agent memory · Concurrency · Data loss · Post-mortem · inspeximus",
+        "tags_sk": "Pamäť agentov · Súbežnosť · Strata dát · Post-mortem · inspeximus",
+        "kicker": "Post-mortem", "kicker_sk": "Post-mortem",
+    },
     "a-status-nobody-earned": {
         "slug": "a-status-nobody-earned",
         "title": "Our claims table certified five rows it had never run, and the number it "

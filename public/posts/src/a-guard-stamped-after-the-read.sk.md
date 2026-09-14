@@ -1,8 +1,13 @@
-# Dvanást súbežných zapisovateľov, 9 záznamov stratených z 2 880, každý z nich nahlásený ako uložený. Dve príčiny, ktoré sme zmerali a vyvrátili, kým tretia obstála, a štvrtá, ktorú CI našlo po vydaní opravy.
+# Dvanásť súbežných zapisovateľov, 9 záznamov stratených z 2 880, každý z nich nahlásený ako uložený. Dve príčiny, ktoré sme zmerali a vyvrátili, kým tretia obstála, a štvrtá, ktorú som po vydaní opravy pomenoval nesprávne.
 
 Vydávam pamäťové úložisko pre agentov, ktorého ponuka znie: zápis buď pristane, alebo ti povie, že
-nepristál. Dvanásť septembrových dní jeho vlastné CI tvrdilo opak a väčšinu z tých dní to nikto
-nečítal.
+nepristál. Od 1. do 13. septembra jeho vlastné CI tvrdilo opak a väčšinu z tých dní to nikto nečítal.
+
+Pravidlo, ktoré bolo porušené, je staré. Emacs, `importlib` v CPythone aj index gitu berú stat súboru
+pred čítaním, cargo si zapíše čas začiatku buildu skôr, než rustc číta zdrojáky, a git dôvod
+dokumentuje pod [racy-git](https://git-scm.com/docs/racy-git). Pravidlo som poznal a napísal som opačné poradie. Pravidlo je
+staré. Tento text pridáva meranie: dve príčiny, ktoré vyzerali správne a boli vyvrátené, tú, ktorá
+obstála, a štvrtú, ktorú som po vydaní opravy pomenoval nesprávne.
 
 Falzifikátor hneď na začiatku: spusti `probes/does_a_wider_change_signature_stop_the_silent_loss.py`
 z repozitára inspeximus na commite `2e8483a`. Beží v troch ramenách, prekladane, tridsať kôl po
@@ -18,17 +23,21 @@ widened    (pred čítaním, plus st_ino)            2 840       0
 
 ## Ako pipeline vyzeral zvonku
 
-Ôsmeho septembra workflow `tests` zlyhal v 11 z predošlých 12 behov. Jediný zelený bol `81b042f`.
-Hlavná príčina bola trápna a nesúvisiaca: jeden probe porovnával počet čistých pokusov s konštantou,
-kým kód nad ním neplatné pokusy zahadzoval, takže worker, ktorý sa na malom runneri nespustil, sa
-čítal ako stratený záznam, a hlásenie vypísalo straty ako `[0, 0, 0]` hneď vedľa zlyhania, ktoré
-ohlasovalo. To bolo opravené v `e7a0d19` a pipeline bol na dva behy zelený.
+Ôsmeho septembra workflow `tests` zlyhal v 13 behoch za sebou, raz prešiel na `81b042f` a zlyhal
+znova. Hlavná príčina bola trápna a nesúvisiaca: 8 z posledných 11 červených behov padlo na probe
+o inštalácii hookov. Ďalšie tri padli na probe zámku, ktorý porovnával počet čistých pokusov s
+konštantou, kým kód nad ním neplatné pokusy zahadzoval, takže worker, ktorý sa na runneri nespustil,
+sa čítal ako stratený záznam, a v poslednom z nich hlásenie vypísalo straty ako `[0, 0, 0]` hneď
+vedľa zlyhania, ktoré ohlasovalo. To bolo opravené v `e7a0d19`. Beh na tom commite bol zelený na
+druhý pokus. Prvý pokus stratil 1 z 84 záznamov na defekte, o ktorom je tento text, a opakovanie to
+zo zoznamu vymazalo.
 
 V tom šume bol jeden skutočný riadok: probe súbežných zapisovateľov hlásil záznam, o ktorom bolo
 zapisovateľovi povedané, že je uložený, a v úložisku nebol. Commitnutý receipt toho probe nesie ten
 istý tvar z lokálneho behu, 448 nahlásených záznamov a 1 chýbajúci. To je vlastnosť, ktorú produkt
 predáva, zlyhávajúca, v behu, ktorý nikto neotvoril, lebo predošlých desať bolo červených z iného
-dôvodu. Chronicky červený pipeline nie je pipeline s mnohými zlyhaniami. Je to pipeline bez signálu.
+dôvodu. Po desiatich červených behoch za sebou jedenásty nikto neotvorí, takže pipeline už vtedy neniesol
+žiadny signál.
 
 ## Prvá príčina, zmeraná a nesprávna: zámok
 
@@ -42,13 +51,20 @@ dôvod, takže táto hypotéza sa nabudúce overí jedným riadkom, nie dňom.
 
 Každý handle si drží podpis súboru, ktorý naposledy čítal, `(mtime_ns, size)`, a odmietne uložiť cez
 súbor, ktorého podpis sa zmenil. Dva rovnako dlhé zápisy v jednom tiku mtime by na tomto podpise
-kolidovali, a NTFS posúva mtime v krokoch 0,5 až 1,5 ms, takže kolízia je reálna. Zmerané na 1 500
-rovnako dlhých zápisoch: `(mtime_ns, size)` kolidoval 211-krát; pridanie `st_ino` alebo hashu obsahu
+kolidovali, a na tomto NTFS stroji sa mtime v tom istom receipte posúval v krokoch 0,5 až 1,5 ms, takže
+kolízia je reálna. Zmerané na 1 500
+rovnako dlhých zápisoch v receipte na `2e8483a`: `(mtime_ns, size)` kolidoval 211-krát; pridanie `st_ino` alebo hashu obsahu
 to zrazilo na 0.
 
 Tretie rameno teda podpis rozšírilo. Nestratilo nič, a nestratilo nič ani rameno, ktoré opravilo len
-poradie. Kolízie existujú a nie sú príčinou; podpis je vo vydaní nezmenený a úložisko neplatí nič za
-pole, ktoré nepotrebuje.
+poradie. Kolízie existujú a túto stratu nespôsobili. Podpis je vo vydaní nezmenený.
+
+Tá veta je užšia, než vyzerá, a nepriateľské opakovanie probe našlo jej hranu. Každý zapisovateľ v
+tejto záťaži pridáva, takže každý pristátý zápis je väčší než súbor, proti ktorému bol overený, a dva
+rôzne stavy nikdy nezdieľajú veľkosť. V tejto záťaži `(mtime_ns, size)` nemôže kolidovať inak než cez
+samotný defekt poradia, preto v opakovaní stratil aj podpis len z veľkosti 0 z 1 432 a podpis len z
+mtime 0 z 1 416. Prepisy rovnakej veľkosti v jednom tiku mtime, 1 ms na tomto NTFS a 4 ms na ext4,
+sú režim, kde by rozšírenie záležalo, a ten je tu nezmeraný.
 
 Poznámka k tým 211. Poznámky k vydaniu 2.27.1 hovorili 119. Commitnutý receipt hovorí 211 a poznámky
 hovorili 119, lebo číslo bolo napísané, nie prečítané. Záver sa nehýbe, kolízie boli vyvrátené tak či
@@ -62,35 +78,31 @@ nechal načítavajúci handle so starými záznamami pod novým podpisom. Strá�
 podpisy, nevidel zmenu a prepísal celé úložisko zo zastaraného pohľadu. JSON úložisko nevie zlučovať,
 takže záznam druhého zapisovateľa zmizol, a tomu zapisovateľovi už bolo povedané, že je uložený.
 
-Oprava je poradie. Zober podpis pred čítaním. Potom sa zmena môže vkradnúť len počas čítania, čo
+Oprava je poradie: zober podpis pred čítaním. Potom sa zmena môže vkradnúť len počas čítania, čo
 nechá uložený podpis starší než súbor, a strážca nahlási rozdiel, ktorý tam nie je. Volajúci dostane
-`StoreChangedOnDisk`, ktoré môže zopakovať. Falošné odmietnutie sa dá napraviť; tichý prepis nie.
+`StoreChangedOnDisk`, ktoré môže zopakovať. Falošné odmietnutie stojí jedno opakovanie. Tichý
+prepis stojí záznam, o ktorom nikto nevie, že chýba.
 
 ## Ako vyzerá deterministický test
 
 Rasa, ktorá stratí jeden záznam z 320, nie je test. Test, ktorý toto prišpendlí, monkeypatchne
-čítanie tak, aby druhý handle zapísal doprostred neho, a potom overí, že záznam, ktorý pristál
+čítanie prvého handlu tak, aby druhý, skutočný handle zapísal doprostred neho, a potom overí, že záznam, ktorý pristál
 počas čítania, je po uložení prvého handlu stále tam. Tri prípady: zápis počas čítania nie je
 prepísaný, neskorý handle stále uloží svoj vlastný záznam a kontrola bez konkurenčného zápisu
-zachová všetko. Na starom poradí padne zakaždým a na novom prejde zakaždým, čo je to, na čo test je.
-Probe zostáva vedľa neho kvôli číslu.
+zachová všetko. Na starom poradí padne zakaždým a na novom prejde zakaždým. Probe zostáva vedľa neho kvôli
+číslu.
 
-## Tretia inštancia, ktorú CI našlo po vydaní opravy
+## Oprava vyšla, CI stratilo ďalší záznam a ja som mu pomenoval nesprávnu príčinu
 
-Oprava vyššie vyšla ako 2.27.1 a jej poznámky varovali, že oprava pristane na nahlásenej inštancii,
-kým trieda prežije. Potom CI na runneri s 2 vCPU stratilo `w7:r0` na commite `0a26545`, so zámkom
-držaným pri každom zapisovateľovi a s poradím už opraveným. Trieda prežila o jedno volanie ďalej.
+Oprava poradia vyšla ako 2.27.1 a jej poznámky varovali, že oprava pristane na nahlásenej
+inštancii, kým trieda prežije. Potom CI na `ubuntu-latest`, ktorý GitHub dáva verejnému repozitáru
+so 4 vCPU, stratilo `w7:r0` na commite `0a26545`, so zámkom držaným pri každom zapisovateľovi a s
+poradím už opraveným.
 
-`reload()` je cesta opakovania, ktorú správa `StoreChangedOnDisk` volajúcemu odporúča. Volá opravený
-`_load_from_disk`, zlúči späť vlastné záznamy handlu a potom znova priradil čerstvý podpis: stat po
-čítaní, mimo zámku. Zápis, ktorý pristál v tom okne, nechal načítavajúci handle so záznamami spred
-zápisu pod podpisom spoza neho. Ďalšie uloženie prepísalo súbor zo zastaraného pohľadu. Ten istý
-mechanizmus, druhé miesto volania.
-
-Prečo probe hlásil 0: opakoval otvorením nového handlu, ktorý do `reload()` nikdy nevstúpi. Meral
-cestu, ktorá záznamy nestráca. CI harness opakuje tak, ako hovorí chybová správa. Pribudli dve
-ramená, ktoré opakujú cez `reload()`, a probe bežal na Linuxe pripnutý na 2 CPU, 80 kôl po
-dvanástich zapisovateľoch:
+Pri jeho hľadaní som našiel skutočný defekt. `reload()`, cesta opakovania, ktorú správa
+`StoreChangedOnDisk` odporúča, volá opravený loader cez `_merge_with_disk`, ktorý potom znova
+priradil čerstvý podpis: stat po čítaní, mimo zámku. Do probe pribudli dve ramená, ktoré opakujú
+cez `reload()`, a na ext4 pripnutom na 2 CPU, 80 kôl po dvanástich zapisovateľoch:
 
 ```
 rameno                                                  nahlásených   chýba
@@ -101,12 +113,36 @@ reload-old    (2.27.1, opakovanie cez reload(), s pečiatkou)  7 680      15
 reload-fixed  (2.27.5, pečiatka odstránená)                   7 680       0
 ```
 
-Na Windows tých istých päť ramien za 30 kôl stratilo na `reload-old` 0, preto to stôl nikdy
-nevidel. Tik mtime na ext4 na tom stroji je asi 4 ms a rasa je tam na starom poradí asi päťkrát
-častejšia (50 proti 5 na beh). 2.27.5 pečiatku odstraňuje a `reload()` opakuje vlastné zlúčenie a
-uloženie, najviac osemkrát, takže cesta zotavenia nevracia výnimku, kvôli ktorej existuje.
-Deterministický test naň používa skutočný druhý handle zapisujúci doprostred čítania v reload:
-na 2.27.4 padne, na 2.27.5 prejde a po vrátení pečiatky padne znova.
+To vyšlo ako 2.27.5, s deterministickým testom, a poznámky k vydaniu hovorili, že to CI chytilo.
+Mýlili sa a našla to overovacia pasáž nad týmto textom, tým, že čítala CI harness namiesto môjho
+opisu. Harness `reload()` nikdy nevolá. Reopenuje, ako probe. Beží na predvolenom riadkovom
+úložisku, ktorého save sa k tej istej pečiatke dostane, ale to úložisko zapisuje iba id, ktorých sa
+dotklo, a mazania odvodzuje z baseline prečítanej pri tom istom otvorení, takže zastaraný podpis
+tam susedov riadok zmazať nemôže. Zmerané na CI ceste, riadkové úložisko a reopen pri odmietnutí, s
+vrátenou pečiatkou: 0 z 7 548 stratených na 2 CPU a 0 z 7 248 na 4, kým kontrola so starým
+poradím stratila 40 a 41. Defekt v `reload()` je skutočný a opravený, a nie je to to, čo CI zasiahlo.
+
+Dve straty CI boli `w7:r0` a `w1:r0`, prvý záznam zapisovateľa obakrát, a ten tvar bol v logoch od
+prvej z nich. Probe s 8 zapisovateľmi po jednom zázname, v dvoch podmienkach, ext4 na 4 CPU, 200 kôl
+každá:
+
+```
+podmienka                                            prvých zápisov nahlásených   chýba
+súbor pri štarte zapisovateľov neexistoval                                1 600       3
+súbor existoval s jedným záznamom                                         1 600       0
+```
+
+Rasa pri vytváraní. `sqlite3.connect` vytvorí súbor skôr, než prvý commit zapíše hlavičku SQLite.
+Druhý handle, ktorý sa otvorí v tom okne, vidí súbor, ktorý existuje a nevyzerá ako riadkové
+úložisko, prečíta ho ako JSON úložisko bez záznamov, skonvertuje to nič na riadky a výsledok
+položí cez `os.replace` na cestu, mimo akéhokoľvek zámku. Prvému zapisovateľovi už bolo povedané,
+že jeho záznam je uložený. 2.27.6 tú konverziu robí pod zámkom úložiska a vnútri znova prečíta
+hlavičku, takže úložisko, ktoré medzitým vytvoril sused, sa načíta, nie nahradí: 0 z 1 600 na tom
+istom probe. Deterministický test okno reprodukuje bez časovania a na 2.27.5 padne 2 z 3.
+
+Poznámky k 2.27.5 teraz nesú opravu vedľa viet, ktoré boli nesprávne, rovnako ako poznámky k
+2.27.1 nesú tých 119. Dve vydania za sebou opravili každé niečo skutočné a každé na jednom mieste
+nesprávne opísalo vlastný dôkaz, a obakrát bol receipt, ktorý to ukázal, taký, ktorý som nečítal.
 
 ## Čo by som urobil inak
 
@@ -115,6 +151,11 @@ ktoré záznamy stratil, nie koľko, lebo „1 chýba" ma poslalo k zámku a k p
 záznamov by ukázali na handle, ktorý držal zastarané dáta. A keď za jeden deň zomrú dve hypotézy,
 napísať do poznámok k vydaniu, že zomreli, aby ďalší človek ten deň nestrávil znova. Poznámky
 k 2.27.1 to robia; tento text je dlhšia verzia.
+
+Nepriateľské opakovanie nechalo aj účet. Na Windows pri tejto záťaži asi jedno otvorenie zo sto
+vyhodí `PermissionError`, lebo loader číta súbor, kým ho sused vymieňa, a neopakuje. Ten
+zapisovateľ neuloží nič a povie to, čo je poctivá polovica ponuky, a stále je to defekt. Je ďalší na
+rade.
 
 ---
 
@@ -125,5 +166,9 @@ za rameno a kontrola, ktorá zámok odstráni) a
 DanceNitra/inspeximus na `2e8483a` alebo neskôr. Päťramenné behy sú
 `probes/does_a_wider_change_signature_stop_the_silent_loss.linux-2cpu.result.json` (Linux, 80 kôl)
 a windowsový `.result.json` na `30a734f` alebo neskôr, s
-`tests/test_a_reload_that_restamps_after_the_read_repeats_the_defect.py`. Počet CI behov je `gh run list --workflow tests`
-nad tým repozitárom, dvanásť behov končiacich na `6eee2de`.
+`tests/test_a_reload_that_restamps_after_the_read_repeats_the_defect.py`. Ramená CI cesty sú
+`.rows-linux-2cpu.result.json` a `.rows-linux-4cpu.result.json` a rasa pri vytváraní je
+`probes/is_the_first_write_of_a_fresh_handle_the_one_that_goes_missing.py` s jeho `.linux-4cpu.result.json`
+(2.27.5) a `.linux-4cpu.fixed.result.json` (2.27.6), plus
+`tests/test_a_peer_creating_the_store_is_not_migrated_over.py`, všetko na tagu `v2.27.6`. Počet CI behov je `gh run list --workflow tests`
+nad tým repozitárom, behy od 6. do 8. septembra končiace na `6eee2de`.
