@@ -1,0 +1,8 @@
+the two figures Marat quoted come from the 104-row naturalized v4nat set, TAT-Monitor native all-MiniLM-L6-v2, confusion [tn 53, fp 6; fn 1, tp 44], report of 12 July 2026
+46-row heldout: 0.905 native all-MiniLM-L6-v2, 0.930 nomic-embed-text reimplementation
+DOI 10.5281/zenodo.21326757, Sultanov and Drahos
+Jingubang compiler is Guanghao's: named in edrn-dmrg-verification#1 on 24 July; Marat's 30 July contributions line
+probes/which_fields_of_a_1644_audit_entry_the_store_already_records.py public in DanceNitra/inspeximus at v2.27.7
+2.27.6 on PyPI 2026-09-14 08:37 UTC; three gaps found against it; 2.27.7 closes them; tests fail 4 of 5 on 2.27.6
+eight-field table: six present, two partial (operation type, alternatives)
+observe() reopens on the second distinct support; both queue exits leave meta.reopened_resolved; contradictions() and check_conflict() return pairs, no recommendation
