@@ -1,0 +1,125 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#81081",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/81081",
+ "threads": [
+  "anthropics/claude-code#81081",
+  "https://github.com/anthropics/claude-code/issues/81081"
+ ],
+ "claims": 5,
+ "worth_writing": 5,
+ "blocked": 0,
+ "numbers_examined": [],
+ "numbers_ignored_as_thread_fingerprints": [],
+ "results": [
+  {
+   "claim": "folded-scalar claim does not reproduce on Claude Code CLI 2.1.272 win32: five spellings of one 168-char description, project and user tiers, 10 of 10 arrive in full, read from the request body; probes/does_a_folded_scalar_description_arrive_at_the_model.py in DanceNitra/agora",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5429763634",
+     "who": "DanceNitra",
+     "when": "2026-08-26T18:57",
+     "words": [
+      "agora",
+      "dancenitra",
+      "probes",
+      "request",
+      "win32"
+     ]
+    },
+    {
+     "where": "comment 5496074509",
+     "who": "DanceNitra",
+     "when": "2026-09-01T15:09",
+     "words": [
+      "agora",
+      "dancenitra",
+      "probes",
+      "request",
+      "win32"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "the docs give the skill listing a character budget of 1% of the context window; over budget every name is kept and descriptions drop least-used first; SLASH_COMMAND_TOOL_CHAR_BUDGET overrides it",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5308956011",
+     "who": "bcherny",
+     "when": "2026-08-16T18:17",
+     "words": [
+      "every",
+      "slash_command_tool_char_budget",
+      "window"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "42,207 tokens for 189 skills is about four times over the budget on a 1M window and twenty times over on 200k, if that figure is the on-disk total; if it is what the model received, no budget fired and it is a different loader",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "a discriminating test: set SLASH_COMMAND_TOOL_CHAR_BUDGET to a character count larger than the whole listing, change no YAML, fresh session, count again",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5496074509",
+     "who": "DanceNitra",
+     "when": "2026-09-01T15:09",
+     "words": [
+      "change",
+      "count",
+      "slash_command_tool_char_budget"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "tonydzi wrote that the two routes are indistinguishable from the author's chair; the reply credits that as his point",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5674829300",
+     "who": "tonydzi",
+     "when": "2026-09-15T04:40",
+     "words": [
+      "author",
+      "chair",
+      "indistinguishable",
+      "tonydzi"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
