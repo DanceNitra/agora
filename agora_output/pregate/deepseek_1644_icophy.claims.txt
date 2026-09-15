@@ -1,0 +1,8 @@
+three icophy rows added to probes/which_fields_of_a_1644_audit_entry_the_store_already_records.py in DanceNitra/inspeximus; all PARTIAL on 2.28.1; --mutate <row> moves each to MISSING
+landing anchor: source.observed_sha256 + witness(bind_sources=True) reports stale_at_use when the file changed; opt-in per record
+audit writer in the harness layer rather than the model layer: Claude Code hook stamps the harness as agent; receipt_signer= keeps the key out of the process; a chain with one unsigned entry fails verification on a fresh handle; the handle signs whatever the handle writes
+authorized vs recorded: with revert_authority a restore without capability returns authorization_required; revert_pubkey verifies and cannot mint; default store has no authority and restores on request; ordinary write has no authorization mark
+2.28.1: receipt chain merged across processes; a long-lived handle used to overwrite a peer's receipt on its next write; seven tests, six fail on 2.28.0
+13 consecutive red CI runs on DanceNitra/inspeximus tests workflow, ba7fd4f 2026-09-06 17:25 to 59a427f 2026-09-07 17:09, alerts on every run, cause a probe compared against a constant
+Guanghao accepted the probe offer on 2026-09-15; the reply confirms, it does not re-offer
+owner declines co-signing the whole initiative; open to signing the audit-log format section at a fixed revision
