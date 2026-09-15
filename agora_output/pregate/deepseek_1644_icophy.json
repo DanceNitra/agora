@@ -1,0 +1,245 @@
+{
+ "tool": "pregate",
+ "thread": "deepseek-ai/DeepSeek-V3#1644",
+ "thread_url": "https://github.com/deepseek-ai/DeepSeek-V3/issues/1644",
+ "threads": [
+  "deepseek-ai/DeepSeek-V3#1644",
+  "https://github.com/deepseek-ai/DeepSeek-V3/issues/1644"
+ ],
+ "claims": 8,
+ "worth_writing": 8,
+ "blocked": 0,
+ "numbers_examined": [],
+ "numbers_ignored_as_thread_fingerprints": [
+  "2026"
+ ],
+ "results": [
+  {
+   "claim": "three icophy rows added to probes/which_fields_of_a_1644_audit_entry_the_store_already_records.py in DanceNitra/inspeximus; all PARTIAL on 2.28.1; --mutate <row> moves each to MISSING",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "mutate",
+      "partial",
+      "probes",
+      "which_fields_of_a_1644_audit_entry_the_store_already_records"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "mutate",
+      "partial",
+      "probes",
+      "which_fields_of_a_1644_audit_entry_the_store_already_records"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "landing anchor: source.observed_sha256 + witness(bind_sources=True) reports stale_at_use when the file changed; opt-in per record",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "audit writer in the harness layer rather than the model layer: Claude Code hook stamps the harness as agent; receipt_signer= keeps the key out of the process; a chain with one unsigned entry fails verification on a fresh handle; the handle signs whatever the handle writes",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "entry",
+      "fails",
+      "keeps",
+      "verification"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "entry",
+      "fails",
+      "keeps",
+      "verification"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "authorized vs recorded: with revert_authority a restore without capability returns authorization_required; revert_pubkey verifies and cannot mint; default store has no authority and restores on request; ordinary write has no authorization mark",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "recorded",
+      "restores",
+      "returns",
+      "store",
+      "write"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "recorded",
+      "restores",
+      "returns",
+      "store",
+      "write"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "2.28.1: receipt chain merged across processes; a long-lived handle used to overwrite a peer's receipt on its next write; seven tests, six fail on 2.28.0",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "receipt",
+      "tests",
+      "write"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "receipt",
+      "tests",
+      "write"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "13 consecutive red CI runs on DanceNitra/inspeximus tests workflow, ba7fd4f 2026-09-06 17:25 to 59a427f 2026-09-07 17:09, alerts on every run, cause a probe compared against a constant",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "against",
+      "every",
+      "probe",
+      "tests"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "against",
+      "every",
+      "probe",
+      "tests"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Guanghao accepted the probe offer on 2026-09-15; the reply confirms, it does not re-offer",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "accepted",
+      "probe",
+      "reply"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "owner declines co-signing the whole initiative; open to signing the audit-log format section at a fixed revision",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5667163893",
+     "who": "DanceNitra",
+     "when": "2026-09-14T16:22",
+     "words": [
+      "audit-log",
+      "format",
+      "section"
+     ]
+    },
+    {
+     "where": "comment 5667263623",
+     "who": "maratsultanov2",
+     "when": "2026-09-14T16:30",
+     "words": [
+      "audit-log",
+      "format",
+      "section"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
