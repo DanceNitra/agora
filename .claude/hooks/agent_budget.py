@@ -125,7 +125,11 @@ def approval_for(quote, transcript=None):
 
 def main():
     try:
-        raw = sys.stdin.read()
+        # Bytes, decoded as UTF-8: on Windows sys.stdin decodes with the console code page
+        # (cp1250 here), so a quote with diacritics arrived mangled and never matched the
+        # transcript. Measured 2026-09-15 on "máš povolenie úplne na všetko"; every earlier
+        # approval happened to be ASCII.
+        raw = sys.stdin.buffer.read().decode("utf-8", "replace")
         d = json.loads(raw) if raw.strip() else {}
     except Exception as e:                            # noqa: BLE001
         block("agent_budget: could not read the hook payload (%r). Blocking, because a guard that "
