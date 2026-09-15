@@ -1,0 +1,84 @@
+{
+ "probe": "does_a_folded_scalar_description_arrive_at_the_model.py",
+ "when_utc": "2026-09-15T06:37:57Z",
+ "claude_version": "2.1.272 (Claude Code)",
+ "platform": "win32",
+ "claim_under_test": "anthropics/claude-code#81081, @tonydzi 2026-09-15: a `description: >` folded scalar arrives as a heading, 68 of 189 on their shelf",
+ "fixture_words": 32,
+ "listing_entries_on_wire": 22,
+ "arms": {
+  "project": {
+   "folded": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "folded-strip": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "literal": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "plain-multiline": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "quoted-control": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   }
+  },
+  "user": {
+   "folded": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "folded-strip": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "literal": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "plain-multiline": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   },
+   "quoted-control": {
+    "listed": true,
+    "description_chars": 168,
+    "outcome": "ARRIVES",
+    "description": "Audits a deploy plan for rollback gaps and names the step that cannot be undone. Use when a plan touches production data or a schema and no one has listed the reversal."
+   }
+  }
+ },
+ "tiers_differ": false,
+ "controls": {
+  "all_five_parse_to_the_same_words": true,
+  "quoted_control_arrives_on_both_tiers": true,
+  "no_preexisting_entry_name_only": true,
+  "real_profile_untouched": true
+ },
+ "elapsed_s": 2.2,
+ "verdict": "every block-scalar spelling arrives with its full text on both tiers on this build; the folded-scalar route does not reproduce here"
+}
