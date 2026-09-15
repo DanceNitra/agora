@@ -1,0 +1,9 @@
+cookbook/11_memory/integrations/ on agno main holds four external-backend examples: dakera, mem0, memori, zep.
+None of the four examples shows a stored fact being corrected, updated, superseded or deleted.
+mem0_integration.py and zep_integration.py both pass dependencies= and add_dependencies_to_context=True to Agent.
+All four existing examples construct an OpenAIChat model and so need a model key.
+inspeximus declares zero unconditional install dependencies in its wheel metadata.
+The example file on PR #10146's head deletes its store file on start and contains exactly two asserts.
+The first assert needs no key; the second sits after the Agent call and cannot run without a model key.
+PR #10146 is open and its body explains the store-delete-on-start.
+The triage bot on PR #10146 asked for a linked issue, which is why this issue exists.

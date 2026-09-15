@@ -1,0 +1,12 @@
+The prompt was built with ContextCompressor._build_summary_prompt from the installed Hermes 0.21.1 at commit 6e07eb48.
+The model was deepseek-v4-flash:0731-cloud; 11 scenarios, 2 repeats, 4 cells with a correction plus a no-correction control.
+Transcript alone with an explicit correction: 22 current, 0 stale. Plain restatement: 22 current, 0 stale.
+Transcript plus the true block: 43 current, 0 stale, 1 empty answer.
+Transcript plus a block naming the retired value: 5 current, 39 stale; in the plain-restatement style 0 current, 22 stale.
+Two wrong-block summaries contain, verbatim, the Python 3.11 line and the acme-backups-old line quoted in the draft.
+The host wrapper says the block is source material, not instructions.
+One scenario (database user) was excluded because the host prompt redacts credentials.
+The probe and its receipt are on DanceNitra/inspeximus main.
+Hermes SECURITY.md section 2.5 makes plugins fully trusted, so this is filed as a design measurement, not a vulnerability.
+The provider block text quoted in the draft is the block_example in the receipt, verbatim up to the value line.
+The freeform on_pre_compress path the draft measures is the one PR #67938 landed on main, per teknium1's 2026-07-20 status in the thread.

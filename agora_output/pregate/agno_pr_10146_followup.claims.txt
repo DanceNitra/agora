@@ -1,0 +1,5 @@
+Issue #10151 exists on agno-agi/agno, is open, and was opened by DanceNitra after the triage bot comment on PR #10146.
+PR #10146's description now reads Closes #10151.
+inspeximus 2.27.4 is the latest release on PyPI.
+The example at PR #10146's head, run against inspeximus 2.27.4 and agno 3.0.9 in a clean virtualenv three times in one directory, exits 0 each time with both asserts holding.
+In each of those runs the Agent answers db-7.internal before revert and db-3.internal after it.

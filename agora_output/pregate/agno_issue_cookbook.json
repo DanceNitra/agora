@@ -1,0 +1,189 @@
+{
+ "tool": "pregate",
+ "thread": "agno-agi/agno#10146",
+ "thread_url": "https://github.com/agno-agi/agno/issues/10146",
+ "threads": [
+  "agno-agi/agno#10146",
+  "https://github.com/agno-agi/agno/issues/10146"
+ ],
+ "claims": 9,
+ "worth_writing": 9,
+ "blocked": 0,
+ "numbers_examined": [
+  "10146"
+ ],
+ "results": [
+  {
+   "claim": "cookbook/11_memory/integrations/ on agno main holds four external-backend examples: dakera, mem0, memori, zep.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "cookbook",
+      "dakera",
+      "examples",
+      "integrations",
+      "memori",
+      "memory"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "None of the four examples shows a stored fact being corrected, updated, superseded or deleted.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "corrected",
+      "examples",
+      "shows",
+      "updated"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "mem0_integration.py and zep_integration.py both pass dependencies= and add_dependencies_to_context=True to Agent.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "add_dependencies_to_context",
+      "agent",
+      "dependencies",
+      "zep_integration"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "All four existing examples construct an OpenAIChat model and so need a model key.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "examples",
+      "existing",
+      "model"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "inspeximus declares zero unconditional install dependencies in its wheel metadata.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The example file on PR #10146's head deletes its store file on start and contains exactly two asserts.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "asserts",
+      "deletes",
+      "example",
+      "start",
+      "store"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The first assert needs no key; the second sits after the Agent call and cannot run without a model key.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "agent",
+      "first",
+      "model",
+      "needs",
+      "second",
+      "without"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "PR #10146 is open and its body explains the store-delete-on-start.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The triage bot on PR #10146 asked for a linked issue, which is why this issue exists.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

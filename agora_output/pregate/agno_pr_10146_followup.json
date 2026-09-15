@@ -1,0 +1,102 @@
+{
+ "tool": "pregate",
+ "thread": "agno-agi/agno#10146",
+ "thread_url": "https://github.com/agno-agi/agno/issues/10146",
+ "threads": [
+  "agno-agi/agno#10146",
+  "https://github.com/agno-agi/agno/issues/10146"
+ ],
+ "claims": 5,
+ "worth_writing": 5,
+ "blocked": 0,
+ "numbers_examined": [
+  "10146",
+  "10151"
+ ],
+ "results": [
+  {
+   "claim": "Issue #10151 exists on agno-agi/agno, is open, and was opened by DanceNitra after the triage bot comment on PR #10146.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146",
+    "10151"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "PR #10146's description now reads Closes #10151.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146",
+    "10151"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "inspeximus 2.27.4 is the latest release on PyPI.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The example at PR #10146's head, run against inspeximus 2.27.4 and agno 3.0.9 in a clean virtualenv three times in one directory, exits 0 each time with both asserts holding.",
+   "verdict": "NEW",
+   "numbers": [
+    "10146"
+   ],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "against",
+      "asserts",
+      "clean",
+      "directory",
+      "example",
+      "inspeximus"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "In each of those runs the Agent answers db-7.internal before revert and db-3.internal after it.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5439572991",
+     "who": "DanceNitra",
+     "when": "2026-09-13T10:44",
+     "words": [
+      "agent",
+      "before",
+      "internal",
+      "revert"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

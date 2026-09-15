@@ -1,0 +1,193 @@
+{
+ "tool": "pregate",
+ "thread": "anthropics/claude-code#70555",
+ "thread_url": "https://github.com/anthropics/claude-code/issues/70555",
+ "threads": [
+  "anthropics/claude-code#70555",
+  "https://github.com/anthropics/claude-code/issues/70555"
+ ],
+ "claims": 9,
+ "worth_writing": 9,
+ "blocked": 0,
+ "numbers_examined": [],
+ "results": [
+  {
+   "claim": "Adding one line to the memory index took it to 184 lines and 25,149 UTF-16 units; the loader window held 180 lines and 4 pointers fell outside it.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5461436478",
+     "who": "tonydzi",
+     "when": "2026-08-29T09:01",
+     "words": [
+      "adding",
+      "units",
+      "utf-16"
+     ]
+    },
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "loader",
+      "pointers",
+      "units",
+      "utf-16"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "One of the 4 omitted pointers was public-repo-anon-git-identity.md, the record of which git identity is used on public repositories (SUPERSEDED 2026-07-25: a named identity).",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "After compaction the index is 126 lines, 18,867 UTF-16 units, 143 pointers, 0 outside the window.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "pointers",
+      "units",
+      "utf-16"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "78 lines carrying 98 distinct pointers moved from the index to MEMORY_ARCHIVE.md today; 33 pointers came back when the three dropped sections were restored; 208 - 98 + 33 = 143.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "carrying",
+      "pointers",
+      "three"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "probes/what_our_own_index_actually_delivers.py accepts --file and both receipts are committed in DanceNitra/agora.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "agora",
+      "probes",
+      "what_our_own_index_actually_delivers"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "An earlier repair of the index had dropped three whole sections (inspeximus, Benchmarks / laws, Collaborations / projects), 33 pointers, which no loader receipt can see; they were restored from a same-day backup.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5461436478",
+     "who": "tonydzi",
+     "when": "2026-08-29T09:01",
+     "words": [
+      "dropped",
+      "three",
+      "whole"
+     ]
+    },
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "loader",
+      "pointers",
+      "three"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The before file has 184 CRLF line endings, so 184 of its 25,149 UTF-16 units are carriage returns; the after file has 0.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "hooks/memory_index_receipt.py is a SessionStart hook on DanceNitra/agora main that prints the pointers outside the loader window by name and prints nothing when nothing was cut; it loads none of them.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5652117984",
+     "who": "DanceNitra",
+     "when": "2026-09-13T08:06",
+     "words": [
+      "agora",
+      "loader",
+      "loads",
+      "pointers"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "It has 7 tests in tests/test_memory_index_receipt_hook.py and two mutation controls were run: a CR-blind read fails 2 tests, a window that ignores the unit cap fails 3.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}
