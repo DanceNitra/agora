@@ -100,6 +100,13 @@ def approval_for(quote, transcript=None):
                 msg = r.get("message") or {}
                 if msg.get("role") == "user" and _origin_kind(r) == "human":
                     human.append((_ts(r.get("timestamp")), _text_of(msg)))
+                # A message the owner types while a turn is running is recorded as a queue
+                # operation, not as a user message: {"type": "queue-operation", "operation":
+                # "enqueue", "content": "..."}. Nothing but the person at the keyboard writes
+                # one. Measured 2026-09-15: a mid-turn approval was invisible to this reader.
+                elif (r.get("type") == "queue-operation" and r.get("operation") == "enqueue"
+                      and isinstance(r.get("content"), str)):
+                    human.append((_ts(r.get("timestamp")), r["content"]))
 
         hits = [(t, txt) for t, txt in human if want and want in _norm(txt)]
         if not hits:
