@@ -1,8 +1,11 @@
 # CURRENT STATE — pointer
 
-**Latest handoff: `HANDOFF_2026-08-06.md`** (inbox 100 -> 0; board edited to drop the retrieval axis;
-5 GitHub comments out incl. one public retraction; 4 claims killed at the gate, 1 got stronger; the
-swarm's five silent organs traced to a write path that is never called).
+**Latest handoff: `HANDOFF_2026-09-16_session.md`** (inspeximus 2.36.1 to 2.38.0 shipped; the
+chain head outside the store closes the agmi truncation cell; agmi PR #1 OPEN, watch for the reply;
+four decisions to write to inspeximus after the restart; brain and dungeon down while UnrealEditor
+holds :8000).
+
+Earlier: `HANDOFF_2026-09-09_session.md`, `HANDOFF_2026-09-08_session.md`, `HANDOFF_2026-08-06.md`.
 
 ---
 
