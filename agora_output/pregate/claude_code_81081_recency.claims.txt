@@ -1,0 +1,2 @@
+The 2026-08-26 seeded run on CLI 2.1.246 swept the usage-count ratio between a year-stale half and a seconds-old half of the fixture, and the side that kept its descriptions flipped between a 5x and a 10x count ratio.
+tonydzi's nsr (3 uses, last 2026-08-04) and skill-forge (2 uses, 2026-07-27) kept their text while one-use skills last used 2026-07-07 to 2026-08-30 lost it.
