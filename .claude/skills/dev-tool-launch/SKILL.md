@@ -123,6 +123,27 @@ hostile ones, for the benefit of the readers; open source is the go-to-market fo
 the paid tier is the enterprise set (SSO, audit logs, disaster recovery, SLA); sell with a demo,
 never a deck; "documentation is marketing" and a feature is not done until its doc is.
 
+## What the GTM talk adds (Jeanne DeWitt Grosser, Vercel/Stripe; RmnWHz8HD74, read in full)
+
+- Buyers buy to avoid pain or reduce risk about four times as often as to gain upside (she gives
+  it as a round-number stat, not a measurement). "Here is how you will be better than your
+  competitors" sells; "here is the future we enable" sells only to other founders. For inspeximus
+  that is the compliance and evidence story, written as the risk the buyer avoids (an auditor
+  they cannot answer, a DSAR they cannot prove), not as the future of agent memory.
+- Add value at every touchpoint whether or not they buy: Vercel opens with the prospect's own
+  Core Web Vitals against peers. Ours is "run the probe on your own store" and "verify our
+  transparency log without trusting us"; each page must hand the reader something they keep.
+- Larger customers refuse generic docs and ask for the blueprint for their setup ("every
+  marketplace runs on Stripe, tell me the best way to set up a marketplace"). One worked example
+  per adapter, each runnable, is that blueprint. Docs stop at install; blueprints start there.
+- Segmentation: three attributes, no more, that predict who buys and how much. For us: the
+  framework they run (adapter), whether a regulator or auditor can reach them (EU high-risk,
+  regulated industry), and whether a person's data is in the memory (DSAR exposure).
+- Discovery: listen more than half the time; answer a question with a question about the question
+  before solving. Applies to every issue and thread reply: the measurement they need, not ours.
+- Sales as R&D: every conversation is signal for the roadmap. Our threads already work this way
+  (#82056 became a probe; agmi became a PR).
+
 ## Where the transcripts live
 
 `agora_output/study/videos.jsonl.gz` (deduplicated, 12 videos, 102 KB) with an index in
