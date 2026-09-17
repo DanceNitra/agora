@@ -1,4 +1,4 @@
-# Your delete() returned OK. Are the bytes still on disk?
+# We deleted one record from five AI memory stores. Two still had it on disk.
 
 We stored a record in five agent-memory stores, deleted it through each store's own API, ran the compaction each store exposes, and searched the raw files. On one machine on 17 September 2026, with chromadb 1.1.1, qdrant-client 1.18.0 in local mode, mem0ai 2.0.11, lancedb 0.30.0 and inspeximus 2.24.0, two of the five still held the record's bytes. All five delete calls returned success. Both cases are documented: mem0 keeps a history log by design, and Chroma keeps the text in its write-ahead log until 1,000 operations pass. A second record that nobody deleted stayed in every store, which is how we know an "absent" means the store deleted one record rather than everything. The check is [one file](https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py). It runs on the backends you have installed, names the file that still holds the bytes, and reports on your versions.
 
