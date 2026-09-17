@@ -380,3 +380,7 @@ agora_output/episodes/**/*.m4a
 agora_output/episodes/**/*.mp3
 agora_output/episodes/**/*.wav
 agora_output/episodes/**/cover.png
+
+# A third-party bundle (sergebulaev/linkedin-skills, MIT), read in full on 2026-09-17 and kept as the
+# reference behind .claude/skills/linkedin/. Not ours to vendor; the adapted skill points into it.
+.agents/linkedin-skills-source/

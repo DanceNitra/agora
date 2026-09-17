@@ -19,4 +19,7 @@ Two caveats if you run something similar. LanceDB reads absent only after Table.
 The check is one file and only tests the backends you have installed:
 https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py
 
+Full write-up with every vendor's own statement, the GDPR and NIST references and the Ghost Vectors numbers:
+https://dancenitra.github.io/agora/public/posts/verify-agent-memory-deletion.html
+
 If you would rather listen than read, the same investigation is a podcast episode: https://open.spotify.com/episode/7khBL2ppx1uTfsY9UtuLMJ
