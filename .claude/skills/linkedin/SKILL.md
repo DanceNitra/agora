@@ -33,8 +33,14 @@ from it before drafting; do not recall it. This skill says what Agora changes.
    none, not "one per 100 words".
 3. **Tier 0 only. The owner pastes.** No Publora key, no `LINKEDIN_SKILLS_CUSTOM_POSTER`, no
    auto-publish. Deliver the post body, the first comment (with the links), the posting window and
-   the reply plan. The Apify read layer is a spend; it needs a `BUDGET:` line and the owner's words
-   before the first token is set.
+   the reply plan.
+   **Read with the browser first; Apify only for what a browser cannot do.** Owner, 2026-09-17,
+   angry: "Nemíňaj kredity na to, že sa pozrieš cez Apify. Máš prístup k browserom." A profile
+   headline, one post's text, one comment thread, a like count: open the page in the built-in
+   browser (`mcp__Claude_Browser__navigate` + `get_page_text`) or ask him to look. Apify is for
+   bulk reads only: a full comment tree for a sweep, the engager roster of a post, his recent
+   comments across posts. Every Apify call is a spend; say what it fetches and why the browser
+   cannot before running it.
 4. **Links in the first comment**, never in the body (0.4 to 0.6x reach in the bundle's data).
    The first comment carries the article, then the episode, then the probe. Zero hashtags.
 5. **Google developer style still governs the sentence**: lead with the answer, one idea per
