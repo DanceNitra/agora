@@ -74,3 +74,21 @@ repos put in their AGENTS.md files" (156). A number, a subject doing a thing, a 
 4. Write the SEO title, the H1, the Reddit title, the episode title and the X hook from the
    survivors, each to its own constraint above.
 5. Show the owner three per surface with their scores. He picks. Nothing renders before that.
+
+## Cover art prompts for GPT Image (2 / 2.5), from OpenAI's own guide, read 2026-09-17
+
+Sources: developers.openai.com/api/docs/guides/image-prompting and the cookbook
+"GPT Image Generation Models Prompting Guide". Rules as stated there:
+- Order: scene, subject, details, constraints, in labelled sections. Decide the result first.
+- "Name materials, lighting, colors, and the visual medium." Say "photorealistic" when you want it.
+  Specify scale, atmosphere and colour; a mood word alone does nothing.
+- Text: put the exact words in quotation marks, say where they sit and in what typography, spell an
+  unusual word letter by letter, then "ask for no extra text" and check the spelling in the output.
+  Use `quality="high"` when the image carries text.
+- Size is a parameter, never a sentence. gpt-image-2: both edges multiples of 16, at most
+  8,294,400 pixels, so a square cover is 2880 x 2880 (Spotify accepts 1400 to 3000 square).
+- Describe framing and texture with photography language (lens, light, surface), not "4K" or
+  "masterpiece". For iteration: pass the previous output back and "change only X".
+- The restrained typographic prompt of 2026-09-17 was rejected by the owner ("hovno"): for a
+  podcast cover he wants a cinematic scene that tells the episode's story, with the title set
+  inside it, not a product-page card. Restraint stays for the storefront pages, not for covers.
