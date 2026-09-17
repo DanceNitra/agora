@@ -193,6 +193,10 @@ OUT_OF_REPO_WAIVERS = {
     "C:/Users/Danculus/inspeximus-repo/probes/does_the_headline_number_depend_on_who_judges_it.py",
     "C:/Users/Danculus/inspeximus-repo/probes/the_judge_is_not_deterministic_at_temperature_zero.py",
     "agora_output/lab/memops/pilot.py",   # repo-relative but under .gitignore's agora_output/lab/
+    # Added 2026-09-14 for the guard-stamped-after-the-read post, pinned here 2026-09-17. They sat
+    # unpinned for three days because the server-tests workflow had not run on main since 09-06.
+    "C:/Users/Danculus/inspeximus-repo/probes/does_a_wider_change_signature_stop_the_silent_loss.py",
+    "C:/Users/Danculus/inspeximus-repo/probes/what_a_concurrent_writer_is_told_against_what_the_store_keeps.py",
 }
 
 
@@ -207,11 +211,16 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
     for path, w in data.items():
         if path.startswith("_"):
             continue
-        # FOUR WAIVERS NAME FILES THAT ARE NOT IN THIS REPOSITORY, so no checkout can resolve
-        # them and this assertion could only ever hold on the one machine that has them. Three are
-        # absolute paths into sibling repositories; the fourth is repo-relative but sits under
+        # SIX WAIVERS NAME FILES THAT ARE NOT IN THIS REPOSITORY, so no checkout can resolve
+        # them and this assertion could only ever hold on the one machine that has them. Five are
+        # absolute paths into sibling repositories; the sixth is repo-relative but sits under
         # agora_output/lab/, which .gitignore excludes. The first version of this exception keyed on
         # "absolute path" and missed the ignored one, which is why CI failed a second time.
+        #
+        # A waiver keyed by a file under drafts/ is a third shape and is refused outright below:
+        # drafts/ is gitignored, so it can never resolve, and publish_gate keys waivers by the
+        # AUDITED ARTIFACT, so a draft-keyed entry is never read by the gate at all. Three such
+        # entries sat in the file from 09-09 to 09-17 and waived nothing.
         #
         # They are listed by name rather than detected, so the set is identical in every
         # environment and a fifth cannot appear quietly. The real fix is to move them to the waiver
@@ -220,6 +229,9 @@ def test_waivers_point_at_files_that_exist_and_still_have_the_finding():
         if path in OUT_OF_REPO_WAIVERS:
             seen_out_of_repo.add(path)
             continue
+        assert not path.startswith("drafts/"), (
+            f"waiver for {path}: the gate keys waivers by the audited artifact, never by the draft, "
+            "so this entry waives nothing. Record the empty-target reason in the verify receipt.")
         p = ROOT / path
         assert p.exists(), f"waiver for {path} but the file is gone -- remove the waiver"
         kinds = {f.kind for f in ca.audit(p)}

@@ -78,10 +78,6 @@
     "reason": "AGORA_MEMORY_DIR selects WHICH store is read, so it can change every number and is disclosed rather than dismissed: the published run used the default, ~/.claude/projects/C--Users-Danculus-agora/memory, holding 26 dated copies of MEMORY.md and MEMORY_ARCHIVE.md with 11 dated sections. It cannot be swept, because the claim is about that one store's own retirement history and no second store has one. The resolved path is written into the receipt as memory_dir on every run.",
     "dated": "2026-09-08"
   },
-  "drafts/email_epjb_which_submission_route.md": {
-    "date": "2026-09-09",
-    "reason": "No artifact of ours stands behind any figure in this draft. It carries two numbers: an HTTP 404 returned by articlestatus.edpsciences.org/is/epjb/ and a journal identifier. Both were fetched directly in this session and neither is produced by code we wrote, so the construction gate has nothing to audit and refuses on an empty target set, which is its correct behaviour. The three checkable facts are verified against the live pages instead, recorded in the verify receipt."
-  },
   "C:/Users/Danculus/inspeximus-repo/probes/integrity_bench_revert.py": {
     "kinds": [
       "UNSWEPT-KNOB"
@@ -89,32 +85,18 @@
     "reason": "OPENAI_API_KEY selects the judge and CAN change a measured value, so it is disclosed rather than dismissed. The two numbers this artifact backs on DanceNitra/inspeximus#1 are timings of the refusal path, and the draft states the value both arms ran at, OPENAI_API_KEY=sk-test-not-a-real-key, beside every figure. The arms differ only in the commit, ad75c7a against 4b407a9, with the same key and the same endpoint, which is what makes the 46.74 s against 0.67 s a property of the short-circuit rather than of the key. The published 0.75 and 0.20 benchmark scores are a different matter and already carry their instrument, gpt-4o-mini at temperature 0.0, on the site.",
     "dated": "2026-09-11"
   },
-  "drafts/edrn_guanghao_pdf_published.md": {
-    "kinds": [
-      "NO-ARTIFACT"
-    ],
-    "date": "2026-09-12",
-    "reason": "A 144-word status reply to co-authors. It publishes no number this project computed, so there is no runnable model to audit and the empty target set is correct rather than a miss. The one figure in it, 142 graphs, is the collaborator OWN count, verified live against his comment 5581194066 where he writes \"in 142 graphs, 84 counterexample edge pairs in total\". The two sha256 values on the linked page were recomputed from the files and match."
-  },
-  "drafts/agno_issue_inspeximus_cookbook.md": {
-    "kinds": [
-      "NO-ARTIFACT"
-    ],
-    "date": "2026-09-13",
-    "reason": "A 378-word tracking issue on agno-agi/agno, opened because their triage bot requires one for PR #10146. It publishes no number this project computed: the only figures are a count of files in their cookbook directory (four) and a count of asserts in the example (two), both read directly from their tree and the PR head, not produced by a probe. There is no runnable model to audit and the empty target set is correct rather than a miss. The counts are checked by the verify pass against the live repository."
-  },
   "C:/Users/Danculus/inspeximus-repo/probes/does_a_wider_change_signature_stop_the_silent_loss.py": {
     "kinds": [
       "UNSWEPT-KNOB"
     ],
-    "date": "2026-09-14",
+    "dated": "2026-09-14",
     "reason": "PYTEST_CURRENT_TEST is the suite's smoke switch: under pytest it drops --trials to 1 and disables the non-zero exit, so the suite does not measure sample size. Every published run was standalone with the switch unset and the trial count recorded in the receipt (30 on Windows at 2e8483a and 180fb1b, 80 on Linux 2 CPUs at 180fb1b) and stated next to each number in the article. The knob was never varied because it has one non-default value and that value is 'smoke test'."
   },
   "C:/Users/Danculus/inspeximus-repo/probes/what_a_concurrent_writer_is_told_against_what_the_store_keeps.py": {
     "kinds": [
       "UNSWEPT-KNOB"
     ],
-    "date": "2026-09-14",
+    "dated": "2026-09-14",
     "reason": "PYTEST_CURRENT_TEST is the suite's smoke switch: under pytest it drops --trials to 1 and disables the non-zero exit, so the suite does not measure sample size. Every published run was standalone with the switch unset and the trial count recorded in the receipt (30 on Windows at 2e8483a and 180fb1b, 80 on Linux 2 CPUs at 180fb1b) and stated next to each number in the article. The knob was never varied because it has one non-default value and that value is 'smoke test'."
   }
 }

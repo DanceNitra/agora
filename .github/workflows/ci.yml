@@ -9,6 +9,7 @@ on:
       - 'server/**'
       - 'game/**'
       - 'shell/**'
+      - 'tools/**'   # server/tests read tools/construction_waivers.json and import tools/*.py
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
@@ -16,6 +17,7 @@ on:
       - 'server/**'
       - 'game/**'
       - 'shell/**'
+      - 'tools/**'   # server/tests read tools/construction_waivers.json and import tools/*.py
       - '.github/workflows/ci.yml'
 
 # A newer push cancels an in-flight run instead of accumulating stuck runs.
