@@ -295,6 +295,8 @@ META = {
         "slug": "verify-agent-memory-deletion",
         "title": "Verify AI agent memory deletion: can you prove it is gone?",
         "title_sk": "Overenie mazania v agentovej pamäti: vieš dokázať, že je preč?",
+        "h1": "We deleted one record from five AI memory stores. Two still had it on disk.",
+        "h1_sk": "Zmazali sme jeden záznam z piatich AI pamäťových úložísk. Dve ho mali stále na disku.",
         "desc": "Your agent's delete() returns success - that does not mean the data left. Run a free "
                 "self-check on your own store and see what your delete really removed.",
         "desc_sk": "delete() tvojho agenta vráti úspech - to neznamená, že dáta odišli. Spusti si voľnú "
@@ -521,6 +523,10 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     datehuman = f"{_MONS[int(mo)]} {int(d)}, {y}"
     datehuman_sk = f"{int(d)}. {_MONS_SK[int(mo)]} {y}"
     title_sk = m.get("title_sk") or m["title"]
+    # The on-page H1 may differ from the <title> tag: the tag carries the search query, the H1 carries
+    # the fact (headline-craft skill). Without an explicit h1 the two stay identical, as before.
+    h1 = m.get("h1") or m["title"]
+    h1_sk = m.get("h1_sk") or m.get("title_sk") or h1
     desc_sk = m.get("desc_sk") or m["desc"]
     tags_sk = m.get("tags_sk") or m["tags"]
     kicker_sk = m.get("kicker_sk") or m["kicker"]
@@ -556,6 +562,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     out = TEMPLATE.format(
         mono="" if bilingual else " data-mono",
         title=html.escape(m["title"]), title_sk=html.escape(title_sk),
+        h1=html.escape(h1), h1_sk=html.escape(h1_sk),
         desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld,
         kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, datehuman_sk=datehuman_sk, read=read,
         tags=m["tags"], tags_sk=tags_sk,
@@ -734,7 +741,7 @@ TEMPLATE = """<!DOCTYPE html>
 </nav>
 <article>
   <div class="kicker"><span class="en">{kicker}</span><span class="sk">{kicker_sk}</span></div>
-  <h1><span class="en">{title}</span><span class="sk">{title_sk}</span></h1>
+  <h1><span class="en">{h1}</span><span class="sk">{h1_sk}</span></h1>
   <div class="meta"><span class="en">{datehuman}</span><span class="sk">{datehuman_sk}</span><span class="en">{read} min read</span><span class="sk">{read} min čítania</span><span class="en">{tags}</span><span class="sk">{tags_sk}</span></div>
   <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
     <p><span class="en">{tldr}</span><span class="sk">{tldr_sk}</span></p></div>
