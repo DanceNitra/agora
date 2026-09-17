@@ -1,0 +1,366 @@
+{
+  "slug": "verify-agent-memory-deletion",
+  "notebook": "b1ad1d78-66e3-4794-836d-8a61b374f074",
+  "research_query": "You deleted the user's data. Can you prove it's gone?",
+  "research_mode": "deep",
+  "research_output": "800-88 Rev. 2: What Changed in the 2025 Update | DriveWipe\n  \u2022 What Is NIST 800-88? Media Sanitization Standard Explained - Atlanta eWaste \nSolutions\n  \u2022 What Is Hard Drive Shredding? How It Works, What It Costs, and When Wiping \nIs Enough\n  \u2022 Customer-managed encryption keys (CMEK) - Google Cloud Documentation\n  \u2022 Deep Dive on AWS Key Management Service | Encryption Consulting\n  \u2022 Data deletion on Google Cloud | Security\n  \u2022 Data Deletion Methodology - Emergent Mind\n  \u2022 Proof of Erasure: Secure Personal Data Deletion with Public Verifiability\n  \u2022 Accelerating Secure and Verifiable Data Deletion in Cloud Storage via SGX \nand Blockchain\n  \u2022 [2307.04316] Accelerating Secure and Verifiable Data Deletion in Cloud \nStorage via SGX and Blockchain - arXiv\n  \u2022 Accelerating Secure and Verifiable Data Deletion in Cloud Storage via SGX \nand Blockchain - arXiv\n  \u2022 VeriForgot: Blockchain-Attested Verifiable Machine Unlearning Using \nMembership Inference Oracles for GDPR Compliance - Preprints.org\n  \u2022 Verifiable and Provably Secure Machine Unlearning - arXiv\n  \u2022 Verifiable and Provably Secure Machine Unlearning - arXiv\n  \u2022 Verifiable and Provably Secure Machine Unlearning - CISPA - Figshare\n  \u2022 Machine Unlearning; Principles, Methods, and Evolving Frontiers\n  \u2022 Assured Data Deletion with Fine-grained Access Control for Fog-based \nIndustrial Applications - arXiv\n  \u2022 Analysis of a Modified Hyperledger Fabric Blockchain Architecture for \nGDPR-Compliant Identity and Access Management - MDPI\n  \u2022 Deletion Pipelines under DPDP: How to Operationalize Erasure Requests - \nDigital Anumati\n  \u2022 Cloud Computing Security: Assured Deletion - Informatica\n  \u2022 Azure Storage account uses customer-managed keys (CMKs) for encryption - \nProwler Hub\n  \u2022 Data Encryption in M365 and Azure: PMK, CMK, and Customer Key | ISCG\n  \u2022 How to Encrypt ePHI in Cloud Systems - Censinet\n  \u2022 What Is ITAD? IT Asset Disposition Explained (2026) - Human-I-T\n  \u2022 Data Erasure Resources & Guides \u2014 NIST, HIPAA, GDPR Compliance | DiskDeleter\nBlog\n  \u2022 AWS SaaS Multi-Tenant Architecture Guide - Tenant Isolation, Pool and Silo \nModels, Onboarding, and Metering | hidekazu-konishi.com\n  \u2022 Delete Workforce Identity Federation users and their data - Google Cloud \nDocumentation\n  \u2022 Data deletion on Google Cloud Platform\n  \u2022 AWS KMS Vs Azure Key Vault Vs GCP KMS - Encryption Consulting\n  \u2022 The Ultimate Guide to Data Erasure Standards in 2026 - Workwize\n  \u2022 New IEEE 2883 Data Erasure Standard Fills Technology Gap - Blancco\n  \u2022 IEEE 2883-2022 Complete Guide: The Modern Standard for Data\n  \u2022 Cloud computing security: Assured deletion and verification\n  \u2022 Cloud data deletion: Cryptographic challenges and requirements - Computer \nScience Journals\n  \u2022 A Secure Storage and Deletion Verification Scheme of Microgrid Data Based on\nIntegrating Blockchain into Edge Computing - MDPI\n  \u2022 A Verifiable Deletion Protocol for Enhancing Constraints on ... - IJESAT\n  \u2022 Default encryption at rest | Security - Google Cloud Documentation\n",
+  "sources": [
+    {
+      "id": "41b5e40b-8907-4c35-b380-dfa4b37f868e",
+      "title": "A Secure Storage and Deletion Verification Scheme of Microgrid Data Based on Integrating Blockchain into Edge Computing - MDPI",
+      "type": "web_page",
+      "url": "https://www.mdpi.com/2079-9292/11/23/4033",
+      "status": 2
+    },
+    {
+      "id": "3c1f9f27-a4e0-4a35-bcb0-f52992ff3825",
+      "title": "A Verifiable Deletion Protocol for Enhancing Constraints on ... - IJESAT",
+      "type": "pdf",
+      "url": "https://ijesat.com/ijesat/files/AVerifiableDeletionProtocolforEnhancingConstraintsonPublicCloudsConference1_1783494551.pdf",
+      "status": 2
+    },
+    {
+      "id": "89a72c8c-e44c-4112-9a8b-fe767fda258d",
+      "title": "AWS KMS Vs Azure Key Vault Vs GCP KMS - Encryption Consulting",
+      "type": "web_page",
+      "url": "https://www.encryptionconsulting.com/aws-kms-vs-azure-key-vault-vs-gcp-kms/",
+      "status": 2
+    },
+    {
+      "id": "3b667048-4363-4db1-a98c-76b8cef2db71",
+      "title": "AWS SaaS Multi-Tenant Architecture Guide - Tenant Isolation, Pool and Silo Models, Onboarding, and Metering | hidekazu-konishi.com",
+      "type": "web_page",
+      "url": "https://hidekazu-konishi.com/entry/aws_saas_multi_tenant_architecture_guide.html",
+      "status": 2
+    },
+    {
+      "id": "dcbec4bb-8cfd-4c24-8950-128dedf6e789",
+      "title": "Accelerating Secure and Verifiable Data Deletion in Cloud Storage via SGX and Blockchain",
+      "type": "web_page",
+      "url": "https://www.semanticscholar.org/paper/eee2628723cc1b63ddf9a717d2d90b737f47b5ef",
+      "status": 2
+    },
+    {
+      "id": "9953ce85-f2d8-4d76-962e-d26693420b46",
+      "title": "Accelerating Secure and Verifiable Data Deletion in Cloud Storage via SGX and Blockchain - arXiv",
+      "type": "pdf",
+      "url": "https://arxiv.org/pdf/2307.04316",
+      "status": 2
+    },
+    {
+      "id": "a7d6ed4e-9f0a-4572-90b8-923ab25bae89",
+      "title": "Analysis of a Modified Hyperledger Fabric Blockchain Architecture for GDPR-Compliant Identity and Access Management - MDPI",
+      "type": "web_page",
+      "url": "https://www.mdpi.com/2078-2489/17/6/525",
+      "status": 2
+    },
+    {
+      "id": "f93172cc-86e3-4cda-a670-eb156f68cc14",
+      "title": "Assured Data Deletion with Fine-grained Access Control for Fog-based Industrial Applications - arXiv",
+      "type": "web_page",
+      "url": "https://arxiv.org/html/1804.02834v1",
+      "status": 2
+    },
+    {
+      "id": "8c8e0dc0-435e-4b67-8eec-80ccc800482b",
+      "title": "Azure Storage account uses customer-managed keys (CMKs) for encryption - Prowler Hub",
+      "type": "web_page",
+      "url": "https://hub.prowler.com/check/storage_ensure_encryption_with_customer_managed_keys",
+      "status": 2
+    },
+    {
+      "id": "e76d385e-8b8f-4d5c-ba11-26b2c579cc48",
+      "title": "Cloud Computing Security: Assured Deletion - Informatica",
+      "type": "pdf",
+      "url": "https://www.informatica.si/index.php/informatica/article/view/6245/3261",
+      "status": 2
+    },
+    {
+      "id": "45ad9045-5cab-4f7c-931b-2aa0a7cd4815",
+      "title": "Cloud computing security: Assured deletion and verification",
+      "type": "pdf",
+      "url": "https://www.computersciencejournals.com/ijcit/article/143/6-2-14-817.pdf",
+      "status": 2
+    },
+    {
+      "id": "e5c05160-abd6-4e97-95c3-f4e856edc11d",
+      "title": "Cloud data deletion: Cryptographic challenges and requirements - Computer Science Journals",
+      "type": "pdf",
+      "url": "https://www.computersciencejournals.com/ijcpdm/article/106/5-2-13-845.pdf",
+      "status": 2
+    },
+    {
+      "id": "704dcd31-58d9-4780-aa63-40b23e489f66",
+      "title": "Customer-managed encryption keys (CMEK) - Google Cloud Documentation",
+      "type": "web_page",
+      "url": "https://docs.cloud.google.com/kms/docs/cmek",
+      "status": 2
+    },
+    {
+      "id": "4d95239c-8a97-4132-9b38-75092804a3b0",
+      "title": "Data Deletion Methodology - Emergent Mind",
+      "type": "web_page",
+      "url": "https://www.emergentmind.com/topics/data-deletion-methodology",
+      "status": 2
+    },
+    {
+      "id": "3e1bfea8-0bbc-4a4a-b344-46559f84d36b",
+      "title": "Data Encryption in M365 and Azure: PMK, CMK, and Customer Key | ISCG",
+      "type": "web_page",
+      "url": "https://www.iscg.pl/en/blog/postit/data-encryption-in-m365-and-azure-what-options-are-available-when-and-how-to-implement-them/",
+      "status": 2
+    },
+    {
+      "id": "81e5ed9f-9a4c-4261-87e3-4dff5f1c9c69",
+      "title": "Data Erasure Resources & Guides \u2014 NIST, HIPAA, GDPR Compliance | DiskDeleter Blog",
+      "type": "web_page",
+      "url": "https://diskdeleter.com/blog/modern-challenges-and-solutions-in-secure-ssd-data-erasure/",
+      "status": 2
+    },
+    {
+      "id": "3fc50562-feca-4256-811a-f265d1e86fc1",
+      "title": "Data deletion on Google Cloud Platform",
+      "type": "pdf",
+      "url": "https://services.google.com/fh/files/misc/gcp_data_deletion_nda.pdf",
+      "status": 2
+    },
+    {
+      "id": "b824514f-3588-4b1a-a7e9-69ef312eeda3",
+      "title": "Data deletion on Google Cloud | Security",
+      "type": "web_page",
+      "url": "https://docs.cloud.google.com/docs/security/deletion",
+      "status": 2
+    },
+    {
+      "id": "bbf1528d-b255-4c09-864a-1f29cfc1a8ec",
+      "title": "Deep Dive on AWS Key Management Service | Encryption Consulting",
+      "type": "web_page",
+      "url": "https://www.encryptionconsulting.com/deep-dive-on-aws-key-management-service/",
+      "status": 2
+    },
+    {
+      "id": "4c3cbc9f-2701-4c6c-8473-130e1762164a",
+      "title": "Default encryption at rest | Security - Google Cloud Documentation",
+      "type": "web_page",
+      "url": "https://docs.cloud.google.com/docs/security/encryption/default-encryption",
+      "status": 2
+    },
+    {
+      "id": "9f6891e6-654d-4913-85b8-bb30c356c83f",
+      "title": "Delete Workforce Identity Federation users and their data - Google Cloud Documentation",
+      "type": "web_page",
+      "url": "https://docs.cloud.google.com/iam/docs/workforce-delete-user-data",
+      "status": 2
+    },
+    {
+      "id": "1cb37a99-32b3-4ce1-88f5-aa4e7e20aa3c",
+      "title": "Deletion Pipelines under DPDP: How to Operationalize Erasure Requests - Digital Anumati",
+      "type": "web_page",
+      "url": "https://trust.digitalanumati.com/deletion-pipelines-operationalize-erasure-requests/",
+      "status": 2
+    },
+    {
+      "id": "b30fbd8f-4414-4f75-91f9-28ef23dfbf77",
+      "title": "How to Encrypt ePHI in Cloud Systems - Censinet",
+      "type": "web_page",
+      "url": "https://censinet.com/perspectives/encrypt-ephi-cloud-systems-guide",
+      "status": 2
+    },
+    {
+      "id": "fecf6afe-e8f5-4cb7-b893-6a8969ab4ca5",
+      "title": "IEEE 2883 vs NIST 800-88: What Changed and Why It Matters - Returna",
+      "type": "web_page",
+      "url": "https://returna.com/blog/ieee-2883-vs-nist-800-88/",
+      "status": 2
+    },
+    {
+      "id": "5848f8a0-e1b3-4738-8182-16e077c9226b",
+      "title": "IEEE 2883-2022 Complete Guide: The Modern Standard for Data",
+      "type": "web_page",
+      "url": "https://dsecuretech.com/blog/ieee-2883-complete-guide",
+      "status": 2
+    },
+    {
+      "id": "4c72377c-e849-4ffb-a3f9-6f12e0fab27a",
+      "title": "IEEE 2883-2022 Data Destruction Standards Explained | SK Tes",
+      "type": "web_page",
+      "url": "https://www.sktes.com/news/understanding-ieee-2883-2022-clear-purge-and-destruct-explained",
+      "status": 2
+    },
+    {
+      "id": "e98c20da-8595-42b7-b335-a0bdb41426d9",
+      "title": "Machine Unlearning; Principles, Methods, and Evolving Frontiers",
+      "type": "pdf",
+      "url": "https://api.taylorfrancis.com/content/books/mono/download?identifierName=doi&identifierValue=10.1201/9781003771470&type=googlepdf",
+      "status": 2
+    },
+    {
+      "id": "2893a613-64de-4b79-92ea-f38d959b6549",
+      "title": "NIST 800-88 R2 Vs IEEE 2883-2022 | Sanitization Standards Compared - BitRaser",
+      "type": "web_page",
+      "url": "https://www.bitraser.com/blog/nist-800-88-or-ieee-2883-a-comparison/",
+      "status": 2
+    },
+    {
+      "id": "3e2deb9c-804c-4bc9-85cf-b5d33e6f2df2",
+      "title": "NIST 800-88 Rev. 2: What Changed in the 2025 Update | DriveWipe",
+      "type": "web_page",
+      "url": "https://www.drivewipe.com/standards/nist-800-88-rev-2",
+      "status": 2
+    },
+    {
+      "id": "02f03425-e422-4fec-933b-789ef580bfe2",
+      "title": "NIST SP 800-88 Guidelines for Media Sanitization Explained - Jetico",
+      "type": "web_page",
+      "url": "https://jetico.com/blog/nist-sp-800-88-guidelines-media-sanitization-explained/",
+      "status": 2
+    },
+    {
+      "id": "fd180d03-3532-4eed-b9cf-fec71b5debc4",
+      "title": "New IEEE 2883 Data Erasure Standard Fills Technology Gap - Blancco",
+      "type": "web_page",
+      "url": "https://blancco.com/resources/blog-an-introduction-to-the-new-ieee-data-era-standard/",
+      "status": 2
+    },
+    {
+      "id": "5a31b79d-d9a8-4ff4-bd3a-f4a0a969622b",
+      "title": "Proof of Erasure: Secure Personal Data Deletion with Public Verifiability",
+      "type": "web_page",
+      "url": "https://www.priv.gc.ca/en/opc-actions-and-decisions/research/funding-for-privacy-research-and-knowledge-translation/completed-contributions-program-projects/2022-2023/p_202223_08/",
+      "status": 2
+    },
+    {
+      "id": "00f4a2a1-30da-4953-8794-621464e50310",
+      "title": "The Ultimate Guide to Data Erasure Standards in 2026 - Workwize",
+      "type": "web_page",
+      "url": "https://www.goworkwize.com/blog/data-erasure-standards",
+      "status": 2
+    },
+    {
+      "id": "258eb4c6-a9f4-467c-9752-4d69e788cb96",
+      "title": "VeriForgot: Blockchain-Attested Verifiable Machine Unlearning Using Membership Inference Oracles for GDPR Compliance - Preprints.org",
+      "type": "web_page",
+      "url": "https://www.preprints.org/manuscript/202603.2325",
+      "status": 2
+    },
+    {
+      "id": "d82b67f4-a824-4ade-aad0-6c6ed48cc421",
+      "title": "Verifiable and Provably Secure Machine Unlearning - CISPA - Figshare",
+      "type": "web_page",
+      "url": "https://publications.cispa.de/articles/conference_contribution/Verifiable_and_Provably_Secure_Machine_Unlearning/32771223",
+      "status": 2
+    },
+    {
+      "id": "9caeb84d-5a72-4516-bb6e-831c84334248",
+      "title": "Verifiable and Provably Secure Machine Unlearning - IEEE Computer Society",
+      "type": "web_page",
+      "url": "https://www.computer.org/csdl/proceedings-article/satml/2025/171100a479/26Vnp5mE1nG",
+      "status": 3
+    },
+    {
+      "id": "f0f2ba3a-b794-4a73-b6cc-038c152b1950",
+      "title": "Verifiable and Provably Secure Machine Unlearning - arXiv",
+      "type": "web_page",
+      "url": "https://arxiv.org/html/2210.09126v3",
+      "status": 2
+    },
+    {
+      "id": "f9da78a5-38c0-4c4f-a47c-09ee415e8a43",
+      "title": "Verifiable and Provably Secure Machine Unlearning - arXiv",
+      "type": "pdf",
+      "url": "https://arxiv.org/pdf/2210.09126",
+      "status": 2
+    },
+    {
+      "id": "ab8be960-4de4-46c9-9eec-09be50cb54e8",
+      "title": "Verify AI agent memory deletion: can you prove it is gone? \u00b7 Agora",
+      "type": "web_page",
+      "url": "https://dancenitra.github.io/agora/public/posts/verify-agent-memory-deletion.html",
+      "status": 2
+    },
+    {
+      "id": "58c8b689-c553-4f47-b873-99748510525a",
+      "title": "What Is Hard Drive Shredding? How It Works, What It Costs, and When Wiping Is Enough",
+      "type": "web_page",
+      "url": "https://www.human-i-t.org/hard-drive-shredding-explainer/",
+      "status": 2
+    },
+    {
+      "id": "b00f276c-b0d4-43b0-b42d-c709a8a0ff42",
+      "title": "What Is ITAD? IT Asset Disposition Explained (2026) - Human-I-T",
+      "type": "web_page",
+      "url": "https://www.human-i-t.org/what-is-itad/",
+      "status": 2
+    },
+    {
+      "id": "69a5deb4-ba3f-492f-b4c5-3b9a274f9135",
+      "title": "What Is NIST 800-88? Media Sanitization Standard Explained - Atlanta eWaste Solutions",
+      "type": "web_page",
+      "url": "https://www.ewasteatl.com/post/what-is-nist-800-88",
+      "status": 2
+    },
+    {
+      "id": "327f5c9f-0826-49ac-8b5f-0b0c5e393b5c",
+      "title": "What Is NIST SP 800-88? A Plain-English Guide for Compliance Officers - ClearRecord",
+      "type": "web_page",
+      "url": "https://clearrecord.co/blog/what-is-nist-800-88/",
+      "status": 2
+    },
+    {
+      "id": "2e6122ad-8fef-4ea2-b235-f7971402edb3",
+      "title": "[2307.04316] Accelerating Secure and Verifiable Data Deletion in Cloud Storage via SGX and Blockchain - arXiv",
+      "type": "web_page",
+      "url": "https://arxiv.org/abs/2307.04316",
+      "status": 2
+    },
+    {
+      "id": "12a9296e-93f9-4375-bfa8-db53b2c208e5",
+      "title": "https://medium.com/@enehkosi64/setting-up-azure-storage-encryption-with-customer-managed-keys-bfd4a1db7fa0",
+      "type": "web_page",
+      "url": "https://medium.com/@enehkosi64/setting-up-azure-storage-encryption-with-customer-managed-keys-bfd4a1db7fa0",
+      "status": 3
+    },
+    {
+      "id": "cf53b1a3-32ad-4b79-80e4-6a267f7687e9",
+      "title": "https://www.researchgate.net/publication/341627875_Publicly_Verifiable_and_Efficient_Fine-Grained_Data_Deletion_Scheme_in_Cloud_Computing",
+      "type": "web_page",
+      "url": "https://www.researchgate.net/publication/341627875_Publicly_Verifiable_and_Efficient_Fine-Grained_Data_Deletion_Scheme_in_Cloud_Computing",
+      "status": 3
+    },
+    {
+      "id": "6e097f22-22d6-46d7-a5eb-d008c821226d",
+      "title": "https://www.researchgate.net/publication/364434382_Verifiable_and_Provably_Secure_Machine_Unlearning",
+      "type": "web_page",
+      "url": "https://www.researchgate.net/publication/364434382_Verifiable_and_Provably_Secure_Machine_Unlearning",
+      "status": 3
+    },
+    {
+      "id": "97462ca4-301a-48d8-901d-fbe63449d90e",
+      "title": "https://www.researchgate.net/publication/372248000_Accelerating_Secure_and_Verifiable_Data_Deletion_in_Cloud_Storage_via_SGX_and_Blockchain",
+      "type": "web_page",
+      "url": "https://www.researchgate.net/publication/372248000_Accelerating_Secure_and_Verifiable_Data_Deletion_in_Cloud_Storage_via_SGX_and_Blockchain",
+      "status": 3
+    },
+    {
+      "id": "4ec49e64-fd39-48d9-8b41-27128d38e5e1",
+      "title": "https://www.researchgate.net/publication/390430002_Provable_Co-Owned_Data_Deletion_with_Zero-Residuals_and_Verifiability_in_Multi-Cloud_Environment",
+      "type": "web_page",
+      "url": "https://www.researchgate.net/publication/390430002_Provable_Co-Owned_Data_Deletion_with_Zero-Residuals_and_Verifiability_in_Multi-Cloud_Environment",
+      "status": 3
+    },
+    {
+      "id": "8edfe731-c76e-4f8c-9c52-4ed6bd66fdf0",
+      "title": "https://www.scribd.com/document/1077798811/IT-Data-Deletion-Project",
+      "type": "web_page",
+      "url": "https://www.scribd.com/document/1077798811/IT-Data-Deletion-Project",
+      "status": 3
+    },
+    {
+      "id": "b01394fa-7c71-4b69-b53e-4acd483744de",
+      "title": "https://www.scribd.com/document/489421132/Deleting-Secret-Data-With-Public-Verifiability",
+      "type": "web_page",
+      "url": "https://www.scribd.com/document/489421132/Deleting-Secret-Data-With-Public-Verifiability",
+      "status": 3
+    }
+  ]
+}

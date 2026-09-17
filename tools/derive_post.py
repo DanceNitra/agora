@@ -40,7 +40,7 @@ OUT = ROOT / "agora_output" / "derivatives"
 SITE = "https://dancenitra.github.io/agora/public/posts"
 
 # Links to our own pages are always allowed: a derivative links back to the article it derives from.
-OWN_HOSTS = ("dancenitra.github.io", "github.com/dancenitra")
+OWN_HOSTS = ("dancenitra.github.io", "github.com/dancenitra", "raw.githubusercontent.com/dancenitra")
 
 # Words that are capitalised for reasons other than being a name, plus the channels and brands
 # every derivative names. Lowercase, compared case-insensitively.
@@ -51,6 +51,7 @@ january february march april may june july august september october november dec
 agora reddit spotify notebooklm gemini echoes tomorrow danchi linkedin github claude python
 episode season title description chapters focus notes link links probe article post thread
 tl dr tldr edit update source sources
+api sql sqlite ssd dpo faq url json csv cpu gpu ram ok
 """.split())
 
 _UNITS = {
@@ -130,6 +131,14 @@ def _strip_urls(text: str) -> tuple[str, list[str]]:
     return _URL.sub(" ", text), urls
 
 
+THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}(?!\d))")
+
+
+def _plain_numbers(text: str) -> str:
+    """'200,050' -> '200050', so plain digits in a derivative match a source written with separators."""
+    return THOUSANDS.sub("", text)
+
+
 def numbers_in(text: str) -> list[str]:
     text = _DATE.sub(" ", _LIST_MARK.sub(" ", text))
     out = []
@@ -145,11 +154,15 @@ def names_in(text: str) -> list[str]:
     """Capitalised words that do not start a sentence, a line, a cell or a list item."""
     out = []
     for m in _CAP.finditer(text):
-        before = text[: m.start()].rstrip()
-        if not before or before[-1] in ".!?:|*#>-\n\"“(":
+        raw_before = text[: m.start()]
+        before = raw_before.rstrip()
+        if not before or before[-1] in ".!?:|*#>-\"“(" or raw_before.endswith("\n"):
             continue
         w = m.group(1)
-        if w.lower() in STOP or w.isupper() and len(w) < 3:
+        if w.endswith(("'s", "’s")):
+            w = w[:-2]
+        w = w.rstrip("'’")
+        if len(w) < 3 or w.lower() in STOP or w.isupper() and len(w) < 3:
             continue
         out.append(w)
     return out
@@ -172,12 +185,12 @@ def corpus_for(slug: str, folder: Path) -> tuple[str, list[str]]:
             )
         parts.append(ctx.read_text(encoding="utf-8"))
     text, urls = _strip_urls("\n".join(parts))
-    return words_to_digits(text).lower(), urls
+    return _plain_numbers(words_to_digits(text)).lower(), urls
 
 
 def check_text(text: str, corpus: str, corpus_urls: list[str], spoken: bool = False) -> dict:
     body, urls = _strip_urls(text)
-    body = words_to_digits(body)
+    body = _plain_numbers(words_to_digits(body))
     low = corpus
     missing_numbers = sorted({n for n in numbers_in(body) if n.lower() not in low})
     missing_links = sorted({
