@@ -57,6 +57,11 @@ each page on the site opens with the runnable command and its printed output, th
 are our distribution today and they produced every external mention we have. Keep the cadence:
 one measured reply per thread event, through the gate.
 
+**Risk avoided, not upside gained (Grosser).** Buyers reduce risk about four times as often as
+they buy upside. Every page's first sentence names the risk the reader avoids: an auditor they
+cannot answer, a DSAR they cannot prove, a correction that came back. Done today on the two new
+pages (erasure, audit trail); the index hero still leads with the mechanism and gets the same edit.
+
 **Word of mouth over paid (all).** Nobody in the sources recommends ads for a dev tool at this
 stage. No budget is proposed.
 
