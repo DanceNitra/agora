@@ -2,6 +2,8 @@
 
 Uložili sme záznam do piatich úložísk agentovej pamäte, zmazali ho cez vlastné API každého úložiska, spustili kompakciu, ktorú každé úložisko ponúka, a prehľadali surové súbory. Na jednom stroji 17. septembra 2026, s chromadb 1.1.1, qdrant-client 1.18.0 v lokálnom režime, mem0ai 2.0.11, lancedb 0.30.0 a inspeximus 2.24.0, dve z piatich držali bajty záznamu aj potom. Všetkých päť volaní delete vrátilo úspech. Oba prípady sú zdokumentované: mem0 vedie log histórie zámerne a Chroma drží text vo write-ahead logu, kým neprebehne 1 000 operácií. Druhý záznam, ktorý nikto nemazal, ostal v každom úložisku, a podľa toho vieme, že „absent" znamená, že úložisko zmazalo jeden záznam a nie všetko. Kontrola je [jeden súbor](https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py). Beží na backendoch, ktoré máš nainštalované, pomenuje súbor, ktorý bajty stále drží, a hlási tvoje verzie.
 
+*Toto vyšetrovanie je aj epizódou nášho podcastu Echoes of Tomorrow, rozprávanou ako detektívka: [vypočuj si ju na Spotify](https://open.spotify.com/episode/7khBL2ppx1uTfsY9UtuLMJ).*
+
 ## Medzera je medzi povinnosťou a pozorovateľnou veličinou
 
 Článok 17(1) GDPR stanovuje povinnosť: prevádzkovateľ „shall have the obligation to erase personal data without undue delay", ak platí jeden z vymenovaných dôvodov. Článok 19 dodáva, že príjemcom tých dát to treba oznámiť, pokiaľ sa to neukáže ako nemožné alebo neprimerane náročné.
