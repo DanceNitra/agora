@@ -22,6 +22,7 @@ import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+import owner_spoke as ow  # noqa: E402
 import skill_ran as sr  # noqa: E402
 
 PROJECTS = os.path.join(os.path.expanduser("~"), ".claude", "projects")
@@ -49,3 +50,15 @@ def test_the_first_rule_named_a_directory_that_does_not_exist():
     # changed its naming and both this test and project_slug() need a second look.
     old = "C--" + os.path.abspath(ROOT).replace(":", "").replace("\\", "-").replace("/", "-").lstrip("-")
     assert not os.path.isdir(os.path.join(PROJECTS, old))
+
+
+def test_owner_spoke_reads_the_same_directory_skill_ran_does():
+    # owner_spoke.py hard-coded the main checkout's slug, so a worktree session looked for its own
+    # `show` in transcripts it never wrote. Both tools now derive the directory from ROOT.
+    assert ow._project_dir() == os.path.join(PROJECTS, sr.project_slug(ROOT))
+    assert os.path.basename(ow._project_dir()) == sr.project_slug(ow.ROOT)
+
+
+@pytest.mark.skipif(not os.path.isdir(PROJECTS), reason="no ~/.claude/projects on this machine")
+def test_owner_spoke_finds_transcripts_without_a_project_dir_argument():
+    assert ow._transcripts(), "the default directory holds no transcript, so the guard is blind"

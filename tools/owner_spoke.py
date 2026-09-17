@@ -53,11 +53,28 @@ import os
 import re
 
 SHOW_LINE = re.compile(r"sha256 : ([0-9a-f]{64})")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _project_dir() -> str:
+    """Where Claude Code writes this checkout's transcripts.
+
+    The first version hard-coded `C--Users-Danculus-agora`, which is right for the main checkout
+    and wrong for every worktree: a session started in one reads the main checkout's transcripts,
+    so a `show` printed here was looked for in files this session never wrote. The slug rule lives
+    in `skill_ran.py` beside this file, and this file is imported both as `owner_spoke` (from
+    `send_approved.py`) and as `tools.owner_spoke` (from `.claude/hooks/agent_budget.py`), hence the
+    two import forms.
+    """
+    try:
+        from skill_ran import project_slug
+    except ImportError:
+        from tools.skill_ran import project_slug
+    return os.path.join(os.path.expanduser("~"), ".claude", "projects", project_slug(ROOT))
 
 
 def _transcripts(project_dir: str | None = None) -> list[str]:
-    d = project_dir or os.path.expanduser(
-        os.path.join("~", ".claude", "projects", "C--Users-Danculus-agora"))
+    d = project_dir or _project_dir()
     return sorted(glob.glob(os.path.join(d, "*.jsonl")), key=os.path.getmtime)
 
 
