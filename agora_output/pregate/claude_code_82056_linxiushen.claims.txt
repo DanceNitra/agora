@@ -1,0 +1,8 @@
+The instructions attachment with files[].content is present in all 6 sessions from 2.1.263 on and absent from all 13 up to 2.1.260, across 19 transcripts on builds 2.1.234 through 2.1.273.
+Build and date are confounded on one machine, so the edge is an edge here rather than a release boundary.
+JhouCode found the injection in 3 of 647 transcripts on 2026-08-24, all subagent files, when the newest build was 2.1.237.
+Six sessions hold 21 instructions records with 12 distinct deliveries; every compaction writes a record tagged changed true reason compaction; every resume writes an untagged record that repeats the previous delivery byte for byte.
+One session holds 11 records: three cuts with loader notices 201 lines and 24.6KB, 205 lines and 25.2KB, 211 lines and 26KB, then three whole loads after the index was trimmed.
+Where the loader cut, the both-caps notice pjt222 captured on the wire follows the text inside the attachment.
+Nine distinct whole loads carry no notice, two just under the cap at 200 lines and 24998 units and 198 lines and 24874 units; the 198 one matches a same-hour receipt of the file at 24875 units with its trailing newline.
+A resume that repeats the session-start delivery after the file changed on disk is either a faithful record of a stale delivery or a replay; only a request-body capture separates those.
