@@ -374,3 +374,9 @@ agora_output/edrn_submission/
 # a gitlink by a `git add .agents`, which is a submodule reference with no submodule behind it: a
 # fresh clone gets an empty directory and no way to fill it.
 .agents/marketingskills-source/
+
+# podcast episodes: audio and covers stay local, receipts and spotify.md stay tracked
+agora_output/episodes/**/*.m4a
+agora_output/episodes/**/*.mp3
+agora_output/episodes/**/*.wav
+agora_output/episodes/**/cover.png
