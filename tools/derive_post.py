@@ -121,7 +121,7 @@ def _value(low: list[str]) -> int:
 
 _URL = re.compile(r"https?://[^\s<>()\[\]\"']+")
 _DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b")
-_NUM = re.compile(r"(?<![\w./-])[-+]?\d[\d,]*(?:\.\d+)?\s?%?")
+_NUM = re.compile(r"(?<![\w./-])[-+]?\d[\d,]*(?:\.\d+)? ?%?")   # a space before %, never a newline
 _LIST_MARK = re.compile(r"^\s*(?:\d+[.)]|#+|[-*]|\|)\s*", re.M)
 _CAP = re.compile(r"(?<![\w'])([A-Z][A-Za-z0-9'-]{2,})")
 
