@@ -45,7 +45,7 @@ EPISODES = ROOT / "agora_output" / "episodes"
 SHOW = "Echoes of Tomorrow"
 ARTIST = "Agora"
 UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
-ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", NOTEBOOKLM_HL="en-US")   # every artifact in English
 
 
 def say(msg: str) -> None:
@@ -104,7 +104,7 @@ def cmd_research(slug: str, query: str | None, mode: str) -> int:
     q = query or title
     say(f"deep research on: {q!r}")
     out = nlm("research", "start", q, "--mode", mode, "--title", f"{SHOW}: {slug}",
-              "--auto-import", timeout=1500)
+              "--auto-import", "--force", timeout=1500)
     ids = UUID.findall(out)
     if not ids:
         print(out)
@@ -139,6 +139,16 @@ def _artifact_status(nb: str, art_id: str) -> str:
     return "unknown"
 
 
+def _audio_in_progress(nb: str) -> list[str]:
+    out = nlm("studio", "status", nb, "--json")
+    try:
+        data = json.loads(out)
+    except json.JSONDecodeError:
+        return []
+    return [a.get("artifact_id") for a in (data if isinstance(data, list) else [data])
+            if a.get("type") == "audio" and a.get("status") == "in_progress"]
+
+
 def cmd_audio(slug: str, fmt: str, length: str, language: str, artifact: str | None,
               notebook: str | None) -> int:
     st = state(slug)
@@ -150,6 +160,16 @@ def cmd_audio(slug: str, fmt: str, length: str, language: str, artifact: str | N
         art_id = artifact
         say(f"using existing artifact {art_id}")
     else:
+        # A "rate limited" error from `audio create` does not mean the job was refused: measured
+        # 2026-09-17, every retry queued another generation and 36 sat in progress. Never create
+        # while one is queued; attach to it instead.
+        queued = _audio_in_progress(nb)
+        if queued:
+            say(f"an audio job is already in progress ({queued[0][:8]}); attaching to it instead of creating another")
+            art_id = queued[0]
+            st["artifact"] = art_id
+            save(slug, st)
+            return _wait_and_download(slug, st, nb, art_id)
         ep = (derivatives(slug) / "episode.md").read_text(encoding="utf-8")
         focus = section(ep, "Focus")
         if not focus or focus.startswith("("):
@@ -165,6 +185,10 @@ def cmd_audio(slug: str, fmt: str, length: str, language: str, artifact: str | N
         st.update({"audio_format": fmt, "audio_length": length, "focus": focus})
     st["artifact"] = art_id
     save(slug, st)
+    return _wait_and_download(slug, st, nb, art_id)
+
+
+def _wait_and_download(slug: str, st: dict, nb: str, art_id: str) -> int:
     t0 = time.time()
     while True:
         status = _artifact_status(nb, art_id)
@@ -177,8 +201,19 @@ def cmd_audio(slug: str, fmt: str, length: str, language: str, artifact: str | N
             raise SystemExit("audio not ready after 30 minutes; rerun `audio --artifact <id>` later")
         time.sleep(30)
     raw = folder(slug) / "episode_raw.m4a"
-    nlm("download", "audio", nb, "--id", art_id, "--output", str(raw), "--no-progress",
-        timeout=900)
+    # NotebookLM reports the artifact complete minutes before its media URL resolves; measured
+    # 2026-09-17: 404 for about four minutes after "completed". Retry for up to 15 minutes.
+    t1 = time.time()
+    while True:
+        try:
+            nlm("download", "audio", nb, "--id", art_id, "--output", str(raw), "--no-progress",
+                timeout=900)
+            break
+        except SystemExit as ex:
+            if "propagating" not in str(ex) or time.time() - t1 > 900:
+                raise
+            say("media URL still propagating; retrying in 60 s")
+            time.sleep(60)
     found = raw if raw.exists() else next(folder(slug).glob("episode_raw.*"), None)
     if not found:
         raise SystemExit("download reported success but no episode_raw.* file exists")
@@ -202,7 +237,12 @@ def cmd_transcribe(slug: str, model: str, language: str | None) -> int:
     except Exception as e:  # noqa: BLE001
         say(f"cuda failed ({e.__class__.__name__}); falling back to cpu int8")
         wm = WhisperModel(model, device="cpu", compute_type="int8")
-    segs, info = wm.transcribe(str(raw), language=language, vad_filter=True, beam_size=5)
+    # The article's own numbers as a vocabulary hint. Measured 2026-09-17: "200,050" came out as
+    # "200,000 50" without it and "200,050" with it, while a genuinely misspoken "1.8.0" stayed
+    # "1.8.0" either way, so the hint sharpens recognition without hiding a wrong number.
+    art = (dp.SRC / f"{slug}.en.md").read_text(encoding="utf-8")
+    hint = "Numbers spoken exactly: " + ", ".join(sorted(set(dp.numbers_in(dp._strip_urls(art)[0])), key=len, reverse=True)[:60])
+    segs, info = wm.transcribe(str(raw), language=language, vad_filter=True, beam_size=5, initial_prompt=hint[:800])
     lines, plain, t0 = [], [], time.time()
     for s in segs:
         lines.append(f"[{s.start:7.1f} -> {s.end:7.1f}] {s.text.strip()}")
@@ -351,7 +391,7 @@ def main() -> int:
     r = sub.add_parser("research"); r.add_argument("slug"); r.add_argument("--query")
     r.add_argument("--mode", default="deep", choices=["deep", "fast"])
     a = sub.add_parser("audio"); a.add_argument("slug"); a.add_argument("--format", default="deep_dive")
-    a.add_argument("--length", default="default"); a.add_argument("--language", default="en")
+    a.add_argument("--length", default="default"); a.add_argument("--language", default="en-US")
     a.add_argument("--artifact"); a.add_argument("--notebook")
     t = sub.add_parser("transcribe"); t.add_argument("slug")
     t.add_argument("--model", default="large-v3-turbo"); t.add_argument("--language")
@@ -376,7 +416,7 @@ def main() -> int:
     if ns.cmd == "package":
         return cmd_package(ns.slug, ns.season, ns.number)
     for step in (
-        lambda: cmd_audio(ns.slug, ns.format, ns.length, "en", None, None),
+        lambda: cmd_audio(ns.slug, ns.format, ns.length, "en-US", None, None),
         lambda: cmd_transcribe(ns.slug, "large-v3-turbo", "en"),
         lambda: cmd_check(ns.slug),
         lambda: cmd_master(ns.slug, None, None, ns.cover),
