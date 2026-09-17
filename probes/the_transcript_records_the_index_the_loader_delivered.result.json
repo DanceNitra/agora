@@ -8,184 +8,426 @@
    "transcript": "ba363076",
    "version": "2.1.234",
    "first_ts": "2026-08-18T06:26:59.798Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "7dccb956",
    "version": "2.1.235",
    "first_ts": "2026-08-19T05:46:51.488Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "46de8dac",
    "version": "2.1.237",
    "first_ts": "2026-08-20T07:12:10.392Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "e6f8e2c8",
    "version": "2.1.238",
    "first_ts": "2026-08-21T02:08:20.842Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "d58cd2cd",
    "version": "2.1.241",
    "first_ts": "2026-08-23T06:15:56.767Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "ce036cca",
    "version": "2.1.241",
    "first_ts": "2026-08-23T16:48:47.663Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "f076d85f",
    "version": "2.1.247",
    "first_ts": "2026-08-27T21:11:35.550Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "1c679688",
    "version": "2.1.247",
    "first_ts": "2026-08-27T21:15:09.534Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "954871c9",
    "version": "2.1.251",
    "first_ts": "2026-08-28T19:56:00.700Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "70f91893",
    "version": "2.1.251",
    "first_ts": "2026-08-29T18:16:27.137Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "08256d82",
    "version": "2.1.252",
    "first_ts": "2026-09-01T13:28:12.810Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "ed61e078",
    "version": "2.1.259",
    "first_ts": "2026-09-03T18:28:28.453Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "5d882efe",
    "version": "2.1.260",
    "first_ts": "2026-09-04T17:11:46.659Z",
-   "instructions": 0,
-   "memory_md": null
+   "records": []
   },
   {
    "transcript": "e5ba5243",
    "version": "2.1.263",
    "first_ts": "2026-09-08T19:00:16.392Z",
-   "instructions": 1,
-   "memory_md": {
-    "lines_delivered": 198,
-    "units_delivered": 24874,
-    "units_without_warning": 24874,
-    "lines_without_warning": 198,
-    "warning_line_present": false,
-    "warning_text": null
-   }
+   "records": [
+    {
+     "ts": "2026-09-08T19:00:19",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 198,
+      "units_delivered": 24874,
+      "body_lines": 198,
+      "body_units": 24874,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "a11cd8875b"
+     }
+    }
+   ]
   },
   {
    "transcript": "5fad286c",
    "version": "2.1.266",
    "first_ts": "2026-09-09T04:58:50.208Z",
-   "instructions": 1,
-   "memory_md": {
-    "lines_delivered": 200,
-    "units_delivered": 24998,
-    "units_without_warning": 24998,
-    "lines_without_warning": 200,
-    "warning_line_present": false,
-    "warning_text": null
-   }
+   "records": [
+    {
+     "ts": "2026-09-09T04:59:32",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 200,
+      "units_delivered": 24998,
+      "body_lines": 200,
+      "body_units": 24998,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "505756b433"
+     }
+    }
+   ]
   },
   {
    "transcript": "581e2099",
    "version": "2.1.267",
    "first_ts": "2026-09-09T21:59:22.761Z",
-   "instructions": 2,
-   "memory_md": {
-    "lines_delivered": 201,
-    "units_delivered": 25125,
-    "units_without_warning": 24972,
-    "lines_without_warning": 200,
-    "warning_line_present": true,
-    "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into "
-   }
+   "records": [
+    {
+     "ts": "2026-09-09T21:59:26",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25125,
+      "body_lines": 199,
+      "body_units": 24971,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "abaa649800"
+     }
+    },
+    {
+     "ts": "2026-09-10T09:50:34",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25125,
+      "body_lines": 199,
+      "body_units": 24971,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "abaa649800"
+     }
+    }
+   ]
   },
   {
    "transcript": "9ac32257",
    "version": "2.1.267",
    "first_ts": "2026-09-10T11:24:59.665Z",
-   "instructions": 11,
-   "memory_md": {
-    "lines_delivered": 201,
-    "units_delivered": 25125,
-    "units_without_warning": 24972,
-    "lines_without_warning": 200,
-    "warning_line_present": true,
-    "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into "
-   }
+   "records": [
+    {
+     "ts": "2026-09-10T11:27:41",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25125,
+      "body_lines": 199,
+      "body_units": 24971,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "abaa649800"
+     }
+    },
+    {
+     "ts": "2026-09-11T13:07:48",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25125,
+      "body_lines": 199,
+      "body_units": 24971,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 201 lines and 24.6KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "abaa649800"
+     }
+    },
+    {
+     "ts": "2026-09-11T13:14:48",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25055,
+      "body_lines": 199,
+      "body_units": 24901,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 205 lines and 25.2KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "54998447ab"
+     }
+    },
+    {
+     "ts": "2026-09-12T13:07:57",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 201,
+      "units_delivered": 25055,
+      "body_lines": 199,
+      "body_units": 24901,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 205 lines and 25.2KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into ",
+      "sha1": "54998447ab"
+     }
+    },
+    {
+     "ts": "2026-09-12T15:12:08",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 200,
+      "units_delivered": 25087,
+      "body_lines": 198,
+      "body_units": 24935,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 211 lines and 26KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into to",
+      "sha1": "f4c928f124"
+     }
+    },
+    {
+     "ts": "2026-09-13T11:10:34",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 200,
+      "units_delivered": 25087,
+      "body_lines": 198,
+      "body_units": 24935,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 211 lines and 26KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into to",
+      "sha1": "f4c928f124"
+     }
+    },
+    {
+     "ts": "2026-09-13T12:12:21",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 183,
+      "units_delivered": 24891,
+      "body_lines": 183,
+      "body_units": 24891,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "e62e91faa8"
+     }
+    },
+    {
+     "ts": "2026-09-13T20:57:40",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 183,
+      "units_delivered": 24891,
+      "body_lines": 183,
+      "body_units": 24891,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "e62e91faa8"
+     }
+    },
+    {
+     "ts": "2026-09-13T21:10:49",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 127,
+      "units_delivered": 19104,
+      "body_lines": 127,
+      "body_units": 19104,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "44a286a4f8"
+     }
+    },
+    {
+     "ts": "2026-09-14T17:38:05",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 127,
+      "units_delivered": 19104,
+      "body_lines": 127,
+      "body_units": 19104,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "44a286a4f8"
+     }
+    },
+    {
+     "ts": "2026-09-14T19:07:26",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 128,
+      "units_delivered": 19354,
+      "body_lines": 128,
+      "body_units": 19354,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "2914157fcc"
+     }
+    }
+   ]
   },
   {
    "transcript": "2efe0de5",
    "version": "2.1.272",
    "first_ts": "2026-09-15T15:13:45.122Z",
-   "instructions": 5,
-   "memory_md": {
-    "lines_delivered": 132,
-    "units_delivered": 20314,
-    "units_without_warning": 20314,
-    "lines_without_warning": 132,
-    "warning_line_present": false,
-    "warning_text": null
-   }
+   "records": [
+    {
+     "ts": "2026-09-15T15:14:11",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 132,
+      "units_delivered": 20314,
+      "body_lines": 132,
+      "body_units": 20314,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "0254bbe49c"
+     }
+    },
+    {
+     "ts": "2026-09-15T19:40:44",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 132,
+      "units_delivered": 20314,
+      "body_lines": 132,
+      "body_units": 20314,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "0254bbe49c"
+     }
+    },
+    {
+     "ts": "2026-09-15T19:43:02",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 133,
+      "units_delivered": 20554,
+      "body_lines": 133,
+      "body_units": 20554,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "b61b289080"
+     }
+    },
+    {
+     "ts": "2026-09-16T08:30:01",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 133,
+      "units_delivered": 20554,
+      "body_lines": 133,
+      "body_units": 20554,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "b61b289080"
+     }
+    },
+    {
+     "ts": "2026-09-16T08:55:30",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 134,
+      "units_delivered": 20883,
+      "body_lines": 134,
+      "body_units": 20883,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "8df73673fb"
+     }
+    }
+   ]
   },
   {
    "transcript": "d620e971",
    "version": "2.1.273",
    "first_ts": "2026-09-16T20:17:34.563Z",
-   "instructions": 1,
-   "memory_md": {
-    "lines_delivered": 135,
-    "units_delivered": 21129,
-    "units_without_warning": 21129,
-    "lines_without_warning": 135,
-    "warning_line_present": false,
-    "warning_text": null
-   }
+   "records": [
+    {
+     "ts": "2026-09-16T20:17:39",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 135,
+      "units_delivered": 21129,
+      "body_lines": 135,
+      "body_units": 21129,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "22db12c004"
+     }
+    }
+   ]
   }
  ],
+ "records": 21,
+ "distinct_deliveries": 12,
  "newest_build_without_attachment": "2.1.260",
  "oldest_build_with_attachment": "2.1.263",
  "verdicts": {
-  "every_instructions_attachment_names_memory_md": true,
+  "every_instructions_record_names_memory_md": true,
   "warning_only_where_the_body_reaches_a_cap": true,
   "capped_body_never_exceeds_the_unit_cap": true,
+  "changed_records_differ_and_untagged_records_repeat_the_previous_delivery": true,
   "attachment_absent_before_and_present_from_a_single_build_edge": true
  }
 }
