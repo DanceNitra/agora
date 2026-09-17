@@ -49,8 +49,11 @@ from it before drafting; do not recall it. This skill says what Agora changes.
    his word; `references/story-bank.md` section 8 is the list.
 8. **Voice profile and story bank live outside the repo.** Both files hold his career detail, and
    `github.com/DanceNitra/agora` is public. The filled copies live at
-   `C:/Users/Danculus/.config/linkedin/voice-profile.md` and `.../story-bank.md`; the skill reads
-   them from there and never writes them into the tree.
+   `C:/Users/Danculus/.config/linkedin/voice-profile.md` and `.../story-bank.md` (seeded
+   2026-09-17 from Agora's record; sections marked THIN wait for the owner's answers). Read both
+   before any draft; never write them into the tree. The Apify token lives in
+   `.agents/linkedin-skills-source/.env` (the whole directory is gitignored); the owner writes
+   it there himself. Check the layer with `python scripts/check_config.py` in that directory.
 9. **Comments on other people's posts do not name inspeximus.** The bundle's rule and ours agree:
    describe what we measured, let the profile carry the product.
 10. **Nothing goes outward before the owner taps approval**, and a comment on a maintainer's or
