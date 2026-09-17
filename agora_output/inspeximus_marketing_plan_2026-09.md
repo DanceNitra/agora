@@ -90,8 +90,9 @@ stage. No budget is proposed.
   `export_subject`, Art. 15/16/17), the query PLUR ranks for with three posts
 - new: "audit trail for AI agents: what the agent knew when it acted" (action ledger,
   `matches()`, agent-audit-trail export)
-- new: "mem0 to inspeximus migration" (MIGRATION_FROM_MEM0.md exists as a file; a page ranks, a
-  repo file does not)
+- ~~new: "mem0 to inspeximus migration"~~: live 2026-09-17 as migrate-from-mem0.html on 2.41.0, with a
+  real `import-mem0` run (no migration doc existed before; the importer was built for the page and the
+  red team's re-import-after-erasure break was fixed in code first)
 Each new page: claims reused from already-gated pages or the README; anything new goes through
 the gate.
 
