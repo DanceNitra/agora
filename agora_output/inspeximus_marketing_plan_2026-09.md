@@ -18,6 +18,10 @@ launching on Hacker News. What each source says is marked; what we measured is m
 | sitemaps, all five | "Couldn't fetch" for weeks; live test fetches them; resubmitted today |
 | README first screen | rebuilt today to the leaders' seven blocks (131560c, 64eb5a1) |
 | ai-act.html inbound links | 0 before today; README, storefront and root site now link it |
+| erasure.html, audit-trail.html | live 2026-09-17 on 2.39.1 after a 3-lens red team (four verifier holes fixed first); IndexNow accepted, GSC request queued for the quota reset |
+| good first issues | #30 to #33 open, labels in three axes, Discussions on |
+| LangChain #35357 / #35691 | KILLED at the pre-draft read: closed vendor pile-ons, maintainer hides pitches |
+| dev.to article | drafted, gated, canonical to ai-act.html; needs the owner's dev.to account |
 | category queries ("EU AI Act Article 12 logging agent", "agent memory GDPR erasure") | we appear nowhere; dev.to posts, PLUR (3 posts), LangChain issue #35357, supra-wall, asqav do |
 
 ## 1. Marketing (first)
