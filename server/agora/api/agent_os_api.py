@@ -1281,11 +1281,14 @@ def _outreach_destination_provenance(repo: str, issue_no: int) -> tuple[bool, st
     except Exception:
         return True, "unverified (correspondence store unreadable)"
     try:
+        # The ledger's path is defined once, in scout._STORE. The first version rebuilt it here
+        # from __file__, which was the same file by coincidence and could not be redirected by a
+        # test, so the only test of this branch read the live ledger and died when the ledger
+        # moved on.
         import json as _json
-        from pathlib import Path as _P
-        p = _P(__file__).resolve().parents[2] / ".scout.json"
-        if p.exists():
-            for r in _json.loads(p.read_text(encoding="utf-8")) or []:
+        from agora.execution.scout import _STORE as _ledger
+        if _ledger.exists():
+            for r in _json.loads(_ledger.read_text(encoding="utf-8")) or []:
                 if (r.get("repo") or "").strip().lower() == repo.lower() \
                         and int(r.get("issue") or 0) == issue_no:
                     return True, "a lead the Scout has ruled on"

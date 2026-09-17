@@ -79,6 +79,9 @@ def test_closing_an_old_record_still_names_the_owner(tmp_path, monkeypatch):
     close anonymously forever, so the backlog would keep failing the gate after the fix shipped."""
     box = tmp_path / ".scout_box.json"
     monkeypatch.setattr(scout, "_BOX", box)
+    # box_mark also writes the ledger (record_contacted, since 2026-09-06). With only the box
+    # redirected, this test wrote a fixture row into server/.scout.json on every run.
+    monkeypatch.setattr(scout, "_STORE", tmp_path / ".scout.json")
     scout._box_save([{"url": "https://example.org/issues/2", "status": "open", "found_ts": 0.0}])
     assert scout.box_mark("https://example.org/issues/2", "no_fit") is True
     rec = scout.box_load()[-1]

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -195,9 +196,30 @@ OUT_OF_REPO_WAIVERS = {
     "agora_output/lab/memops/pilot.py",   # repo-relative but under .gitignore's agora_output/lab/
     # Added 2026-09-14 for the guard-stamped-after-the-read post, pinned here 2026-09-17. They sat
     # unpinned for three days because the server-tests workflow had not run on main since 09-06.
+    # The third was pinned one push later: it passed on the one machine that has the file, which
+    # is the blind spot this set exists for, so the check below no longer trusts that machine.
     "C:/Users/Danculus/inspeximus-repo/probes/does_a_wider_change_signature_stop_the_silent_loss.py",
     "C:/Users/Danculus/inspeximus-repo/probes/what_a_concurrent_writer_is_told_against_what_the_store_keeps.py",
+    "C:/Users/Danculus/inspeximus-repo/probes/integrity_bench_revert.py",
 }
+
+
+def test_every_unpinned_waiver_names_a_tracked_file():
+    """The check that does not depend on which machine runs it.
+
+    `p.exists()` below is true on the owner's machine for every sibling-repo path, so an unpinned
+    out-of-repo waiver passes locally and fails only in CI. Git tracking is the same answer
+    everywhere: a waiver key that is not pinned must be a file this repository ships.
+    """
+    data = json.loads((TOOLS / "construction_waivers.json").read_text(encoding="utf-8"))
+    tracked = set(subprocess.run(["git", "ls-files", "--", "tools", "probes", "research", "agora_output"],
+                                 cwd=ROOT, capture_output=True, text=True, check=True).stdout.split())
+    for path in data:
+        if path.startswith("_") or path in OUT_OF_REPO_WAIVERS:
+            continue
+        assert path in tracked, (
+            f"waiver for {path} is neither pinned in OUT_OF_REPO_WAIVERS nor a file git tracks, so "
+            "it passes here and fails in every other checkout")
 
 
 def test_waivers_point_at_files_that_exist_and_still_have_the_finding():

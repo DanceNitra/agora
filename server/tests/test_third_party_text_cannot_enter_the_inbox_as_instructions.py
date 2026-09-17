@@ -21,6 +21,7 @@ injection walks past it. This file tests the half that is deterministic.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -156,29 +157,57 @@ def _prov():
     return importlib.import_module("agora.api.agent_os_api")._outreach_destination_provenance
 
 
-def test_a_thread_from_no_record_is_flagged_not_refused():
+@pytest.fixture()
+def stores(tmp_path, monkeypatch):
+    """The three records _outreach_destination_provenance reads, each redirected to an empty file.
+
+    The first version of these tests read the LIVE stores. Two things went wrong with that. The
+    ruled-on case named openclaw/openclaw#7707, which was in .scout.json on 2026-08-14 and is not
+    any more, so the test failed on the machine it was written on. And in CI the skip that should
+    have covered a fresh checkout stopped firing on 2026-09-06, when box_mark began writing the
+    ledger and two tests that redirect only the box left a two-row .scout.json in the checkout.
+    A fixture answers the question the test asks, which is about the reader, on every machine.
+    """
+    sys.path.insert(0, str(ROOT / "server"))
+    import importlib
+    scout = importlib.import_module("agora.execution.scout")
+    corr = importlib.import_module("agora.execution.correspondent")
+    box, ledger, letters = tmp_path / "box.json", tmp_path / "ledger.json", tmp_path / "corr.json"
+    for p in (box, ledger, letters):
+        p.write_text("[]", encoding="utf-8")
+    monkeypatch.setattr(scout, "_BOX", box)
+    monkeypatch.setattr(scout, "_STORE", ledger)
+    monkeypatch.setattr(corr, "_STORE", letters)
+    return {"box": box, "ledger": ledger, "letters": letters}
+
+
+def test_a_thread_from_no_record_is_flagged_not_refused(stores):
     known, why = _prov()("attacker/evil-repo", 42)
     assert known is False and why == "no record"
 
 
-def test_a_new_issue_with_no_thread_is_normal():
+def test_a_new_issue_with_no_thread_is_normal(stores):
     assert _prov()("", 0)[0] is True
 
 
-def test_a_thread_the_scout_ruled_on_is_recognised():
-    """openclaw#7707 is in .scout.json — the ledger the first version forgot, which is what made it
-    reject threads we had engaged with by hand."""
-    # .scout.json is runtime state and is not tracked, so a fresh checkout has no ledger for the
-    # reader to recognise anything from. The assertion is about the reader, not the environment.
-    #
-    # The path is server/.scout.json, which is where agent_activity._load resolves it. The first
-    # version of this skip asked ROOT, the repo root, which is one level up and never holds the
-    # file, so it skipped on this machine too and quietly cost a passing test. Ask the location the
-    # code under test actually reads.
-    if not (ROOT / "server" / ".scout.json").exists():
-        pytest.skip("no .scout.json in this environment; there is no ledger to read")
+def test_a_thread_the_scout_ruled_on_is_recognised(stores):
+    """A thread in .scout.json, the ledger the first version forgot, which is what made it reject
+    threads we had engaged with by hand. The row is the shape record_contacted writes."""
+    stores["ledger"].write_text(json.dumps([
+        {"url": "https://github.com/openclaw/openclaw/issues/7707", "repo": "openclaw/openclaw",
+         "issue": 7707, "outcome": "drafted", "ts": 0.0}]), encoding="utf-8")
     known, why = _prov()("openclaw/openclaw", 7707)
     assert known is True and "Scout" in why
+    # the control: the same ledger does not vouch for a thread it does not hold
+    assert _prov()("openclaw/openclaw", 7708) == (False, "no record")
+
+
+def test_an_unreadable_ledger_errs_toward_known(stores):
+    """A momentarily corrupt file must not turn every proposal into a false alarm, or the warning
+    stops being read. This is the branch a loader that swallows errors would silently remove."""
+    stores["ledger"].write_text("{not json", encoding="utf-8")
+    known, why = _prov()("attacker/evil-repo", 42)
+    assert known is True and "unreadable" in why
 
 
 def test_the_endpoint_warns_rather_than_refusing():

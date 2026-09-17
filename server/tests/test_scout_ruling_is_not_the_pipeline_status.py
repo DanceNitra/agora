@@ -36,6 +36,9 @@ def box(tmp_path, monkeypatch):
                               "kind": "contribute", "status": "open",
                               "found_ts": time.time()}]), encoding="utf-8")
     monkeypatch.setattr(S, "_BOX", p)
+    # box_mark also writes the ledger (record_contacted, since 2026-09-06). With only the box
+    # redirected, the marking test wrote a fixture row into server/.scout.json on every run.
+    monkeypatch.setattr(S, "_STORE", tmp_path / "ledger.json")
     return p
 
 
