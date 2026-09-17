@@ -86,6 +86,49 @@ first code block. The leaders keep it; they do not open with it.
    sidebar sections hidden.
 7. **Weekly read** of Search Console into the loop, with the four numbers above.
 
+
+## What the frames showed that the transcripts did not (watched 2026-09-17, frame by frame)
+
+Eddie Jaoude's repo walkthrough (bASuF1TbMy4), the screen itself:
+- The repo header carries 40 open issues, 12 open PRs, Discussions ON, 34 labels in three axes
+  (`aspect: interface`, `goal: improvement`, `talk: discussion`), milestones, and "Open in Gitpod"
+  on every PR. A repo that looks worked-on is the first trust signal, before the README.
+- A product screenshot sits inside the README, not a chart about the product.
+- Community profile: every row green (description, README, code of conduct, contributing,
+  license, issue templates, PR template). Ours was 57% until 2026-09-17.
+- Repo settings: website URL and topics filled; unused sidebar sections (Packages, Environments)
+  hidden so the page does not read as dormant; Releases used as the visible heartbeat.
+
+Matthew Yonkovit's slides (CFIVdndP5Hs):
+- The funnel: millions who could use it -> tens of thousands who find it (awareness) -> thousands
+  who try it (easy) -> hundreds who rely on it (a kick-ass product). Driving awareness before the
+  product is ready "can damage your project's reputation"; early days go to product and engineering.
+- Good docs, nine points: explains the project and use cases in common language; understood in
+  10 seconds on the first page; visuals, even unpolished; navigation easy; install instructions
+  AND recipes/examples/tutorials; installation covers the common scenarios; language-specific
+  examples in separate sections; a way to give feedback; docs as a repo.
+- Free-to-paid converts on: better security, support ("the insurance"), zero ops, automation,
+  and company policy: "companies may have specific compliance requirements". That is the
+  inspeximus-pro pitch in one slide.
+- Open-source adoption is not commercial success; track both, with different metrics.
+
+The AI-search video (bhTo8fDmr5I) demoed a content editor: pages built as an outline of questions
+(H2 = the question), each section with a fact and its source, and a "topics and questions" panel
+listing what competing pages answer. That is the page template for every query page we build.
+
+YC's dev-tools talk (z1aKRhRnVNk), transcript read in full: nobody knows you, so the first users
+come from personal outreach, not inbound; launch on Show HN and launch again on every release
+(Ollama did; Supabase runs a launch week each quarter); reply to every comment, including the
+hostile ones, for the benefit of the readers; open source is the go-to-market for a library;
+the paid tier is the enterprise set (SSO, audit logs, disaster recovery, SLA); sell with a demo,
+never a deck; "documentation is marketing" and a feature is not done until its doc is.
+
+## Where the transcripts live
+
+`agora_output/study/videos.jsonl.gz` (deduplicated, 12 videos, 102 KB) with an index in
+`agora_output/study/videos.md`. `python tools/watch_library.py list`. Temp directories from
+/watch are deleted by `python tools/watch_library.py clean` after each study pass.
+
 ## What this does not override
 
 The standing gate (validate, storm, stress-claim, verify-claims, humanizer) still decides
