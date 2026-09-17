@@ -299,7 +299,7 @@ META = {
                 "self-check on your own store and see what your delete really removed.",
         "desc_sk": "delete() tvojho agenta vráti úspech - to neznamená, že dáta odišli. Spusti si voľnú "
                    "kontrolu na vlastnom úložisku a zisti, čo tvoje mazanie naozaj odstránilo.",
-        "date": "2026-08-01",
+        "date": "2026-08-01", "modified": "2026-09-17",
         "tags": "Agent memory · GDPR Article 17 · Right to erasure · Verification",
         "tags_sk": "Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie",
         "kicker": "Tools", "kicker_sk": "Nástroje",
