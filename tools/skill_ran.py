@@ -49,6 +49,7 @@ import argparse
 import io
 import json
 import os
+import re
 import sys
 import time
 
@@ -64,6 +65,19 @@ ALIASES = {"verify": ("verify-claims", "verify"),
            "humanizer": ("humanizer",)}
 
 
+def project_slug(path):
+    """The directory name Claude Code gives `path` under ~/.claude/projects.
+
+    The harness replaces every character that is not a letter or a digit with a hyphen, so
+    `C:\\Users\\Danculus\\agora` becomes `C--Users-Danculus-agora` (the colon and the first backslash
+    both turn into hyphens). This is the rule `hooks/memory_index_receipt.py` applies, and it is the
+    one to keep: the first version of this function prefixed a literal `C--` and stripped the
+    colon, which produced `C--C-Users-Danculus-agora`, a directory that does not exist, so the
+    fallback below never found a transcript and every `--in-session` receipt was refused.
+    """
+    return re.sub(r"[^A-Za-z0-9]", "-", os.path.abspath(path))
+
+
 def transcript_path():
     """The current session's transcript, from the environment the harness sets."""
     p = os.environ.get("CLAUDE_TRANSCRIPT_PATH")
@@ -71,8 +85,7 @@ def transcript_path():
         return p
     # Fall back to the newest transcript for this project directory. Newest rather than any, because
     # an older session's Skill call is not evidence about this draft.
-    slug = "C--" + os.path.abspath(ROOT).replace(":", "").replace("\\", "-").replace("/", "-").lstrip("-")
-    d = os.path.join(os.path.expanduser("~/.claude/projects"), slug)
+    d = os.path.join(os.path.expanduser("~/.claude/projects"), project_slug(ROOT))
     if not os.path.isdir(d):
         return None
     files = [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".jsonl")]
