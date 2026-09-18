@@ -142,6 +142,7 @@ def cmd_batch_add(a) -> int:
         "text": text,
         "sha": _sha(text),
         "why": a.why or "",
+        "links_ok": a.allow_links or "",   # a link in a reply is fine when the other party asked for it
         "status": "drafted",
     }
     b["items"].append(item)
@@ -153,15 +154,15 @@ def cmd_batch_add(a) -> int:
 def _check_item(it: dict, ledger: list[dict], day: str) -> list[str]:
     errs = []
     lo, hi = LIMITS["post_chars"] if it["kind"] == "post" else LIMITS["comment_chars"]
-    n = len(it["text"])
+    n = len(re.sub(r"https?://\S+", "", it["text"]) if it.get("links_ok") else it["text"])  # requested links are not prose
     if not lo <= n <= hi:
         errs.append(f"length {n} outside {lo}-{hi}")
     if "—" in it["text"] or "–" in it["text"]:
         errs.append("em or en dash")
     if it["kind"] != "post" and re.search(r"inspeximus", it["text"], re.I):
         errs.append("names the product in a comment on someone else's post")
-    if it["kind"] != "post" and re.search(r"https?://", it["text"]):
-        errs.append("a link in a comment")
+    if it["kind"] != "post" and re.search(r"https?://", it["text"]) and not it.get("links_ok"):
+        errs.append("a link in a comment (allowed only with --allow-links '<who asked>')")
     if it["kind"] == "post" and re.search(r"https?://", it["text"]):
         errs.append("a link in the post body (it belongs in the first comment)")
     m = re.match(r"\s*[^.!?\n]*([.!?])", it["text"])
@@ -243,7 +244,8 @@ def cmd_batch_approve(a) -> int:
         sys.exit("run `batch check` and clear every FAIL before approving")
     b["approved"] = {"at": _now().isoformat(), "words": a.words}
     for it in b["items"]:
-        it["status"] = "approved"
+        if it.get("status") != "posted":      # a second approval in the day must not un-post what went out
+            it["status"] = "approved"
     _save_batch(b)
     print(f"batch {d} approved: {len(b['items'])} items may go out, {LIMITS['min_minutes_between_clicks']} min apart")
     return 0
@@ -345,7 +347,8 @@ def main() -> int:
     bp = s.add_parser("batch"); bs = bp.add_subparsers(dest="bcmd", required=True)
     x = bs.add_parser("new"); x.add_argument("--date"); x.add_argument("--force", action="store_true"); x.set_defaults(fn=cmd_batch_new)
     x = bs.add_parser("add"); x.add_argument("kind"); x.add_argument("--date"); x.add_argument("--target"); x.add_argument("--author")
-    x.add_argument("--slug"); x.add_argument("--text-file", required=True); x.add_argument("--why"); x.set_defaults(fn=cmd_batch_add)
+    x.add_argument("--slug"); x.add_argument("--text-file", required=True); x.add_argument("--why")
+    x.add_argument("--allow-links", help="who asked for the link, verbatim; lifts the no-link rule for this item"); x.set_defaults(fn=cmd_batch_add)
     x = bs.add_parser("check"); x.add_argument("--date"); x.set_defaults(fn=cmd_batch_check)
     x = bs.add_parser("show"); x.add_argument("--date"); x.set_defaults(fn=cmd_batch_show)
     x = bs.add_parser("approve"); x.add_argument("--date"); x.add_argument("--words", required=True); x.set_defaults(fn=cmd_batch_approve)
