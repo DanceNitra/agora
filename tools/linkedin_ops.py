@@ -203,7 +203,7 @@ def cmd_batch_check(a) -> int:
     if own > LIMITS["own_posts_per_week"]:
         print(f"FAIL  {own} own posts in 7 days > {LIMITS['own_posts_per_week']}"); bad += 1
     for it in b["items"]:
-        errs = _check_item(it, ledger, d)
+        errs = [] if it.get("status") == "posted" else _check_item(it, ledger, d)  # what went out is not re-judged
         it["check"] = errs
         print(("ok    " if not errs else "FAIL  ") + f"{it['id']} {it['kind']:7s} {it['author'] or it['slug']}" + ("" if not errs else "\n        " + "\n        ".join(errs)))
         bad += bool(errs)
