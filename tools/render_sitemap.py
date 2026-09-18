@@ -45,6 +45,9 @@ def build():
     for f in ("track-record.html", "research-digest.html", "forecast.html"):
         if (ROOT / "public" / f).exists():
             urls.append((f"{SITE}/public/{f}", None))
+    # Podcast episode pages: one per episode, the og:image LinkedIn and X need, a Spotify embed.
+    for f in sorted((ROOT / "public" / "podcast").glob("*.html")):
+        urls.append((f"{SITE}/public/podcast/{f.name}", None))
     # `inspeximus` is deliberately NOT here. /public/inspeximus/ canonicalises CROSS-SITE to
     # https://dancenitra.github.io/inspeximus/ -- the product's own Pages site, which is live and holds
     # near-identical content (measured: 88% 5-gram overlap). A sitemap must not submit a URL the page
