@@ -516,6 +516,22 @@ def _extract_faq(md: str):
     return out
 
 
+def _og_image(slug: str) -> str:
+    """The og:image and twitter:image tags for a post, or nothing.
+
+    LinkedIn refuses a Featured link and shows no card in the feed when a page has no og:image;
+    measured 2026-09-18 on the erasure post ("We couldn't generate a preview for this link"). The
+    image lives at public/posts/og/<slug>.png, 1200 x 630, made by tools/og_image.py from the
+    episode cover or a plain title card. A post with no file gets no tag rather than a broken URL.
+    """
+    f = ROOT / "public" / "posts" / "og" / f"{slug}.png"
+    if not f.exists():
+        return ""
+    url = f"{SITE}/posts/og/{slug}.png"
+    return (f'\n<meta property="og:image" content="{url}">\n<meta property="og:image:width" content="1200">'
+            f'\n<meta property="og:image:height" content="630">\n<meta name="twitter:image" content="{url}">')
+
+
 def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual: bool) -> None:
     """Write {slug}.html from the editorial template and record the post in the manifest.
     Mono-lingual (bilingual=False) hides the language toggle and shows EN only."""
@@ -563,7 +579,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
         mono="" if bilingual else " data-mono",
         title=html.escape(m["title"]), title_sk=html.escape(title_sk),
         h1=html.escape(h1), h1_sk=html.escape(h1_sk),
-        desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld,
+        desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld, ogimage=_og_image(m["slug"]),
         kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, datehuman_sk=datehuman_sk, read=read,
         tags=m["tags"], tags_sk=tags_sk,
         tldr=html.escape(m["desc"]), tldr_sk=html.escape(desc_sk),
@@ -655,7 +671,7 @@ TEMPLATE = """<!DOCTYPE html>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{site}/posts/{slug}.html">
-<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta property="og:site_name" content="Agora — autonomous research OS">{ogimage}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{desc}">
