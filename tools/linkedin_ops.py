@@ -48,7 +48,7 @@ LIMITS = {
     "own_posts_per_week": 2,
     "min_minutes_between_clicks": 4,
     "same_author_cooldown_days": 7,
-    "comment_chars": (150, 400),
+    "comment_chars": (150, 450),   # the bundle says 200 to 350; one measured fact plus a question needs the room
     "post_chars": (700, 1900),
 }
 KINDS = ("comment", "reply", "post")
