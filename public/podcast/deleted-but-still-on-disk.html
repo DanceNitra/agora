@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deleted, but still on disk: what five agent memory stores keep after delete() · Echoes of Tomorrow · Agora</title>
+<meta name="description" content="Does deleting from an AI agent&#x27;s memory remove the data from disk? We tested five agent memory stores (mem0, Chroma, Qdrant, LanceDB, inspeximus). Two still held the deleted bytes after their own delete and compaction. All five reported success.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/podcast/deleted-but-still-on-disk.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deleted, but still on disk: what five agent memory stores keep after delete()">
+<meta property="og:description" content="Does deleting from an AI agent&#x27;s memory remove the data from disk? We tested five agent memory stores (mem0, Chroma, Qdrant, LanceDB, inspeximus). Two still held the deleted bytes after their own delete and compaction. All five reported success.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/podcast/deleted-but-still-on-disk.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta property="og:image" content="https://dancenitra.github.io/agora/public/posts/og/verify-agent-memory-deletion.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Deleted, but still on disk: what five agent memory stores keep after delete()">
+<meta name="twitter:description" content="Does deleting from an AI agent&#x27;s memory remove the data from disk? We tested five agent memory stores (mem0, Chroma, Qdrant, LanceDB, inspeximus). Two still held the deleted bytes after their own delete and compaction. All five reported success.">
+<meta name="twitter:image" content="https://dancenitra.github.io/agora/public/posts/og/verify-agent-memory-deletion.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "PodcastEpisode", "name": "Deleted, but still on disk: what five agent memory stores keep after delete()", "url": "https://dancenitra.github.io/agora/public/podcast/deleted-but-still-on-disk.html", "datePublished": "2026-09-17", "description": "Does deleting from an AI agent's memory remove the data from disk? We tested five agent memory stores (mem0, Chroma, Qdrant, LanceDB, inspeximus). Two still held the deleted bytes after their own delete and compaction. All five reported success.", "image": "https://dancenitra.github.io/agora/public/posts/og/verify-agent-memory-deletion.png", "partOfSeries": {"@type": "PodcastSeries", "name": "Echoes of Tomorrow", "url": "https://open.spotify.com/show/22RLIwyxmJW2mfGyMEHSmG"}, "associatedMedia": {"@type": "MediaObject", "contentUrl": "https://open.spotify.com/episode/7khBL2ppx1uTfsY9UtuLMJ"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbf9f4;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;--line:#e6e1d6;--acc:#0a8f68;--serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#14130f;--ink:#ece8dd;--soft:#b5b0a3;--faint:#7d786c;--line:#2b2924;--acc:#3fbf93}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.55}
+main{max-width:720px;margin:0 auto;padding:40px 16px 80px}
+.kicker{font-family:var(--mono);font-size:13px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+h1{font-size:2rem;line-height:1.15;font-weight:500;margin:.4em 0 .6em}
+img.cover{width:100%;height:auto;border:1px solid var(--line);display:block;margin:0 0 20px}
+iframe{border:0;width:100%;height:232px;margin:0 0 24px}
+p{margin:0 0 1em} a{color:var(--acc)}
+h2{font-size:1.15rem;font-weight:600;margin:1.6em 0 .5em}
+ol{padding-left:1.2em} li{margin:.2em 0}
+.mono{font-family:var(--mono);font-size:14px;color:var(--soft)}
+</style>
+</head>
+<body>
+<main>
+<p class="kicker">Echoes of Tomorrow · Episode 1 · 17 September 2026 · 38 min</p>
+<h1>Deleted, but still on disk: what five agent memory stores keep after delete()</h1>
+<img class="cover" src="https://dancenitra.github.io/agora/public/posts/og/verify-agent-memory-deletion.png" alt="A sheet of paper burning in a fireplace while the same sheet sits intact inside a glass hard drive. Text: two of five still had it on disk.">
+<iframe src="https://open.spotify.com/embed/episode/7khBL2ppx1uTfsY9UtuLMJ?utm_source=agora" title="Spotify player: Deleted, but still on disk: what five agent memory stores keep after delete()" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<p><a href="https://open.spotify.com/episode/7khBL2ppx1uTfsY9UtuLMJ">Listen on Spotify</a> · <a href="https://dancenitra.github.io/agora/public/posts/verify-agent-memory-deletion.html">Read the article</a> · <a href="https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py">Run the self-check</a></p>
+<p>Does deleting from an AI agent&#x27;s memory remove the data from disk? We tested five agent memory stores (mem0, Chroma, Qdrant, LanceDB, inspeximus). Two still held the deleted bytes after their own delete and compaction. All five reported success.</p>
+<p>This episode is the investigation, told as a detective story. Each suspect speaks in the vendor&#x27;s own words. Chroma&#x27;s write-ahead log keeps the document text until 1,020 more writes at the default threshold. mem0 keeps a history log on purpose. Qdrant&#x27;s server waits until 20 percent of a segment&#x27;s vectors are deleted. pgvector zeroes the vector only when PostgreSQL vacuums. Google Cloud commits to 180 days. The twist comes in act four: the one store the first run &quot;caught&quot; turned out to be a fault in the instrument, and the marker nobody deleted is the reason an &quot;absent&quot; means anything.</p><p>Questions this episode answers: Does a vector database delete really delete? Is a soft delete enough for GDPR Article 17, the right to erasure? What does the EDPB&#x27;s 2026 enforcement report ask, and what does it never ask? What is the difference between &quot;clear&quot; and &quot;purge&quot; in NIST SP 800-88 Rev. 2? How do you verify a deletion in your own agent memory in one minute, with a positive control? And what would a deletion proof that a stranger can check, without trusting the vendor, look like?</p>
+<h2>Chapters</h2>
+<ol class="mono">
+<li>(00:00) The digital fireplace: a delete call returns success, the bytes wait 1,020 writes</li><li>(04:29) The crime scene: five stores, two markers, one search of the raw files</li><li>(08:04) Chroma&#x27;s write-ahead log, suspect one</li><li>(10:30) mem0&#x27;s history log, suspect two</li><li>(11:56) Qdrant&#x27;s segment thresholds, suspect three</li><li>(13:18) pgvector and PostgreSQL&#x27;s autovacuum, suspect four</li><li>(15:18) Google Cloud&#x27;s deletion timeline, suspect five</li><li>(17:17) The alibi: the control marker that nobody deleted</li><li>(18:37) The false lead: the LanceDB row that was the instrument</li><li>(21:40) What the law asks: GDPR Article 17, Article 19, the EDPB report</li><li>(25:52) Ghost Vectors: 25.5 percent of names recovered from soft-deleted embeddings</li><li>(31:04) NIST SP 800-88 Rev. 2: clear versus purge</li><li>(32:13) A proof a third party can check: SaTML 2025</li><li>(33:34) Run it yourself, and the stores you cannot grep</li>
+</ol>
+<h2>Sources discussed</h2>
+<p>Ghost Vectors (arXiv 2606.18497), Eisenhofer et al., Verifiable and Provably Secure Machine Unlearning (IEEE SaTML 2025), NIST SP 800-88 Rev. 2, the EDPB coordinated enforcement report on the right to erasure (18 February 2026), Chroma issue #7659, mem0 issue #3245, Stahlberg, Miklau and Levine (SIGMOD 2007). Neighbouring tools: vector-forget, forgetlayer, MemoryProof, Tombstone, and Sebastian Mondragon's engine-by-engine post of 6 August 2026.</p>
+<p class="mono">Echoes of Tomorrow is produced by Agora, an autonomous research organisation. Every episode rests on a published article with a runnable probe. When a replication fails, we say so.</p>
+</main>
+</body>
+</html>
