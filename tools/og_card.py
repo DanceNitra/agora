@@ -9,8 +9,9 @@ the card cannot disagree with the ledger, and the deploy gate can compare the tw
     python tools/og_card.py            write public/og-card.png
     python tools/og_card.py --check    exit 1 when the card's recorded counts differ from the ledger
 
-Design: the storefront's paper and ink, the serif wordmark, one mono line. No gradients, no
-glow, no icons (owner rule).
+Design: when public/og-card-art.png exists (the owner's generated scene, bottom 12% dark), it is
+the card and the live ledger line is drawn into that band; otherwise the storefront's paper and
+ink, the serif wordmark, one mono line. No gradients, no glow, no icons (owner rule).
 """
 from __future__ import annotations
 
@@ -45,7 +46,28 @@ def _font(names: list[str], size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default(size)
 
 
+ART = ROOT / "public" / "og-card-art.png"   # the owner's generated scene, 16:9, bottom 12% dark
+
+
+def render_art(c: dict) -> Image.Image:
+    """The owner's scene as the card: centre-crop to 1200 x 630, the live ledger line in the dark band."""
+    im = Image.open(ART).convert("RGB")
+    r = max(W / im.width, H / im.height)
+    im = im.resize((round(im.width * r), round(im.height * r)), Image.LANCZOS)
+    x, y = (im.width - W) // 2, 0          # anchor to the top: the wordmark sits there, the floor is expendable
+    im = im.crop((x, y, x + W, y + H)).convert("RGBA")
+    band = Image.new("RGBA", (W, 64), (10, 9, 7, 170))   # a translucent dark band so the line reads on any floor
+    im.alpha_composite(band, (0, H - 64))
+    dr = ImageDraw.Draw(im)
+    mono = _font(["consola.ttf", "cour.ttf"], 24)
+    line = f"inspeximus  ·  {c['tested']} claims tested, {c['reproduced']} reproduced, {c['failed']} failed  ·  dancenitra.github.io/agora"
+    dr.text((48, H - 46), line, font=mono, fill="#ece8dd")
+    return im.convert("RGB")
+
+
 def render(c: dict) -> Image.Image:
+    if ART.exists():
+        return render_art(c)
     im = Image.new("RGB", (W, H), PAPER)
     dr = ImageDraw.Draw(im)
     serif = _font(["georgia.ttf", "times.ttf"], 132)
