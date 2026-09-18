@@ -22,6 +22,7 @@ their own text, and inLanguage sk -- otherwise the Slovak hub pages would carry 
 Idempotent: a page that already has JSON-LD is left alone.
 """
 from __future__ import annotations
+from pathlib import Path
 
 import io
 import json
@@ -54,6 +55,18 @@ PAGES = {
     "public/research-digest.html": {"type": "CollectionPage"},
 }
 
+
+
+def _og_card_version() -> str:
+    """A cache key for the share card: LinkedIn keeps an image by URL for weeks, so the URL must
+    change when the card does. tools/og_card.py writes the counts it drew into public/og-card.json."""
+    import json
+    stamp = Path(__file__).resolve().parents[1] / "public" / "og-card.json"
+    try:
+        c = json.loads(stamp.read_text(encoding="utf-8"))
+        return f"{c['tested']}-{c['reproduced']}-{c['failed']}"
+    except Exception:  # noqa: BLE001
+        return "0"
 
 def _head_text(soup: BeautifulSoup) -> tuple[str, str]:
     title = (soup.title.string or "").strip() if soup.title else ""
@@ -97,7 +110,7 @@ def build(path: pathlib.Path, spec: dict, url: str, lang: str) -> bool:
     (soup.head or soup).append(script)
 
     added = [k for k, v in (("og:url", url), ("og:site_name", "Agora"),
-                            ("og:image", f"{SITE}/public/og-card.png"),
+                            ("og:image", f"{SITE}/public/og-card.png?v={_og_card_version()}"),
                             ("og:image:alt", "Agora — research that ships receipts"),
                             ("og:locale", "sk_SK" if lang == "sk" else "en_US"))
              if _add_meta(soup, "og", k, v)]
