@@ -1,13 +1,13 @@
 {
   "kind": "static-log-cosignature",
   "log_url": "https://dancenitra.github.io/inspeximus/transparency",
-  "n_writes": 192,
-  "observed_utc": "2026-09-17T10:23:21Z",
+  "n_writes": 224,
+  "observed_utc": "2026-09-18T10:01:47Z",
   "scope": "This says one witness saw this exact head and that it extends what the same witness saw before. It does NOT say any entry is true, and it cannot see a different history shown to somebody else between visits.",
-  "signature": "401447cd9137d86f90c9793fce51dbb0dc2b233962db106b638313aa3ec711520f116b5cd45e0766a009f02bc1d9668854ce7a222b3f10ed58a3892c8317d10d",
-  "sth_hash": "f1c0aec7136865476939dc65eb82ed028ca932272d54fb009ddbf380c6f01093",
+  "signature": "ba3973a7fc8ce7fb654145a12e99a74479d818ba8aaa4ffc67a453d8d27d3979be9f09e0b87d253ecbb43e115ba804174a8bc0d6959b86d0949b01003ea3e807",
+  "sth_hash": "62a4308ce8c04af3a10a75577c6fdf6248da068b906eaef796c573a1430a47fe",
   "verdict": "EXTENDS",
   "witness_name": "agora CI (SAME OWNER as the log, not an independent witness)",
   "witness_pubkey": "ee9a12ff79d4ebc999c83857b9b8316fa5ccd104a30a94c3d8f262f69e4f3aac",
-  "writes_tip": "ca4d5e7cdc974fc3719d5e950d64f4b9390fbb1b0cbcfdd111798f05ac86e2cf"
+  "writes_tip": "6225aaa1eed0a070871c1e4bddc4a89421998f3e866fd283166bbbe400639e7f"
 }
