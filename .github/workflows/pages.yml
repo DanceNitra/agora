@@ -73,6 +73,13 @@ jobs:
         # check that reads the page itself still passes.
         run: python3 tools/render_writing_index.py --check
 
+      - name: The homepage share card must carry the ledger's current counts
+        # Measured 2026-09-18: public/og-card.png from 2026-07-12 still named the product "mnemo" and
+        # was what LinkedIn showed for the whole site. An image is not diffed in review; the stamp is.
+        run: |
+          pip install --quiet pillow
+          python3 tools/og_card.py --check
+
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |
           python3 - <<'PY'
