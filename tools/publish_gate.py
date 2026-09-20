@@ -110,8 +110,22 @@ def enforce(paths, label: str, *, unresolved=(), external=(), require_nonempty: 
                             "not in the repo it names" % u)
 
     if not paths and require_nonempty and not external:
-        problems.append("NO artifact resolved for %r. An empty target set is a refusal: a gate that "
-                        "audits nothing cannot tell you the claim is safe." % label)
+        # A DRAFT WITH NO RUNNABLE MODEL OF OURS can be waived, in writing, under its own path with
+        # the kind NO-ARTIFACT and a reason: a review reply whose figures come from someone else's
+        # harness, a letter whose numbers quote the other side. Until 2026-09-20 the waiver file
+        # was consulted only per artifact, so a NO-ARTIFACT entry written for a draft was never
+        # read and the refusal stood however good the reason; the 2026-09-18 book-chapter reply
+        # carried exactly such a waiver and was refused all the same.
+        _lab = Path(label)
+        _rel = _lab.relative_to(ROOT).as_posix() if _lab.is_absolute() and ROOT in _lab.parents else str(label).replace("\\", "/")
+        _w = waivers.get(_rel, {})
+        if "NO-ARTIFACT" in set(_w.get("kinds", [])) and str(_w.get("reason", "")).strip():
+            print("  waived [NO-ARTIFACT] %s — %s (dated %s)" % (_rel, _w["reason"], _w.get("date") or _w.get("dated", "?")))
+        else:
+            problems.append("NO artifact resolved for %r. An empty target set is a refusal: a gate that "
+                            "audits nothing cannot tell you the claim is safe. A draft with no runnable "
+                            "model of ours is waived under its own path with kind NO-ARTIFACT and a "
+                            "reason." % label)
 
     for p in sorted(set(paths)):
         rel = p.relative_to(ROOT).as_posix() if ROOT in p.parents else p.as_posix()

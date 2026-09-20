@@ -123,5 +123,19 @@
   ],
   "reason": "OPENAI_API_KEY is read only inside run_hindsight(), the Hindsight column, whose extractor needs a model. The number published from this probe (store-resolved 20/20 for inspeximus, --systems inspeximus) never enters that function: the inspeximus path reads the raw recall payload with no judge, no key and no network, and the probe refuses to score Hindsight at all when the key is absent rather than scoring an empty store. The knob therefore cannot change the inspeximus value; the Hindsight and mem0 columns state their extractor next to every number in probes/INTEGRITY_BENCHMARK.md.",
   "dated": "2026-09-17"
+ },
+ "agora_output/drafts/20260918_edrn_issue2_book_chapter_reply.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-18",
+  "reason": "A reply to a co-author who asked us to check his book chapter about our work. Every figure in it is a quotation of what the chapter says and of what our own earlier comments on Issue #2 and Issue #1 (5150703763, 5430290397, the PR #6 manuscript text) say, checked line by line against those comments in this session; none is computed by a probe for this reply, so there is no runnable model to audit and the empty target set is correct. The chapter's own account was checked against the same comments and found accurate."
+ },
+ "agora_output/drafts/20260920_agmi_pr1_review_reply.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-20",
+  "reason": "A reply to a maintainer's review on tech4biz-yasha/agmi#1 listing the three edits he asked for. Its figures are a commit id (3a19ede, upstream main), a pytest count (16 passed, 3 skipped) and the full_runner table (read/audit/audit, reported), all produced this cycle by the maintainer's own harness in a fresh venv against inspeximus 3.0.0 from PyPI, not by a probe of ours, so there is no runnable model of ours to audit and the empty target set is correct."
  }
 }
