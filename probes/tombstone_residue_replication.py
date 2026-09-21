@@ -57,6 +57,7 @@ def marker_check() -> dict:
     """Write two marker points to a Qdrant local store, delete one, read the files back."""
     import glob
     import os
+    import struct
     import tempfile
 
     from qdrant_client import QdrantClient
@@ -68,9 +69,14 @@ def marker_check() -> dict:
     c.upsert("kb", [PointStruct(id=1, vector=[0.7654321] * 8, payload={"t": "MARKER_DELETED_XYZ"}),
                     PointStruct(id=2, vector=[0.1234567] * 8, payload={"t": "MARKER_KEPT_XYZ"})])
 
-    def found() -> tuple[bool, bool]:
+    # The vector itself is stored as a pickled numpy array, big-endian float64, so the marker is
+    # looked for both as its payload string and as the raw bytes of its first coordinate.
+    kill_vec = struct.pack(">d", 0.7654321)
+    keep_vec = struct.pack(">d", 0.1234567)
+
+    def found() -> tuple[bool, bool, bool, bool]:
         blob = b"".join(open(f, "rb").read() for f in glob.glob(d + "/**/*", recursive=True) if os.path.isfile(f))
-        return b"MARKER_DELETED_XYZ" in blob, b"MARKER_KEPT_XYZ" in blob
+        return (b"MARKER_DELETED_XYZ" in blob, b"MARKER_KEPT_XYZ" in blob, kill_vec in blob, keep_vec in blob)
 
     before = found()
     c.delete("kb", points_selector=[1])
@@ -80,7 +86,9 @@ def marker_check() -> dict:
     secure = sqlite3.connect(db).execute("pragma secure_delete").fetchone()[0]
     return {"sqlite_version": sqlite3.sqlite_version, "secure_delete": secure,
             "deleted_marker_before": before[0], "deleted_marker_after": after[0],
-            "control_marker_before": before[1], "control_marker_after": after[1]}
+            "control_marker_before": before[1], "control_marker_after": after[1],
+            "deleted_vector_before": before[2], "deleted_vector_after": after[2],
+            "control_vector_before": before[3], "control_vector_after": after[3]}
 
 
 def main() -> int:
@@ -90,10 +98,11 @@ def main() -> int:
     if "--marker" in sys.argv:
         r = marker_check()
         print("\nQdrant local-mode marker check:", json.dumps(r))
-        if not (r["control_marker_before"] and r["control_marker_after"]):
+        if not (r["control_marker_before"] and r["control_marker_after"] and r["control_vector_before"] and r["control_vector_after"]):
             print("CONTROL FAILED: the undeleted marker is not readable, the scan cannot be trusted")
             return 2
-        verdict = "bytes stay after delete" if r["deleted_marker_after"] else "bytes are gone after delete"
+        stays = r["deleted_marker_after"] or r["deleted_vector_after"]
+        verdict = "bytes stay after delete" if stays else "bytes are gone after delete (payload and vector)"
         print(f"{verdict}; pragma secure_delete = {r['secure_delete']} (SQLite {r['sqlite_version']})")
     return 0
 

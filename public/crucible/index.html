@@ -6,9 +6,9 @@
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 13 failed, 23 not-computable, 1 retracted by us (58 verdicts). Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 22 reproduced, 14 failed, 23 not-computable, 1 retracted by us (60 verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 13 failed, 23 not-computable, 1 retracted by us; 58 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable","retracted"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (22 reproduced, 14 failed, 23 not-computable, 1 retracted by us; 60 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable","retracted"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -179,8 +179,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">13</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">22</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">14</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">23</div><div class="lbl">Not computable</div></div>
     <div class="t retracted"><div class="num">1</div><div class="lbl">Retracted by us</div></div>
   </div>
@@ -201,7 +201,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">34 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">36 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -217,6 +217,26 @@
           <h3>A memory&#x27;s support edge -- which earlier record a new write was derived from -- can be rec</h3>
           <p class="cresult">RETRACTED 2026-08-06 -- this entry could not decide the claim in EITHER direction, and the FAILED verdict overstated what it measured. (1) The instrument had no demonstrated sensitivity: at its shipped setting it scores F1 0.211/0.225/0.182/0.062, BELOW the trivial &#x27;call every write derived&#x27; baseline of 0.667, and a null from an instrument not shown to detect a known effect is uninterpretable. (2) The corpus is degenerate: discrimination is WORST where reuse is HIGHEST -- strict AUC 0.441 at 90% parent wording retained, below chance, with 55.9% of pairs tied at exactly 0.0000. A statistic measuring reuse cannot degrade as reuse rises; that is vocabulary saturation in a 30-word lexicon, and no threshold repairs it. (3) The better threshold we found (-0.111) beats the do-nothing baseline by only +0.07 to +0.23 F1 at recall ~1.0 -- it wins mostly by firing on everything, which is the same error as the original precision 1.000, with the sign flipped. Prior art we should have cited: METER (Clough et al., ACL 2002) and Hoad &amp; Zobel (JASIST 2003). Nothing here licenses any claim about real stores -- Moreira et al. (IEEE TIP 27(12), 2018) report directed edge overlap 0.124 even with a PERFECT candidate set.</p>
           <div class="cfoot"><span class="cyear">lab a1d88c &middot; 2026-08-01</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Tombstone (Poojan Patel, 2026): after `tombstone erase`, 0.0 percent of the subjects&#x27; own </h3>
+          <p class="cresult">Same run as the native-delete entry. The full Tombstone erase (baseline B4) left 0.000 residue on all three local backends, as the author reports, with the byte-level scan still finding the undeleted subjects (own_record_rate 1.0 in the B3 partial-erase control cells, so the scan can see what is there). Wall time per erasure on our machine 7 to 15 s against his 11 to 21 s. The one caveat is inherited from the other entry: on a SQLite built with SECURE_DELETE the native delete already reaches 0.0 for Qdrant local, so there the tool&#x27;s gain over a plain delete is the receipt, not the bytes. Probe: probes/tombstone_residue_replication.py, data in probes/data/tombstone/.</p>
+          <div class="cfoot"><span class="cyear">Poojan Patel, Tombstone README section Results</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/probes/tombstone_residue_replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>Tombstone (Poojan Patel, 2026): after a native delete(), 92.0 to 100.0 percent of a subjec</h3>
+          <p class="cresult">Re-ran the author&#x27;s own bench (bench/residue/run_residue.py, his lockfile, his AG News corpus, all-MiniLM-L6-v2, 200 subjects) on Ubuntu 24.04 under WSL, 2026-09-20 to 21; pgvector skipped (needs Postgres). faiss reproduces exactly: 0.920 after native delete, 0.920 after the vendor compact step. chroma reproduces: 0.997 and 1.000 against his 0.998 and 1.000. qdrant does not: 0.000 in both cells against his 1.000. Mechanism, measured with a marker record (its payload string and its vector&#x27;s own bytes) and an undeleted control in a Qdrant local-mode store: Qdrant local keeps points in SQLite, and Ubuntu&#x27;s libsqlite3 3.45.1 is built with SQLITE_SECURE_DELETE (pragma secure_delete = 1), so a deleted row is overwritten with zeros; the same check on Windows CPython&#x27;s SQLite 3.49.1 (secure_delete = 0) leaves the bytes in place, which is the author&#x27;s result. The 100 percent for Qdrant local is therefore a property of the platform&#x27;s SQLite build, not of Qdrant, and the claim as stated does not hold across platforms. The rebuild cell for chroma also differs in figure (0.372 against 0.786) with the same direction; not traced. 12 of 15 cells agree within 0.02. Probe: probes/tombstone_residue_replication.py --marker, data in probes/data/tombstone/.</p>
+          <div class="cfoot"><span class="cyear">Poojan Patel, Tombstone README section Results</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/probes/tombstone_residue_replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -588,7 +608,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-08-14 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-09-21 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
