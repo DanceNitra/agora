@@ -1,0 +1,8 @@
+# Reply to Guanghao's 2026-09-18 letter on the book chapter about our work (Issue #2)
+The chapter's figures each trace to a comment in this thread or to the manuscript text, and its three quotations are our own sentences as written.
+The tensor-RG paragraph with the far-bath series 86.5, 96.4, 91.2, 100.0 against 0.0, 0.0, 11.1, 24.5 and the 84.7 to 87.4 range appears three times in the chapter about our work, and the first copy also carries the L1 and L2 energies.
+The multi-seed audit section appears in the dual-diagnosis chapter and again, nearly verbatim, in the reproducibility chapter.
+The boundary statement names the Kane-Fisher analysis, the Bethe ansatz calculation and the chi extrapolation, which belong to the EDRN Hubbard paper in Issue #1.
+The four-corrections section has the L confound behind the A(C) correlation, the Kane-Fisher weak link, the Bethe ansatz value for the Mott gap, and A corrected from 0.47 to 3.19 by the chi = 100 to 600 extrapolation.
+Comment 5150703763 carries the arm table with arms A to E at N=6 and N=8, the 3.085e-01 against 1.5e-15 alignment mistake, and path independence to 1.3e-15 at N=8, which is what the boundary statement claims and no more.
+Comment 5430290397 carries the thirty-graph orbit check, with E(1) from 0.0868 to 0.4039 across the graphs and the gasket at 0.110269.

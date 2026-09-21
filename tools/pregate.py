@@ -61,7 +61,12 @@ PROBES = os.path.join(ROOT, "probes")
 # NOT IDEMPOTENT ACROSS A SEND. Once a comment is published, re-running this on the same
 # claims blocks them as ALREADY SAID BY US, citing that comment. The verdict is correct and
 # the gate is not broken; it ran before the send, which is the only time it means anything.
-NUM = re.compile(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w]|\.\d)")
+# SCIENTIFIC NOTATION IS A FIGURE TOO. The first rule stopped at the mantissa's letter, so
+# "3.085e-01", "1.3e-15" and "7.93e-30" were not figures at all: a claim quoting a comment whose
+# only distinctive numbers are in that form read "in it: NOTHING" and was blocked as a misquote
+# (edrn_book_chapter, 2026-09-21, comment 5150703763, whose figures are all exponent-form). The
+# exponent alternative comes first so the mantissa cannot be taken alone.
+NUM = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?[eE][+-]?\d{1,3}|\d+\.\d{3,}|\d{4,})(?![\w]|\.\d)")
 
 # A YEAR IS NOT A FINGERPRINT. The first live run flagged two claims as already said because
 # "2026" appears in the other party's comments, which it does in every comment anyone dates.

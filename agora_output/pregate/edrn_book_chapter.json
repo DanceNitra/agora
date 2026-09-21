@@ -1,0 +1,133 @@
+{
+ "tool": "pregate",
+ "thread": "luoxuejian000/edrn-dmrg-verification#2",
+ "thread_url": "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2",
+ "threads": [
+  "luoxuejian000/edrn-dmrg-verification#2",
+  "https://github.com/luoxuejian000/edrn-dmrg-verification/issues/2"
+ ],
+ "claims": 7,
+ "worth_writing": 7,
+ "blocked": 0,
+ "numbers_examined": [
+  "0.0868",
+  "0.110269",
+  "0.4039",
+  "1.3e-15",
+  "1.5e-15",
+  "3.085e-01",
+  "5150703763",
+  "5430290397"
+ ],
+ "numbers_ignored_as_thread_fingerprints": [],
+ "results": [
+  {
+   "claim": "The chapter's figures each trace to a comment in this thread or to the manuscript text, and its three quotations are our own sentences as written.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The tensor-RG paragraph with the far-bath series 86.5, 96.4, 91.2, 100.0 against 0.0, 0.0, 11.1, 24.5 and the 84.7 to 87.4 range appears three times in the chapter about our work, and the first copy also carries the L1 and L2 energies.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 5303073894",
+     "who": "DanceNitra",
+     "when": "2026-08-15T16:08",
+     "words": [
+      "appears",
+      "paragraph",
+      "tensor-rg",
+      "times"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The multi-seed audit section appears in the dual-diagnosis chapter and again, nearly verbatim, in the reproducibility chapter.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The boundary statement names the Kane-Fisher analysis, the Bethe ansatz calculation and the chi extrapolation, which belong to the EDRN Hubbard paper in Issue #1.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "The four-corrections section has the L confound behind the A(C) correlation, the Kane-Fisher weak link, the Bethe ansatz value for the Mott gap, and A corrected from 0.47 to 3.19 by the chi = 100 to 600 extrapolation.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5150703763 carries the arm table with arms A to E at N=6 and N=8, the 3.085e-01 against 1.5e-15 alignment mistake, and path independence to 1.3e-15 at N=8, which is what the boundary statement claims and no more.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "1.3e-15",
+    "1.5e-15",
+    "3.085e-01",
+    "5150703763"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5150703763",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "1.3e-15",
+    "1.5e-15",
+    "3.085e-01"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Comment 5430290397 carries the thirty-graph orbit check, with E(1) from 0.0868 to 0.4039 across the graphs and the gasket at 0.110269.",
+   "verdict": "QUOTES US",
+   "numbers": [
+    "0.0868",
+    "0.110269",
+    "0.4039",
+    "5430290397"
+   ],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "quotes_comment": "5430290397",
+   "quoted_author": "DanceNitra",
+   "figures_in_that_comment": [
+    "0.0868",
+    "0.110269",
+    "0.4039"
+   ],
+   "figures_not_in_that_comment": [],
+   "numbers_with_no_source": []
+  }
+ ]
+}
