@@ -117,6 +117,44 @@ def seed_config(cfgdir: str, skills: list, mode: str) -> dict:
                 usage[s["skill"]] = {"usageCount": ratio, "lastUsedAt": now - year}
             else:
                 usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - 1000}
+    elif mode.startswith("gap:"):
+        # gap:R:D    the early half has usageCount R and was last used D DAYS ago; the late half has
+        #            usageCount 1 and was used a second ago. The ratio sweep above held the gap at a
+        #            year and swept R; this holds R and sweeps the gap, which is the axis @tonydzi's
+        #            organic listing sits on (2 uses, 7 weeks stale, kept; 1 use, 20 days stale,
+        #            dropped: anthropics/claude-code#81081, 2026-09-19). Used by the sibling probe
+        #            at_two_uses_how_stale_before_a_fresh_single_use_wins.py.
+        _, r, d = mode.split(":")
+        ratio, days = int(r), float(d)
+        for s in skills:
+            if s["pos"] <= n / 2:
+                usage[s["skill"]] = {"usageCount": ratio, "lastUsedAt": int(now - days * 86400 * 1000)}
+            else:
+                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - 1000}
+    elif mode.startswith("pair:") or mode.startswith("rpair:"):
+        # pair:R:D1:D2   the early half has usageCount R, last used D1 days ago; the late half has
+        #                usageCount 1, last used D2 days ago. Both stale, which is what an organic
+        #                listing looks like: @tonydzi's kept 2-use skill was 54 days old and his
+        #                dropped 1-use skill 20 days old, not seconds.
+        # rpair:R:D1:D2  the same with the halves SWAPPED: the R-use group sits in the LATE half.
+        #                Listing order favours the early half when nothing else decides (the
+        #                no-history arm), so a count win measured only with the R-use group early
+        #                could be position. A count win in both orientations cannot be.
+        kind, r, d1, d2 = mode.split(":")
+        ratio, days1, days2 = int(r), float(d1), float(d2)
+        for s in skills:
+            r_group = (s["pos"] <= n / 2) if kind == "pair" else (s["pos"] > n / 2)
+            if r_group:
+                usage[s["skill"]] = {"usageCount": ratio, "lastUsedAt": int(now - days1 * 86400 * 1000)}
+            else:
+                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": int(now - days2 * 86400 * 1000)}
+    elif mode == "unrecorded_early":
+        # The early half has NO record at all; the late half has usageCount 1, a second old. Says
+        # where a skill with no skillUsage entry lands against once-used ones: @tonydzi's
+        # audit-content arrived with text and no record (same thread, 2026-09-19).
+        for s in skills:
+            if s["pos"] > n / 2:
+                usage[s["skill"]] = {"usageCount": 1, "lastUsedAt": now - 1000}
     elif mode != "none":
         raise SystemExit("REFUSED: unknown seed mode %r" % mode)
     cfg = {"skillUsage": usage}
@@ -170,11 +208,15 @@ def run_arm(label: str, n: int, wide: int, narrow: int, mode: str) -> dict:
            "seeded_entries": len(usage), "seed_survived": seed_survived,
            # The real profile is a FILE, ~/.claude.json. An earlier version compared the temp dir
            # against the ~/.claude DIRECTORY, which is a different path by construction and so
-           # could never fail. This reads the real file's mtime and its content instead.
+           # could never fail. This reads the real file's content instead: a leak would put the
+           # fixture's skill names into it. The mtime is reported beside it, not folded into it:
+           # on 2026-09-21 eight arms in a row read isolated=False because ANOTHER session on this
+           # machine rewrote ~/.claude.json mid-run, while the content check found no fixture
+           # name in it. A shared machine's profile moves on its own; the leak test is the content.
            "isolated": (os.path.abspath(cfg) != os.path.abspath(REAL_PROFILE)
-                        and os.path.getmtime(REAL_PROFILE) <= START
                         and "usage-skill-" not in io.open(REAL_PROFILE, encoding="utf-8",
                                                           errors="replace").read()),
+           "real_profile_touched_during_run": os.path.getmtime(REAL_PROFILE) > START,
            "names_on_wire": len(names), "descriptions_on_wire": len(kept),
            "kept_positions": [s["pos"] for s in kept],
            "kept_kinds": {"wide": sum(1 for s in kept if s["kind"] == "wide"),
