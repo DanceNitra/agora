@@ -1,14 +1,32 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass); RETRACTED = a verdict we published and then withdrew, kept on the record with the reason.",
- "generated": "2026-08-14",
+ "generated": "2026-09-21",
  "counts": {
-  "REPRODUCED": 21,
-  "FAILED": 13,
+  "REPRODUCED": 22,
+  "FAILED": 14,
   "NOT_COMPUTABLE": 23,
   "RETRACTED": 1
  },
  "entries": [
+  {
+   "claim": "Tombstone (Poojan Patel, 2026): after `tombstone erase`, 0.0 percent of the subjects' own records remain in chroma, faiss and qdrant index files",
+   "source": "Poojan Patel, Tombstone README section Results, github.com/Poojan6216/tombstone @58d57ae (tombstone-erase 0.1.1 on PyPI), bench/results/residue-latest.json",
+   "verdict": "REPRODUCED",
+   "note": "Same run as the native-delete entry. The full Tombstone erase (baseline B4) left 0.000 residue on all three local backends, as the author reports, with the byte-level scan still finding the undeleted subjects (own_record_rate 1.0 in the B3 partial-erase control cells, so the scan can see what is there). Wall time per erasure on our machine 7 to 15 s against his 11 to 21 s. The one caveat is inherited from the other entry: on a SQLite built with SECURE_DELETE the native delete already reaches 0.0 for Qdrant local, so there the tool's gain over a plain delete is the receipt, not the bytes. Probe: probes/tombstone_residue_replication.py, data in probes/data/tombstone/.",
+   "lab_id": "655560",
+   "code": "https://github.com/DanceNitra/agora/blob/main/probes/tombstone_residue_replication.py",
+   "date": "2026-09-21"
+  },
+  {
+   "claim": "Tombstone (Poojan Patel, 2026): after a native delete(), 92.0 to 100.0 percent of a subject's vectors stay physically recoverable from the index files (chroma 99.8, faiss 92.0, qdrant 100.0; 200 subjects each)",
+   "source": "Poojan Patel, Tombstone README section Results, github.com/Poojan6216/tombstone @58d57ae (tombstone-erase 0.1.1 on PyPI), bench/results/residue-latest.json",
+   "verdict": "FAILED",
+   "note": "Re-ran the author's own bench (bench/residue/run_residue.py, his lockfile, his AG News corpus, all-MiniLM-L6-v2, 200 subjects) on Ubuntu 24.04 under WSL, 2026-09-20 to 21; pgvector skipped (needs Postgres). faiss reproduces exactly: 0.920 after native delete, 0.920 after the vendor compact step. chroma reproduces: 0.997 and 1.000 against his 0.998 and 1.000. qdrant does not: 0.000 in both cells against his 1.000. Mechanism, measured with a marker record (its payload string and its vector's own bytes) and an undeleted control in a Qdrant local-mode store: Qdrant local keeps points in SQLite, and Ubuntu's libsqlite3 3.45.1 is built with SQLITE_SECURE_DELETE (pragma secure_delete = 1), so a deleted row is overwritten with zeros; the same check on Windows CPython's SQLite 3.49.1 (secure_delete = 0) leaves the bytes in place, which is the author's result. The 100 percent for Qdrant local is therefore a property of the platform's SQLite build, not of Qdrant, and the claim as stated does not hold across platforms. The rebuild cell for chroma also differs in figure (0.372 against 0.786) with the same direction; not traced. 12 of 15 cells agree within 0.02. Probe: probes/tombstone_residue_replication.py --marker, data in probes/data/tombstone/.",
+   "lab_id": "728811",
+   "code": "https://github.com/DanceNitra/agora/blob/main/probes/tombstone_residue_replication.py",
+   "date": "2026-09-21"
+  },
   {
    "claim": "A memory's support edge -- which earlier record a new write was derived from -- can be recovered from CONTENT SIMILARITY, so provenance lineage does not have to be declared at write time.",
    "source": "OUR OWN claim, and we shipped it: inspeximus implements it as the `infer_lineage` fallback for writes that declare no parent. The same assumption underlies the nightly 'inspect the cited evidence' sweep described by @icophy in openclaw/openclaw#7707, and the provenance literature (W3C PROV-O `prov:wasDerivedFrom`; Buneman, Khanna & Tan, ICDT 2001) treats the edge as GIVEN rather than asking whether it can be recovered.",

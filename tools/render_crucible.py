@@ -60,6 +60,8 @@ def script_link(lab_rec):
 # survive re-renders regardless of the ledger file). Only add a mapping you are confident about -- a wrong
 # receipt is worse than none. Extend as more probes are confirmed (agentpoison, eviction, separation-law, ...).
 _PROBE_BY_LAB = {
+    "728811": "probes/tombstone_residue_replication.py",               # Tombstone native-delete residue (FAILED, platform SQLite)
+    "655560": "probes/tombstone_residue_replication.py",               # Tombstone erase 0.0 (REPRODUCED)
     "39737a": "research/probes/nudge_pubbias_artifact.py",              # food-nudges 2.5x
     "502d6c": "research/probes/good_to_great_null.py",                  # good-to-great
     "bf7bb9": "research/probes/llm_judge_length_null.py",               # llm-as-judge length
