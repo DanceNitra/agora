@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-21",
+  "created": "2026-09-21T13:57:11.774895+02:00",
+  "items": [
+    {
+      "id": "2026-09-21-01",
+      "kind": "comment",
+      "target": "https://www.linkedin.com/search/results/content/?keywords=%22Your%20agent%20doesn%27t%20get%20root%22#jamie-madden",
+      "author": "Jamie Madden",
+      "slug": "verify-agent-memory-deletion",
+      "text": "The gate settles whether the agent was allowed to act. I keep measuring the gap between what a call returned and what happened. On 17 September I deleted one record from five agent memory stores through their own delete calls. Each returned success. Two still held the bytes on disk. A trail that logs \"approved, returned OK\" is an accurate log of a wrong state. What closed it: reading the file after the call, with an undeleted twin as the control.",
+      "sha": "98325ad2398f",
+      "why": "n8n DevRel, 97 reactions, 4 empty comments, NemoClaw/OpenShell approval gate; our measured post-condition gap fits exactly",
+      "links_ok": "",
+      "status": "posted",
+      "check": [],
+      "url": "https://www.linkedin.com/search/results/content/?keywords=%22Your%20agent%20doesn%27t%20get%20root%22#jamie-madden-comment"
+    },
+    {
+      "id": "2026-09-21-02",
+      "kind": "comment",
+      "target": "https://www.linkedin.com/search/results/content/?keywords=%22agent%20memory%22%20delete#connected-data",
+      "author": "Connected Data London",
+      "slug": "verify-agent-memory-deletion",
+      "text": "Supersede, don't delete is the right default for beliefs and the wrong one for people. Article 17 asks for erasure, and a graph that never removes anything cannot answer it, because the superseded edge still holds the subject's data. The two clocks help. Erasure becomes a third operation with its own transaction time. It removes the edge and its history and leaves a receipt. Then you read the files afterward instead of trusting the API's reply.",
+      "sha": "c13949b82a83",
+      "why": "1h old, 1 comment, 'supersede don't delete, nothing gets erased' meets Article 17; our erasure and supersession work fits",
+      "links_ok": "",
+      "status": "posted",
+      "check": [],
+      "url": "https://www.linkedin.com/posts/agentmemory-graphrag-agenticai-share-7507748508305702912-pHH8/"
+    }
+  ],
+  "approved": {
+    "at": "2026-09-21T14:08:42.446240+02:00",
+    "words": "ostatné súhlasym a môžeš to tam napostovať keď všetko dojde tak jak treba"
+  }
+}

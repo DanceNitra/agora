@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-20",
+  "created": "2026-09-20T09:18:46.835821+02:00",
+  "items": [
+    {
+      "id": "2026-09-20-01",
+      "kind": "reply",
+      "target": "https://www.linkedin.com/in/ppatel6216/#tombstone-post-reply",
+      "author": "Poojan Patel",
+      "slug": "verify-agent-memory-deletion",
+      "text": "Thanks for taking the per-store control in. On the WAL: for Chroma it is reachable from the app after all. It sits as rows in chroma.sqlite3 inside the persist directory, so a process that has the path can read that file and find the deleted bytes. That is how my check got its two of five. Once your version with the control is out I will run it next to mine on the same five stores and tell you what differs.",
+      "sha": "89bfd511c8ec",
+      "why": "he mentioned Rasto, adopted the per-store control, and said WAL is unreachable from the app; it is reachable for Chroma",
+      "links_ok": "",
+      "status": "posted",
+      "check": [],
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7506712303686316032/#reply-to-poojan"
+    }
+  ],
+  "approved": {
+    "at": "2026-09-20T09:20:03.912718+02:00",
+    "words": "ok"
+  }
+}
