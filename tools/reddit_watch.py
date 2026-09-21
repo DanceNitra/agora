@@ -60,7 +60,9 @@ def when(ts: float) -> str:
     return dt.datetime.fromtimestamp(ts, dt.UTC).strftime("%m-%d %H:%M")
 
 
-def cmd_threads(tok: str) -> int:
+def cmd_threads(tok: str, max_age_days: int) -> int:
+    """Report comments addressed to us with no reply from us below them, at most max_age_days old.
+    Older silences were deliberate (June and July 2026 jabs), so a daily brief must not resurface them."""
     subs = get(f"/user/{US}/submitted", tok, limit=100)["data"]["children"]
     open_items = 0
     for s in subs:
@@ -78,7 +80,8 @@ def cmd_threads(tok: str) -> int:
             ours_below = any(k.get("kind") == "t1" and k["data"].get("author") == US for k in kids)
             parent_is_us = c.get("parent_id", "").startswith("t3_") or any(
                 p.get("name") == c.get("parent_id") and p.get("author") == US for _, p in nodes)
-            if not ours_below and parent_is_us:
+            fresh = (time.time() - c["created_utc"]) / 86400 <= max_age_days
+            if not ours_below and parent_is_us and fresh and c.get("author") != "AutoModerator":
                 waiting.append((depth, c))
         print(f"r/{d['subreddit']:12s} {d['score']:3d}pts {len(nodes):3d}c  {d['title'][:70]}")
         for depth, c in waiting:
@@ -86,7 +89,7 @@ def cmd_threads(tok: str) -> int:
             print(f"    WAITING {when(c['created_utc'])} u/{c['author']} (depth {depth}): "
                   f"{c['body'][:160].replace(chr(10), ' ')}")
         time.sleep(0.7)
-    print(f"\n{open_items} comment(s) addressed to us without a reply from us")
+    print(f"\n{open_items} comment(s) addressed to us without a reply from us (last {max_age_days} days)")
     return 0
 
 
@@ -114,14 +117,15 @@ def cmd_sub(tok: str, sub: str, limit: int) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
-    sp.add_parser("threads")
+    t = sp.add_parser("threads")
+    t.add_argument("--days", type=int, default=14)
     p = sp.add_parser("sub")
     p.add_argument("name")
     p.add_argument("--limit", type=int, default=100)
     a = ap.parse_args()
     tok = token()
     if a.cmd == "threads":
-        return cmd_threads(tok)
+        return cmd_threads(tok, a.days)
     return cmd_sub(tok, a.name, a.limit)
 
 
