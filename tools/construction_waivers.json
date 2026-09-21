@@ -144,5 +144,26 @@
   "kinds": [
    "NO-ARTIFACT"
   ]
+ },
+ "agora_output/drafts/20260921_agmi_pr1_thanks.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-21",
+  "reason": "A two-sentence thank-you on the merged tech4biz-yasha/agmi#1. No number, no measurement; the one fact (merged by tech4biz-yasha) is checked with gh pr view."
+ },
+ "agora_output/drafts/20260921_memstrata_discussion2_lifecycle_reference_reply.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-21",
+  "reason": "The draft's only runnable model of ours is probes/the_lifecycle_reference_against_our_two_probes.py, audited directly by the gate (clean, exit 0) on 2026-09-21; the draft-level resolver did not pick it up from the backticked path. Every other figure is his (tag, his comment 18530173)."
+ },
+ "agora_output/drafts/20260921_claude_code_81081_gap_sweep_reply.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-21",
+  "reason": "The draft's runnable model is probes/at_two_uses_how_stale_before_a_fresh_single_use_wins.py, audited directly (clean, exit 0) on 2026-09-21 before the send; recorded here so the waiver ledger matches what was done."
  }
 }

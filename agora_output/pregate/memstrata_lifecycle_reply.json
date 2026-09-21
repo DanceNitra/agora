@@ -1,0 +1,155 @@
+{
+ "tool": "pregate",
+ "thread": "DanceNitra/agora#2",
+ "thread_url": "https://github.com/DanceNitra/agora/issues/2",
+ "threads": [
+  "DanceNitra/agora#2",
+  "https://github.com/DanceNitra/agora/issues/2"
+ ],
+ "claims": 8,
+ "worth_writing": 8,
+ "blocked": 0,
+ "numbers_examined": [],
+ "numbers_ignored_as_thread_fingerprints": [],
+ "results": [
+  {
+   "claim": "Our probe ran his lifecycle reference at tag lifecycle-reference-v0.1 on Python 3.12.10 and SQLite 3.49.1.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "An adapter that deletes and prints 0 completes and one that does not delete and prints 2 is incomplete, so the verdict does not follow the count.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18366258",
+     "who": "DanceNitra",
+     "when": "2026-09-09T10:18",
+     "words": [
+      "delete",
+      "incomplete",
+      "verdict"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "An adapter whose inspect returns zero rows without deleting is caught by the byte probe.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18530173",
+     "who": "yadu9989",
+     "when": "2026-09-20T18:02",
+     "words": [
+      "deleting",
+      "probe",
+      "whose"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "With secure_delete off and no VACUUM the verdict is incomplete because the bytes remain in the file.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "A held-open WAL reader leaves the target failed on the checkpoint-busy path and the same operation id completes after the reader closes.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18360042",
+     "who": "yadu9989",
+     "when": "2026-09-09T02:18",
+     "words": [
+      "failed",
+      "leaves",
+      "target"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "Retrying the same operation id with fewer probe values is refused as immutable_operation_id_conflict, and a fresh operation with no probe values cannot complete.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18366258",
+     "who": "DanceNitra",
+     "when": "2026-09-09T10:18",
+     "words": [
+      "complete",
+      "fresh",
+      "probe",
+      "retrying"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "An adapter that overrides byte_probe to report zero matches completes while the marker is still in its file, because the coordinator calls the target's own byte scan.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  },
+  {
+   "claim": "We agree the thirty-day retention window from the suppression operation, retries do not extend it, scope expiry wins, credentials retired before key destruction, no cross-scope promise.",
+   "verdict": "NEW",
+   "numbers": [],
+   "hits": [],
+   "leads": [
+    {
+     "where": "comment 18530173",
+     "who": "yadu9989",
+     "when": "2026-09-20T18:02",
+     "words": [
+      "credentials",
+      "cross-scope",
+      "expiry",
+      "extend",
+      "promise",
+      "retries"
+     ]
+    }
+   ],
+   "self_attribution": null,
+   "unit": null,
+   "numbers_with_no_source": []
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+# Reply to Neeraj's 2026-09-20 comment on discussion #2 (lifecycle reference)
+Our probe ran his lifecycle reference at tag lifecycle-reference-v0.1 on Python 3.12.10 and SQLite 3.49.1.
+An adapter that deletes and prints 0 completes and one that does not delete and prints 2 is incomplete, so the verdict does not follow the count.
+An adapter whose inspect returns zero rows without deleting is caught by the byte probe.
+With secure_delete off and no VACUUM the verdict is incomplete because the bytes remain in the file.
+A held-open WAL reader leaves the target failed on the checkpoint-busy path and the same operation id completes after the reader closes.
+Retrying the same operation id with fewer probe values is refused as immutable_operation_id_conflict, and a fresh operation with no probe values cannot complete.
+An adapter that overrides byte_probe to report zero matches completes while the marker is still in its file, because the coordinator calls the target's own byte scan.
+We agree the thirty-day retention window from the suppression operation, retries do not extend it, scope expiry wins, credentials retired before key destruction, no cross-scope promise.
