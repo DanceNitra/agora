@@ -1,0 +1,108 @@
+{
+  "probe": "the_lifecycle_reference_against_our_two_probes.py",
+  "tag": "lifecycle-reference-v0.1",
+  "arms": {
+    "A_deletes_reports_2": {
+      "complete": true,
+      "state": "complete",
+      "statuses": [
+        "verified"
+      ],
+      "marker_still_in_any_file": false,
+      "reported_count_printed_by_adapter": 2,
+      "files_inside_workspace": true
+    },
+    "B_nodelete_reports_2": {
+      "complete": false,
+      "state": "incomplete",
+      "statuses": [
+        "incomplete"
+      ],
+      "marker_still_in_any_file": true,
+      "reported_count_printed_by_adapter": 2,
+      "files_inside_workspace": true
+    },
+    "C_deletes_reports_0": {
+      "complete": true,
+      "state": "complete",
+      "statuses": [
+        "verified"
+      ],
+      "marker_still_in_any_file": false,
+      "reported_count_printed_by_adapter": 0,
+      "files_inside_workspace": true
+    },
+    "lying_inspect": {
+      "complete": false,
+      "state": "incomplete",
+      "statuses": [
+        "incomplete"
+      ],
+      "marker_still_in_any_file": true,
+      "reported_count_printed_by_adapter": null,
+      "files_inside_workspace": true
+    },
+    "lying_byte_probe": {
+      "complete": true,
+      "state": "complete",
+      "statuses": [
+        "verified"
+      ],
+      "marker_still_in_any_file": true,
+      "reported_count_printed_by_adapter": null,
+      "files_inside_workspace": true
+    },
+    "no_vacuum_no_secure_delete": {
+      "complete": false,
+      "state": "incomplete",
+      "statuses": [
+        "incomplete"
+      ],
+      "marker_still_in_any_file": true,
+      "reported_count_printed_by_adapter": 2,
+      "files_inside_workspace": true
+    },
+    "wal_held_open": {
+      "complete": false,
+      "state": "incomplete",
+      "current_status": "failed",
+      "current_error": "RuntimeError",
+      "marker_in_current_files": true,
+      "retry_after_reader_closed": {
+        "complete": true,
+        "state": "complete",
+        "marker_in_current_files": false
+      }
+    },
+    "bound_to_operation": {
+      "first_incomplete": true,
+      "weaker_marker_same_op": "refused: immutable_operation_id_conflict",
+      "fresh_op_no_marker_complete": false,
+      "fresh_op_no_marker_state": "incomplete",
+      "absent_marker_statuses": [
+        "failed"
+      ],
+      "absent_marker_calibration": [
+        "positive_control_failed"
+      ],
+      "absent_marker_complete": false
+    }
+  },
+  "controls": {
+    "CONTROL_the_deleting_arm_completes": true,
+    "CONTROL_the_non_deleting_arm_is_incomplete": true,
+    "CONTROL_every_file_read_was_inside_his_workspace": true,
+    "the_verdict_does_not_follow_the_count": true,
+    "a_lying_inspect_is_caught_by_the_byte_probe": true,
+    "a_lying_byte_probe_PASSES_while_the_bytes_remain": true,
+    "freed_pages_are_seen_without_vacuum_or_secure_delete": true,
+    "or_freed_pages_left_nothing_readable": false,
+    "a_held_open_wal_reader_makes_the_erase_incomplete": true,
+    "and_the_retry_after_the_reader_closes_completes": true,
+    "a_weaker_marker_on_the_same_operation_is_refused": true,
+    "a_fresh_operation_with_no_marker_cannot_complete": true,
+    "an_absent_marker_fails_calibration_before_purge": true
+  },
+  "python": "3.12.10",
+  "sqlite": "3.49.1"
+}
