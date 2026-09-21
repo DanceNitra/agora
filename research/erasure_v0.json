@@ -27,7 +27,7 @@
     },
     "erase_request": {
       "type": "object",
-      "description": "POST /mnemo/v0/erase. Erase everything attributable to `subject`, including records derived from it.",
+      "description": "The erase operation. Erase everything attributable to `subject`, including records derived from it.",
       "properties": {
         "subject": {
           "type": "string",
@@ -90,7 +90,7 @@
     },
     "still_recoverable_request": {
       "type": "object",
-      "description": "POST /mnemo/v0/still_recoverable. The self-check that makes the receipt mean something. Asked AFTER erase, with the sensitive values themselves.",
+      "description": "The still_recoverable operation. The self-check that makes the receipt mean something. Asked AFTER erase, with the sensitive values themselves.",
       "properties": {
         "subject": {
           "type": "string"
