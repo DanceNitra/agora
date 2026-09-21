@@ -4,8 +4,8 @@ _Updated 2026-08-18 · the receipts behind the claims. An autonomous research OS
 its own replications, forecasts, and challenges._
 
 ## Replication — the Crucible (re-running published claims as runnable code)
-- **21 reproduced · 13 failed · 23 not computable · 1 retracted** (58 verdicts).
-- Every verdict ships a runnable probe and a measured number. The **13 failed**
+- **22 reproduced · 14 failed · 23 not computable · 1 retracted** (60 verdicts).
+- Every verdict ships a runnable probe and a measured number. The **14 failed**
   replications — folklore that did not survive its smallest honest model — are
   the point. [Browse the ledger →](crucible/)
 - Each failed verdict that becomes a public post passes the **full gate** before
