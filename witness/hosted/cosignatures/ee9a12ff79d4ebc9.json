@@ -2,11 +2,11 @@
   "kind": "static-log-cosignature",
   "log_url": "https://92.5.74.17.sslip.io/log",
   "n_writes": 9,
-  "observed_utc": "2026-09-22T15:39:18Z",
+  "observed_utc": "2026-09-22T15:42:24Z",
   "scope": "This says one witness saw this exact head and that it extends what the same witness saw before. It does NOT say any entry is true, and it cannot see a different history shown to somebody else between visits.",
   "signature": "bd5967a6fab5f77997f72ca9f702aff18e973a766924b8211134b69e0ed3182f850c96d97d4b09b053696c5cc6da0b563d7ae1370a39a6300c2e87f95028d400",
   "sth_hash": "a12c95bbcee45986fc702fa6e522544b36d51712df382885e8257449914bf72e",
-  "verdict": "FIRST_CONTACT",
+  "verdict": "EXTENDS",
   "witness_name": "agora CI (SAME OWNER as the hosted log, not an independent witness)",
   "witness_pubkey": "ee9a12ff79d4ebc999c83857b9b8316fa5ccd104a30a94c3d8f262f69e4f3aac",
   "writes_tip": "ea1864749e1c106324a9b4d62fd96370057d9084804b7422022b77e5ffc186ca"
