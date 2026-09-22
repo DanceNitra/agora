@@ -74,9 +74,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install cryptography inspeximus
-      - name: Fetch the witness
-        run: curl -sSfO https://raw.githubusercontent.com/DanceNitra/inspeximus/main/tools/witness_static_log.py
+      # Pinned, so the job runs the version we read rather than whatever we publish later.
+      - run: pip install "inspeximus==3.6.2" cryptography certifi
       - name: Mirror the static copy of the hosted log
         run: |
           mkdir -p witness/hosted/mirror
@@ -88,7 +87,7 @@ jobs:
         env:
           INSPEXIMUS_WITNESS_SECRET: ${{ secrets.INSPEXIMUS_WITNESS_SECRET }}
         run: |
-          python witness_static_log.py             --url https://92.5.74.17.sslip.io/log             --state witness/hosted/state.json             --out witness/hosted/cosignatures             --name "agora CI (SAME OWNER as the hosted log, not an independent witness)"
+          inspeximus witness watch             --url https://92.5.74.17.sslip.io/log             --state witness/hosted/state.json             --out witness/hosted/cosignatures             --name "agora CI (SAME OWNER as the hosted log, not an independent witness)"
       - name: Commit what this witness saw
         if: always()
         run: |
