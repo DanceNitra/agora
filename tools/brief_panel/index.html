@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<title>Brief</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #161a21; --line: #232935; --text: #e6e8ec;
+    --dim: #8b93a1; --urgent: #e5533d; --waiting: #d9a441; --watch: #4f7cff;
+    --ok: #3fb950;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 "Segoe UI", system-ui, sans-serif;
+  }
+  header {
+    position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: 14px 16px 12px; display: flex; align-items: baseline; gap: 10px;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+  header .stamp { margin-left: auto; color: var(--dim); font-size: 12px; }
+  .counts { display: flex; gap: 6px; padding: 0 16px 12px; border-bottom: 1px solid var(--line); }
+  .pill {
+    font-size: 12px; padding: 3px 9px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--dim);
+  }
+  .pill.on { color: var(--text); }
+  .pill.urgent.on { border-color: var(--urgent); color: var(--urgent); }
+  .pill.waiting.on { border-color: var(--waiting); color: var(--waiting); }
+  main { padding: 12px 16px 24px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--line);
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .card.urgent { border-left-color: var(--urgent); }
+  .card.waiting { border-left-color: var(--waiting); }
+  .card.watch { border-left-color: var(--watch); }
+  .card.settled { opacity: 0.45; }
+  .card h2 { font-size: 14px; margin: 0 0 4px; font-weight: 600; }
+  .meta { color: var(--dim); font-size: 12px; margin-bottom: 8px; }
+  .meta a { color: var(--dim); }
+  .row { margin: 6px 0; }
+  .label { color: var(--dim); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .actions { display: flex; gap: 8px; margin-top: 10px; }
+  button {
+    font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    background: #1e2531; color: var(--text); border: 1px solid var(--line);
+  }
+  button:hover { background: #253040; }
+  button.primary { background: #2a3a5c; border-color: #35486f; }
+  button.copied { border-color: var(--ok); color: var(--ok); }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.45 } }
+  .done { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .done h3 { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px; }
+  .done li { color: var(--dim); font-size: 13px; margin-bottom: 3px; }
+  .empty { color: var(--dim); padding: 30px 0; text-align: center; }
+  .tag { color: var(--waiting); }
+  .tag.ok { color: var(--ok); }
+  .clock {
+    float: right; font-variant-numeric: tabular-nums; font-size: 12px;
+    color: var(--dim); border: 1px solid var(--line); border-radius: 5px; padding: 1px 7px;
+  }
+  .clock.warm { color: var(--waiting); border-color: #4a3c1c; }
+  .clock.hot { color: var(--urgent); border-color: #4a2320; }
+  .clock .what { color: var(--dim); margin-right: 5px; }
+  .stamp.hot { color: var(--urgent); }
+  body.stale { outline: 2px solid var(--urgent); outline-offset: -2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Brief pre Buildera</h1>
+  <span class="stamp" id="stamp"></span>
+</header>
+<div class="counts" id="counts"></div>
+<main id="main"></main>
+<script>
+// Everything in brief.json comes from issue titles and mail snippets, which strangers
+// write. It is data, never markup: escape it, and let only http(s) links through.
+function esc(v) {
+  return String(v == null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function safeUrl(v) {
+  try {
+    const u = new URL(String(v));
+    return (u.protocol === "https:" || u.protocol === "http:") ? u.href : "";
+  } catch { return ""; }
+}
+const LABEL = { URGENT: "urgentné", WAITING: "čaká na nás", WATCH: "sledovať" };
+const CLS = { URGENT: "urgent", WAITING: "waiting", WATCH: "watch" };
+const SIX_HOURS = 6 * 3600 * 1000;
+
+// Two states, because "I pasted it" and "it is finished" are different things.
+// sent: handed to the Builder, still owed a result. done: finished, nothing owed.
+function states() {
+  try { return JSON.parse(localStorage.getItem("states") || "{}"); } catch { return {}; }
+}
+function setState(id, value) {
+  const s = states();
+  if (value) s[id] = { state: value, at: Date.now() }; else delete s[id];
+  try { localStorage.setItem("states", JSON.stringify(s)); } catch {}
+}
+// The clock answers one question: how long has this been sitting on someone.
+// Green under 6 h, amber to 24 h, red above, because a day of silence is the
+// thing worth seeing from across the room.
+function elapsed(fromMs) {
+  if (!Number.isFinite(fromMs)) return { text: "?", cls: "", hours: 0 };
+  const m = Math.max(0, Math.floor((Date.now() - fromMs) / 60000));
+  const h = Math.floor(m / 60), d = Math.floor(h / 24);
+  const text = d >= 1 ? `${d} d ${h % 24} h` : (h >= 1 ? `${h} h ${m % 60} m` : `${m} m`);
+  const cls = h >= 24 ? "hot" : (h >= 6 ? "warm" : "");
+  return { text, cls, hours: h };
+}
+function sinceLabel(ms) {
+  const h = Math.floor((Date.now() - ms) / 3600000);
+  if (h < 1) return "pred chvíľou";
+  return h < 24 ? `pred ${h} h` : `pred ${Math.floor(h / 24)} d`;
+}
+
+function card(it, st) {
+  const isDone = st && st.state === "done";
+  const isSent = st && st.state === "sent";
+  const el = document.createElement("article");
+  el.className = "card " + CLS[it.state] + (isDone ? " settled" : "");
+  // Sent items count from the hand-over; everything else counts from their last word.
+  const clock = elapsed(isSent ? st.at : new Date(it.when).getTime());
+  const clockWhat = isDone ? "uzavreté" : (isSent ? "u Buildera" : "bez odpovede");
+  const overdue = !isDone && clock.hours >= 6 && (it.state === "URGENT" || isSent);
+  const href = safeUrl(it.link);
+  el.innerHTML = `
+    <div class="clock ${clock.cls}"><span class="what">${esc(clockWhat)}</span>${esc(clock.text)}</div>
+    <h2${overdue ? ' class="pulse"' : ""}>${esc(it.title)}</h2>
+    <div class="meta">${esc(it.who)}${href ? ` · <a href="${esc(href)}" target="_blank" rel="noopener noreferrer">otvoriť</a>` : ""}${
+      isSent ? ` · <span class="tag">u Buildera ${esc(sinceLabel(st.at))}</span>` : ""}${
+      isDone ? ` · <span class="tag ok">hotové</span>` : ""}</div>
+    <div class="row">${esc(it.want)}</div>
+    ${it.task ? `<div class="row"><span class="label">pre buildera</span><br>${esc(it.task)}</div>` : ""}
+    ${it.acceptance ? `<div class="row"><span class="label">hotové, keď</span><br>${esc(it.acceptance)}</div>` : ""}
+  `;
+  const actions = document.createElement("div");
+  actions.className = "actions";
+  if (it.paste && !isDone) {
+    const copy = document.createElement("button");
+    copy.className = "primary";
+    copy.textContent = "Kopírovať pre Buildera";
+    // Copying marks it as handed over, because that is what copying it means.
+    copy.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(it.paste);
+      } catch {
+        // file:// can refuse the clipboard API; the old selection path always works.
+        const ta = document.createElement("textarea");
+        ta.value = it.paste; document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand && document.execCommand("copy");
+        ta.remove();
+        if (!ok) { copy.textContent = "Kopírovanie zlyhalo"; return; }
+      }
+      setState(it.id, "sent");
+      copy.textContent = "Skopírované";
+      copy.classList.add("copied");
+      setTimeout(render, 1200);
+    };
+    actions.appendChild(copy);
+  }
+  if (!isDone) {
+    const done = document.createElement("button");
+    done.textContent = "Hotové";
+    done.onclick = () => { setState(it.id, "done"); render(); };
+    actions.appendChild(done);
+  } else {
+    const back = document.createElement("button");
+    back.textContent = "Vrátiť späť";
+    back.onclick = () => { setState(it.id, null); render(); };
+    actions.appendChild(back);
+  }
+  el.appendChild(actions);
+  return el;
+}
+
+let lastGood = null;
+
+async function render() {
+  let data;
+  try {
+    const res = await fetch("../../agora_output/channels/brief.json?t=" + Date.now());
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    data = await res.json();
+    if (!data || !Array.isArray(data.items)) throw new Error("brief.json has no items array");
+    lastGood = data;
+    document.body.classList.remove("stale");
+  } catch (err) {
+    // Stale data shown as fresh is the one failure this panel must not have.
+    document.body.classList.add("stale");
+    document.getElementById("stamp").textContent = "brief sa nenačítal: " + err.message;
+    if (!lastGood) {
+      document.getElementById("main").innerHTML =
+        '<div class="empty">Brief sa nedá prečítať. Spusti úlohu v Routines.</div>';
+      return;
+    }
+    data = lastGood;
+  }
+  const s = states();
+  const live = new Set(data.items.map(i => i.id));
+  let pruned = false;
+  for (const id of Object.keys(s)) if (!live.has(id)) { delete s[id]; pruned = true; }
+  if (pruned) { try { localStorage.setItem("states", JSON.stringify(s)); } catch {} }
+  const open = data.items.filter(i => !(s[i.id] && s[i.id].state === "done"));
+  const closed = data.items.filter(i => s[i.id] && s[i.id].state === "done");
+
+  const gen = new Date(data.generated_at).getTime();
+  if (!document.body.classList.contains("stale")) {
+    const age = elapsed(gen);
+    document.getElementById("stamp").textContent = Number.isFinite(gen)
+      ? `brief ${age.text} starý` : "brief bez času";
+    document.getElementById("stamp").className = "stamp " + (age.hours >= 6 ? "hot" : "");
+  }
+
+  const counts = { URGENT: 0, WAITING: 0, WATCH: 0 };
+  open.forEach(i => counts[i.state]++);
+  document.getElementById("counts").innerHTML = Object.keys(LABEL).map(k =>
+    `<span class="pill ${CLS[k]} ${counts[k] ? "on" : ""}">${LABEL[k]} ${counts[k]}</span>`).join("");
+
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  const order = { URGENT: 0, WAITING: 1, WATCH: 2 };
+  open.sort((a, b) => order[a.state] - order[b.state]).forEach(i => main.appendChild(card(i, s[i.id])));
+  if (!open.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Nič nečaká.";
+    main.appendChild(e);
+  }
+  closed.forEach(i => main.appendChild(card(i, s[i.id])));
+
+  if (data.done && data.done.length) {
+    const d = document.createElement("div");
+    d.className = "done";
+    d.innerHTML = "<h3>Vybavené</h3><ul>" + data.done.map(x => `<li>${esc(x)}</li>`).join("") + "</ul>";
+    main.appendChild(d);
+  }
+}
+render();
+setInterval(render, 60000);  // the clocks move, and a new brief lands the same way
+</script>
+</body>
+</html>
