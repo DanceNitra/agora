@@ -61,9 +61,14 @@ jobs:
           git config user.email "agora-witness@users.noreply.github.com"
           git add witness/
           git diff --staged --quiet || git commit -m "witness: inspeximus log at $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
+          git pull --rebase -q origin main && git push
 
   hosted-log:
+    # Runs after the job above rather than beside it: both commit to this repository, and on the
+    # first run they raced. The loser pushed nothing and reported a red witness, which is the one
+    # signal that must never be noise.
+    needs: witness
+    if: always()
     # The HOSTED transparency service (inspeximus-log, Frankfurt, since 2026-09-22). Same owner as
     # the log, so this is a tripwire and its name says so; the readable copy in witness/hosted/mirror
     # is what keeps the log readable when the VM is reclaimed. The VM holds no credential for this
