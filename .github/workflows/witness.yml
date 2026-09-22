@@ -101,3 +101,31 @@ jobs:
           git add witness/hosted/
           git diff --staged --quiet || git commit -m "witness: hosted log at $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase -q origin main && git push
+
+  anchor:
+    # Bitcoin does the remembering. A witness needs a volunteer who keeps a job alive for years; an
+    # OpenTimestamps receipt needs nobody, and the block timestamp is not ours to move. It proves
+    # only that these head bytes existed before that block: nothing about whether an entry is true,
+    # and nothing about a history shown to somebody else. That gap is what witnesses are for.
+    needs: hosted-log
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install opentimestamps-client certifi
+      - name: Stamp both heads, then upgrade every receipt that has been mined
+        run: |
+          python tools/anchor_head.py stamp --url https://dancenitra.github.io/inspeximus/transparency --out witness/ots
+          python tools/anchor_head.py stamp --url https://92.5.74.17.sslip.io/log --out witness/ots
+          python tools/anchor_head.py upgrade --dir witness/ots
+      - name: Commit the receipts
+        if: always()
+        run: |
+          git config user.name  "agora-witness"
+          git config user.email "agora-witness@users.noreply.github.com"
+          git add witness/ots/
+          git diff --staged --quiet || git commit -m "anchor: transparency heads at $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase -q origin main && git push
