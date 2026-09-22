@@ -18,18 +18,13 @@ $hour  = (Get-Date).Hour
 $quiet = ($hour -ge 22 -or $hour -lt 7)
 
 if (-not $NoToast -and -not $quiet -and ($urgent + $waiting) -gt 0) {
-    $line = "$waiting caka, $urgent urgentne"
-    if ($top) { $line = "$line : $top" }
-    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
-    $xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent(
-        [Windows.UI.Notifications.ToastTemplateType]::ToastText02)
-    $texts = $xml.GetElementsByTagName("text")
-    $texts.Item(0).AppendChild($xml.CreateTextNode("Brief pre Buildera")) > $null
-    $texts.Item(1).AppendChild($xml.CreateTextNode($line)) > $null
-    $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
-    # The AppUserModelID must be one Windows knows, otherwise the toast is dropped in
-    # silence. register_app.ps1 writes it under HKCU and stamps the Start Menu shortcut.
-    [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Agora.BriefPanel").Show($toast)
+    # Our own frameless window, painted by us. Chrome's app mode always drew its
+    # own title bar, so that window was never ours.
+    $py = (Get-Command python -ErrorAction SilentlyContinue).Source
+    if ($py) {
+        $notify = Join-Path $PSScriptRoot "notify_qt.py"
+        Start-Process -FilePath $py -ArgumentList "`"$notify`"" -WindowStyle Hidden
+    }
 }
 
 # -NoToast skips the toast, -WindowOnly is its alias kept for the Start Menu shortcut.
