@@ -1,8 +1,8 @@
 {
   "https://dancenitra.github.io/inspeximus/transparency": {
-    "n_writes": 257,
-    "seen_utc": "2026-09-21T11:03:15Z",
-    "sth_hash": "68de3b2d4f6912ff409e56fca1cb1c258875c0d236dfa47a95c9d8c290a42698",
-    "writes_tip": "1e653c578e22cb0dd395efc386d25f219f082966fd4b17438775e6c6dcb360c5"
+    "n_writes": 281,
+    "seen_utc": "2026-09-22T10:16:56Z",
+    "sth_hash": "1e9de2b67ba94ade3424f5980763290209e10ad1592c3daeceb279698a86396f",
+    "writes_tip": "2c1855934ea7da72823e234e9ce930f507c199f9475d5705971ad2a57e6802b1"
   }
 }
