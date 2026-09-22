@@ -18,8 +18,8 @@ from pathlib import Path
 
 from PyQt6.QtCore import (QEasingCurve, QPoint, QPropertyAnimation, QRectF, Qt,
                           QTimer)
-from PyQt6.QtGui import (QColor, QFont, QFontMetrics, QPainter, QPainterPath,
-                         QPixmap)
+from PyQt6.QtGui import (QColor, QFont, QFontMetrics, QImage, QPainter,
+                         QPainterPath, QPixmap)
 from PyQt6.QtWidgets import QApplication, QWidget
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,7 +27,8 @@ BRIEF = ROOT / "agora_output" / "channels" / "brief.json"
 PANEL = Path(__file__).resolve().parent / "show.ps1"
 LOGO = ROOT / "public" / "sig" / "agora-96.png"
 
-W, H, MARGIN, RADIUS = 380, 156, 20, 14
+W, H, MARGIN, RADIUS = 340, 104, 18, 12
+BADGE, BADGE_R = 40, 10
 SECONDS = 12
 
 BG = QColor("#111419")
@@ -61,6 +62,8 @@ class Toast(QWidget):
         self.left_ms = SECONDS * 1000
         self.paused = False
         self.beat = 0.0
+        self.hover_close = False
+        self.setMouseTracking(True)
 
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint
@@ -104,6 +107,12 @@ class Toast(QWidget):
                 return
         self.update()
 
+    def mouseMoveEvent(self, e) -> None:
+        near = e.position().x() > W - 34 and e.position().y() < 32
+        if near != self.hover_close:
+            self.hover_close = near
+            self.update()
+
     def enterEvent(self, _e) -> None:
         self.paused = True
 
@@ -111,7 +120,7 @@ class Toast(QWidget):
         self.paused = False
 
     def mousePressEvent(self, e) -> None:
-        if e.position().x() > W - 34 and e.position().y() < 34:
+        if e.position().x() > W - 34 and e.position().y() < 32:
             self.close()
             return
         subprocess.Popen(
@@ -128,67 +137,60 @@ class Toast(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        card = QRectF(0, 0, W, H)
         path = QPainterPath()
-        path.addRoundedRect(card, RADIUS, RADIUS)
+        path.addRoundedRect(QRectF(0, 0, W, H), RADIUS, RADIUS)
         p.fillPath(path, BG)
         p.setPen(EDGE)
         p.drawPath(path)
 
-        # accent edge, the one piece of colour that carries the meaning
+        # The left edge carries the urgency. One signal, one place, so the corner
+        # does not need a second one competing with the close button.
         edge = QPainterPath()
-        edge.addRoundedRect(QRectF(0, 0, 4, H), 2, 2)
+        edge.addRoundedRect(QRectF(0, 0, 3, H), 1.5, 1.5)
         p.fillPath(edge, self.accent)
 
-        y = 18
+        # The mark is shown whole, in its own rounded tile, the way an app icon sits
+        # in a notification. Clipping to the same curvature as the card keeps the
+        # black field from reading as a hard-cornered box.
         if not self.logo.isNull():
-            p.drawPixmap(20, y, 18, 18, self.logo.scaled(
-                36, 36, Qt.AspectRatioMode.KeepAspectRatio,
+            tile = QRectF(16, (H - BADGE) / 2, BADGE, BADGE)
+            clip = QPainterPath()
+            clip.addRoundedRect(tile, BADGE_R, BADGE_R)
+            p.save()
+            p.setClipPath(clip)
+            p.drawPixmap(tile.toRect(), self.logo.scaled(
+                BADGE * 3, BADGE * 3, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
                 Qt.TransformationMode.SmoothTransformation))
-        p.setPen(DIM)
-        f = QFont("Segoe UI", 8)
-        f.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1.6)
-        f.setCapitalization(QFont.Capitalization.AllUppercase)
-        p.setFont(f)
-        p.drawText(46, y + 14, "Agora brief")
+            p.restore()
+            p.setPen(QColor("#2b3240"))
+            p.drawPath(clip)
 
-        if self.urgent:  # a slow beat, only where it is earned
-            import math
-            a = 120 + int(100 * (1 + math.sin(self.beat)) / 2)
-            dot = QColor(self.accent)
-            dot.setAlpha(a)
-            p.setBrush(dot)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.drawEllipse(W - 30, y + 4, 8, 8)
-
+        x = 16 + BADGE + 14
         p.setPen(DIM)
-        p.setFont(QFont("Segoe UI", 9))
-        p.drawText(W - 30, y + 14, "×")
+        eyebrow = QFont("Segoe UI", 7)
+        eyebrow.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1.4)
+        eyebrow.setCapitalization(QFont.Capitalization.AllUppercase)
+        p.setFont(eyebrow)
+        p.drawText(x, 34, "Agora brief")
+
+        p.setPen(QColor("#5b6472") if not self.hover_close else TEXT)
+        p.setFont(QFont("Segoe UI", 10))
+        p.drawText(QRectF(W - 30, 12, 18, 18),
+                   Qt.AlignmentFlag.AlignCenter, "×")
 
         p.setPen(TEXT)
-        head = QFont("Segoe UI Semibold", 13)
-        p.setFont(head)
-        p.drawText(20, 68, f"{len(self.waiting)} čaká · {len(self.urgent)} urgentné")
+        p.setFont(QFont("Segoe UI Semibold", 11))
+        p.drawText(x, 58, f"{len(self.waiting)} čaká · {len(self.urgent)} urgentné")
 
         p.setPen(DIM)
-        body = QFont("Segoe UI", 9)
+        body = QFont("Segoe UI", 8)
         p.setFont(body)
-        title = QFontMetrics(body).elidedText(
-            self.top.get("title", ""), Qt.TextElideMode.ElideRight, W - 40)
-        p.drawText(20, 90, title)
-        who = QFontMetrics(body).elidedText(
-            self.top.get("who", ""), Qt.TextElideMode.ElideRight, W - 40)
-        p.setPen(QColor("#6b7280"))
-        p.drawText(20, 108, who)
+        p.drawText(x, 78, QFontMetrics(body).elidedText(
+            self.top.get("title", ""), Qt.TextElideMode.ElideRight, W - x - 16))
 
-        p.setPen(DIM)
-        p.setFont(QFont("Segoe UI", 8))
-        p.drawText(20, H - 18, "Klikni a otvor panel" if self.urgent
-                   else "Klikni a otvor panel · zmizne samo")
-
-        if not self.urgent:  # the countdown, hairline thin
+        if not self.urgent:
             frac = max(0.0, self.left_ms / (SECONDS * 1000))
-            p.fillRect(QRectF(0, H - 3, W * frac, 3), EDGE)
+            p.fillRect(QRectF(0, H - 2, W * frac, 2), EDGE)
 
 
 def main() -> int:
