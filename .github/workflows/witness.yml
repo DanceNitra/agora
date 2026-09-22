@@ -62,3 +62,37 @@ jobs:
           git add witness/
           git diff --staged --quiet || git commit -m "witness: inspeximus log at $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
+
+  hosted-log:
+    # The HOSTED transparency service (inspeximus-log, Frankfurt, since 2026-09-22). Same owner as
+    # the log, so this is a tripwire and its name says so; the readable copy in witness/hosted/mirror
+    # is what keeps the log readable when the VM is reclaimed. The VM holds no credential for this
+    # repository: this job PULLS over HTTPS and commits here.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Pinned, so the job runs the version we read rather than whatever we publish later.
+      - run: pip install "inspeximus==3.6.2" cryptography certifi
+      - name: Mirror the static copy of the hosted log
+        run: |
+          mkdir -p witness/hosted/mirror
+          for f in head.json log.jsonl keys.json keys.cbor verify.py index.html; do
+            curl -sSf "https://92.5.74.17.sslip.io/log/$f" -o "witness/hosted/mirror/$f"
+          done
+          (cd witness/hosted/mirror && python verify.py)
+      - name: Look at the hosted log and refuse it if the history changed
+        env:
+          INSPEXIMUS_WITNESS_SECRET: ${{ secrets.INSPEXIMUS_WITNESS_SECRET }}
+        run: |
+          inspeximus witness watch             --url https://92.5.74.17.sslip.io/log             --state witness/hosted/state.json             --out witness/hosted/cosignatures             --name "agora CI (SAME OWNER as the hosted log, not an independent witness)"
+      - name: Commit what this witness saw
+        if: always()
+        run: |
+          git config user.name  "agora-witness"
+          git config user.email "agora-witness@users.noreply.github.com"
+          git add witness/hosted/
+          git diff --staged --quiet || git commit -m "witness: hosted log at $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase -q origin main && git push
