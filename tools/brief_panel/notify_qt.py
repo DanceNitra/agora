@@ -7,6 +7,7 @@ counts itself out, and never dismisses an urgent item on its own.
 
     python tools/brief_panel/notify_qt.py            # show if anything waits
     python tools/brief_panel/notify_qt.py --demo     # show with sample data
+    pythonw tools/brief_panel/notify_qt.py --tray    # live in the tray, watch the file
 """
 from __future__ import annotations
 
@@ -18,9 +19,9 @@ from pathlib import Path
 
 from PyQt6.QtCore import (QEasingCurve, QPoint, QPropertyAnimation, QRectF, Qt,
                           QTimer)
-from PyQt6.QtGui import (QColor, QFont, QFontMetrics, QImage, QPainter,
-                         QPainterPath, QPixmap)
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtGui import (QAction, QColor, QFont, QFontMetrics, QIcon, QImage,
+                         QPainter, QPainterPath, QPixmap)
+from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
 
 ROOT = Path(__file__).resolve().parents[2]
 BRIEF = ROOT / "agora_output" / "channels" / "brief.json"
@@ -188,21 +189,115 @@ class Toast(QWidget):
         p.drawText(x, 78, QFontMetrics(body).elidedText(
             self.top.get("title", ""), Qt.TextElideMode.ElideRight, W - x - 16))
 
+        # One faint hint, right aligned, so the card says what a click does without
+        # spending a row on it.
+        p.setPen(QColor("#5b6472"))
+        hint = QFont("Segoe UI", 7)
+        p.setFont(hint)
+        p.drawText(QRectF(0, 76, W - 16, 14),
+                   Qt.AlignmentFlag.AlignRight, "otvoriť →")
+
         if not self.urgent:
             frac = max(0.0, self.left_ms / (SECONDS * 1000))
             p.fillRect(QRectF(0, H - 2, W * frac, 2), EDGE)
 
 
+def counts(data: dict | None) -> tuple[list, list]:
+    items = (data or {}).get("items") or []
+    return ([i for i in items if i.get("state") == "URGENT"],
+            [i for i in items if i.get("state") == "WAITING"])
+
+
+def quiet_now() -> bool:
+    h = __import__("datetime").datetime.now().hour
+    return h >= 22 or h < 7
+
+
+def open_panel() -> None:
+    subprocess.Popen(
+        ["powershell", "-NoProfile", "-WindowStyle", "Hidden",
+         "-ExecutionPolicy", "Bypass", "-File", str(PANEL), "-NoToast"],
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+
+
+class Tray:
+    """Lives in the tray so the panel is one click away at any hour.
+
+    It watches brief.json and raises the window only when the set of open items
+    CHANGES. A toast on every poll would be the same alarm six times a day for
+    work already seen, which is how an alert becomes wallpaper.
+    """
+
+    def __init__(self, app: QApplication) -> None:
+        self.app = app
+        self.seen: set[str] = set()
+        self.toast: Toast | None = None
+        # The tray scales the icon down hard, so give it the mark on its own field
+        # rather than a 192 px badge squeezed into 16 px of tray.
+        self.icon = QSystemTrayIcon(QIcon(str(LOGO)) if LOGO.exists() else QIcon())
+        self.icon.setToolTip("Agora brief")
+        menu = QMenu()
+        self.status = QAction("Agora brief", menu)
+        self.status.setEnabled(False)
+        menu.addAction(self.status)
+        menu.addSeparator()
+        act_open = QAction("Otvoriť panel", menu)
+        act_open.triggered.connect(open_panel)
+        menu.addAction(act_open)
+        act_show = QAction("Ukázať oznámenie", menu)
+        act_show.triggered.connect(lambda: self.raise_toast(force=True))
+        menu.addAction(act_show)
+        menu.addSeparator()
+        act_quit = QAction("Ukončiť", menu)
+        act_quit.triggered.connect(app.quit)
+        menu.addAction(act_quit)
+        self.icon.setContextMenu(menu)
+        self.icon.activated.connect(
+            lambda r: open_panel() if r == QSystemTrayIcon.ActivationReason.Trigger else None)
+        self.icon.show()
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.poll)
+        self.timer.start(60_000)
+        self.poll()
+
+    def poll(self) -> None:
+        data = read_brief(False)
+        urgent, waiting = counts(data)
+        self.icon.setToolTip(f"Agora: {len(waiting)} čaká, {len(urgent)} urgentné")
+        self.status.setText(f"{len(waiting)} čaká · {len(urgent)} urgentné")
+        ids = {i.get("id") for i in urgent + waiting}
+        if ids - self.seen and not quiet_now():
+            self.raise_toast()
+        self.seen = ids
+
+    def raise_toast(self, force: bool = False) -> None:
+        data = read_brief(False)
+        urgent, waiting = counts(data)
+        if not urgent and not waiting:
+            if force:
+                self.icon.showMessage("Agora brief", "Nič nečaká.",
+                                      QSystemTrayIcon.MessageIcon.NoIcon, 3000)
+            return
+        if self.toast is not None:
+            self.toast.close()
+        self.toast = Toast(urgent, waiting)
+        self.toast.show_in()
+
+
 def main() -> int:
+    if "--tray" in sys.argv:
+        app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(False)  # the tray outlives every toast
+        Tray(app)
+        return app.exec()
+
     demo = "--demo" in sys.argv
     data = read_brief(demo)
-    items = (data or {}).get("items") or []
-    urgent = [i for i in items if i.get("state") == "URGENT"]
-    waiting = [i for i in items if i.get("state") == "WAITING"]
+    urgent, waiting = counts(data)
     if not urgent and not waiting:
         return 0
-    hour = __import__("datetime").datetime.now().hour
-    if not demo and (hour >= 22 or hour < 7):  # quiet hours
+    if not demo and quiet_now():
         return 0
 
     app = QApplication(sys.argv)
