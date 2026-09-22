@@ -384,3 +384,10 @@ agora_output/episodes/**/cover.png
 # A third-party bundle (sergebulaev/linkedin-skills, MIT), read in full on 2026-09-17 and kept as the
 # reference behind .claude/skills/linkedin/. Not ours to vendor; the adapted skill points into it.
 .agents/linkedin-skills-source/
+
+# Internal operations: prospects, the Builder log, the daily brief. The agora repo is
+# PUBLIC, and a plan in a public repo tells every competitor what to build and when.
+agora_output/sales/
+agora_output/channels/brief.json
+agora_output/channels/builder_log.md
+agora_output/channels/builder_briefing.md
