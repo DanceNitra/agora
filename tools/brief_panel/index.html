@@ -186,8 +186,22 @@ let lastGood = null;
 async function render() {
   let data;
   try {
-    const res = await fetch("../../agora_output/channels/brief.json?t=" + Date.now());
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    // The relative path holds when the file is opened from its own folder. A viewer
+    // that renders the page from another base (a snapshot, a data: URL) breaks it, so
+    // the absolute path is tried as well before anything is called broken.
+    const candidates = [
+      new URL("../../agora_output/channels/brief.json", document.baseURI).href,
+      "file:///C:/Users/Danculus/agora/agora_output/channels/brief.json"
+    ];
+    let res = null, lastErr = null;
+    for (const url of candidates) {
+      try {
+        const r = await fetch(url + "?t=" + Date.now());
+        if (r.ok) { res = r; break; }
+        lastErr = new Error("HTTP " + r.status);
+      } catch (e) { lastErr = e; }
+    }
+    if (!res) throw lastErr || new Error("brief.json not reachable");
     data = await res.json();
     if (!data || !Array.isArray(data.items)) throw new Error("brief.json has no items array");
     lastGood = data;
