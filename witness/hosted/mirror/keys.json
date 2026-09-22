@@ -1,0 +1,9 @@
+{
+  "kty": "OKP",
+  "crv": "Ed25519",
+  "alg": "EdDSA",
+  "kid": "9fb780dd72894867c6dac8e140cc78d755617147d20cfd26bfe557190f65ac49",
+  "x_hex": "9fb780dd72894867c6dac8e140cc78d755617147d20cfd26bfe557190f65ac49",
+  "x_b64url": "n7eA3XKJSGfG2sjhQMx411VhcUfSDP0mv-VXGQ9lrEk",
+  "note": "verifies the receipts under entries/. It does NOT tell you the log is the same one shown to anyone else; only a witness can."
+}
