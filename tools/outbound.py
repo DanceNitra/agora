@@ -172,7 +172,15 @@ Return under 200 words: the three verdicts, what you changed, and the final sha2
 def cmd_gate(a):
     meta = _meta(a.slug)
     draft = os.path.join(_dir(a.slug), "draft.md")
-    print("Launch ONE Agent call: subagent_type general-purpose, model sonnet, this prompt:\n")
+    # .claude/hooks/agent_budget.py refuses any launch whose prompt lacks these two lines, and
+    # the quote must be the owner's own words, typed after this budget was shown to him.
+    # On the first live run (r91188, 2026-09-25) the prompt lacked them and two launches were
+    # refused before the third passed, each refusal a full turn of context.
+    print("FIRST tell the owner in one line: BUDGET: 1 gate subagent, model sonnet, about 60k tokens.")
+    print("Wait for his yes. Then launch ONE Agent call: subagent_type general-purpose, model sonnet,")
+    print("with this prompt, pasting his reply VERBATIM (punctuation included) into the quote:\n")
+    print("BUDGET: 1 gate subagent, model sonnet, about 60k tokens")
+    print('Owner approved: "<his exact reply>"\n')
     print(GATE_PROMPT.format(draft=draft, thread=meta["thread"], sign=meta["sign"], slug=a.slug))
     print("\nThen record the three receipts from that run's output file (under .../tasks/):")
     for sk in ("humanizer", "verify", "redteam"):
