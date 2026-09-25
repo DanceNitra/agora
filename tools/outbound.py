@@ -169,7 +169,7 @@ REDTEAM: <PUBLISH / REFRAME / KILL> <the single most damaging finding>
 HUMANIZER: <what changed, or nothing>"""
 
 GATE_FLAGS = ["--output-format", "json", "--strict-mcp-config",
-              "--setting-sources", "", "--tools", "Read,Edit,Skill",
+              "--setting-sources", "project", "--tools", "Read,Edit,Skill",
               "--allowedTools", "Read", "Edit", "Skill", "--permission-mode", "acceptEdits"]
 
 
@@ -205,7 +205,13 @@ def cmd_gate(a):
     exe = shutil.which("claude")
     if not exe:
         raise SystemExit("REFUSED: the claude CLI is not on PATH.")
-    cmd = [exe, "-p", "--model", a.model, *GATE_FLAGS, "--mcp-config", empty]
+    # Project settings are needed: with --setting-sources "" the project skills do not load and
+    # every Skill call returns "Unknown skill" (measured 2026-09-25, both gate runs on r91188).
+    # Their hooks are switched off instead, because they inject context into every turn.
+    nohooks = os.path.join(_dir(a.slug), "nohooks.json")
+    with io.open(nohooks, "w", encoding="utf-8") as fh:
+        fh.write('{"disableAllHooks": true}')
+    cmd = [exe, "-p", "--model", a.model, *GATE_FLAGS, "--mcp-config", empty, "--settings", nohooks]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
                        errors="replace", input=prompt, timeout=1800)
     raw = r.stdout or ""

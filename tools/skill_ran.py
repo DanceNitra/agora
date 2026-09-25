@@ -93,6 +93,24 @@ def find(skill, draft, tp):
     want = os.path.basename(draft)
     alt = os.path.relpath(os.path.abspath(draft), ROOT).replace(os.sep, "/")
     out = []
+    # A Skill CALL is not a skill RUN. Measured 2026-09-25: a `claude -p` gate started with
+    # --setting-sources "" had no project skills, every Skill call returned "Unknown skill", and
+    # this function still counted all three, so six receipts were recorded for skills that never
+    # ran. Only a call whose tool_result came back without an error counts.
+    failed = set()
+    with io.open(tp, encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if '"tool_result"' not in line:
+                continue
+            try:
+                rec = json.loads(line)
+            except ValueError:
+                continue
+            for c in ((rec.get("message") or {}).get("content") or []):
+                if isinstance(c, dict) and c.get("type") == "tool_result":
+                    txt = json.dumps(c.get("content"))[:400]
+                    if c.get("is_error") or "Unknown skill" in txt:
+                        failed.add(c.get("tool_use_id"))
     with io.open(tp, encoding="utf-8", errors="replace") as fh:
         for line in fh:
             if '"Skill"' not in line:
@@ -106,6 +124,8 @@ def find(skill, draft, tp):
                     continue
                 inp = c.get("input") or {}
                 if inp.get("skill") not in ALIASES.get(skill, (skill,)):
+                    continue
+                if c.get("id") in failed:
                     continue
                 args = str(inp.get("args") or "")
                 # Every text under agora_output/outbound/ is named draft.md, so the basename alone
