@@ -245,6 +245,22 @@ def _the_gate(path: str) -> int | None:
     m = hr.missing(path)
     if not m:
         return None
+    # A SEALED OUTBOUND TEXT is its gated draft plus one generated line: the seal footer. The
+    # receipts bind draft.md, because the seal is made after the gate and changes the sha, so on
+    # r91188 (2026-09-25) every receipt was valid and the send was still refused. Accept them only
+    # when the sealed bytes ARE the draft's bytes followed by nothing but that single footer line.
+    sib = os.path.join(os.path.dirname(os.path.abspath(path)), "draft.md")
+    if os.path.basename(path) == "draft.sealed.md" and os.path.isfile(sib):
+        sealed = io.open(path, encoding="utf-8", newline="").read()
+        draft = io.open(sib, encoding="utf-8", newline="").read().rstrip()
+        rest = sealed[len(draft):].strip() if sealed.startswith(draft) else None
+        footer_only = (rest is not None and "\n" not in rest
+                       and rest.startswith('<a href="https://raw.githubusercontent.com/DanceNitra/inspeximus/')
+                       and 'alt="Inspeximus seal"' in rest)
+        if footer_only and not hr.missing(sib):
+            print("gate: receipts bind %s; the sealed file is that draft plus the seal footer only"
+                  % sib)
+            return None
     print("REFUSED: the gate has not run on this draft. Missing: %s" % ", ".join(m))
     print("  The gate is the SKILLS, not a probes/*.py I wrote:")
     print("    verify  -> .claude/skills/verify-claims/SKILL.md    (every number vs its artifact)")
