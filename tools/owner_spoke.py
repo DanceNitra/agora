@@ -225,6 +225,17 @@ def check(sha: str, project_dir: str | None = None, draft: str | None = None) ->
                            "the reply cannot be attributed to this draft. Show this draft again and "
                            "get a fresh answer." % between[0][:16])
 
+        # HASH-KEYED APPROVAL. Owner, 2026-09-25, verbatim: "áno, posli <hash> nahrádza vkladanie
+        # textu do chatu". Pasting every sentence into chat made each approval round re-read the
+        # whole session context, millions of tokens per page. He reviews the rendered file and
+        # answers "posli <first 6 hex of the sha>". Conditions 1-3 still hold (the hash was shown,
+        # he spoke afterwards, no other draft in between); this reply replaces conditions 4 and 5.
+        tag = re.compile(r"\bpo[sš]li\s+" + re.escape(sha.lower()[:6]) + r"\b", re.I)
+        keyed = [(t, x) for t, x in after if tag.search(x or "")]
+        if keyed:
+            return True, ("owner replied 'posli %s' at %s after the hash was shown at %s"
+                          % (sha.lower()[:6], keyed[0][0].isoformat(), anchor.isoformat()))
+
         # WAS THE TEXT ITSELF PUT IN FRONT OF HIM, not just its digest?
         if draft:
             try:
