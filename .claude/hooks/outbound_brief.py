@@ -12,8 +12,8 @@ root = os.environ.get("CLAUDE_PROJECT_DIR") or os.path.dirname(os.path.dirname(o
     os.path.abspath(__file__))))
 lines = [
     "[outbound] Any text that leaves Agora: invoke the `outbound` skill and use tools/outbound.py.",
-    "[outbound] Budget: under 100k tokens per text, gate included. Mechanics are scripts (0 tokens);",
-    "[outbound] one Sonnet gate subagent; owner approves with 'posli <6 hex>' on the render;",
+    "[outbound] Mechanics are scripts (0 tokens). No gate model call and no humanizer: the writing",
+    "[outbound] model answers for content (author receipt); owner approves 'posli <6 hex>' on the render;",
     "[outbound] never paste the draft into chat. Compact at ~40% context, not 94%.",
 ]
 try:

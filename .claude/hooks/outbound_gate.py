@@ -159,7 +159,7 @@ def main() -> int:
         "hours later, so the page reads correctly. The notification emails are not editable: every "
         "subscriber received a comment from us whose entire body was a local path.\n"
         "The sender refuses --body, binds the digest to the text actually sent, and checks the "
-        "verify, redteam and humanizer receipts. Reads are untouched by this hook."
+        "author receipt. Reads are untouched by this hook."
         % (hit, cmd.strip()[:400]))
     return 2
 

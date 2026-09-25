@@ -1,11 +1,11 @@
 ---
 name: outbound
-description: The ONLY way any text leaves Agora (GitHub comment, PR, reply, post). One text, under 100k tokens, gate and seal included. Use for every outbound draft, every "posli", every seal. Mechanics are tools/outbound.py (0 tokens); the model writes the draft; the gate is one stripped claude -p call.
+description: The ONLY way any text leaves Agora (GitHub comment, PR, reply, post). One text, under 100k tokens, gate and seal included. Use for every outbound draft, every "posli", every seal. Mechanics are tools/outbound.py (0 tokens); the model writes the draft and answers for it; the gate is an author receipt, 0 tokens.
 ---
 
 # Outbound: one text, under 100k tokens
 
-Owner rule, 2026-09-25: one outbound page costs under 100k tokens, gate included. On 2026-09-24 one
+Owner rule, 2026-09-25: one outbound page costs under 100k tokens. Since the same day the gate costs nothing: On 2026-09-24 one
 page cost millions because every step ran by hand in a session with a 94%-full context. Every step
 that needs no judgment is a script. Do not rebuild any of it by hand, and do not re-derive this
 procedure: follow it.
@@ -17,7 +17,7 @@ procedure: follow it.
 | 1. start | `python tools/outbound.py new SLUG --thread owner/repo#N --sign github\|edrn [--kind pr]` | 0 |
 | 2. write | write `agora_output/outbound/SLUG/draft.md` and `claims.py` (one claim per figure) | the draft |
 | 3. lint | `python tools/outbound.py check SLUG` until it prints `all N checks pass` | 0 |
-| 4. gate | `python tools/outbound.py gate SLUG` prints the budget line; tell the owner, and after his yes run `gate SLUG --go`: one stripped `claude -p` Sonnet call runs the three skills and records the three receipts from its own transcript. Never a subagent: it starts at 89k tokens | 30-60k |
+| 4. gate | `python tools/outbound.py gate SLUG`: records that Opus 5.5, the model that wrote the draft, answers for every fact, figure and word (`author.json`, bound to the draft sha256). No model call, no approval needed | 0 |
 | 5. seal | `python tools/outbound.py seal SLUG --inputs <source files>` (render, receipt, log, stamp, SVG pair, footer) | 0 |
 | 6. owner | `python tools/outbound.py show SLUG`, send him the two render PNGs with SendUserFile, then wait for `posli <6 hex>`; then `python tools/outbound.py post SLUG --sha <full hash>` | small |
 
@@ -28,24 +28,24 @@ a restart or a compaction instead of reconstructing state from memory.
 
 In the main checkout `C:\Users\Danculus\agora`, never in a worktree. The inputs (probes, results,
 session reports) are untracked files, and a worktree holds only committed ones, so a worktree session
-cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree off, model Sonnet.
+cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree off, model Opus 5.5 (it answers for the content).
 
 ## Rules that save the tokens
 
 - **Run the whole text in a SHORT session.** The main session only commissions it. A long context
   multiplies every turn. Compact any session at about 40%, not 94%.
-- **Freeze the text before step 4.** An edit after the gate invalidates the receipts by design and
-  costs a new gate run. Fix everything `check` reports first.
+- **Freeze the text before step 4.** An edit after the gate invalidates the author receipt; re-run
+  `gate`, which is free. Fix everything `check` reports first.
 - **Never paste the draft into chat.** The owner reads the render and answers `posli <first 6 hex of
   the sha>`. `tools/owner_spoke.py` accepts that reply (owner decision 2026-09-25, commit e415da30).
-- **One stripped gate call, not a subagent and not a panel.** Humanizer, verify-claims and stress-claim run inline inside it,
-  each once. No storm unless the claim rests on literature rather than a re-runnable artifact.
+- **No gate model call, no humanizer (owner, 2026-09-25).** The stripped `claude -p` gate cost
+  0.39 USD on a five-sentence reply with nothing to check. Verify every figure against its source
+  while writing; the seal recomputes them. No storm unless the claim rests on literature rather than
+  a re-runnable artifact, and then only after the owner hears the price.
 - **Not other people's work.** If their question needs a computation they can run, send the script,
   not our result. Before any run over 100k tokens, tell the owner the cost and wait.
-- **Budget is in `usd_equivalent`, not raw tokens.** Raw token sums count every cached re-read and
-  overstate cost. Caps: the gate 1 USD, the whole text 2 USD. `gate.json` records the gate's figure.
-  Measured 2026-09-25 on r91188: the stripped Opus gate cost 0.62 USD (15 turns, 338k tokens summed
-  over turns); the old subagent gate summed to about 4M.
+- **Budget in `usd_equivalent`.** Writing is the only model cost. Anything else that would call a
+  model is priced to the owner first.
 - **Over budget: stop and say so.** Never finish a text silently over the cap.
 
 ## Where each piece goes
@@ -62,7 +62,7 @@ inspeximus holds only the product and its seals. It is not a storage place for o
 
 ## What stays exactly as before
 
-The gate is still the three SKILLS with receipts (`tools/humanizer_receipt.py`), the seal is still on
-every text (`send_approved.py` refuses without it), the owner still approves every send, EDRN is
+The seal is still on every text (`send_approved.py` refuses without it), the owner still approves
+every send, `send_approved.py` refuses without an author receipt bound to the draft, EDRN is
 signed "Rastislav Drahoš, Agora Research OS" with no AI disclosure, and gh payloads stay pure ASCII.
 `outbound.py check` enforces the last two.

@@ -242,28 +242,22 @@ def _tells_gate(body: str, acked: bool, skill_ran: bool) -> int | None:
 
 
 def _the_gate(path: str) -> int | None:
-    """The owner's gate, and it is not a script I wrote. None means proceed.
+    """The author receipt binds these bytes. None means proceed.
 
-    "a pod branou sa myslia veci ako Validate, storm ak je treba, redteam a podobne!!!!!" -- and
-    then, the same day, "ZAPIS SI TO NATVRDO A TEN TVOJ SKRIPT DAJ DO HOVEN". Both were said
-    because I kept running `probes/gate_*.py`, a file I wrote that morning, and calling it the gate.
-    That file recomputes figures against receipts. It is ONE check inside VALIDATE. It is not the
-    frame, and it never was.
-
-    The frame is the SKILLS: verify-claims (validate the facts), stress-claim (red-team the claim),
-    and humanizer (how it reads). Storm when the claim rests on literature. Until today the send
-    path asked for `--humanizer-skill-ran`, which is a bare flag -- exactly as strong as
-    remembering, and on 2026-08-26 I passed it for a draft whose skeptic and validator had never
-    run. So each skill now leaves a RECEIPT bound to the draft's content sha256, an edit
-    invalidates it, and this refuses without all three.
+    Owner, 2026-09-25: the three skill receipts (verify, redteam, humanizer), recorded by a separate
+    `claude -p` gate call, cost 0.39 USD on a five-sentence reply with nothing to check. He removed
+    that call and the humanizer: "za content bude zodpovedat OPUS 5.5". The model that writes the
+    draft answers for it, and tools/author_receipt.py binds the draft's sha256 to that model, so an
+    edit after recording still refuses the send. Figures are still recomputed by the seal, and the
+    owner still approves the render.
     """
-    m = hr.missing(path)
-    if not m:
+    import author_receipt as ar
+    why = ar.check(path)
+    if not why:
         return None
-    # A SEALED OUTBOUND TEXT is its gated draft plus one generated line: the seal footer. The
-    # receipts bind draft.md, because the seal is made after the gate and changes the sha, so on
-    # r91188 (2026-09-25) every receipt was valid and the send was still refused. Accept them only
-    # when the sealed bytes ARE the draft's bytes followed by nothing but that single footer line.
+    # A SEALED OUTBOUND TEXT is its draft plus one generated line, the seal footer. The receipt
+    # binds draft.md, because the seal changes the sha. Accept it only when the sealed bytes ARE the
+    # draft's bytes followed by nothing but that single footer line.
     sib = os.path.join(os.path.dirname(os.path.abspath(path)), "draft.md")
     if os.path.basename(path) == "draft.sealed.md" and os.path.isfile(sib):
         sealed = io.open(path, encoding="utf-8", newline="").read()
@@ -272,19 +266,11 @@ def _the_gate(path: str) -> int | None:
         footer_only = (rest is not None and "\n" not in rest
                        and rest.startswith('<a href="https://raw.githubusercontent.com/DanceNitra/inspeximus/')
                        and 'alt="Inspeximus seal"' in rest)
-        if footer_only and not hr.missing(sib):
-            print("gate: receipts bind %s; the sealed file is that draft plus the seal footer only"
-                  % sib)
+        if footer_only and not ar.check(sib):
+            print("gate: the author receipt binds %s; the sealed file is that draft plus the seal "
+                  "footer only" % sib)
             return None
-    print("REFUSED: the gate has not run on this draft. Missing: %s" % ", ".join(m))
-    print("  The gate is the SKILLS, not a probes/*.py I wrote:")
-    print("    verify  -> .claude/skills/verify-claims/SKILL.md    (every number vs its artifact)")
-    print("    redteam -> .claude/skills/stress-claim/SKILL.md     (the claim, before the prose)")
-    print("    humanizer -> .claude/skills/humanizer/SKILL.md      (how it reads)")
-    print("  Then record each one against THESE bytes:")
-    for skill in m:
-        print("    python tools/humanizer_receipt.py record %s --skill %s --found \"...\""
-              % (path, skill))
+    print("REFUSED: %s" % why)
     return 1
 
 
@@ -631,11 +617,9 @@ def main(argv=None):
     ap.add_argument("--ack-thread", action="store_true",
                     help="record that a human read what happened in the thread SINCE this draft was "
                          "written, including a close, and still wants it sent unchanged")
-    ap.add_argument("--humanizer-skill-ran", action="store_true",
-                    help="record that .claude/skills/humanizer/SKILL.md was actually RUN on this "
-                         "draft. This module is not that skill and refuses to run without it.")
-    ap.add_argument("--ack-tells", action="store_true",
-                    help="record that a human read the flagged constructions and is keeping them")
+    # Kept only so older command lines still parse. The humanizer left the pipeline 2026-09-25.
+    ap.add_argument("--humanizer-skill-ran", action="store_true", help=argparse.SUPPRESS)
+    ap.add_argument("--ack-tells", action="store_true", help=argparse.SUPPRESS)
     ap.add_argument("--no-seal", metavar="REASON",
                     help="send without the inspeximus seal; the owner's reason, at least 20 characters")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
@@ -737,13 +721,6 @@ def main(argv=None):
     if refuse is not None:
         return refuse
     refuse = _the_gate(a.file)
-    if refuse is not None:
-        return refuse
-
-    # _the_gate just passed, and it requires a humanizer receipt bound to these bytes (or, for a
-    # sealed outbound text, to its draft). That receipt IS the record that the skill ran, so the
-    # bare flag is redundant here; r91188 was refused for lacking it while its receipt was valid.
-    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells, True)
     if refuse is not None:
         return refuse
 

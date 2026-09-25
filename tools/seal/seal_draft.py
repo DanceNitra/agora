@@ -427,6 +427,12 @@ def verify_pinned(commit: str, name: str, content: bytes, tries: int = 6) -> str
 
 # ----------------------------------------------------------------------------------------- main
 
+def has_claims(script_src: str) -> bool:
+    """True when the claims script calls claim() outside a comment."""
+    return any(re.match(r"\s*claim\(", ln) for ln in script_src.splitlines()
+               if not ln.lstrip().startswith("#"))
+
+
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
@@ -467,18 +473,39 @@ def main(argv=None) -> int:
 
     # 2. RECOMPUTE, then the hash-only statement.
     print("[2/6] recompute_receipt")
-    cmd = [sys.executable, "-X", "utf8", RECOMPUTE, a.draft, a.script, "--inputs"] + a.inputs + \
-        sum([["--token", t] for t in a.token], []) + ["--skill", a.skill]
-    r = subprocess.run(cmd, cwd=ROOT)
-    if r.returncode != 0:
-        print("STOPPED: recompute_receipt refused. Nothing was logged.")
-        return 1
     rpath = os.path.join(RECEIPTS, dsha[:32] + "." + a.skill + ".recompute.json")
-    receipt = json.load(io.open(rpath, encoding="utf-8"))
-    muts = receipt["mutations"]
-    caught = sum(1 for m in muts if m.get("claims_broken"))
-    if caught != len(muts) or not muts:
-        raise SystemExit("REFUSED: %d of %d mutations broke a claim." % (caught, len(muts)))
+    # Receipts are named by the draft's hash, so sealing the same bytes again (even a --dry-run)
+    # overwrote the logged receipt of a text already sent. Measured 2026-09-25 on 58b45601; the
+    # original was rebuilt only because the log kept its statement hash.
+    if os.path.isfile(rpath) and "log_entry" in json.load(io.open(rpath, encoding="utf-8")):
+        raise SystemExit("REFUSED: %s is already logged for these exact bytes. This text was sealed "
+                         "before; do not seal it again." % os.path.relpath(rpath, ROOT))
+    script_src = io.open(a.script, encoding="utf-8").read()
+    if not has_claims(script_src):
+        # A text with no figure has nothing to recompute. Owner, 2026-09-25: a five-sentence reply
+        # was refused here until a claim was invented for it. The seal still logs the draft's hash
+        # and time, and the footer reads "0 of 0".
+        print("    no CLAIM in %s: nothing to recompute; the seal records the draft's hash and time"
+              % os.path.basename(a.script))
+        receipt = {"claims": {}, "draft_sha256": dsha,
+                   "inputs": [{"sha256": dsha}], "mutations": [],
+                   "recorded_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                   "script_sha256": sha(script_src.encode("utf-8")), "skill": a.skill,
+                   "stdout_sha256": sha(b"")}
+        io.open(rpath, "wb").write(receipt_bytes(receipt))
+        caught = 0
+    else:
+        cmd = [sys.executable, "-X", "utf8", RECOMPUTE, a.draft, a.script, "--inputs"] + a.inputs + \
+            sum([["--token", t] for t in a.token], []) + ["--skill", a.skill]
+        r = subprocess.run(cmd, cwd=ROOT)
+        if r.returncode != 0:
+            print("STOPPED: recompute_receipt refused. Nothing was logged.")
+            return 1
+        receipt = json.load(io.open(rpath, encoding="utf-8"))
+        muts = receipt["mutations"]
+        caught = sum(1 for m in muts if m.get("claims_broken"))
+        if caught != len(muts) or not muts:
+            raise SystemExit("REFUSED: %d of %d mutations broke a claim." % (caught, len(muts)))
     spath = os.path.join(RECEIPTS, dsha[:16] + ".log-statement.json")
     statement = build_statement(receipt)
     io.open(spath, "wb").write(statement)

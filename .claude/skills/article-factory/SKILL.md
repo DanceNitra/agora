@@ -1,6 +1,6 @@
 ---
 name: article-factory
-description: The one procedure for taking a research finding to a published Agora article (EN and SK, in the sitemap), a Reddit-ready version, an English "Echoes of Tomorrow" podcast episode built on NotebookLM deep research, and the episode's text promo for X and LinkedIn. Use when the owner says "urob z toho clanok", "sprav podcast", "priprav to na Reddit", "Publish article", when an inbox task of kind "Publish article" appears, or when an existing post is to be deepened and re-issued. Deep research runs BEFORE the article, so the article is the best version of itself; then the standing gate (VALIDATE, storm-research, stress-claim, verify-claims, humanizer last); then tools/derive_post.py and tools/podcast_episode.py for the mechanics. Built 2026-09-17 from agora_output/content_engine_plan_2026-09.md; reordered the same day on the owner's instruction.
+description: The one procedure for taking a research finding to a published Agora article (EN and SK, in the sitemap), a Reddit-ready version, an English "Echoes of Tomorrow" podcast episode built on NotebookLM deep research, and the episode's text promo for X and LinkedIn. Use when the owner says "urob z toho clanok", "sprav podcast", "priprav to na Reddit", "Publish article", when an inbox task of kind "Publish article" appears, or when an existing post is to be deepened and re-issued. Deep research runs BEFORE the article, so the article is the best version of itself; then the standing gate (VALIDATE, storm-research, stress-claim, verify-claims; no humanizer since 2026-09-25); then tools/derive_post.py and tools/podcast_episode.py for the mechanics. Built 2026-09-17 from agora_output/content_engine_plan_2026-09.md; reordered the same day on the owner's instruction.
 argument-hint: "<slug of public/posts/src/<slug>.en.md, or the finding in one sentence>"
 ---
 
@@ -80,7 +80,6 @@ edit both), in Google developer style, using the article's own findings and
 - The falsifier: what result would have proved us wrong.
 - The probe link: `research/probes/<name>.py`, public, self-contained, prints every number.
 - Under 1,200 words. The long form, if any, stays on the storefront.
-Do not run the humanizer here. It runs once, last, in step 8c.
 
 ## 5. VALIDATE
 
@@ -128,13 +127,9 @@ toggle, and rebuilds the index and the sitemap.)
 Commit the sources, the HTML, the sitemap. Push to Pages. Submit the URL to IndexNow and
 request indexing in Search Console, so Google finds it.
 
-### 8c. Humanizer, once, last
-The `humanizer` SKILL on the EN source, then the receipt:
-```bash
-python tools/humanizer_receipt.py record public/posts/src/<slug>.en.md --in-session
-```
-If the humanizer changed the text, mirror the change in the SK source, re-render (8a), commit
-again. Never a script in place of the skill; never a second pass (owner, twice).
+### 8c. No humanizer
+The humanizer left the pipeline on 2026-09-25 (owner). The writing model, Opus 5.5, answers for
+the wording as it answers for the facts.
 
 ### 8d. Freeze
 ```bash
@@ -155,8 +150,7 @@ Then:
 ```bash
 python -X utf8 tools/derive_post.py check <slug>
 ```
-Every derivative that goes outward gets the `humanizer` SKILL and its receipt, keyed to its own
-bytes. A derivative edited after the pass has no receipt.
+A derivative that goes outward as a comment or reply goes through the `outbound` skill.
 
 ## 10. The episode, in English
 
@@ -179,7 +173,7 @@ In `agora_output/derivatives/<slug>/`, from the article and the episode only:
 - `x.md`: three to five posts, the first is the number, the last carries the episode link.
 - `linkedin.md`: 120 to 200 words, the episode link and the article link.
 - an OG image for the article at 1200 x 630, same restraint rules, if the post has none.
-`derive_post.py check <slug>` again, then the `humanizer` SKILL and receipts on each.
+`derive_post.py check <slug>` again on each.
 
 ## 12. Brief the owner, once, in Slovak
 

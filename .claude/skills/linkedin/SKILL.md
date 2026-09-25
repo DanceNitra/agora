@@ -1,6 +1,6 @@
 ---
 name: linkedin
-description: Run Agora's LinkedIn as a marketing operation on top of sergebulaev/linkedin-skills (MIT, read in full 2026-09-17, kept at .agents/linkedin-skills-source/). Use for a LinkedIn post from a published Agora article or episode, a comment or reply on someone's post, a weekly plan, the profile rewrite, or the engager and thread reports. Every draft obeys Agora's rules first (numbers only from the gated article, humanizer last, owner pastes), then the bundle's 2026 craft (number-first hook, one contrast, one triple, link in the first comment).
+description: Run Agora's LinkedIn as a marketing operation on top of sergebulaev/linkedin-skills (MIT, read in full 2026-09-17, kept at .agents/linkedin-skills-source/). Use for a LinkedIn post from a published Agora article or episode, a comment or reply on someone's post, a weekly plan, the profile rewrite, or the engager and thread reports. Every draft obeys Agora's rules first (numbers only from the gated article, no humanizer pass, owner pastes), then the bundle's 2026 craft (number-first hook, one contrast, one triple, link in the first comment).
 argument-hint: "post <slug> | comment <url> | reply <url> | plan | profile | engagers <url> | threads"
 ---
 
@@ -26,11 +26,10 @@ from it before drafting; do not recall it. This skill says what Agora changes.
    `python tools/derive_post.py check <slug> agora_output/derivatives/<slug>/linkedin.md` must
    print `ok`. The bundle's "add an odd-precision number" rule is satisfied only with a number the
    article already carries. If the article has no number for the beat, the beat goes.
-2. **Humanizer runs last, once**, the `humanizer` SKILL, then
-   `tools/humanizer_receipt.py record ... --skill humanizer --in-session --wording-is-final`. The
-   bundle's own `linkedin-humanizer` is a reference for the 2026 LinkedIn tells (reveal bridges,
-   staccato stacks, "It's not X, it's Y"); it is not the pass. Agora's rule on em dashes stays:
-   none, not "one per 100 words".
+2. **No humanizer pass** (owner, 2026-09-25). Opus 5.5, the model writing the post, answers for
+   its wording. The bundle's `linkedin-humanizer` lists the 2026 LinkedIn tells (reveal bridges,
+   staccato stacks, "It's not X, it's Y"); avoid them while writing. Agora's rule on em dashes
+   stays: none, not "one per 100 words".
 3. **Tier 0 only. The owner pastes.** No Publora key, no `LINKEDIN_SKILLS_CUSTOM_POSTER`, no
    auto-publish. Deliver the post body, the first comment (with the links), the posting window and
    the reply plan.
@@ -79,7 +78,7 @@ from it before drafting; do not recall it. This skill says what Agora changes.
    P.S. only when there is a real follow-up.
 4. Write the first comment: the article URL, the episode URL, the probe URL, each with five words
    of what it is.
-5. `derive_post.py check`, then the humanizer SKILL, then the receipt.
+5. `derive_post.py check`.
 6. Show the owner: formula, the post, the first comment, the character count, the window
    (Tue, Wed, or Thu, 07:00 to 08:30 CET for EU decision makers), and the reply plan (answer
    every comment inside 90 minutes; the first hour decides most of the reach).
