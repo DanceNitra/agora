@@ -38,6 +38,18 @@ a restart or a compaction instead of reconstructing state from memory.
   not our result. Before any run over 100k tokens, tell the owner the cost and wait.
 - **Over budget: stop and say so.** Never finish a text silently at 300k.
 
+## Where each piece goes
+
+| piece | place | never |
+|---|---|---|
+| draft, claims.py, receipts, renders | `agora_output/outbound/SLUG/` (local, private) | any repo push |
+| seal SVG pair | `DanceNitra/inspeximus` `docs/seal/` (seal_draft.py does it) | anything else into inspeximus |
+| a probe the text links to | public `DanceNitra/agora` `probes/`, via the `C:/Users/Danculus/_pubmain` worktree, only that probe and its result, owner sees the file list first | pushing our working branch |
+| physics scripts for EDRN | the `DanceNitra/edrn-dmrg-verification` fork branch | agora or inspeximus |
+| session reports, strategy, plans | `agora_output/strategy/` (private) | any public place, any link in a comment |
+
+inspeximus holds only the product and its seals. It is not a storage place for our outreach.
+
 ## What stays exactly as before
 
 The gate is still the three SKILLS with receipts (`tools/humanizer_receipt.py`), the seal is still on
