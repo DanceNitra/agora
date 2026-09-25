@@ -143,6 +143,20 @@ def bind_payload(draft: str, cmd: list) -> tuple[list, bytes] | str:
     return out, Path(draft).read_bytes()
 
 
+def without_seal_footer(text: str) -> str:
+    """The text with the generated inspeximus seal footer cut off, for the checks that read figures.
+
+    The footer carries the seal date and the root in four-hex groups ("6175 df94 10f4"); both the
+    pregate and the prior-statement checks read them as figures and refused r91188 on 2026-09-25.
+    The cut starts at the first link into docs/seal/, so everything written above it is still read.
+    """
+    cut = text.find("/docs/seal/")
+    if cut == -1:
+        return text
+    start = text.rfind("<a ", 0, cut)
+    return text[:start if start != -1 else cut]
+
+
 def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | None:
     """Run the prior-statement check. Returns an exit code to refuse with, or None to proceed.
 
@@ -171,7 +185,8 @@ def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | 
         print("prior-statement check: NOT RUN -- this command does not post to a github thread.")
         print("  Reported, not assumed clean.")
         return None
-    code, report = psc.check(Path(path).read_text(encoding="utf-8", errors="replace"), thread)
+    code, report = psc.check(without_seal_footer(
+        Path(path).read_text(encoding="utf-8", errors="replace")), thread)
     print(report)
     print("")
     if code in (0, 3):
@@ -485,9 +500,7 @@ def _pregate_gate_impl(path, thread_spec):
     # The inspeximus seal footer is generated, not written: its root groups ("6175 df94 10f4")
     # and image URLs are hex, and a four-digit group read as a figure refused r91188 on 2026-09-25.
     # Only the footer block is cut, from the first seal link to the end; the prose is scanned whole.
-    _cut = body.find('/docs/seal/')
-    if _cut != -1:
-        body = body[:body.rfind("<a ", 0, _cut) if body.rfind("<a ", 0, _cut) != -1 else _cut]
+    body = without_seal_footer(body)
     nums = set(re.findall(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])", body))
     if not nums:
         return None
@@ -727,7 +740,10 @@ def main(argv=None):
     if refuse is not None:
         return refuse
 
-    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells, a.humanizer_skill_ran)
+    # _the_gate just passed, and it requires a humanizer receipt bound to these bytes (or, for a
+    # sealed outbound text, to its draft). That receipt IS the record that the skill ran, so the
+    # bare flag is redundant here; r91188 was refused for lacking it while its receipt was valid.
+    refuse = _tells_gate(stdin.decode("utf-8", "replace"), a.ack_tells, True)
     if refuse is not None:
         return refuse
 
