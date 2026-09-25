@@ -9,7 +9,7 @@ no tokens. The only model work left is writing the draft and ONE gate subagent (
 
     python tools/outbound.py new    SLUG --thread owner/repo#N --sign github|edrn [--kind issue|pr]
     python tools/outbound.py check  SLUG      # deterministic lint, 0 tokens
-    python tools/outbound.py gate   SLUG      # prints the one gate-subagent prompt
+    python tools/outbound.py gate   SLUG [--go] # budget line; --go runs the stripped gate and receipts
     python tools/outbound.py seal   SLUG --inputs FILE... [--dry-run]
     python tools/outbound.py show   SLUG      # render paths + hash for the owner
     python tools/outbound.py post   SLUG --sha HASH
@@ -151,41 +151,87 @@ def cmd_check(a):
     return 1 if bad else 0
 
 
-GATE_PROMPT = """You are the outbound gate for ONE text. Budget: finish in as few turns as possible.
-Draft: {draft}
-Thread: {thread}. Signature rule: {sign}.
-Claims recompute (already run, deterministic): `python tools/outbound.py seal {slug} --dry-run` output is
-in the parent's message if relevant; do not re-run heavy scripts.
+GATE_PROMPT = """You are the outbound gate for ONE text: {draft}
+Thread: {thread}. Signature rule: {sign}. Do not change the signature line.
 
-Run these three skills IN ORDER, each exactly once, on the draft file, and edit the draft in place:
-1. Skill `humanizer`: remove AI-writing patterns. Keep every fact and number. No em dashes.
-2. Skill `verify-claims`, inline, no subagents: every number and named fact against the files the
-   draft cites. Report CONFIRMED / FALSE per claim. Cut or fix anything not confirmed.
-3. Skill `stress-claim`, inline, no subagents: one pass on the argument. Verdict PUBLISH / REFRAME /
-   KILL with the single most damaging finding.
+Invoke these three skills with the Skill tool, IN THIS ORDER, each exactly once. The args of every
+Skill call MUST contain the full draft path above, or the receipt cannot be recorded.
+1. Skill `verify-claims`, args: "inline, no subagents: {draft}". Check every number and named fact
+   against the files the draft cites. Fix or cut anything not confirmed.
+2. Skill `stress-claim`, args: "inline, no subagents: {draft}". One pass on the argument.
+3. Skill `humanizer`, args: "{draft}". Last, because it only touches wording. Keep every fact and
+   number, no em dashes.
+Edit the draft in place with Edit. Do not spawn agents, do not use the web, do not post anything.
 
-Do not read the thread history beyond the last 3 comments. Do not spawn agents. Do not post anything.
-Return under 200 words: the three verdicts, what you changed, and the final sha256 of the draft
-(python -c "import hashlib;print(hashlib.sha256(open(r'{draft}','rb').read()).hexdigest())")."""
+Then answer in plain text, at least 250 characters, exactly these lines:
+VERIFY: <CONFIRMED n/n, or what was fixed>
+REDTEAM: <PUBLISH / REFRAME / KILL> <the single most damaging finding>
+HUMANIZER: <what changed, or nothing>"""
+
+GATE_FLAGS = ["--model", "sonnet", "--output-format", "json", "--strict-mcp-config",
+              "--setting-sources", "", "--tools", "Read,Edit,Skill",
+              "--allowedTools", "Read", "Edit", "Skill", "--permission-mode", "acceptEdits"]
+
+
+def _projects_dir():
+    slug = re.sub(r"[:\\/]", "-", os.path.abspath(ROOT))   # C:\Users\x\agora -> C--Users-x-agora
+    return os.path.join(os.path.expanduser("~/.claude/projects"), slug)
 
 
 def cmd_gate(a):
+    """Run the gate as ONE stripped `claude -p` call, then record the three receipts from its own
+    transcript. Measured 2026-09-25 on a one-word prompt: a default `claude -p` starts at 93,402
+    tokens of context, this flag set at 27,617, because it drops the MCP tool schemas, the settings
+    hooks and their injected context. The r91188 gate subagent started at 89,393 and ended at 153k.
+    """
     meta = _meta(a.slug)
     draft = os.path.join(_dir(a.slug), "draft.md")
-    # .claude/hooks/agent_budget.py refuses any launch whose prompt lacks these two lines, and
-    # the quote must be the owner's own words, typed after this budget was shown to him.
-    # On the first live run (r91188, 2026-09-25) the prompt lacked them and two launches were
-    # refused before the third passed, each refusal a full turn of context.
-    print("FIRST tell the owner in one line: BUDGET: 1 gate subagent, model sonnet, about 60k tokens.")
-    print("Wait for his yes. Then launch ONE Agent call: subagent_type general-purpose, model sonnet,")
-    print("with this prompt, pasting his reply VERBATIM (punctuation included) into the quote:\n")
-    print("BUDGET: 1 gate subagent, model sonnet, about 60k tokens")
-    print('Owner approved: "<his exact reply>"\n')
-    print(GATE_PROMPT.format(draft=draft, thread=meta["thread"], sign=meta["sign"], slug=a.slug))
-    print("\nThen record the three receipts from that run's output file (under .../tasks/):")
-    for sk in ("humanizer", "verify", "redteam"):
-        print("  python tools/humanizer_receipt.py record %s --skill %s --evidence <output file> "
-              "--found \"<what the run found>\" --wording-is-final" % (draft, sk))
+    fails = [n for ok, n, _ in lint(a.slug) if not ok and not n.startswith("WARN ")]
+    if fails:
+        raise SystemExit("REFUSED: `check` fails (%s). Fix the draft first." % "; ".join(fails))
+    if not a.go:
+        print("BUDGET: 1 stripped `claude -p` gate call, model sonnet, about 30-60k tokens.")
+        print("Tell the owner that line, wait for his yes, then run: "
+              "python tools/outbound.py gate %s --go" % a.slug)
+        return 0
+    empty = os.path.join(_dir(a.slug), "nomcp.json")
+    with io.open(empty, "w", encoding="utf-8") as fh:
+        fh.write('{"mcpServers":{}}')
+    prompt = GATE_PROMPT.format(draft=draft, thread=meta["thread"], sign=meta["sign"])
+    cmd = ["claude", "-p", prompt, *GATE_FLAGS, "--mcp-config", empty]
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", stdin=subprocess.DEVNULL, timeout=1800)
+    raw = r.stdout or ""
+    try:
+        res = json.loads(raw[raw.index("{"):])
+    except Exception:
+        raise SystemExit("gate call returned no JSON (rc %d):\n%s\n%s"
+                         % (r.returncode, raw[-800:], r.stderr[-800:]))
+    u = res.get("usage", {})
+    total_in = u.get("input_tokens", 0) + u.get("cache_creation_input_tokens", 0) + u.get("cache_read_input_tokens", 0)
+    tp = os.path.join(_projects_dir(), res.get("session_id", "") + ".jsonl")
+    log = {"session_id": res.get("session_id"), "transcript": tp, "turns": res.get("num_turns"),
+           "input_tokens_all_turns": total_in, "output_tokens": u.get("output_tokens"),
+           "usd_equivalent": res.get("total_cost_usd"), "draft_sha256": _sha(draft),
+           "result": res.get("result", "")}
+    with io.open(os.path.join(_dir(a.slug), "gate.json"), "w", encoding="utf-8") as fh:
+        json.dump(log, fh, indent=1)
+    print(res.get("result", ""))
+    print("\ngate cost: %s input tokens over %s turns, %s output (gate.json)"
+          % (total_in, res.get("num_turns"), u.get("output_tokens")))
+    found = (res.get("result") or "").strip()
+    env = dict(os.environ, CLAUDE_TRANSCRIPT_PATH=tp)
+    bad = 0
+    for sk in ("verify", "redteam", "humanizer"):
+        rc = subprocess.run([PY, os.path.join(ROOT, "tools", "humanizer_receipt.py"), "record", draft,
+                             "--skill", sk, "--in-session", "--found", found, "--wording-is-final"],
+                            cwd=ROOT, env=env).returncode
+        bad += rc != 0
+    if bad:
+        print("RECEIPTS: %d of 3 refused; read the lines above. Do not work around them." % bad)
+        return 1
+    print("RECEIPTS: 3 of 3 recorded from %s" % tp)
+    return 0
 
 
 def cmd_seal(a):
@@ -269,8 +315,9 @@ def main(argv=None):
     p = sub.add_parser("new"); p.add_argument("slug"); p.add_argument("--thread", required=True)
     p.add_argument("--sign", required=True, choices=sorted(SIGNATURES))
     p.add_argument("--kind", default="issue", choices=("issue", "pr"))
-    for name in ("check", "gate", "show"):
+    for name in ("check", "show"):
         sub.add_parser(name).add_argument("slug")
+    p = sub.add_parser("gate"); p.add_argument("slug"); p.add_argument("--go", action="store_true")
     p = sub.add_parser("seal"); p.add_argument("slug"); p.add_argument("--inputs", nargs="*", default=[])
     p.add_argument("--dry-run", action="store_true")
     p = sub.add_parser("post"); p.add_argument("slug"); p.add_argument("--sha", required=True)

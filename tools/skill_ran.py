@@ -68,6 +68,15 @@ def transcript_path():
     """The current session's transcript, from the environment the harness sets."""
     p = os.environ.get("CLAUDE_TRANSCRIPT_PATH")
     if p and os.path.isfile(p):
+        # A gate run's own transcript (a subagent's agent-*.jsonl, or a `claude -p` session file)
+        # is valid evidence, and tools/outbound.py points here at it. It must be a file the harness
+        # wrote, so only .jsonl under ~/.claude/projects is accepted; anything else is refused
+        # rather than silently replaced by the newest session.
+        real = os.path.realpath(p).replace("\\", "/").lower()
+        home = os.path.realpath(os.path.expanduser("~/.claude/projects")).replace("\\", "/").lower()
+        if not (real.startswith(home + "/") and real.endswith(".jsonl")):
+            raise SystemExit("REFUSED: CLAUDE_TRANSCRIPT_PATH %s is not a harness transcript "
+                             "(.jsonl under ~/.claude/projects)." % p)
         return p
     # Fall back to the newest transcript for this project directory. Newest rather than any, because
     # an older session's Skill call is not evidence about this draft.
@@ -99,7 +108,14 @@ def find(skill, draft, tp):
                 if inp.get("skill") not in ALIASES.get(skill, (skill,)):
                     continue
                 args = str(inp.get("args") or "")
-                if want not in args and alt not in args:
+                # Every text under agora_output/outbound/ is named draft.md, so the basename alone
+                # would let a run on one text stand as evidence for another. Require the relative
+                # path there, compared with separators normalised.
+                norm = args.replace("\\", "/")
+                if want == "draft.md":
+                    if alt not in norm:
+                        continue
+                elif want not in args and alt not in norm:
                     continue
                 out.append({"timestamp": rec.get("timestamp"), "skill": skill,
                             "args_head": " ".join(args.split())[:300]})
