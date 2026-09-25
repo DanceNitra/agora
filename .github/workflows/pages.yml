@@ -52,6 +52,10 @@ jobs:
           [ -d sk ] && cp -r sk _site/sk || true
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
           [ -f sitemap_index.xml ] && cp sitemap_index.xml _site/sitemap_index.xml || true
+          # Search Console has reported sitemap.xml as 'could not fetch' since July while the file
+          # answers 200 and parses. A plain-text sitemap with the same URLs, derived here so it can
+          # never drift from sitemap.xml, gives Search Console a second submission to fetch.
+          [ -f sitemap.xml ] && grep -o '<loc>[^<]*</loc>' sitemap.xml | sed 's/<\/*loc>//g' > _site/sitemap.txt || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
           # Search Console / Bing ownership tokens live at the property root. They are not in
           # public/, so without this line they are committed and never published -- the file
