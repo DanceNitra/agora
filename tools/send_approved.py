@@ -466,6 +466,12 @@ def _pregate_gate_impl(path, thread_spec):
     # carry a figure still needs a thread and still refuses without one, which is the case the
     # gate exists for.
     body = io.open(path, encoding="utf-8").read()
+    # The inspeximus seal footer is generated, not written: its root groups ("6175 df94 10f4")
+    # and image URLs are hex, and a four-digit group read as a figure refused r91188 on 2026-09-25.
+    # Only the footer block is cut, from the first seal link to the end; the prose is scanned whole.
+    _cut = body.find('/docs/seal/')
+    if _cut != -1:
+        body = body[:body.rfind("<a ", 0, _cut) if body.rfind("<a ", 0, _cut) != -1 else _cut]
     nums = set(re.findall(r"(?<![\w.])(\d+\.\d{3,}|\d{4,})(?![\w.])", body))
     if not nums:
         return None

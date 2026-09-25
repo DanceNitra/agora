@@ -256,6 +256,8 @@ def cmd_seal(a):
     draft = os.path.join(d, "draft.md")
     inputs = [draft] + list(a.inputs or [])
     repo, _ = _thread_parts(meta["thread"])
+    if _pregate(a.slug) != 0:
+        raise SystemExit("REFUSED: pregate flagged a claim (read the lines above). Fix the draft first.")
     cmd = [PY, os.path.join(ROOT, "tools", "seal", "seal_draft.py"), draft,
            os.path.join(d, "claims.py"), "--inputs", *inputs, "--label", a.slug,
            "--context", repo, "--out", os.path.join(d, "draft.sealed.md")]
@@ -274,6 +276,19 @@ def _sealed(slug):
 def _publish_cmd(meta):
     repo, num = _thread_parts(meta["thread"])
     return ["gh", meta.get("kind", "issue"), "comment", num, "--repo", repo]
+
+
+def _pregate(slug):
+    """Run tools/pregate.py on the draft, so send_approved finds a receipt for every figure.
+
+    send_approved refuses a draft whose distinctive figures no pregate run on this thread has
+    seen; on r91188 the only receipt was an older claims file from the same thread, and the post
+    was refused. The draft itself is the claims file, as it was for the agmi PR.
+    """
+    meta = _meta(slug)
+    out = os.path.join(ROOT, "agora_output", "pregate", "outbound_%s.json" % slug)
+    return _run([PY, os.path.join(ROOT, "tools", "pregate.py"), os.path.join(_dir(slug), "draft.md"),
+                 "--thread", meta["thread"], "--json", out])
 
 
 def cmd_show(a):
@@ -295,7 +310,7 @@ def cmd_post(a):
     p = _sealed(a.slug)
     return _run([PY, os.path.join(ROOT, "tools", "send_approved.py"), "post", p, "--sha", a.sha,
                  "--thread", "https://github.com/%s/issues/%s" % _thread_parts(meta["thread"]),
-                 "--", *_publish_cmd(meta)])
+                 "--", *_publish_cmd(meta), "--body-file", p])
 
 
 def _stage(slug):
