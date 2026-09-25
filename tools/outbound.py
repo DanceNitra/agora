@@ -283,6 +283,10 @@ def cmd_show(a):
                "--thread", "https://github.com/%s/issues/%s" % _thread_parts(meta["thread"])])
     sha = _sha(p)
     print("\nOWNER: look at the renders seal_draft printed, then answer:  posli %s" % sha[:6])
+    # Repeated as the LAST line on purpose. owner_spoke.py anchors the approval on the harness
+    # record of this exact line, and on r91188 a `| tail` cut the copy send_approved prints first,
+    # so the owner's first "posli" was refused.
+    print("sha256 : %s" % sha)
     return rc
 
 
