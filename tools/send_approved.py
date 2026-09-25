@@ -566,6 +566,21 @@ def _pregate_gate(path, thread_spec):
     return 1
 
 
+SEAL_MARK = 'alt="Inspeximus seal"'
+
+
+def seal_missing(body):
+    """Owner, 2026-09-24, after two unsealed drafts in one evening: "jak mame dogfoodovat ked
+    nepecatkujeme?" Every outbound text carries the inspeximus seal block (copied from the last
+    sent one, see memory seal-format-is-the-one-already-sent). Remembering it failed twice, so the
+    send path refuses without it. Returns a reason string, or "" when the seal is there."""
+    if SEAL_MARK not in body:
+        return "no seal block (%s) in the draft" % SEAL_MARK
+    if "Root <code>&hellip;" not in body:
+        return "a seal image without its root line; copy the whole block from the last sent comment"
+    return ""
+
+
 def main(argv=None):
     import owner_spoke as osp   # lives beside this file
 
@@ -586,6 +601,8 @@ def main(argv=None):
                          "draft. This module is not that skill and refuses to run without it.")
     ap.add_argument("--ack-tells", action="store_true",
                     help="record that a human read the flagged constructions and is keeping them")
+    ap.add_argument("--no-seal", metavar="REASON",
+                    help="send without the inspeximus seal; the owner's reason, at least 20 characters")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
     # swallows later options too, so `post f --sha X -- gh ...` lost the --sha and the tool refused a
     # correctly approved draft. A gate that fails closed on its own argument parsing is still a gate
@@ -613,6 +630,10 @@ def main(argv=None):
         # fix: rewriting after approval invalidates the hash by design.
         print("")
         print(ht.report(body))
+        miss = seal_missing(body)
+        if miss:
+            print("")
+            print("SEAL MISSING: %s. `post` will refuse this draft. Seal it before showing the owner." % miss)
         if a.thread:
             print("")
             print(psc.check(body, a.thread)[1])
@@ -624,6 +645,14 @@ def main(argv=None):
         print("\nShow the owner this draft together with the hash above, and pass it back as --sha.")
         return 0
 
+    miss = seal_missing(io.open(a.file, encoding="utf-8").read())
+    if miss:
+        if not a.no_seal or len(a.no_seal.strip()) < 20:
+            print("REFUSED: %s." % miss)
+            print("  Every outbound text carries the inspeximus seal (owner, 2026-09-24). Seal it, or pass")
+            print("  --no-seal with the owner's reason (20+ characters).")
+            return 1
+        print("NOTE: sent without a seal, reason: %s" % a.no_seal.strip())
     if not a.sha:
         print("REFUSED: --sha is required. Run `show` first and get the owner's approval on that hash.")
         return 2
