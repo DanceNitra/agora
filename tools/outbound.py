@@ -12,6 +12,7 @@ content; since 2026-09-25 there is no separate gate call (see .claude/skills/out
     python tools/outbound.py gate   SLUG      # author receipt: the writing model answers for it, 0 tokens
     python tools/outbound.py seal   SLUG --inputs FILE... [--dry-run]
     python tools/outbound.py show   SLUG      # render paths + hash for the owner
+    python tools/outbound.py dryrun SLUG [--sha HASH] [--offline]  # every send check, nothing sent
     python tools/outbound.py post   SLUG --sha HASH
     python tools/outbound.py status [SLUG]    # where every text stands, and the next command
 
@@ -232,6 +233,111 @@ def cmd_post(a):
                  "--", *_publish_cmd(meta), "--body-file", p])
 
 
+def _quiet(fn, *args):
+    """Call one send_approved check with its printout captured. Returns (result, printout)."""
+    import contextlib
+
+    class _Buf(io.StringIO):
+        def reconfigure(self, **kw):      # pregate.py reconfigures stdout when it is imported
+            pass
+    buf = _Buf()
+    with contextlib.redirect_stdout(buf):
+        try:
+            res = fn(*args)
+        except Exception as ex:                                     # noqa: BLE001
+            res = "raised %s: %s" % (type(ex).__name__, ex)
+    return res, buf.getvalue()
+
+
+def dryrun_checks(slug, sha=None, offline=False):
+    """Every check `send_approved.py post` runs, in its order, with nothing published.
+
+    Returns a list of (status, name, detail). status is PASS, FAIL, SKIP or WAIT. WAIT marks the
+    owner-spoke check, which cannot pass before the owner answers `show`, so it never fails a dry
+    run. The checks are the send path's own functions, imported, never re-typed here, so a dry run
+    cannot drift from what `post` will do.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import send_approved as sa
+    import owner_spoke as osp
+    meta = _meta(slug)
+    p = os.path.join(_dir(slug), "draft.sealed.md")
+    if not os.path.exists(p):
+        return [("FAIL", "sealed file exists", "run `outbound.py seal %s` first" % slug)]
+    thread = "https://github.com/%s/issues/%s" % _thread_parts(meta["thread"])
+    cmd = _publish_cmd(meta) + ["--body-file", p]
+    out = []
+
+    def add(name, res, text="", wait=False):
+        if res is None or res == "":
+            out.append(("PASS", name, ""))
+        else:
+            tail = [ln.strip() for ln in text.strip().splitlines() if ln.strip()][-3:]
+            why = res if isinstance(res, str) else " | ".join(tail)
+            out.append(("WAIT" if wait else "FAIL", name, why))
+
+    add("seal block present", sa.seal_missing(io.open(p, encoding="utf-8").read()))
+    now = sa.digest(p)
+    if sha:
+        add("sha matches the approved hash", None if sha.strip().lower() == now
+            else "approved %s, current %s" % (sha.strip().lower()[:12], now[:12]))
+    else:
+        out.append(("SKIP", "sha matches the approved hash", "no --sha; current %s" % now[:12]))
+    ok, why = osp.check(now, draft=p)
+    add("owner spoke after show", None if ok else why, wait=True)
+    bound = sa.bind_payload(p, cmd)
+    add("payload bound to the file", bound if isinstance(bound, str) else None)
+    stdin = bound[1] if not isinstance(bound, str) else io.open(p, "rb").read()
+    add("pregate receipts for every figure", *_quiet(sa._pregate_gate, p, thread))
+    add("gate receipts (verify, redteam, humanizer)", *_quiet(sa._the_gate, p))
+    add("humanizer_tells on the payload", *_quiet(sa._tells_gate, stdin.decode("utf-8", "replace"),
+                                                   False, True))
+    if sa._creates_a_thread(cmd):
+        add("no duplicate thread", *_quiet(sa._new_thread_gate, p, cmd, False))
+    elif offline:
+        out.append(("SKIP", "thread open, nothing new since the draft", "--offline"))
+        out.append(("SKIP", "no overlap with our prior comments", "--offline"))
+    else:
+        add("thread open, nothing new since the draft",
+            *_quiet(sa._thread_moved_gate, p, cmd, thread, False))
+        add("no overlap with our prior comments", *_quiet(sa._prior_gate, p, cmd, thread, False))
+        # A text that already went out overlaps the comment it became, by construction. That is
+        # the check working, not a defect in the text, so it is named SENT, and only when a
+        # comment in the thread is this payload byte for byte.
+        if out[-1][0] == "FAIL":
+            cid = _landed_as(meta["thread"], stdin)
+            if cid:
+                out[-1] = ("SENT", out[-1][1], "this exact text is already comment %s" % cid)
+    return out
+
+
+def _landed_as(thread, payload):
+    """The id of a comment in THREAD whose body is PAYLOAD byte for byte, or None."""
+    repo, num = _thread_parts(thread)
+    r = subprocess.run(["gh", "api", "repos/%s/issues/%s/comments" % (repo, num), "--paginate",
+                        "--jq", ".[] | [.id, .body] | @json"], capture_output=True, timeout=120)
+    for line in r.stdout.decode("utf-8", "replace").splitlines():
+        try:
+            cid, body = json.loads(line)
+        except Exception:                                           # noqa: BLE001
+            continue
+        if body.encode("utf-8").strip() == payload.strip():
+            return cid
+    return None
+
+
+def cmd_dryrun(a):
+    res = dryrun_checks(a.slug, a.sha, a.offline)
+    for st, name, why in res:
+        print("%-4s  %s%s" % (st, name, ("  [%s]" % why) if why and st != "PASS" else ""))
+    bad = sum(1 for st, _, _ in res if st == "FAIL")
+    sent = any(st == "SENT" for st, _, _ in res)
+    print("\nDRY RUN: %s%s. Nothing was published."
+          % ("%d check(s) FAIL" % bad if bad else "every check passes",
+             "; this text was already sent, do not post it again" if sent else ""))
+    return 1 if bad else 0
+
+
 def _stage(slug):
     d = _dir(slug)
     draft = os.path.join(d, "draft.md")
@@ -272,6 +378,8 @@ def main(argv=None):
     p = sub.add_parser("seal"); p.add_argument("slug"); p.add_argument("--inputs", nargs="*", default=[])
     p.add_argument("--dry-run", action="store_true")
     p = sub.add_parser("post"); p.add_argument("slug"); p.add_argument("--sha", required=True)
+    p = sub.add_parser("dryrun"); p.add_argument("slug"); p.add_argument("--sha")
+    p.add_argument("--offline", action="store_true", help="skip the two checks that read the thread")
     p = sub.add_parser("status"); p.add_argument("slug", nargs="?")
     a = ap.parse_args(argv)
     return globals()["cmd_" + a.cmd](a) or 0

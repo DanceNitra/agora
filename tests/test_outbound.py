@@ -69,3 +69,39 @@ def test_wrong_signature_fails(slot):
 def test_seal_in_draft_fails(slot):
     res = slot("github", '<img alt="Inspeximus seal">\n\n' + outbound.SIGNATURES["github"] + "\n")
     assert not res["draft.md carries no seal (seal adds it)"]
+
+
+R91188 = os.path.join(ROOT, "agora_output", "outbound", "r91188")
+
+
+@pytest.fixture
+def sent_copy(tmp_path, monkeypatch):
+    """r91188 as it was sent on 2026-09-25, copied so a mutation never touches the real folder."""
+    if not os.path.exists(os.path.join(R91188, "draft.sealed.md")):
+        pytest.skip("r91188 not on disk")
+    import shutil
+    shutil.copytree(R91188, tmp_path / "r91188")
+    monkeypatch.setattr(outbound, "BASE", str(tmp_path))
+    return tmp_path / "r91188"
+
+
+def _fails(res):
+    return [n for st, n, _ in res if st == "FAIL"]
+
+
+def test_dryrun_passes_the_text_actually_sent(sent_copy):
+    assert _fails(outbound.dryrun_checks("r91188", offline=True)) == []
+
+
+def test_dryrun_fails_on_one_changed_character(sent_copy):
+    p = sent_copy / "draft.md"
+    t = p.read_bytes()
+    i = t.index(b"fired 8 times") + 6
+    p.write_bytes(t[:i] + b"9" + t[i + 1:])
+    assert _fails(outbound.dryrun_checks("r91188", offline=True)) == [
+        "gate receipts (verify, redteam, humanizer)"]
+
+
+def test_dryrun_fails_on_a_wrong_sha(sent_copy):
+    res = outbound.dryrun_checks("r91188", sha="0" * 64, offline=True)
+    assert _fails(res) == ["sha matches the approved hash"]
