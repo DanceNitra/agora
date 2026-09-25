@@ -1,6 +1,6 @@
 ---
 name: outbound
-description: The ONLY way any text leaves Agora (GitHub comment, PR, reply, post). One text, under 100k tokens, gate and seal included. Use for every outbound draft, every "posli", every seal. Mechanics are tools/outbound.py (0 tokens); the model writes the draft and runs ONE gate subagent.
+description: The ONLY way any text leaves Agora (GitHub comment, PR, reply, post). One text, under 100k tokens, gate and seal included. Use for every outbound draft, every "posli", every seal. Mechanics are tools/outbound.py (0 tokens); the model writes the draft; the gate is one stripped claude -p call.
 ---
 
 # Outbound: one text, under 100k tokens
@@ -17,7 +17,7 @@ procedure: follow it.
 | 1. start | `python tools/outbound.py new SLUG --thread owner/repo#N --sign github\|edrn [--kind pr]` | 0 |
 | 2. write | write `agora_output/outbound/SLUG/draft.md` and `claims.py` (one claim per figure) | the draft |
 | 3. lint | `python tools/outbound.py check SLUG` until it prints `all N checks pass` | 0 |
-| 4. gate | `python tools/outbound.py gate SLUG` prints ONE subagent prompt; run it once, model `sonnet`; record the three receipts it prints | 40-60k |
+| 4. gate | `python tools/outbound.py gate SLUG` prints the budget line; tell the owner, and after his yes run `gate SLUG --go`: one stripped `claude -p` Sonnet call runs the three skills and records the three receipts from its own transcript. Never a subagent: it starts at 89k tokens | 30-60k |
 | 5. seal | `python tools/outbound.py seal SLUG --inputs <source files>` (render, receipt, log, stamp, SVG pair, footer) | 0 |
 | 6. owner | `python tools/outbound.py show SLUG`, send him the two render PNGs with SendUserFile, then wait for `posli <6 hex>`; then `python tools/outbound.py post SLUG --sha <full hash>` | small |
 
@@ -38,7 +38,7 @@ cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree 
   costs a new gate run. Fix everything `check` reports first.
 - **Never paste the draft into chat.** The owner reads the render and answers `posli <first 6 hex of
   the sha>`. `tools/owner_spoke.py` accepts that reply (owner decision 2026-09-25, commit e415da30).
-- **One gate subagent, not a panel.** Humanizer, verify-claims and stress-claim run inline inside it,
+- **One stripped gate call, not a subagent and not a panel.** Humanizer, verify-claims and stress-claim run inline inside it,
   each once. No storm unless the claim rests on literature rather than a re-runnable artifact.
 - **Not other people's work.** If their question needs a computation they can run, send the script,
   not our result. Before any run over 100k tokens, tell the owner the cost and wait.
