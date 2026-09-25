@@ -198,9 +198,16 @@ def cmd_gate(a):
     with io.open(empty, "w", encoding="utf-8") as fh:
         fh.write('{"mcpServers":{}}')
     prompt = GATE_PROMPT.format(draft=draft, thread=meta["thread"], sign=meta["sign"])
-    cmd = ["claude", "-p", prompt, "--model", a.model, *GATE_FLAGS, "--mcp-config", empty]
+    # On Windows `claude` is claude.CMD, which subprocess cannot start without the full path, and a
+    # .CMD runs through cmd.exe, which breaks a multi-line argument at the newline and rewrites %, ^
+    # and ". So the path comes from shutil.which and the prompt goes in on stdin, never on argv.
+    import shutil
+    exe = shutil.which("claude")
+    if not exe:
+        raise SystemExit("REFUSED: the claude CLI is not on PATH.")
+    cmd = [exe, "-p", "--model", a.model, *GATE_FLAGS, "--mcp-config", empty]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
-                       errors="replace", stdin=subprocess.DEVNULL, timeout=1800)
+                       errors="replace", input=prompt, timeout=1800)
     raw = r.stdout or ""
     try:
         res = json.loads(raw[raw.index("{"):])
