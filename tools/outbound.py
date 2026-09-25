@@ -168,7 +168,7 @@ VERIFY: <CONFIRMED n/n, or what was fixed>
 REDTEAM: <PUBLISH / REFRAME / KILL> <the single most damaging finding>
 HUMANIZER: <what changed, or nothing>"""
 
-GATE_FLAGS = ["--model", "sonnet", "--output-format", "json", "--strict-mcp-config",
+GATE_FLAGS = ["--output-format", "json", "--strict-mcp-config",
               "--setting-sources", "", "--tools", "Read,Edit,Skill",
               "--allowedTools", "Read", "Edit", "Skill", "--permission-mode", "acceptEdits"]
 
@@ -198,7 +198,7 @@ def cmd_gate(a):
     with io.open(empty, "w", encoding="utf-8") as fh:
         fh.write('{"mcpServers":{}}')
     prompt = GATE_PROMPT.format(draft=draft, thread=meta["thread"], sign=meta["sign"])
-    cmd = ["claude", "-p", prompt, *GATE_FLAGS, "--mcp-config", empty]
+    cmd = ["claude", "-p", prompt, "--model", a.model, *GATE_FLAGS, "--mcp-config", empty]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
                        errors="replace", stdin=subprocess.DEVNULL, timeout=1800)
     raw = r.stdout or ""
@@ -210,7 +210,7 @@ def cmd_gate(a):
     u = res.get("usage", {})
     total_in = u.get("input_tokens", 0) + u.get("cache_creation_input_tokens", 0) + u.get("cache_read_input_tokens", 0)
     tp = os.path.join(_projects_dir(), res.get("session_id", "") + ".jsonl")
-    log = {"session_id": res.get("session_id"), "transcript": tp, "turns": res.get("num_turns"),
+    log = {"model": a.model, "session_id": res.get("session_id"), "transcript": tp, "turns": res.get("num_turns"),
            "input_tokens_all_turns": total_in, "output_tokens": u.get("output_tokens"),
            "usd_equivalent": res.get("total_cost_usd"), "draft_sha256": _sha(draft),
            "result": res.get("result", "")}
@@ -318,6 +318,7 @@ def main(argv=None):
     for name in ("check", "show"):
         sub.add_parser(name).add_argument("slug")
     p = sub.add_parser("gate"); p.add_argument("slug"); p.add_argument("--go", action="store_true")
+    p.add_argument("--model", default="sonnet", help="sonnet or opus; gate.json records which, to compare")
     p = sub.add_parser("seal"); p.add_argument("slug"); p.add_argument("--inputs", nargs="*", default=[])
     p.add_argument("--dry-run", action="store_true")
     p = sub.add_parser("post"); p.add_argument("slug"); p.add_argument("--sha", required=True)
