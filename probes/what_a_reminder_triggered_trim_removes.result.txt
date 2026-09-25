@@ -1,0 +1,9 @@
+self-test: 4 of 4 controls hold
+transcripts scanned: 1332
+ordinary_bash                            782
+ordinary_edits                           14
+ordinary_removed:dated                   1
+ordinary_removed:rule                    1
+ordinary_shrinking_edits                 2
+ordinary_write                           1
+reminders                                8
