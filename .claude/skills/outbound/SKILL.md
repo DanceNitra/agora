@@ -42,7 +42,11 @@ cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree 
   each once. No storm unless the claim rests on literature rather than a re-runnable artifact.
 - **Not other people's work.** If their question needs a computation they can run, send the script,
   not our result. Before any run over 100k tokens, tell the owner the cost and wait.
-- **Over budget: stop and say so.** Never finish a text silently at 300k.
+- **Budget is in `usd_equivalent`, not raw tokens.** Raw token sums count every cached re-read and
+  overstate cost. Caps: the gate 1 USD, the whole text 2 USD. `gate.json` records the gate's figure.
+  Measured 2026-09-25 on r91188: the stripped Opus gate cost 0.62 USD (15 turns, 338k tokens summed
+  over turns); the old subagent gate summed to about 4M.
+- **Over budget: stop and say so.** Never finish a text silently over the cap.
 
 ## Where each piece goes
 
