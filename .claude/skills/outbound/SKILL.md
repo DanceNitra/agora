@@ -24,6 +24,12 @@ procedure: follow it.
 `python tools/outbound.py status` shows every text in flight and its next command. Run it first after
 a restart or a compaction instead of reconstructing state from memory.
 
+## Where the session runs
+
+In the main checkout `C:\Users\Danculus\agora`, never in a worktree. The inputs (probes, results,
+session reports) are untracked files, and a worktree holds only committed ones, so a worktree session
+cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree off, model Sonnet.
+
 ## Rules that save the tokens
 
 - **Run the whole text in a SHORT session.** The main session only commissions it. A long context
