@@ -45,6 +45,14 @@
             "command": "python \"$CLAUDE_PROJECT_DIR/hooks/memory_index_receipt.py\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/outbound_brief.py\""
+          }
+        ]
       }
     ],
     "PreToolUse": [
