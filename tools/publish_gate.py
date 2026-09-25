@@ -109,7 +109,10 @@ def enforce(paths, label: str, *, unresolved=(), external=(), require_nonempty: 
             problems.append("UNRESOLVED artifact: %s — the publication links a runnable model that is "
                             "not in the repo it names" % u)
 
-    if not paths and require_nonempty and not external:
+    # `and not external` used to sit here, so a draft whose every link pointed into another repo
+    # audited nothing and printed "OK -- 0 artifact(s) audited" (session T, 2026-09-24). Links we do
+    # not audit are not evidence; the NO-ARTIFACT waiver below is the way through for such a draft.
+    if not paths and require_nonempty:
         # A DRAFT WITH NO RUNNABLE MODEL OF OURS can be waived, in writing, under its own path with
         # the kind NO-ARTIFACT and a reason: a review reply whose figures come from someone else's
         # harness, a letter whose numbers quote the other side. Until 2026-09-20 the waiver file

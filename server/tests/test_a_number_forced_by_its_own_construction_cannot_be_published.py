@@ -134,6 +134,21 @@ def test_an_empty_target_set_is_a_refusal_not_a_pass():
     assert exc.value.code == 1
 
 
+def test_a_draft_that_links_only_other_repos_is_a_refusal_not_a_pass(monkeypatch):
+    """The same shape one branch over. A draft whose every link points into someone else's repo left
+    the local target set empty, and the gate printed "OK -- 0 artifact(s) audited" and exited 0
+    (session T, 2026-09-24). Zero audited is zero measured, whatever the links point at. A draft that
+    genuinely has no runnable model of ours is waived under its own path with kind NO-ARTIFACT."""
+    monkeypatch.setattr(pg, "load_waivers", lambda: {})
+    with pytest.raises(SystemExit) as exc:
+        pg.enforce([], "draft.md", external=["SomeoneElse/theirrepo/probes/thing.py"])
+    assert exc.value.code == 1
+
+    monkeypatch.setattr(pg, "load_waivers", lambda: {"draft.md": {
+        "kinds": ["NO-ARTIFACT"], "reason": "a reply whose figures come from their harness", "dated": "2026-09-26"}})
+    pg.enforce([], "draft.md", external=["SomeoneElse/theirrepo/probes/thing.py"])   # control: waivable
+
+
 def test_an_unresolved_artifact_is_a_refusal():
     """A publication that links a runnable model the reader cannot open is a broken receipt."""
     with pytest.raises(SystemExit) as exc:
