@@ -122,7 +122,7 @@ def main() -> int:
     ap.add_argument("--date", required=True, help='as it should read, e.g. "26 Sep 2026"')
     ap.add_argument("--label", default="sealed reply")
     ap.add_argument("--out", required=True,
-                    help="name it inspeximus-seal-entry<N>-<last 12 hex of root>.png: the recipient sees the file name")
+                    help="the recipient sees the file name: inspeximus-<entry>-<last 12 hex of root>.png, kept in the vault at 06 Business/02_Brand/Seals with a row in its Seals register, never on the Desktop")
     a = ap.parse_args()
     if not re.fullmatch(r"[0-9a-f]{64}", a.root):
         raise SystemExit("REFUSED: --root must be 64 lowercase hex characters")
