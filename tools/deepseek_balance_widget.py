@@ -22,7 +22,7 @@ from deepseek_balance_notify import LOG, balance
 
 REFRESH_S = 60
 WARN_USD = 0.50
-BG = "#1b1b1b"            # the Codex sidebar footer colour, sampled from a screenshot
+BG = "#1d1d1d"            # made fully transparent below; close to the footer so glyph edges blend
 FG, FG_WARN = "#f2c14e", "#ff6b6b"
 FONT_FILE = os.path.join(os.path.expanduser("~"), ".codex", "fonts", "HarryP.ttf")   # "Harry P" by Graham Meade, as in the ftmo-lab monitor
 FONT = ("Harry P", -30)    # negative = pixels
@@ -73,12 +73,14 @@ def frame_rect(hwnd):
 
 class Widget:
     def __init__(self):
-        self.hist = collections.deque(maxlen=30)
+        self.hist = collections.deque(maxlen=120)
+        self.load_history()
         self.hwnd = None
         self.root = tk.Tk()
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
         self.root.configure(bg=BG)
+        self.root.wm_attributes("-transparentcolor", BG)   # no box: only the glyphs are drawn
         self.label = tk.Label(self.root, text="DeepSeek ...", fg=FG, bg=BG, font=FONT)
         self.label.pack(padx=6, pady=0)
         self.root.update_idletasks()
@@ -86,6 +88,18 @@ class Widget:
         self.poll_balance()
         self.follow()
         self.root.mainloop()
+
+    def load_history(self):
+        """Readings from the last hour (this widget and the notify hook), so the rate shows at once."""
+        cutoff = time.time() - 3600
+        try:
+            for line in LOG.read_text(encoding="utf-8").splitlines():
+                d = json.loads(line)
+                t = time.mktime(time.strptime(d["t"], "%Y-%m-%dT%H:%M:%S"))
+                if t >= cutoff:
+                    self.hist.append((t, float(d["balance"])))
+        except Exception:
+            pass
 
     def follow(self):
         """Every 300 ms: stick to the Codex footer, or hide if Codex is not the front window."""
@@ -125,7 +139,7 @@ class Widget:
             t0, b0 = old[-1]
             spent = b0 - bal
             per_h = spent / ((now - t0) / 3600)
-            rate = f"   {spent * 100:.0f}c/10min" + (f"  ~{bal / per_h:.0f}h" if per_h > 0 else "")
+            rate = f"   {spent * 100:.0f}c/10min" + (f"  {bal / per_h:.0f}h" if per_h > 0 else "")
         text = f"$ {bal:.2f}{rate}"
         color = FG_WARN if bal < WARN_USD else FG
         self.root.after(0, lambda: self.label.config(text=text, fg=color))
