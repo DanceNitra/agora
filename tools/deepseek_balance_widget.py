@@ -16,7 +16,10 @@ import ctypes.wintypes as W
 import json
 import threading
 import time
+import re
 import tkinter as tk
+import urllib.request
+from pathlib import Path
 
 from deepseek_balance_notify import LOG, balance
 
@@ -30,6 +33,8 @@ FONT = ("Harry P", -30)    # negative = pixels
 # between the "deepseek" profile name (ends ~160) and the update icon (starts ~500).
 FREE_LEFT, FREE_RIGHT = 165, 495
 ROW_FROM_BOTTOM = 31       # centre line of the settings row
+CODEX_CONFIG = Path.home() / ".codex" / "config.toml"
+AGORA_ENV = Path(__file__).resolve().parent.parent / "server" / ".env"   # holds the Ollama key as AGORA_API_KEY
 CODEX_TITLE = "ChatGPT"    # the Codex desktop app's window title
 
 ctypes.windll.shcore.SetProcessDpiAwareness(2)   # per-monitor aware: crisp text, physical coordinates
@@ -69,6 +74,24 @@ def frame_rect(hwnd):
         r.left, r.top = max(r.left, mi.rcWork.left), max(r.top, mi.rcWork.top)
         r.right, r.bottom = min(r.right, mi.rcWork.right), min(r.bottom, mi.rcWork.bottom)
     return r
+
+
+def codex_on_deepseek():
+    """True while Codex talks to the DeepSeek API (tools/codex_provider.py use deepseek)."""
+    try:
+        m = re.search(r'^model_provider\s*=\s*"([^"]+)"', CODEX_CONFIG.read_text(encoding="utf-8"), re.M)
+        return bool(m) and m.group(1) == "agora_deepseek"
+    except OSError:
+        return True
+
+
+def ollama_usage():
+    """Ollama plan limits as fractions 0..1: (session = the 5-hour window, weekly).
+    GET https://ollama.com/api/usage with the account API key; undocumented, found 2026-09-26."""
+    key = re.search(r'^AGORA_API_KEY\s*=\s*"?([^"\n]+)', AGORA_ENV.read_text(encoding="utf-8"), re.M).group(1).strip()
+    req = urllib.request.Request("https://ollama.com/api/usage", headers={"Authorization": f"Bearer {key}"})
+    lim = json.load(urllib.request.urlopen(req, timeout=15))["limits"]
+    return float(lim["session"]["usage"]), float(lim["weekly"]["usage"])
 
 
 class Widget:
@@ -123,6 +146,8 @@ class Widget:
         self.root.after(REFRESH_S * 1000, self.poll_balance)
 
     def fetch(self):
+        if not codex_on_deepseek():
+            return self.fetch_ollama()
         try:
             bal, cur = balance()
         except Exception as e:
@@ -142,6 +167,17 @@ class Widget:
             rate = f"   {spent * 100:.0f}c/10min" + (f"  {bal / per_h:.0f}h" if per_h > 0 else "")
         text = f"$ {bal:.2f}{rate}"
         color = FG_WARN if bal < WARN_USD else FG
+        self.root.after(0, lambda: self.label.config(text=text, fg=color))
+
+
+    def fetch_ollama(self):
+        try:
+            session, weekly = ollama_usage()
+        except Exception as e:
+            self.root.after(0, lambda: self.label.config(text=f"Ollama ? ({type(e).__name__})", fg=FG))
+            return
+        text = f"5h {session * 100:.0f}%   week {weekly * 100:.0f}%"
+        color = FG_WARN if max(session, weekly) >= 0.9 else FG
         self.root.after(0, lambda: self.label.config(text=text, fg=color))
 
 
