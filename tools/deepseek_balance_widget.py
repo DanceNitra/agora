@@ -158,13 +158,17 @@ class Widget:
         with LOG.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "balance": bal, "currency": cur,
                                 "src": "widget"}) + "\n")
-        old = [(t, b) for t, b in self.hist if now - t >= 540]
+        # The balance moves in whole cents, so ten idle minutes often read 0. The hours estimate uses
+        # the oldest reading of the last hour instead, and stays visible (as --h) when nothing moved.
+        old10 = [(t, b) for t, b in self.hist if now - t >= 540]
+        hour = [(t, b) for t, b in self.hist if now - t <= 3600]
         rate = ""
-        if old:
-            t0, b0 = old[-1]
-            spent = b0 - bal
-            per_h = spent / ((now - t0) / 3600)
-            rate = f"   {spent * 100:.0f}c/10min" + (f"  {bal / per_h:.0f}h" if per_h > 0 else "")
+        if old10:
+            rate = f"   {(old10[-1][1] - bal) * 100:.0f}c/10min"
+        if hour and now - hour[0][0] >= 540:
+            t0, b0 = hour[0]
+            per_h = (b0 - bal) / ((now - t0) / 3600)
+            rate += f"  {bal / per_h:.0f}h" if per_h > 0 else "  --h"
         text = f"$ {bal:.2f}{rate}"
         color = FG_WARN if bal < WARN_USD else FG
         self.root.after(0, lambda: self.label.config(text=text, fg=color))
