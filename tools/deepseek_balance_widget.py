@@ -35,6 +35,8 @@ BG = "#1d1d1d"            # made fully transparent below; close to the footer so
 FG, FG_WARN = "#f2c14e", "#ff6b6b"
 FONT_FILE = os.path.join(os.path.expanduser("~"), ".codex", "fonts", "HarryP.ttf")   # "Harry P" by Graham Meade, as in the ftmo-lab monitor
 FONT = ("Harry P", -30)    # negative = pixels
+FONT_SMALL = ("Harry P", -22)
+FG_DELTA = "#ff9a5c"       # the cost of the last model call, fading out
 # Physical pixels, relative to the Codex window: the free part of the sidebar footer row sits
 # between the "deepseek" profile name (ends ~160) and the update icon (starts ~500).
 FREE_LEFT, FREE_RIGHT = 165, 495
@@ -177,8 +179,16 @@ class Widget:
         self.root.overrideredirect(True)
         self.root.configure(bg=BG)
         self.root.wm_attributes("-transparentcolor", BG)   # no box: only the glyphs are drawn
+        # Three labels side by side: the balance (pulses on every model call), the cost of that call
+        # (fades out), and the rates. The delta keeps a fixed width so nothing shifts when it appears.
         self.label = tk.Label(self.root, text="DeepSeek ...", fg=FG, bg=BG, font=FONT)
-        self.label.pack(padx=6, pady=0)
+        self.label.pack(side="left", padx=(6, 0), pady=0)
+        self.delta = tk.Label(self.root, text="", fg=FG_DELTA, bg=BG, font=FONT_SMALL, width=6, anchor="w")
+        self.delta.pack(side="left", pady=0)
+        self.rest = tk.Label(self.root, text="", fg=FG, bg=BG, font=FONT)
+        self.rest.pack(side="left", padx=(0, 6), pady=0)
+        self.seen_events = 0
+        self.fade_job = None
         self.root.update_idletasks()
         self.frame_hwnd = int(self.root.wm_frame(), 16)
         self.owner = None
@@ -186,6 +196,11 @@ class Widget:
         self.poll_balance()
         self.tick_meter()
         self.follow()
+        if os.environ.get("WIDGET_DEMO") == "1":           # visual check: a fake call every 3 s
+            def demo():
+                self.flash(0.0042)
+                self.root.after(3000, demo)
+            self.root.after(2500, demo)
         self.root.mainloop()
 
     def load_history(self):
@@ -259,29 +274,55 @@ class Widget:
         span = min(3600, time.time() - self.meter.events[0][0]) if self.meter.events else 0
         per_h = hour / (span / 3600) if span >= 300 else per_min * 60
         left = f"  {self.bal / per_h:.0f}h" if per_h > 0 else "  --h"
-        text = f"$ {self.live_balance():.3f}   {per_min * 100:.1f}c/min{left}"
+        money = f"$ {self.live_balance():.3f}"
+        rest = f"{per_min * 100:.1f}c/min{left}"
         self.base_fg = FG_WARN if self.bal < WARN_USD else FG
-        if text != self.label.cget("text"):
-            self.label.config(text=text)
-            self.pulse_step = 1
-            self.pulse()
+        self.label.config(text=money)
+        self.rest.config(text=rest, fg=self.base_fg)
+        n = len(self.meter.events)
+        if n > self.seen_events and self.seen_events:
+            cost = sum(u for _, u in list(self.meter.events)[self.seen_events - n:])
+            self.flash(cost)
         elif not self.pulse_step:
             self.label.config(fg=self.base_fg)
+        self.seen_events = n
 
-    PULSE = ("#fff4c9", "#fbe39a", "#f8d676", "#f5ca5e", "#f2c14e")   # bright to the resting gold, 60 ms apart
+    @staticmethod
+    def mix(a, b, t):
+        a, b = [int(a[i:i + 2], 16) for i in (1, 3, 5)], [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+        return "#" + "".join(f"{round(x + (y - x) * t):02x}" for x, y in zip(a, b))
+
+    def flash(self, cost):
+        """One model call finished: the balance glows white and eases back to gold over ~1 s, and
+        the call's cost appears beside it and fades over ~4 s."""
+        self.delta.config(text=f"-{cost * 100:.1f}c", fg=FG_DELTA)
+        self.pulse_step = 1
+        self.pulse()
+        if self.fade_job:
+            self.root.after_cancel(self.fade_job)
+        self.fade_step = 0
+        self.fade_job = self.root.after(1500, self.fade)
 
     def pulse(self):
-        """A short glow when the text changes: flash toward white, then settle back."""
-        if not self.pulse_step:
-            return
-        if self.pulse_step > len(self.PULSE):
+        steps = 24                                  # 24 x 40 ms, ease-out from white to the resting colour
+        if self.pulse_step > steps:
             self.pulse_step = 0
             self.label.config(fg=self.base_fg)
             return
-        self.label.config(fg=self.PULSE[self.pulse_step - 1] if self.base_fg == FG else FG_WARN)
+        t = 1 - (1 - self.pulse_step / steps) ** 3
+        self.label.config(fg=self.mix("#ffffff", self.base_fg, t))
         self.pulse_step += 1
-        self.root.after(60, self.pulse)
+        self.root.after(40, self.pulse)
 
+    def fade(self):
+        steps = 30                                  # 30 x 80 ms toward the footer grey, then gone
+        self.fade_step += 1
+        if self.fade_step >= steps:
+            self.delta.config(text="")
+            self.fade_job = None
+            return
+        self.delta.config(fg=self.mix(FG_DELTA, "#3a3a3a", self.fade_step / steps))
+        self.fade_job = self.root.after(80, self.fade)
 
     def live_balance(self):
         """The API reports whole cents. Between two cent steps, take the cent it last showed, assume the
@@ -298,7 +339,7 @@ class Widget:
             return
         text = f"5h {session * 100:.0f}%   week {weekly * 100:.0f}%"
         color = FG_WARN if max(session, weekly) >= 0.9 else FG
-        self.root.after(0, lambda: self.label.config(text=text, fg=color))
+        self.root.after(0, lambda: (self.label.config(text=text, fg=color), self.rest.config(text=""), self.delta.config(text="")))
 
 
 if __name__ == "__main__":
