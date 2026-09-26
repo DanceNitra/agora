@@ -17,8 +17,17 @@ projects under AppData/Local/Temp, which are synthetic):
   3. Removed lines: for Edit and MultiEdit, the lines of old_string that new_string no longer has
      (as a multiset). A Write carries only the new file, so its removals are not recoverable here;
      it is counted, never classified.
-  4. The scan cannot see a trim made by a script (python, sed) through Bash, because no old_string
-     is recorded. Those are counted separately as Bash commands naming MEMORY.md after a reminder.
+  4. A trim made by a script (python, sed) through Bash records no old_string, so its removed lines
+     cannot be classified. Such writes are counted separately: a Bash command that names MEMORY.md
+     and writes to it, inside the window and anywhere later in the same session. A script that
+     opens the index without naming it on the command line is invisible to this count.
+  5. SIZE: each reminder states the index size. When a later reminder in the same session reports
+     a smaller index, something removed content between them, whatever tool it used. An Edit/Write
+     walk cannot be blind to that check, and it is printed per session.
+
+Corrected 2026-09-26 after @vshulcz showed an agent trimming through a Bash script: the first
+version reported "14 edits removed 2 lines" and missed a 3.3 KB Bash trim on our own index,
+because it only counted Bash commands inside the window.
 
 Classes, first match wins: rule (never/always/must/only as a word), dated (a 2026 date or MM-DD),
 link (a markdown link), bullet (starts with "- "), prose (anything else non-blank).
@@ -37,6 +46,8 @@ import sys
 ROOT = os.path.expanduser("~/.claude/projects")
 REMINDER = re.compile(r"The memory index at MEMORY\.md is [\d.]+ ?(KB|lines), approaching the")
 IS_INDEX = re.compile(r"(^|[\\/])MEMORY\.md$")
+SIZE = re.compile(r"MEMORY\.md is ([\d.]+) ?KB")
+WRITES = re.compile(r"""open\([^)]*['"][wa]|write_text|>>?\s*"?[^\s"|;&]*MEMORY\.md|sed -i|Set-Content|Add-Content|Out-File""")
 RULE = re.compile(r"\b(never|always|must|only)\b", re.I)
 DATED = re.compile(r"\b20\d\d-\d\d-\d\d\b|\b\d\d-\d\d\b")
 LINK = re.compile(r"\[[^\]]+\]\([^)]+\)")
@@ -89,20 +100,39 @@ def tool_uses(rec: dict):
             yield b.get("name"), b.get("input") or {}
 
 
-def scan_records(records, tally: dict) -> None:
+def writes_index(cmd: str) -> bool:
+    return "MEMORY.md" in cmd and bool(WRITES.search(cmd))
+
+
+def scan_records(records, tally: dict, sizes: list = None) -> None:
     armed = False
+    seen_reminder = False
+    last_kb = None
     for rec in records:
         if is_reminder(rec):
             armed = True
+            seen_reminder = True
             tally["reminders"] += 1
+            tally["reminder_hook:" + str(rec.get("attachment", {}).get("hookName", "none"))] += 1
+            m = SIZE.search(json.dumps(rec.get("attachment", {}), ensure_ascii=False))
+            if m:
+                kb = float(m.group(1))
+                if last_kb is not None and kb < last_kb:
+                    tally["reminder_to_reminder_shrinks"] += 1
+                    if sizes is not None:
+                        sizes.append((rec.get("timestamp", "")[:16], last_kb, kb))
+                last_kb = kb
             continue
         if is_prompt(rec):
             armed = False
             continue
         for name, inp in tool_uses(rec):
             group = "after_reminder" if armed else "ordinary"
-            if name == "Bash" and "MEMORY.md" in str(inp.get("command", "")):
-                tally[group + "_bash"] += 1
+            if name in ("Bash", "PowerShell"):
+                if writes_index(str(inp.get("command", ""))):
+                    tally[group + "_bash_writes"] += 1
+                    if seen_reminder:
+                        tally["later_in_session_after_a_reminder_bash_writes"] += 1
                 continue
             path = str(inp.get("file_path", ""))
             if not IS_INDEX.search(path):
@@ -157,7 +187,20 @@ def self_test() -> None:
     topic = json.loads(json.dumps(edit)); topic["message"]["content"][0]["input"]["file_path"] = "/x/memory/a.md"
     t = collections.Counter(); scan_records([rem, topic], t)
     assert t["after_reminder_edits"] == 0, "only MEMORY.md is the index"
-    print("self-test: 4 of 4 controls hold")
+    bash = {"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "Bash", "input": {
+        "command": "cd memory && python - <<'EOF'\np='MEMORY.md'; open(p,'w').write(s)\nEOF"}}]}}
+    t = collections.Counter(); scan_records([rem, prompt, bash], t)
+    assert t["ordinary_bash_writes"] == 1 and t["later_in_session_after_a_reminder_bash_writes"] == 1, t
+    read = json.loads(json.dumps(bash)); read["message"]["content"][0]["input"]["command"] = "cat MEMORY.md | wc -c"
+    t = collections.Counter(); scan_records([rem, read], t)
+    assert t["after_reminder_bash_writes"] == 0, "reading the index is not writing it"
+    rem2 = json.loads(json.dumps(rem))
+    rem2["attachment"]["content"] = ["The memory index at MEMORY.md is 21KB, approaching the 24.4KB read limit."]
+    sz = []; t = collections.Counter(); scan_records([rem, prompt, rem2], t, sz)
+    assert t["reminder_to_reminder_shrinks"] == 1 and sz[0][1:] == (22.1, 21.0), (t, sz)
+    t = collections.Counter(); scan_records([rem2, prompt, rem], t)
+    assert t["reminder_to_reminder_shrinks"] == 0, "growth is not a trim"
+    print("self-test: 8 of 8 controls hold")
 
 
 def main() -> int:
@@ -166,13 +209,18 @@ def main() -> int:
         return 0
     files = transcripts()
     t = collections.Counter()
+    shrinks = []
     for i, f in enumerate(files, 1):
-        scan_records(load(f), t)
+        found = []
+        scan_records(load(f), t, found)
+        shrinks += [(os.path.basename(f)[:8],) + x for x in found]
         if i % 200 == 0:
             print("  %d/%d transcripts" % (i, len(files)), file=sys.stderr)
     print("transcripts scanned: %d" % len(files))
     for k in sorted(t):
-        print("%-40s %d" % (k, t[k]))
+        print("%-48s %d" % (k, t[k]))
+    for sid, ts, a, b in shrinks:
+        print("index shrank between reminders: session %s, %.1f KB -> %.1f KB by %s" % (sid, a, b, ts))
     return 0
 
 

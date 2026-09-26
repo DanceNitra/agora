@@ -1,9 +1,14 @@
-self-test: 4 of 4 controls hold
-transcripts scanned: 1332
-ordinary_bash                            782
-ordinary_edits                           14
-ordinary_removed:dated                   1
-ordinary_removed:rule                    1
-ordinary_shrinking_edits                 2
-ordinary_write                           1
-reminders                                8
+self-test: 8 of 8 controls hold
+transcripts scanned: 1367
+later_in_session_after_a_reminder_bash_writes    22
+ordinary_bash_writes                             410
+ordinary_edits                                   17
+ordinary_removed:dated                           1
+ordinary_removed:prose                           1
+ordinary_removed:rule                            1
+ordinary_shrinking_edits                         3
+ordinary_write                                   1
+reminder_hook:PostToolUse:Edit                   8
+reminder_to_reminder_shrinks                     1
+reminders                                        8
+index shrank between reminders: session 1a4669bc, 24.3 KB -> 21.0 KB by 2026-09-23T10:41
