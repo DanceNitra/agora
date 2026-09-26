@@ -17,6 +17,15 @@
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/instrument_control.py\""
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/memory_index_guard.py\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
