@@ -175,13 +175,14 @@ class Widget:
         self.hwnd = None
         self.root = tk.Tk()
         self.root.overrideredirect(True)
-        self.root.attributes("-topmost", True)
         self.root.configure(bg=BG)
         self.root.wm_attributes("-transparentcolor", BG)   # no box: only the glyphs are drawn
         self.label = tk.Label(self.root, text="DeepSeek ...", fg=FG, bg=BG, font=FONT)
         self.label.pack(padx=6, pady=0)
         self.root.update_idletasks()
-        self.me = user32.GetParent(self.root.winfo_id()) or self.root.winfo_id()
+        self.frame_hwnd = int(self.root.wm_frame(), 16)
+        self.owner = None
+        self.pulse_step = 0
         self.poll_balance()
         self.tick_meter()
         self.follow()
@@ -200,18 +201,22 @@ class Widget:
             pass
 
     def follow(self):
-        """Every 300 ms: stick to the Codex footer, or hide if Codex is not the front window."""
+        """Every 300 ms: stick to the Codex footer. The label is an OWNED window of Codex, so Windows
+        keeps it directly above Codex in the z-order: visible whenever Codex is visible (also when
+        another monitor has the focus), covered whenever another window covers Codex."""
         if not self.hwnd or not user32.IsWindow(self.hwnd):
             self.hwnd = codex_window()
-        fg = user32.GetForegroundWindow()
-        show = bool(self.hwnd) and not user32.IsIconic(self.hwnd) and (fg in (self.hwnd, self.me) or os.environ.get("WIDGET_ALWAYS") == "1")
+        if self.hwnd and self.owner != self.hwnd:
+            user32.SetWindowLongPtrW(self.frame_hwnd, -8, self.hwnd)   # GWLP_HWNDPARENT = owner
+            self.owner = self.hwnd
+        show = bool(self.hwnd) and not user32.IsIconic(self.hwnd)
         if show:
             r = frame_rect(self.hwnd)
             w, h = self.root.winfo_reqwidth(), self.root.winfo_reqheight()
             x = r.left + (FREE_LEFT + FREE_RIGHT) // 2 - w // 2
             self.root.geometry(f"+{x}+{r.bottom - ROW_FROM_BOTTOM - h // 2}")
-            self.root.deiconify()
-            self.root.lift()
+            if self.root.state() == "withdrawn":
+                self.root.deiconify()
         else:
             self.root.withdraw()
         self.root.after(300, self.follow)
@@ -255,7 +260,27 @@ class Widget:
         per_h = hour / (span / 3600) if span >= 300 else per_min * 60
         left = f"  {self.bal / per_h:.0f}h" if per_h > 0 else "  --h"
         text = f"$ {self.live_balance():.3f}   {per_min * 100:.1f}c/min{left}"
-        self.label.config(text=text, fg=FG_WARN if self.bal < WARN_USD else FG)
+        self.base_fg = FG_WARN if self.bal < WARN_USD else FG
+        if text != self.label.cget("text"):
+            self.label.config(text=text)
+            self.pulse_step = 1
+            self.pulse()
+        elif not self.pulse_step:
+            self.label.config(fg=self.base_fg)
+
+    PULSE = ("#fff4c9", "#fbe39a", "#f8d676", "#f5ca5e", "#f2c14e")   # bright to the resting gold, 60 ms apart
+
+    def pulse(self):
+        """A short glow when the text changes: flash toward white, then settle back."""
+        if not self.pulse_step:
+            return
+        if self.pulse_step > len(self.PULSE):
+            self.pulse_step = 0
+            self.label.config(fg=self.base_fg)
+            return
+        self.label.config(fg=self.PULSE[self.pulse_step - 1] if self.base_fg == FG else FG_WARN)
+        self.pulse_step += 1
+        self.root.after(60, self.pulse)
 
 
     def live_balance(self):
