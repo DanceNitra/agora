@@ -125,6 +125,8 @@ class TokenMeter:
             start = self.pos.get(f)
             if start is None:
                 start = max(0, size - 4_000_000)   # a thread can be 200 MB; the last 4 MB covers the last hour
+                if start == 0:
+                    self.total[f] = (0, 0, 0)       # read from its first byte: the first call is spend too
             if size <= start:
                 self.pos[f] = size
                 continue
@@ -155,6 +157,9 @@ class TokenMeter:
         while self.events and now - self.events[0][0] > 3600:
             self.events.popleft()
 
+    def spent_since(self, t0):
+        return sum(u for t, u in self.events if t > t0)
+
     def spent(self, seconds):
         now = time.time()
         return sum(u for t, u in self.events if now - t <= seconds)
@@ -166,6 +171,7 @@ class Widget:
         self.load_history()
         self.meter = TokenMeter()
         self.bal = self.cur = None
+        self.anchor = None                          # (api balance, when it last changed)
         self.hwnd = None
         self.root = tk.Tk()
         self.root.overrideredirect(True)
@@ -227,6 +233,8 @@ class Widget:
         with LOG.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "balance": bal, "currency": cur,
                                 "src": "widget"}) + "\n")
+        if self.anchor is None or self.anchor[0] != bal:
+            self.anchor = (bal, now)
         self.bal, self.cur = bal, cur
         self.root.after(0, self.render)
 
@@ -246,9 +254,16 @@ class Widget:
         span = min(3600, time.time() - self.meter.events[0][0]) if self.meter.events else 0
         per_h = hour / (span / 3600) if span >= 300 else per_min * 60
         left = f"  {self.bal / per_h:.0f}h" if per_h > 0 else "  --h"
-        text = f"$ {self.bal:.2f}   {per_min * 100:.1f}c/min{left}"
+        text = f"$ {self.live_balance():.3f}   {per_min * 100:.1f}c/min{left}"
         self.label.config(text=text, fg=FG_WARN if self.bal < WARN_USD else FG)
 
+
+    def live_balance(self):
+        """The API reports whole cents. Between two cent steps, take the cent it last showed, assume the
+        true value sat mid-cent when it changed, and subtract the token spend since; clamp to that cent
+        so the third decimal can never contradict the API."""
+        bal, since = self.anchor
+        return min(bal + 0.005, max(bal - 0.005, bal + 0.005 - self.meter.spent_since(since)))
 
     def fetch_ollama(self):
         try:
