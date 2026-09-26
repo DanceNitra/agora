@@ -1,78 +1,112 @@
 # -*- coding: utf-8 -*-
-"""deepseek_balance_widget.py - a small always-on-top window with the live DeepSeek balance.
+"""deepseek_balance_widget.py - the DeepSeek balance, anchored inside the Codex sidebar footer.
 
-Refreshes every 60 s, shows the balance and the spend over the last 10 minutes, and turns red
-under 0.50 USD. Codex's notify toast only fires when a turn ENDS, and a goal turn can run for
-hours, so this is the view that updates while Codex works. Drag it with the mouse; close with x.
+A borderless label sits in the empty space of the Codex settings row (bottom left, beside the
+"deepseek" profile name), follows the Codex window when it moves or resizes, and hides whenever
+Codex is minimized or another app is in front. The balance refreshes every 60 s; the spend over
+the last 10 minutes appears once 10 minutes of readings exist. Under 0.50 USD the text turns red.
+Codex's notify toast only fires when a turn ENDS; this view updates while a turn runs.
 
-    pythonw tools\\deepseek_balance_widget.py
+    pythonw tools\\deepseek_balance_widget.py        (also started from the Windows Startup folder)
 """
 import collections
+import ctypes
+import os
+import ctypes.wintypes as W
 import json
 import threading
 import time
 import tkinter as tk
-import urllib.request
 
 from deepseek_balance_notify import LOG, balance
 
 REFRESH_S = 60
 WARN_USD = 0.50
+BG = "#1b1b1b"            # the Codex sidebar footer colour, sampled from a screenshot
+FG, FG_WARN = "#8f8f8f", "#ff6b6b"
+# Position inside the Codex window, in the same (DPI-virtualised) units GetWindowRect returns.
+X_FROM_LEFT = 112          # just right of the "deepseek" profile name
+Y_FROM_BOTTOM = 21         # vertically centred on the settings row
+CODEX_TITLE = "ChatGPT"    # the Codex desktop app's window title
+
+user32 = ctypes.windll.user32
+
+
+def codex_window():
+    found = []
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, W.HWND, W.LPARAM)
+    def cb(h, _):
+        n = user32.GetWindowTextLengthW(h)
+        if n and user32.IsWindowVisible(h):
+            b = ctypes.create_unicode_buffer(n + 1)
+            user32.GetWindowTextW(h, b, n + 1)
+            if b.value == CODEX_TITLE:
+                found.append(h)
+        return True
+
+    user32.EnumWindows(cb, 0)
+    return found[0] if found else None
 
 
 class Widget:
     def __init__(self):
         self.hist = collections.deque(maxlen=30)
+        self.hwnd = None
         self.root = tk.Tk()
-        self.root.title("DeepSeek")
-        self.root.attributes("-topmost", True)
         self.root.overrideredirect(True)
-        self.root.geometry(f"+{self.root.winfo_screenwidth() - 250}+40")
-        self.frame = tk.Frame(self.root, bg="#1e1e1e", padx=10, pady=6)
-        self.frame.pack()
-        self.big = tk.Label(self.frame, text="DeepSeek ...", fg="#e6e6e6", bg="#1e1e1e", font=("Segoe UI", 13, "bold"))
-        self.big.pack(anchor="w")
-        self.small = tk.Label(self.frame, text="", fg="#9a9a9a", bg="#1e1e1e", font=("Segoe UI", 9))
-        self.small.pack(anchor="w")
-        close = tk.Label(self.frame, text="x", fg="#777", bg="#1e1e1e", cursor="hand2")
-        close.place(relx=1.0, x=4, y=-4, anchor="ne")
-        close.bind("<Button-1>", lambda _: self.root.destroy())
-        for w in (self.frame, self.big, self.small):
-            w.bind("<ButtonPress-1>", self.start_drag)
-            w.bind("<B1-Motion>", self.drag)
-        self.poll()
+        self.root.attributes("-topmost", True)
+        self.root.configure(bg=BG)
+        self.label = tk.Label(self.root, text="DeepSeek ...", fg=FG, bg=BG, font=("Segoe UI", 9))
+        self.label.pack(padx=4, pady=1)
+        self.root.update_idletasks()
+        self.me = user32.GetParent(self.root.winfo_id()) or self.root.winfo_id()
+        self.poll_balance()
+        self.follow()
         self.root.mainloop()
 
-    def start_drag(self, e):
-        self._dx, self._dy = e.x_root - self.root.winfo_x(), e.y_root - self.root.winfo_y()
+    def follow(self):
+        """Every 300 ms: stick to the Codex footer, or hide if Codex is not the front window."""
+        if not self.hwnd or not user32.IsWindow(self.hwnd):
+            self.hwnd = codex_window()
+        fg = user32.GetForegroundWindow()
+        show = bool(self.hwnd) and not user32.IsIconic(self.hwnd) and (fg in (self.hwnd, self.me) or os.environ.get("WIDGET_ALWAYS") == "1")
+        if show:
+            r = W.RECT()
+            user32.GetWindowRect(self.hwnd, ctypes.byref(r))
+            h = self.root.winfo_reqheight()
+            self.root.geometry(f"+{r.left + X_FROM_LEFT}+{r.bottom - Y_FROM_BOTTOM - h // 2}")
+            self.root.deiconify()
+            self.root.lift()
+        else:
+            self.root.withdraw()
+        self.root.after(300, self.follow)
 
-    def drag(self, e):
-        self.root.geometry(f"+{e.x_root - self._dx}+{e.y_root - self._dy}")
-
-    def poll(self):
+    def poll_balance(self):
         threading.Thread(target=self.fetch, daemon=True).start()
-        self.root.after(REFRESH_S * 1000, self.poll)
+        self.root.after(REFRESH_S * 1000, self.poll_balance)
 
     def fetch(self):
         try:
             bal, cur = balance()
         except Exception as e:
-            self.root.after(0, lambda: self.small.config(text=f"chyba: {type(e).__name__}"))
+            self.root.after(0, lambda: self.label.config(text=f"DeepSeek ? ({type(e).__name__})"))
             return
         now = time.time()
         self.hist.append((now, bal))
         with LOG.open("a", encoding="utf-8") as f:
-            f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "balance": bal, "currency": cur, "src": "widget"}) + "\n")
-        old = [b for t, b in self.hist if now - t >= 540]
+            f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "balance": bal, "currency": cur,
+                                "src": "widget"}) + "\n")
+        old = [(t, b) for t, b in self.hist if now - t >= 540]
         rate = ""
         if old:
-            spent10 = old[-1] - bal
-            per_min = spent10 / ((now - [t for t, b in self.hist if b == old[-1]][-1]) / 60)
-            left = f", vydrzi ~{bal / per_min / 60:.1f} h" if per_min > 0 else ""
-            rate = f"za 10 min {spent10 * 100:.0f} centov{left}"
-        color = "#ff6b6b" if bal < WARN_USD else "#e6e6e6"
-        self.root.after(0, lambda: (self.big.config(text=f"DeepSeek {bal:.2f} {cur}", fg=color),
-                                    self.small.config(text=(rate or "meriam spotrebu...") + time.strftime("  %H:%M"))))
+            t0, b0 = old[-1]
+            spent = b0 - bal
+            per_h = spent / ((now - t0) / 3600)
+            rate = f"  |  10 min {spent * 100:.0f} c" + (f", ~{bal / per_h:.1f} h" if per_h > 0 else "")
+        text = f"$ {bal:.2f}{rate}"
+        color = FG_WARN if bal < WARN_USD else FG
+        self.root.after(0, lambda: self.label.config(text=text, fg=color))
 
 
 if __name__ == "__main__":
