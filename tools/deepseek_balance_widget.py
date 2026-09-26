@@ -19,11 +19,17 @@ import time
 import re
 import tkinter as tk
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 from deepseek_balance_notify import LOG, balance
 
-REFRESH_S = 60
+REFRESH_S = 30             # balance API; it returns whole cents, measured 40 calls at 4/s: all 200, median 292 ms
+METER_S = 2                # token meter: Codex writes a token_count event after every model call
+SESSIONS = Path.home() / ".codex" / "sessions"
+# deepseek-flash USD per 1M tokens (api-docs.deepseek.com/quick_start/pricing, read 2026-09-26):
+# (cache hit, cache miss, output). Peak is 01-04 and 06-10 UTC Mon-Fri; every other hour is half price.
+PRICE_PEAK, PRICE_OFF = (0.006, 0.3, 1.2), (0.003, 0.15, 0.6)
 WARN_USD = 0.50
 BG = "#1d1d1d"            # made fully transparent below; close to the footer so glyph edges blend
 FG, FG_WARN = "#f2c14e", "#ff6b6b"
@@ -94,10 +100,72 @@ def ollama_usage():
     return float(lim["session"]["usage"]), float(lim["weekly"]["usage"])
 
 
+def price_at(ts):
+    t = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+    peak = t.weekday() < 5 and (1 <= t.hour < 4 or 6 <= t.hour < 10)
+    return PRICE_PEAK if peak else PRICE_OFF
+
+
+class TokenMeter:
+    """Live spend from the Codex thread files: every token_count event carries the thread's running
+    totals, so the cost of each model call is the difference between two totals times the price."""
+
+    def __init__(self):
+        self.pos, self.total = {}, {}
+        self.events = collections.deque()          # (epoch seconds, usd)
+
+    def scan(self):
+        now = time.time()
+        try:
+            files = [f for f in SESSIONS.rglob("rollout-*.jsonl") if now - f.stat().st_mtime < 7200]
+        except OSError:
+            return
+        for f in files:
+            size = f.stat().st_size
+            start = self.pos.get(f)
+            if start is None:
+                start = max(0, size - 4_000_000)   # a thread can be 200 MB; the last 4 MB covers the last hour
+            if size <= start:
+                self.pos[f] = size
+                continue
+            with f.open("rb") as fh:
+                fh.seek(start)
+                chunk = fh.read()
+            cut = chunk.rfind(bytes([10])) + 1
+            self.pos[f] = start + cut
+            for line in chunk[:cut].splitlines():
+                if b'"token_count"' not in line:
+                    continue
+                try:
+                    d = json.loads(line)
+                    u = d["payload"]["info"]["total_token_usage"]
+                except Exception:
+                    continue
+                tot = (u.get("input_tokens", 0), u.get("cached_input_tokens", 0), u.get("output_tokens", 0))
+                prev = self.total.get(f)
+                self.total[f] = tot
+                if prev is None or tot == prev:
+                    continue
+                inp, hit, out = (max(0, a - b) for a, b in zip(tot, prev))
+                p_hit, p_miss, p_out = price_at(d.get("timestamp"))
+                usd = (hit * p_hit + max(0, inp - hit) * p_miss + out * p_out) / 1e6
+                ts = d.get("timestamp")
+                t = datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp() if ts else now
+                self.events.append((t, usd))
+        while self.events and now - self.events[0][0] > 3600:
+            self.events.popleft()
+
+    def spent(self, seconds):
+        now = time.time()
+        return sum(u for t, u in self.events if now - t <= seconds)
+
+
 class Widget:
     def __init__(self):
-        self.hist = collections.deque(maxlen=120)
+        self.hist = collections.deque(maxlen=240)
         self.load_history()
+        self.meter = TokenMeter()
+        self.bal = self.cur = None
         self.hwnd = None
         self.root = tk.Tk()
         self.root.overrideredirect(True)
@@ -109,6 +177,7 @@ class Widget:
         self.root.update_idletasks()
         self.me = user32.GetParent(self.root.winfo_id()) or self.root.winfo_id()
         self.poll_balance()
+        self.tick_meter()
         self.follow()
         self.root.mainloop()
 
@@ -158,20 +227,27 @@ class Widget:
         with LOG.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "balance": bal, "currency": cur,
                                 "src": "widget"}) + "\n")
-        # The balance moves in whole cents, so ten idle minutes often read 0. The hours estimate uses
-        # the oldest reading of the last hour instead, and stays visible (as --h) when nothing moved.
-        old10 = [(t, b) for t, b in self.hist if now - t >= 540]
-        hour = [(t, b) for t, b in self.hist if now - t <= 3600]
-        rate = ""
-        if old10:
-            rate = f"   {(old10[-1][1] - bal) * 100:.0f}c/10min"
-        if hour and now - hour[0][0] >= 540:
-            t0, b0 = hour[0]
-            per_h = (b0 - bal) / ((now - t0) / 3600)
-            rate += f"  {bal / per_h:.0f}h" if per_h > 0 else "  --h"
-        text = f"$ {bal:.2f}{rate}"
-        color = FG_WARN if bal < WARN_USD else FG
-        self.root.after(0, lambda: self.label.config(text=text, fg=color))
+        self.bal, self.cur = bal, cur
+        self.root.after(0, self.render)
+
+    def tick_meter(self):
+        if codex_on_deepseek():
+            threading.Thread(target=lambda: (self.meter.scan(), self.root.after(0, self.render)), daemon=True).start()
+        self.root.after(METER_S * 1000, self.tick_meter)
+
+    def render(self):
+        """$ balance (API, whole cents), cents per minute over the last 5 minutes of model calls,
+        and hours left at the last hour's pace. Both rates come from token counts, so they move
+        within seconds of a call instead of waiting for the balance to drop a whole cent."""
+        if self.bal is None or not codex_on_deepseek():
+            return
+        per_min = self.meter.spent(300) / 5
+        hour = self.meter.spent(3600)
+        span = min(3600, time.time() - self.meter.events[0][0]) if self.meter.events else 0
+        per_h = hour / (span / 3600) if span >= 300 else per_min * 60
+        left = f"  {self.bal / per_h:.0f}h" if per_h > 0 else "  --h"
+        text = f"$ {self.bal:.2f}   {per_min * 100:.1f}c/min{left}"
+        self.label.config(text=text, fg=FG_WARN if self.bal < WARN_USD else FG)
 
 
     def fetch_ollama(self):
