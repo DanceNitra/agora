@@ -89,6 +89,28 @@ def cmd_threads(tok: str, max_age_days: int) -> int:
             print(f"    WAITING {when(c['created_utc'])} u/{c['author']} (depth {depth}): "
                   f"{c['body'][:160].replace(chr(10), ' ')}")
         time.sleep(0.7)
+    # Replies to our COMMENTS in other people's threads. The loop above only walks threads we started,
+    # so on 2026-09-27 a reply from u/GrungeWerX under our LocalLLaMA comment sat unanswered for 6 days
+    # while this command reported 0; the owner found it in his notifications.
+    print("\nreplies to our comments in other people's threads:")
+    for c in get(f"/user/{US}/comments", tok, limit=100)["data"]["children"]:
+        mine = c["data"]
+        if (time.time() - mine["created_utc"]) / 86400 > max_age_days:
+            continue
+        th = get(f"/r/{mine['subreddit']}/comments/{mine['link_id'][3:]}", tok, comment=mine["id"], depth=3, limit=50)
+        node = th[1]["data"]["children"][0]["data"]
+        rep = node.get("replies")
+        for r in (rep["data"]["children"] if isinstance(rep, dict) else []):
+            if r.get("kind") != "t1" or r["data"].get("author") in (US, "AutoModerator"):
+                continue
+            rr = r["data"].get("replies")
+            answered = any(k.get("kind") == "t1" and k["data"].get("author") == US
+                           for k in (rr["data"]["children"] if isinstance(rr, dict) else []))
+            if not answered and (time.time() - r["data"]["created_utc"]) / 86400 <= max_age_days:
+                open_items += 1
+                print(f"    WAITING {when(r['data']['created_utc'])} u/{r['data']['author']} in r/{mine['subreddit']} "
+                      f"https://www.reddit.com{r['data']['permalink']}: {r['data']['body'][:160].replace(chr(10), ' ')}")
+        time.sleep(0.7)
     print(f"\n{open_items} comment(s) addressed to us without a reply from us (last {max_age_days} days)")
     return 0
 
