@@ -461,7 +461,8 @@ def record_sent(d):
     """The comment id a pregate record says its letter became, or None.
 
     Only a real comment id counts (six or more digits), so a record cannot be closed by writing
-    "yes". Used by the pregate gate and by `outbound.py status`, so the two cannot disagree.
+    "yes". Used by the pregate gate. `outbound.py status` does not take it as proof: it reads the
+    thread, and reports this field only when the thread holds no matching text.
     """
     s = d.get("sent")
     return str(s) if s and re.match(r"^\d{6,}$", str(s)) else None

@@ -14,7 +14,7 @@ content; since 2026-09-25 there is no separate gate call (see .claude/skills/out
     python tools/outbound.py show   SLUG      # render paths + hash for the owner
     python tools/outbound.py dryrun SLUG [--sha HASH] [--offline]  # every send check, nothing sent
     python tools/outbound.py post   SLUG --sha HASH
-    python tools/outbound.py status [SLUG]    # where every text stands, and the next command
+    python tools/outbound.py status [SLUG]    # where every text stands; "sent" is read from the thread
 
 Each text lives in agora_output/outbound/SLUG/: draft.md (body, no seal), claims.py (reads
 AGORA_INPUT_DIR), meta.json, and after `seal` draft.sealed.md. Nothing here sends anything
@@ -306,24 +306,71 @@ def dryrun_checks(slug, sha=None, offline=False):
         # the check working, not a defect in the text, so it is named SENT, and only when a
         # comment in the thread is this payload byte for byte.
         if out[-1][0] == "FAIL":
-            cid = _landed_as(meta["thread"], stdin)
-            if cid:
-                out[-1] = ("SENT", out[-1][1], "this exact text is already comment %s" % cid)
+            try:
+                hit = live_match(meta["thread"], stdin)
+            except LiveReadFailed:
+                hit = None
+            if hit:
+                out[-1] = ("SENT", out[-1][1], "this exact text is already %s" % hit[1])
     return out
 
 
-def _landed_as(thread, payload):
-    """The id of a comment in THREAD whose body is PAYLOAD byte for byte, or None."""
+class LiveReadFailed(RuntimeError):
+    """gh could not read a thread, so nothing can be said about whether a text went out."""
+
+
+def _gh_list(path):
+    """Every item of one paginated GET, as (id, html_url, login, body). Read-only by construction.
+
+    The argv names `--method GET` and carries no field, input or header flag, so it cannot write;
+    tests/test_outbound.py asserts that shape. Raises LiveReadFailed when gh exits non-zero, so an
+    unreadable thread is never reported as a thread without our text.
+    """
+    cmd = ["gh", "api", "--method", "GET", path, "--paginate",
+           "--jq", ".[] | [.id, .html_url, .user.login, .body] | @json"]
+    r = subprocess.run(cmd, capture_output=True, timeout=120)
+    if r.returncode != 0:
+        raise LiveReadFailed("gh api %s exited %d: %s" % (
+            path, r.returncode, r.stderr.decode("utf-8", "replace").strip()[-160:]))
+    return [tuple(json.loads(ln)) for ln in r.stdout.decode("utf-8").splitlines() if ln.strip()]
+
+
+_LOGIN = []
+
+
+def _our_login():
+    """The account gh posts as, read once per process with a GET."""
+    if not _LOGIN:
+        r = subprocess.run(["gh", "api", "--method", "GET", "user", "--jq", ".login"],
+                           capture_output=True, timeout=60)
+        login = r.stdout.decode("utf-8", "replace").strip()
+        if r.returncode != 0 or not login:
+            raise LiveReadFailed("gh api user exited %d" % r.returncode)
+        _LOGIN.append(login)
+    return _LOGIN[0]
+
+
+def live_match(thread, payload, cache=None):
+    """(id, html_url) of the live text by our account whose body is PAYLOAD byte for byte, or None.
+
+    Compared by sha256, with no normalisation: measured 2026-09-28, all six texts that went out
+    match their draft.sealed.md exactly, so a looser comparison would only add false positives.
+    Two places can hold a text we sent: a comment on THREAD, and the body of an issue or PR our
+    account opened in the same repository. lantern-outcome-questions is the second kind: its meta
+    thread is a closed PR, and it went out as the new issue Lantern-svg/lantern#2. Raises
+    LiveReadFailed when a read fails.
+    """
     repo, num = _thread_parts(thread)
-    r = subprocess.run(["gh", "api", "repos/%s/issues/%s/comments" % (repo, num), "--paginate",
-                        "--jq", ".[] | [.id, .body] | @json"], capture_output=True, timeout=120)
-    for line in r.stdout.decode("utf-8", "replace").splitlines():
-        try:
-            cid, body = json.loads(line)
-        except Exception:                                           # noqa: BLE001
-            continue
-        if body.encode("utf-8").strip() == payload.strip():
-            return cid
+    want = hashlib.sha256(payload).hexdigest()
+    me = _our_login()
+    cache = {} if cache is None else cache
+    for path in ("repos/%s/issues/%s/comments" % (repo, num),
+                 "repos/%s/issues?creator=%s&state=all" % (repo, me)):
+        if path not in cache:
+            cache[path] = _gh_list(path)
+        for cid, url, login, body in cache[path]:
+            if login == me and hashlib.sha256((body or "").encode("utf-8")).hexdigest() == want:
+                return cid, url
     return None
 
 
@@ -339,45 +386,84 @@ def cmd_dryrun(a):
     return 1 if bad else 0
 
 
-def _closed(slug):
-    """"6 sent <id>" or "x killed" from the text's pregate record, else None.
-
-    Without this every sealed draft read "5 owner" forever, so a text that already went out looked
-    like it was waiting for a posli: lantern-outcome-questions did on 2026-09-27, hours after it
-    was posted byte-identical as Lantern-svg/lantern#2. The rules are send_approved's own.
-    """
-    p = os.path.join(PREGATE, "outbound_%s.json" % slug)
+def _pregate_record(slug):
     try:
-        rec = json.load(io.open(p, encoding="utf-8"))
+        return json.load(io.open(os.path.join(PREGATE, "outbound_%s.json" % slug), encoding="utf-8"))
     except Exception:                                               # noqa: BLE001
-        return None
+        return {}
+
+
+def _write_sent(slug, cid, url, sha):
+    """Keep what the live read found in SLUG/sent.json, for the record only.
+
+    Nothing reads this file back to decide a stage. A file in our own folder is not the
+    destination: on 2026-08-18 a retraction was called unsent because of where its file sat, while
+    it had been public for two days. `status` asks the thread every time.
+    """
+    p = os.path.join(_dir(slug), "sent.json")
+    rec = {"id": cid, "url": url, "draft_sealed_sha256": sha}
+    try:
+        old = json.load(io.open(p, encoding="utf-8"))
+        if all(old.get(k) == v for k, v in rec.items()):
+            return
+    except Exception:                                               # noqa: BLE001
+        pass
+    rec["verified_at"] = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rec["how"] = "outbound.py status: sha256 of the live body, read with gh api --method GET"
+    tmp = p + ".tmp"
+    with io.open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(rec, fh, indent=1)
+    os.replace(tmp, p)
+
+
+def _stage(slug, cache=None):
+    """(stage, next) for one text. The live thread decides "sent"; local files decide the rest.
+
+    6 sent         a live comment or issue body by our account is draft.sealed.md byte for byte.
+    ? gh failed    the thread could not be read, so the text is neither sent nor safe to post.
+    x killed       the pregate record names an existing .DEAD copy (send_approved.record_killed).
+    ! unconfirmed  a record claims a comment id, but no live text equals draft.sealed.md.
+    1 to 5         the local steps: write, check, gate, seal, owner.
+
+    Until 2026-09-28 a `sent` field in the pregate record closed a text on its own word. A file is
+    not the destination, so that field now only raises "! unconfirmed" when the thread disagrees.
+    """
+    d = _dir(slug)
+    sealed = os.path.join(d, "draft.sealed.md")
     sys.path.insert(0, os.path.join(ROOT, "tools"))
     import send_approved as sa
-    sent = sa.record_sent(rec)
-    if sent:
-        return "6 sent %s" % sent, "nothing; this text went out as comment %s" % sent
+    if os.path.exists(sealed):
+        meta = _meta(slug)
+        with open(sealed, "rb") as fh:
+            payload = fh.read()
+        sha = hashlib.sha256(payload).hexdigest()
+        try:
+            hit = live_match(meta["thread"], payload, cache)
+        except LiveReadFailed as ex:
+            return "? gh failed", "do not post; re-run status when gh can read %s (%s)" % (
+                meta["thread"], ex)
+        if hit:
+            _write_sent(slug, hit[0], hit[1], sha)
+            return "6 sent %s" % hit[0], "nothing; draft.sealed.md sha256 %s is %s" % (sha[:12], hit[1])
+    rec = _pregate_record(slug)
     dead = sa.record_killed(rec)
     if dead:
         return "x killed", "nothing; abandoned, see %s" % dead
-    return None
-
-
-def _stage(slug):
-    closed = _closed(slug)
-    if closed:
-        return closed
-    d = _dir(slug)
+    claimed = sa.record_sent(rec)
+    if claimed:
+        return "! unconfirmed", ("the pregate record says %s, but no live text by us equals "
+                                 "draft.sealed.md; read %s before any post"
+                                 % (claimed, _meta(slug)["thread"]))
     draft = os.path.join(d, "draft.md")
     body = io.open(draft, encoding="utf-8").read()
     if len(body.split()) < 20:
         return "1 write", "write draft.md and claims.py"
     if any(not ok and not n.startswith("WARN ") for ok, n, _ in lint(slug)):
         return "2 check", "python tools/outbound.py check %s" % slug
-    sys.path.insert(0, os.path.join(ROOT, "tools"))
     import author_receipt
     if author_receipt.check(draft):
         return "3 gate", "python tools/outbound.py gate %s" % slug
-    if not os.path.exists(os.path.join(d, "draft.sealed.md")):
+    if not os.path.exists(sealed):
         return "4 seal", "python tools/outbound.py seal %s --inputs <files>" % slug
     return "5 owner", "python tools/outbound.py show %s  (then post --sha after 'posli <hash>')" % slug
 
@@ -386,10 +472,11 @@ def cmd_status(a):
     slugs = [a.slug] if a.slug else sorted(os.listdir(BASE)) if os.path.isdir(BASE) else []
     if not slugs:
         print("no outbound texts in %s" % BASE)
+    cache = {}
     for s in slugs:
         if not os.path.exists(os.path.join(_dir(s), "meta.json")):
             continue
-        stage, nxt = _stage(s)
+        stage, nxt = _stage(s, cache)
         print("%-40s %-18s next: %s" % (s, stage, nxt))
 
 
