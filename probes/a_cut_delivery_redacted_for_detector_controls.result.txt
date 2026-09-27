@@ -1,0 +1,7 @@
+same_utf16_units                   YES
+same_line_count                    YES
+warning_line_kept_and_last         YES
+quoted_index_line_redacted         YES
+no_original_text_left              YES
+build 2.1.275  lines 150  utf16_units 25147
+wrote probes\fixtures\cut_delivery_redacted.json
