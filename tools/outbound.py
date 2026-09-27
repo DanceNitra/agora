@@ -34,6 +34,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = os.path.join(ROOT, "agora_output", "outbound")
+PREGATE = os.path.join(ROOT, "agora_output", "pregate")
 PY = sys.executable
 
 SIGNATURES = {
@@ -206,7 +207,7 @@ def _pregate(slug):
     was refused. The draft itself is the claims file, as it was for the agmi PR.
     """
     meta = _meta(slug)
-    out = os.path.join(ROOT, "agora_output", "pregate", "outbound_%s.json" % slug)
+    out = os.path.join(PREGATE, "outbound_%s.json" % slug)
     return _run([PY, os.path.join(ROOT, "tools", "pregate.py"), os.path.join(_dir(slug), "draft.md"),
                  "--thread", meta["thread"], "--json", out])
 
@@ -338,7 +339,33 @@ def cmd_dryrun(a):
     return 1 if bad else 0
 
 
+def _closed(slug):
+    """"6 sent <id>" or "x killed" from the text's pregate record, else None.
+
+    Without this every sealed draft read "5 owner" forever, so a text that already went out looked
+    like it was waiting for a posli: lantern-outcome-questions did on 2026-09-27, hours after it
+    was posted byte-identical as Lantern-svg/lantern#2. The rules are send_approved's own.
+    """
+    p = os.path.join(PREGATE, "outbound_%s.json" % slug)
+    try:
+        rec = json.load(io.open(p, encoding="utf-8"))
+    except Exception:                                               # noqa: BLE001
+        return None
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import send_approved as sa
+    sent = sa.record_sent(rec)
+    if sent:
+        return "6 sent %s" % sent, "nothing; this text went out as comment %s" % sent
+    dead = sa.record_killed(rec)
+    if dead:
+        return "x killed", "nothing; abandoned, see %s" % dead
+    return None
+
+
 def _stage(slug):
+    closed = _closed(slug)
+    if closed:
+        return closed
     d = _dir(slug)
     draft = os.path.join(d, "draft.md")
     body = io.open(draft, encoding="utf-8").read()
@@ -363,7 +390,7 @@ def cmd_status(a):
         if not os.path.exists(os.path.join(_dir(s), "meta.json")):
             continue
         stage, nxt = _stage(s)
-        print("%-40s %-9s next: %s" % (s, stage, nxt))
+        print("%-40s %-18s next: %s" % (s, stage, nxt))
 
 
 def main(argv=None):

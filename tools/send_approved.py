@@ -457,6 +457,35 @@ PREGATE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
                            "agora_output", "pregate")
 
 
+def record_sent(d):
+    """The comment id a pregate record says its letter became, or None.
+
+    Only a real comment id counts (six or more digits), so a record cannot be closed by writing
+    "yes". Used by the pregate gate and by `outbound.py status`, so the two cannot disagree.
+    """
+    s = d.get("sent")
+    return str(s) if s and re.match(r"^\d{6,}$", str(s)) else None
+
+
+def record_killed(d):
+    """The .DEAD path a pregate record names as its abandoned draft, or None.
+
+    Measured 2026-09-08: a retraction killed on 09-04 for a false premise left a blocked record
+    that refused an unrelated reply four days later. Harder to set than `sent`, not easier, because
+    nothing external corroborates "I gave up on it": the reason must be substantial AND must name a
+    path that exists on disk and is marked dead in its own filename. A record cannot be waved
+    through by writing a sentence.
+    """
+    k = d.get("killed")
+    if not (isinstance(k, str) and len(k.strip()) >= 40):
+        return None
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for w in (w.strip(" '\"(),") for w in k.split() if "/" in w or w.endswith(".md")):
+        if os.path.exists(os.path.join(root, w)) and (".DEAD" in w or ".dead" in w):
+            return w
+    return None
+
+
 def _pregate_gate_impl(path, thread_spec):
     """Every distinctive figure in the draft must have been seen by a pregate run for this thread.
 
@@ -521,23 +550,12 @@ def _pregate_gate_impl(path, thread_spec):
         # correction quoting our own figures, blocked every later letter on that thread for good.
         # A receipt may say which comment it became; those are skipped. The field cannot be set
         # without a real comment id, so the guard is untouched for anything still unresolved.
-        if d.get("sent") and re.match(r"^\d{6,}$", str(d["sent"])):
+        if record_sent(d):
             continue
-        # AND A DRAFT THAT WAS ABANDONED IS ALSO NOT AN OPEN QUESTION. `sent` covers a letter that
-        # went out. A letter that was KILLED leaves the same blocked record behind and blocks every
-        # later letter on the thread just as permanently: measured 2026-09-08, when a retraction
-        # killed on 09-04 for a false premise refused an unrelated reply four days later.
-        #
-        # Harder to set than `sent`, not easier, because nothing external corroborates "I gave up on
-        # it": the reason must be substantial AND must name a path that exists on disk and is marked
-        # dead in its own filename. A record cannot be waved through by writing a sentence.
-        _k = d.get("killed")
-        if isinstance(_k, str) and len(_k.strip()) >= 40:
-            _paths = [w.strip(" '\"(),") for w in _k.split() if "/" in w or w.endswith(".md")]
-            _ok = [w for w in _paths
-                   if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), w)) and (".DEAD" in w or ".dead" in w)]
-            if _ok:
-                continue
+        # AND A DRAFT THAT WAS ABANDONED IS ALSO NOT AN OPEN QUESTION. See record_killed.
+        if record_killed(d):
+            continue
+        if isinstance(d.get("killed"), str) and len(d["killed"].strip()) >= 40:
             print("NOTE: %s claims `killed` but names no existing .DEAD path, so it still blocks."
                   % os.path.basename(f))
         if d.get("blocked"):

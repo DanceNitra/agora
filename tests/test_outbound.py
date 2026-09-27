@@ -111,3 +111,59 @@ def test_dryrun_fails_on_one_changed_character(sent_copy):
 def test_dryrun_fails_on_a_wrong_sha(sent_copy):
     res = outbound.dryrun_checks("r91188", sha="0" * 64, offline=True)
     assert _fails(res) == ["sha matches the approved hash"]
+
+
+@pytest.fixture
+def sealed(tmp_path, monkeypatch):
+    """A sealed draft that passes check and gate, and a writer for its pregate record."""
+    import author_receipt
+    monkeypatch.setattr(outbound, "BASE", str(tmp_path / "outbound"))
+    monkeypatch.setattr(outbound, "PREGATE", str(tmp_path / "pregate"))
+    d = tmp_path / "outbound" / "t"
+    d.mkdir(parents=True)
+    (tmp_path / "pregate").mkdir()
+    (d / "meta.json").write_text(json.dumps({"slug": "t", "thread": "o/r#1", "sign": "github"}))
+    body = ("We ran the walk over our own transcripts and found the reminder fired eight times in "
+            "total, with no edit to the index inside any window.\n\n" + outbound.SIGNATURES["github"] + "\n")
+    (d / "draft.md").write_bytes(body.encode("utf-8"))
+    author_receipt.record(str(d / "draft.md"))
+    (d / "draft.sealed.md").write_bytes(body.encode("utf-8"))
+
+    def record(**fields):
+        (tmp_path / "pregate" / "outbound_t.json").write_text(json.dumps(dict(tool="pregate", **fields)))
+        return outbound._stage("t")[0]
+    return record, tmp_path
+
+
+def test_status_sealed_without_a_record_waits_for_the_owner(sealed):
+    record, _ = sealed
+    assert outbound._stage("t")[0] == "5 owner"
+    assert record(blocked=0) == "5 owner"
+
+
+def test_status_sent_with_a_real_comment_id(sealed):
+    record, _ = sealed
+    assert record(sent="5601087957") == "6 sent 5601087957"
+
+
+def test_status_a_fake_sent_value_does_not_count(sealed):
+    record, _ = sealed
+    assert record(sent="yes") == "5 owner"
+    assert record(sent="12") == "5 owner"
+
+
+def test_status_killed_naming_an_existing_dead_path(sealed):
+    record, tmp = sealed
+    dead = tmp / "outbound" / "t" / "draft.DEAD.md"
+    dead.write_text("x")
+    why = "The target repository is archived, so this cannot be posted. Dead copy: %s" % dead.as_posix()
+    assert record(killed=why) == "x killed"
+
+
+def test_status_killed_without_a_real_dead_path_does_not_count(sealed):
+    record, tmp = sealed
+    assert record(killed="repo archived") == "5 owner"
+    missing = (tmp / "nowhere" / "draft.DEAD.md").as_posix()
+    assert record(killed="The target repository is archived. Dead copy: %s" % missing) == "5 owner"
+    alive = tmp / "outbound" / "t" / "draft.md"
+    assert record(killed="The target repository is archived. Dead copy: %s" % alive.as_posix()) == "5 owner"
