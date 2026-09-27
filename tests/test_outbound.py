@@ -76,12 +76,18 @@ R91188 = os.path.join(ROOT, "agora_output", "outbound", "r91188")
 
 @pytest.fixture
 def sent_copy(tmp_path, monkeypatch):
-    """r91188 as it was sent on 2026-09-25, copied so a mutation never touches the real folder."""
+    """r91188 as it was sent on 2026-09-25, copied so a mutation never touches the real folder.
+
+    It was gated under the three skill receipts, which 0ecce9b3 replaced with one author receipt,
+    so the copy gets that receipt recorded on its unchanged draft, as `outbound.py gate` does now.
+    """
     if not os.path.exists(os.path.join(R91188, "draft.sealed.md")):
         pytest.skip("r91188 not on disk")
     import shutil
+    import author_receipt
     shutil.copytree(R91188, tmp_path / "r91188")
     monkeypatch.setattr(outbound, "BASE", str(tmp_path))
+    author_receipt.record(str(tmp_path / "r91188" / "draft.md"))
     return tmp_path / "r91188"
 
 
@@ -99,7 +105,7 @@ def test_dryrun_fails_on_one_changed_character(sent_copy):
     i = t.index(b"fired 8 times") + 6
     p.write_bytes(t[:i] + b"9" + t[i + 1:])
     assert _fails(outbound.dryrun_checks("r91188", offline=True)) == [
-        "gate receipts (verify, redteam, humanizer)"]
+        "author receipt binds the draft"]
 
 
 def test_dryrun_fails_on_a_wrong_sha(sent_copy):

@@ -289,7 +289,7 @@ def dryrun_checks(slug, sha=None, offline=False):
     add("payload bound to the file", bound if isinstance(bound, str) else None)
     stdin = bound[1] if not isinstance(bound, str) else io.open(p, "rb").read()
     add("pregate receipts for every figure", *_quiet(sa._pregate_gate, p, thread))
-    add("gate receipts (verify, redteam, humanizer)", *_quiet(sa._the_gate, p))
+    add("author receipt binds the draft", *_quiet(sa._the_gate, p))
     add("humanizer_tells on the payload", *_quiet(sa._tells_gate, stdin.decode("utf-8", "replace"),
                                                    False, True))
     if sa._creates_a_thread(cmd):
