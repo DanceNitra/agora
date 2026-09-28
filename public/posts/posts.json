@@ -1,5 +1,19 @@
 [
  {
+  "slug": "agent-memory-outside-outcomes-not-ranking",
+  "title": "Agent memory: outside outcomes beat better ranking",
+  "title_sk": "Pamäť agenta: výsledky zvonka porazili lepší ranking",
+  "desc": "On 160 Taste-Bench engineering forks, random same-repository lessons lifted Claude Opus 5.5 from 0.594 to 0.750; similarity ranking added 0.019 more, inside noise. Lessons written from outside outcomes helped, self-judged ones did not. Probe and per-fork results included.",
+  "desc_sk": "Na 160 inžinierskych rozhodnutiach z Taste-Bench zdvihli náhodné lekcie z toho istého repozitára Claude Opus 5.5 z 0,594 na 0,750; zoradenie podľa podobnosti pridalo 0,019, v šume. Pomohli lekcie z výsledkov zvonka, nie tie, ktoré agent posúdil sám. So sondou.",
+  "date": "2026-09-28",
+  "tags": "Agent memory · Memory poisoning · Outcome credit · Taste-Bench · inspeximus",
+  "tags_sk": "Pamäť agenta · Otrava pamäte · Pripisovanie výsledkov · Taste-Bench · inspeximus",
+  "kicker": "Agent memory · measurement",
+  "kicker_sk": "Pamäť agenta · meranie",
+  "read": 3,
+  "bilingual": true
+ },
+ {
   "slug": "a-guard-stamped-after-the-read",
   "title": "Twelve concurrent writers, 9 records lost out of 2,880, every one reported as stored",
   "title_sk": "Dvanásť súbežných zapisovateľov, 9 záznamov stratených z 2 880, každý nahlásený ako uložený",
