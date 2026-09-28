@@ -306,6 +306,23 @@ META = {
         "tags_sk": "Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie",
         "kicker": "Tools", "kicker_sk": "Nástroje",
     },
+    "decision-memory-needs-outside-outcomes": {
+        "slug": "agent-memory-outside-outcomes-not-ranking",
+        "title": "Agent memory: outside outcomes beat better ranking",
+        "title_sk": "Pamäť agenta: výsledky zvonka porazili lepší ranking",
+        "h1": "An agent's past lessons helped when outside outcomes wrote them, not when a ranker picked them",
+        "h1_sk": "Minulé lekcie agentovi pomohli, keď ich napísali výsledky zvonka, nie keď ich vybral ranker",
+        "desc": "On 160 Taste-Bench engineering forks, random same-repository lessons lifted Claude Opus 5.5 "
+                "from 0.594 to 0.750; similarity ranking added 0.019 more, inside noise. Lessons written from "
+                "outside outcomes helped, self-judged ones did not. Probe and per-fork results included.",
+        "desc_sk": "Na 160 inžinierskych rozhodnutiach z Taste-Bench zdvihli náhodné lekcie z toho istého "
+                   "repozitára Claude Opus 5.5 z 0,594 na 0,750; zoradenie podľa podobnosti pridalo 0,019, v šume. "
+                   "Pomohli lekcie z výsledkov zvonka, nie tie, ktoré agent posúdil sám. So sondou.",
+        "date": "2026-09-28", "modified": "2026-09-28",
+        "tags": "Agent memory · Memory poisoning · Outcome credit · Taste-Bench · inspeximus",
+        "tags_sk": "Pamäť agenta · Otrava pamäte · Pripisovanie výsledkov · Taste-Bench · inspeximus",
+        "kicker": "Agent memory · measurement", "kicker_sk": "Pamäť agenta · meranie",
+    },
     "food-nudges-publication-bias": {
         "slug": "food-nudges-publication-bias",
         "title": "Food Nudges Aren't 2.5× Better — Food Is the Small-Study Domain",
