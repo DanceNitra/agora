@@ -63,6 +63,11 @@ ISSUER = "urn:agora:builder"
 
 SEAL_REPO = "DanceNitra/inspeximus"
 SEAL_DIR = "docs/seal"
+# SEALS NEVER MOVE MAIN (2026-09-28). Every seal upload was a commit on inspeximus main, and two of them
+# landed during the 3.15.2 and 3.15.3 releases, so `tools/release.py` refused because main had moved, and a
+# release had to be rebased and re-run through CI. A seal link is pinned to its commit sha, not to a
+# branch, so the SVGs live on this protected branch and the link shape does not change.
+SEAL_BRANCH = "seals"
 LOGIN = "DanceNitra"
 API = "https://api.github.com"
 RAW = "https://raw.githubusercontent.com"
@@ -337,7 +342,8 @@ def render_check(text: str, token: str, context, outdir: str, stem: str) -> tupl
 
 def last_seal_pair(token: str) -> tuple:
     """(commit, tail, light_svg, dark_svg): the newest pair in docs/seal/ with both themes."""
-    commits = api("GET", "/repos/%s/commits?path=%s&per_page=30" % (SEAL_REPO, SEAL_DIR), token)
+    commits = api("GET", "/repos/%s/commits?path=%s&sha=%s&per_page=30" % (SEAL_REPO, SEAL_DIR, SEAL_BRANCH),
+                  token)
     rx = re.compile(r"^%s/([0-9a-f]{12})-seal-(light|dark)\.svg$" % re.escape(SEAL_DIR))
     for c in commits:
         files = api("GET", "/repos/%s/commits/%s" % (SEAL_REPO, c["sha"]), token).get("files", [])
@@ -399,17 +405,19 @@ def fetch_sent(url: str, token: str) -> tuple:
 
 
 def upload(path: str, content: bytes, message: str, token: str) -> str:
-    """PUT one file into the seal repo; returns the new commit sha. Never overwrites a different file."""
+    """PUT one file into the seal repo's SEAL_BRANCH; returns the new commit sha. Never overwrites a file,
+    and never commits to main."""
     url = "/repos/%s/contents/%s" % (SEAL_REPO, path)
     try:
-        cur = api("GET", url, token)
+        cur = api("GET", url + "?ref=" + SEAL_BRANCH, token)
     except urllib.error.HTTPError as e:
         if e.code != 404:
             raise
         cur = None
     if cur is not None:
         raise SystemExit("REFUSED: %s already exists in %s; a root tail is never reused." % (path, SEAL_REPO))
-    r = api("PUT", url, token, {"message": message, "content": base64.b64encode(content).decode("ascii")})
+    r = api("PUT", url, token, {"message": message, "content": base64.b64encode(content).decode("ascii"),
+                                "branch": SEAL_BRANCH})
     return r["commit"]["sha"]
 
 

@@ -31,7 +31,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from seal_draft import grouped, replace_band  # noqa: E402
+from seal_draft import SEAL_BRANCH, grouped, replace_band  # noqa: E402
 
 REPO = os.path.join(os.path.expanduser("~"), "inspeximus-repo")
 BG = (10, 10, 11)
@@ -49,10 +49,13 @@ img{{height:104px;flex:none}}.t{{font-size:30px;font-weight:600;letter-spacing:-
 
 
 def newest_dark_seal() -> str:
-    names = subprocess.run(["git", "-C", REPO, "log", "--format=", "--name-only", "origin/main", "--",
+    """The newest dark seal on the seal branch (seal_draft.SEAL_BRANCH), which main no longer carries."""
+    ref = "origin/" + SEAL_BRANCH
+    subprocess.run(["git", "-C", REPO, "fetch", "-q", "origin", SEAL_BRANCH], capture_output=True, check=True)
+    names = subprocess.run(["git", "-C", REPO, "log", "--format=", "--name-only", ref, "--",
                             "docs/seal/"], capture_output=True, text=True, check=True).stdout.split()
     name = next(n for n in names if n.endswith("-seal-dark.svg"))
-    return subprocess.run(["git", "-C", REPO, "show", "origin/main:" + name],
+    return subprocess.run(["git", "-C", REPO, "show", ref + ":" + name],
                           capture_output=True, text=True, encoding="utf-8", check=True).stdout
 
 
