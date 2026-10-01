@@ -164,3 +164,12 @@ def test_vanished_tag_is_caught_and_escaped_or_kept_tags_are_not():
     html = "<p>a  b <code>&lt;sz&gt;</code> <small>x</small></p>"
     assert sd.vanished_tags(src, html) == [("sz", 2, 1)]
     assert sd.vanished_tags(src, html.replace("a  b", "a &lt;sz sz&gt; b")) == []
+
+
+def test_the_no_claims_path_creates_the_receipts_folder_before_writing():
+    """A fresh worktree has no agora_output/recompute_receipts; the no-claims write raised there."""
+    import pathlib
+    src = pathlib.Path(__file__).resolve().parents[1].joinpath("tools", "seal", "seal_draft.py").read_text(
+        encoding="utf-8")
+    block = src[src.index("if not has_claims(script_src):"):src.index("caught = 0")]
+    assert block.index("os.makedirs(RECEIPTS, exist_ok=True)") < block.index('io.open(rpath, "wb")')

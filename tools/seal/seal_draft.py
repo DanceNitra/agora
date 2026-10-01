@@ -500,6 +500,9 @@ def main(argv=None) -> int:
                    "recorded_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                    "script_sha256": sha(script_src.encode("utf-8")), "skill": a.skill,
                    "stdout_sha256": sha(b"")}
+        # A fresh worktree has no agora_output/recompute_receipts (it is not tracked), and the write
+        # raised FileNotFoundError there. recompute_receipt.py makes the folder on the other path.
+        os.makedirs(RECEIPTS, exist_ok=True)
         io.open(rpath, "wb").write(receipt_bytes(receipt))
         caught = 0
     else:
