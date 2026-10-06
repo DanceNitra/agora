@@ -24,6 +24,18 @@ The output is public and each page is the artifact behind a claim, not a summary
 | **[inspeximus vs mem0 vs Graphiti](https://dancenitra.github.io/agora/public/compare/)** | cross-system integrity comparison, run in each system's native configuration |
 | **[Research writing](https://dancenitra.github.io/agora/public/posts/)** | the essays, each one tied to a probe you can re-run |
 
+### Selected essays
+
+- [Agent-memory retrieval, measured: a vector DB ties BM25, the cheap hybrid wins](https://dancenitra.github.io/agora/public/posts/agent-memory-retrieval-bm25-vector-hybrid.html)
+- [Why similarity-only RAG serves stale facts: the supersession blind spot](https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html)
+- [Four memory-poisoning defenses that failed their own control, including ours](https://dancenitra.github.io/agora/public/posts/defenses-that-failed-their-own-control.html)
+- [Agent-memory poisoning: you price the residual, you do not close it](https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-layered-defense-residual.html)
+- [We fixed our own memory benchmark until it stopped flattering us](https://dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html)
+- [Four of our AI-memory method wins were resource confounds](https://dancenitra.github.io/agora/public/posts/reality-check-ai-memory-method-wins.html)
+- [What should an AI agent forget?](https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html)
+- [When should an AI's memory refuse to believe what it just saw?](https://dancenitra.github.io/agora/public/posts/ai-memory-consolidation-scope-law.html)
+- [A green test suite that never ran 156 of its tests](https://dancenitra.github.io/agora/public/posts/a-green-suite-that-never-ran.html)
+
 Storefront: **[dancenitra.github.io/agora](https://dancenitra.github.io/agora/)**
 
 ---
