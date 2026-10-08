@@ -425,3 +425,6 @@ agora_output/indexnow/
 # 2026-10-08: local logs and the owner-voice WER working folder
 /nat_g_*.log
 agora_output/episodes/*/wer_slice/
+
+# 2026-10-08 (owner, 1a): pre-checks of outbound texts are private working material
+agora_output/pregate/
