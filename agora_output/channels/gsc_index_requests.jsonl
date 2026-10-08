@@ -8,3 +8,48 @@
 {"at": "2026-09-21T22:51", "url": "https://dancenitra.github.io/agora/public/posts/surface-rules-solved-97-percent-of-my-benchmark.html", "state_before": "NOT on Google", "result": "Indexovanie bolo vyziadane"}
 {"at": "2026-09-21T22:51", "url": "https://dancenitra.github.io/agora/public/posts/provenance-field-one-value.html", "state_before": "NOT on Google", "result": "Indexovanie bolo vyziadane"}
 {"at": "2026-09-21T22:51", "url": "https://dancenitra.github.io/agora/public/posts/a-status-nobody-earned.html", "state_before": "NOT on Google", "result": "Indexovanie bolo vyziadane"}
+{"url": "https://dancenitra.github.io/agora/public/posts/", "at": "2026-09-22", "status": "requested"}
+{"url": "https://dancenitra.github.io/agora/public/track-record.html", "at": "2026-09-22", "status": "already_indexed, quota exceeded after this one"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/does-deleting-agent-memory-actually-erase.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/proving-erasure-agent-memory-deletion-executed-vs-recoverable.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/recency-of-mention-decides-what-llm-agents-write-back-to-memory.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-influence-gate.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-tenant-isolation-by-construction.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T00:2x", "url": "https://dancenitra.github.io/agora/public/podcast/deleted-but-still-on-disk.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane"}
+{"at": "2026-09-24T21:4x", "url": "https://dancenitra.github.io/inspeximus/migrate-from-mem0.html", "state_before": "NOT on Google (unknown to Google, no sitemap refers to it)", "result": "Indexovanie bolo vyziadane (sent twice by mistake)"}
+{"at": "2026-09-24T21:4x", "url": "https://dancenitra.github.io/inspeximus/erasure.html", "state_before": "NOT on Google (unknown to Google, no sitemap refers to it)", "result": "Kvota bola prekrocena, retry tomorrow"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/inspeximus/erasure.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/inspeximus/erasure.html", "state_before": "requested minutes earlier", "result": "probably re-requested by an accidental Enter on ZNOVA POZIADAT; may have cost one quota slot", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/inspeximus/audit-trail.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/inspeximus/quickstart.html", "state_before": "on Google", "result": "not requested, already indexed", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/inspeximus/transparency/", "state_before": "on Google", "result": "not requested, already indexed", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/memory-injection-defense-where-it-breaks.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-defense-provenance-not-truth.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-25", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-retrieval-bm25-vector-hybrid.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-28", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-outside-outcomes-not-ranking.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-09-28", "url": "https://dancenitra.github.io/agora/sk/public/posts/agent-memory-outside-outcomes-not-ranking.html", "state_before": "NOT on Google (unknown to Google)", "result": "Ojoj, nieco sa pokazilo - retry later", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/research-digest.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/forecast.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/integrity/", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/posts/a-green-suite-that-never-ran.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/posts/defenses-that-failed-their-own-control.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html", "state_before": "NOT on Google (unknown to Google)", "result": "Indexovanie bolo vyziadane", "by": "claude via owner Chrome"}
+{"at": "2026-10-05", "url": "https://dancenitra.github.io/inspeximus/transparency/", "state_before": "on Google (indexed)", "result": "not requested, already indexed", "by": "claude via owner Chrome"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html", "note": "confirmed"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-layered-defense-residual.html", "note": "confirmed"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/posts/ai-memory-consolidation-scope-law.html", "note": "confirmed"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/posts/reality-check-ai-memory-method-wins.html", "note": "confirmed"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/leaderboard/", "note": "already on Google; no request needed"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/ai-claims/", "note": "request NOT confirmed; GSC then said quota exceeded"}
+{"date": "2026-10-06", "url": "https://dancenitra.github.io/agora/public/aiaudit/", "note": "request NOT confirmed; not retried"}
+{"date": "2026-10-07", "url": "https://dancenitra.github.io/agora/public/ai-claims/", "note": "confirmed"}
+{"date": "2026-10-07", "url": "https://dancenitra.github.io/agora/public/aiaudit/", "note": "confirmed"}
+{"date": "2026-10-07", "url": "https://dancenitra.github.io/agora/public/audit/", "note": "confirmed"}
+{"date": "2026-10-07", "url": "https://dancenitra.github.io/agora/public/posts/adaptation-corruption-separation-law.html", "note": "confirmed"}
+{"date": "2026-10-07", "url": "https://dancenitra.github.io/agora/public/posts/a-pre-trend-too-gentle-to-see-can-bias-a-difference-in-diffe.html", "note": "GSC error 'Ojoj, nieco sa pokazilo', not confirmed; retry tomorrow"}

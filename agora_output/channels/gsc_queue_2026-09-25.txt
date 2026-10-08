@@ -1,0 +1,11 @@
+# GSC queue for 2026-09-25 (daily quota ~10). Checked 2026-09-24: already on Google: inspeximus/compare.html, inspeximus/claude-code.html
+https://dancenitra.github.io/inspeximus/erasure.html
+https://dancenitra.github.io/inspeximus/audit-trail.html
+https://dancenitra.github.io/inspeximus/quickstart.html
+https://dancenitra.github.io/inspeximus/transparency/
+https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html
+https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html
+https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html
+https://dancenitra.github.io/agora/public/posts/memory-injection-defense-where-it-breaks.html
+https://dancenitra.github.io/agora/public/posts/agent-memory-defense-provenance-not-truth.html
+https://dancenitra.github.io/agora/public/posts/agent-memory-retrieval-bm25-vector-hybrid.html

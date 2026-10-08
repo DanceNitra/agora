@@ -1,0 +1,11 @@
+I test what AI agent memory stores keep after you tell them to delete. On 17 September 2026 I deleted one record from five stores through their own APIs, ran their compaction, and read the raw files. Two of five still held the bytes. All five delete calls had returned success.
+
+That gap between a return code and the disk is what I work on.
+
+inspeximus is the memory layer I maintain for AI agents: zero dependencies, deterministic, with erasure and audit evidence built in. Every write lands in an audit trail and every delete produces a certificate. A separate self-check then reads the store's own files and reports what is still there, because the certificate alone would be the store vouching for itself. It runs as a Python package and as an MCP server, so Claude, Cursor, or any agent can use it as memory.
+
+Agora is the research organisation behind it. We publish measured results with runnable probes, keep a public replication ledger, and say so when a replication fails. Every article comes with the code that produced its numbers, and the same investigation becomes an episode of our podcast, Echoes of Tomorrow.
+
+Before this I built algorithmic trading systems and worked as a data scientist and LLM engineer. I also produce music as DANCHI.
+
+If you run agents with a memory store and want to know what it keeps after delete, the self-check is one file and runs offline on what you have installed. Links in Featured.
