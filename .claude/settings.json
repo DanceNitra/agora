@@ -2,14 +2,6 @@
   "hooks": {
     "PostToolUse": [
       {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -28,25 +20,7 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-          }
-        ]
-      },
       {
         "hooks": [
           {
@@ -68,10 +42,6 @@
       {
         "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
         "hooks": [
-          {
-            "type": "command",
-            "command": "\"C:\\Users\\Danculus\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" -m inspeximus.claude_code"
-          },
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/outbound_gate.py\""
