@@ -165,5 +165,26 @@
   ],
   "date": "2026-09-21",
   "reason": "The draft's runnable model is probes/at_two_uses_how_stale_before_a_fresh_single_use_wins.py, audited directly (clean, exit 0) on 2026-09-21 before the send; recorded here so the waiver ledger matches what was done."
+ },
+ "agora_output/drafts/witness_network_request_2026-09-23.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-23",
+  "reason": "No probe of ours stands behind a number here. The tree size (2) is read from the live signed checkpoint, whose key hash c8ae81d8 matches the stated vkey; the 8 of 8 interop cases come from the CI workflow tlog-witness-interop.yml (green runs 2026-09-23), not from a model we could have constructed."
+ },
+ "agora_output/drafts/witness_network_request_2026-09-23.MIN.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-23",
+  "reason": "No probe of ours stands behind a number here. The tree size (2) is read from the live signed checkpoint, whose key hash c8ae81d8 matches the stated vkey; the 8 of 8 interop cases come from the CI workflow tlog-witness-interop.yml (green runs 2026-09-23), not from a model we could have constructed."
+ },
+ "agora_output/derivatives/decision-memory-needs-outside-outcomes/verified_context.md": {
+  "kinds": [
+   "NO-ARTIFACT"
+  ],
+  "date": "2026-09-28",
+  "reason": "Two context lines for the episode transcript check. They publish no number this project computed. They name the Qwen3.8 27B decider, verified in the docstring of research/probes/taste_outcome_not_ranking.py. They also restate that every lesson carries the true outcome, verified in the article's Limits section and in lesson() of ramr_taste_memory.py, which writes the labelled better option into every lesson."
  }
 }

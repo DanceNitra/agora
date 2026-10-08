@@ -78,6 +78,13 @@ def cmd_threads(tok: str, max_age_days: int) -> int:
             rep = c.get("replies")
             kids = rep["data"]["children"] if isinstance(rep, dict) else []
             ours_below = any(k.get("kind") == "t1" and k["data"].get("author") == US for k in kids)
+            # A later comment of ours anywhere in the thread that names them also answers them: on
+            # 2026-09-27 one top-level summary (pceigo6) answered five people by u/name, and this
+            # command kept reporting all five as waiting.
+            tag = "u/" + c.get("author", "").lower()
+            ours_below = ours_below or any(
+                o.get("author") == US and o["created_utc"] > c["created_utc"] and tag in o.get("body", "").lower()
+                for _, o in nodes)
             parent_is_us = c.get("parent_id", "").startswith("t3_") or any(
                 p.get("name") == c.get("parent_id") and p.get("author") == US for _, p in nodes)
             fresh = (time.time() - c["created_utc"]) / 86400 <= max_age_days

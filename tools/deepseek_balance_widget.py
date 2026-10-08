@@ -94,12 +94,18 @@ def codex_on_deepseek():
 
 
 def ollama_usage():
-    """Ollama plan limits as fractions 0..1: (session = the 5-hour window, weekly).
-    GET https://ollama.com/api/usage with the account API key; undocumented, found 2026-09-26."""
+    """Ollama cloud usage. 8. 10. 2026: https://ollama.com/api/usage already doesn't return "limits"
+    (plan percentages) – only request counts: {"range","totals":{"request_count"},"buckets":[...]}.
+    Returns (requests last 5 h, requests last 24 h, requests last 7 d, plan percentages or None)."""
     key = re.search(r'^AGORA_API_KEY\s*=\s*"?([^"\n]+)', AGORA_ENV.read_text(encoding="utf-8"), re.M).group(1).strip()
-    req = urllib.request.Request("https://ollama.com/api/usage", headers={"Authorization": f"Bearer {key}"})
-    lim = json.load(urllib.request.urlopen(req, timeout=15))["limits"]
-    return float(lim["session"]["usage"]), float(lim["weekly"]["usage"])
+    def get(rng):
+        req = urllib.request.Request(f"https://ollama.com/api/usage?range={rng}", headers={"Authorization": f"Bearer {key}"})
+        return json.load(urllib.request.urlopen(req, timeout=15))
+    d24, d7 = get("24h"), get("7d")
+    lim = d24.get("limits") or d7.get("limits")                       # if Ollama returns percentages again
+    pct = (float(lim["session"]["usage"]), float(lim["weekly"]["usage"])) if lim else None
+    h5 = sum(b.get("request_count", 0) for b in d24.get("buckets", [])[-5:])
+    return h5, d24["totals"]["request_count"], d7["totals"]["request_count"], pct
 
 
 def price_at(ts):
@@ -333,12 +339,16 @@ class Widget:
 
     def fetch_ollama(self):
         try:
-            session, weekly = ollama_usage()
+            h5, h24, d7, pct = ollama_usage()
         except Exception as e:
             self.root.after(0, lambda: self.label.config(text=f"Ollama ? ({type(e).__name__})", fg=FG))
             return
-        text = f"5h {session * 100:.0f}%   week {weekly * 100:.0f}%"
-        color = FG_WARN if max(session, weekly) >= 0.9 else FG
+        if pct:
+            text = f"Ollama 5h {pct[0] * 100:.0f}%  týž {pct[1] * 100:.0f}%"
+            color = FG_WARN if max(pct) >= 0.9 else FG
+        else:   # API dáva len počty požiadaviek (% plánu je len na ollama.com/settings)
+            text = f"Ollama dotazy: 5 h {h5} · deň {h24} · týž {d7:,}".replace(",", " ")
+            color = FG
         self.root.after(0, lambda: (self.label.config(text=text, fg=color), self.rest.config(text=""), self.delta.config(text="")))
 
 

@@ -44,6 +44,11 @@ cannot see them. New session dialog: folder `C:\Users\Danculus\agora`, worktree 
   a re-runnable artifact, and then only after the owner hears the price.
 - **Not other people's work.** If their question needs a computation they can run, send the script,
   not our result. Before any run over 100k tokens, tell the owner the cost and wait.
+  **This is a token rule for support-style questions, never a reason to be cold.** An invitation to
+  work together (someone asks us to test their product, try a joint experiment, collaborate) is a
+  business signal: it goes to the owner first, and the default answer is a warm, grateful yes to the
+  person, with the effort priced separately. Owner, 2026-09-27, after I recommended answering such
+  an invitation with "run our script yourself": "preco sme automaticky odporny???"
 - **Budget in `usd_equivalent`.** Writing is the only model cost. Anything else that would call a
   model is priced to the owner first.
 - **Over budget: stop and say so.** Never finish a text silently over the cap.
