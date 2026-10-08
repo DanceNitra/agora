@@ -1,0 +1,12 @@
+{
+ "H_N6": {
+  "points_tested": 2853,
+  "points_skipped_at_crossing": 0,
+  "max_abs_err": 1.6270079172819862e-08
+ },
+ "H_N7": {
+  "points_tested": 28656,
+  "points_skipped_at_crossing": 0,
+  "max_abs_err": 1.7015167941281106e-08
+ }
+}

@@ -1,0 +1,102 @@
+{
+ "cli": "2.1.280 (Claude Code)",
+ "skills": 220,
+ "rows": [
+  {
+   "older_days": 48.1,
+   "fresher_days": 18.2,
+   "pair": {
+    "kept_early": 0,
+    "kept_late": 42,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "rpair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "verdict": "age decides (fresher kept in both orientations)"
+  },
+  {
+   "older_days": 60,
+   "fresher_days": 20,
+   "pair": {
+    "kept_early": 0,
+    "kept_late": 42,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "rpair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "verdict": "age decides (fresher kept in both orientations)"
+  },
+  {
+   "older_days": 30,
+   "fresher_days": 16,
+   "pair": {
+    "kept_early": 0,
+    "kept_late": 42,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "rpair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "verdict": "age decides (fresher kept in both orientations)"
+  },
+  {
+   "older_days": 90,
+   "fresher_days": 45,
+   "pair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 42,
+    "kept_fresh": 0,
+    "kept_total": 42
+   },
+   "rpair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "verdict": "position decides (early half kept in both orientations)"
+  },
+  {
+   "older_days": 10,
+   "fresher_days": 1,
+   "pair": {
+    "kept_early": 0,
+    "kept_late": 42,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "rpair": {
+    "kept_early": 42,
+    "kept_late": 0,
+    "kept_old": 0,
+    "kept_fresh": 42,
+    "kept_total": 42
+   },
+   "verdict": "age decides (fresher kept in both orientations)"
+  }
+ ],
+ "positive_control_age_visible": true
+}

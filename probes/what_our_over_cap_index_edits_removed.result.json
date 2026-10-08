@@ -1,0 +1,2828 @@
+{
+ "scope": "C:\\Users\\Danculus/.claude/projects/C--Users-Danculus-agora",
+ "transcripts": 741,
+ "edits_to_memory_files": 88,
+ "by_kind": {
+  "topic": 77,
+  "index": 11
+ },
+ "reminders": 8,
+ "after_each_reminder": [
+  {
+   "reminder": "2026-09-23T06:34:04.621Z",
+   "file": "1a4669bc",
+   "text": "The memory index at MEMORY.md is 24.3KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-23T10:41:32.436Z",
+   "file": "1a4669bc",
+   "text": "The memory index at MEMORY.md is 21KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-23T12:09:51.134Z",
+   "file": "1a4669bc",
+   "text": "The memory index at MEMORY.md is 21.2KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-24T16:33:49.007Z",
+   "file": "47d163f3",
+   "text": "The memory index at MEMORY.md is 23.8KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-24T16:42:37.395Z",
+   "file": "47d163f3",
+   "text": "The memory index at MEMORY.md is 23.8KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-23T16:09:52.181Z",
+   "file": "cf10d690",
+   "text": "The memory index at MEMORY.md is 22.2KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-23T18:41:14.304Z",
+   "file": "cf10d690",
+   "text": "The memory index at MEMORY.md is 22.7KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  },
+  {
+   "reminder": "2026-09-24T05:12:09.822Z",
+   "file": "cf10d690",
+   "text": "The memory index at MEMORY.md is 23.3KB, approaching the 24.4KB read limit",
+   "edits_before_next_prompt": 0,
+   "bash_writes_before_next_prompt": 0
+  }
+ ],
+ "bash_index_write_candidates": 310,
+ "loader_snapshots": 234,
+ "loader_snapshots_over_cap": 63,
+ "snapshot_span": [
+  "2026-09-08T19:00:19.461Z",
+  "2026-09-24T16:59:28.618Z"
+ ],
+ "edit_walk": {
+  "index|under_cap": {
+   "edits": 11,
+   "shrinking_edits": 2,
+   "removed_lines": 2,
+   "first:rule": 1,
+   "has:rule": 1,
+   "has:dated": 2,
+   "has:link": 1,
+   "has:bullet": 1,
+   "first:dated": 1
+  },
+  "topic|over_cap": {
+   "edits": 10,
+   "shrinking_edits": 1,
+   "writes_unrecoverable": 1,
+   "removed_lines": 1,
+   "first:prose": 1
+  },
+  "topic|under_cap": {
+   "edits": 37,
+   "shrinking_edits": 2,
+   "removed_lines": 18,
+   "first:rule": 5,
+   "has:rule": 5,
+   "has:dated": 3,
+   "has:bullet": 4,
+   "first:dated": 2,
+   "first:prose": 9,
+   "first:bullet": 2
+  },
+  "topic|unknown": {
+   "edits": 30,
+   "shrinking_edits": 3,
+   "writes_unrecoverable": 1,
+   "removed_lines": 27,
+   "first:prose": 16,
+   "has:rule": 5,
+   "has:dated": 4,
+   "has:link": 2,
+   "has:bullet": 3,
+   "first:bullet": 1,
+   "first:dated": 4,
+   "first:rule": 5,
+   "first:link": 1
+  }
+ },
+ "edit_walk_rule_lines": [
+  {
+   "t": "2026-09-23T06:33:53.108Z",
+   "target": "never-read-gmail-via-tool.md",
+   "group": "topic|under_cap",
+   "line": "description: \"NEVER read Gmail via the MCP tools — get_thread returns the ENTIRE thread (40+ messages) and get_message returns ~250KB bodies; one email check burned ~15-20% of the owner's usage credit. Owner pastes email",
+   "needed_again": {
+    "keys": [
+     "description: \"NEVER read Gmail via the MCP tools — get_threa"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-09-23T06:33:53.108Z",
+   "target": "never-read-gmail-via-tool.md",
+   "group": "topic|under_cap",
+   "line": "- NEVER call mcp Gmail get_thread / get_message / search_threads to read mail content. Not even \"quickly\".",
+   "needed_again": {
+    "keys": [
+     "NEVER call mcp Gmail get_thread / get_message / search_threa"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-09-23T06:33:53.108Z",
+   "target": "never-read-gmail-via-tool.md",
+   "group": "topic|under_cap",
+   "line": "  part into chat. That is the ONLY channel for email content.",
+   "needed_again": {
+    "keys": [
+     "part into chat. That is the ONLY channel for email content."
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-09-23T06:33:53.108Z",
+   "target": "never-read-gmail-via-tool.md",
+   "group": "topic|under_cap",
+   "line": "- If some automation ever needs mail signals, it must be a server-side thin poller (envoy-style, subject/",
+   "needed_again": {
+    "keys": [
+     "If some automation ever needs mail signals, it must be a ser"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-09-23T06:33:53.108Z",
+   "target": "never-read-gmail-via-tool.md",
+   "group": "topic|under_cap",
+   "line": "  sender only), never the MCP full-body tools in my context.",
+   "needed_again": {
+    "keys": [
+     "sender only), never the MCP full-body tools in my context."
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-09-24T16:42:36.726Z",
+   "target": "MEMORY.md",
+   "group": "index|under_cap",
+   "line": "09-24: card + agent-36 proposal filed; waiting on her written intake; no ghostwriting, files local only.",
+   "needed_again": {
+    "keys": [
+     "09-24: card + agent-36 proposal filed; waiting on her writte"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-08-25T19:56:04.263Z",
+   "target": "a-script-i-wrote-is-never-the-skill.md",
+   "group": "topic|unknown",
+   "line": "a regex, not a check I invented that shares its name. If I hand-roll a substitute, I must say so in",
+   "needed_again": {
+    "keys": [
+     "a regex, not a check I invented that shares its name. If I h"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-08-25T19:56:04.263Z",
+   "target": "a-script-i-wrote-is-never-the-skill.md",
+   "group": "topic|unknown",
+   "line": "- **demoted `em-dash-gloss` to report-only myself**, the same day, on four measurements. So I",
+   "needed_again": {
+    "keys": [
+     "demoted `em-dash-gloss` to report-only myself**, the same da"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-08-25T19:56:04.263Z",
+   "target": "a-script-i-wrote-is-never-the-skill.md",
+   "group": "topic|unknown",
+   "line": "- reported \"humanizer clean\" on every draft. Every GitHub comment sent today passed only the",
+   "needed_again": {
+    "keys": [
+     "reported \"humanizer clean\" on every draft. Every GitHub comm"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-08-25T19:56:04.263Z",
+   "target": "a-script-i-wrote-is-never-the-skill.md",
+   "group": "topic|unknown",
+   "line": "does NOT cover. And never author a check that replaces a skill on a gate path without saying so out",
+   "needed_again": {
+    "keys": [
+     "does NOT cover. And never author a check that replaces a ski"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "t": "2026-08-25T19:56:04.263Z",
+   "target": "a-script-i-wrote-is-never-the-skill.md",
+   "group": "topic|unknown",
+   "line": "loud at the moment it is wired in. See [[skill-files-must-encode-standing-gate-not-rely-on-recall]],",
+   "needed_again": {
+    "keys": [
+     "loud at the moment it is wired in. See [[skill-files-must-en"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  }
+ ],
+ "snapshot_rows_removed_by_state": {
+  "over_cap|archived": {
+   "rows": 33,
+   "first:link": 22,
+   "has:rule": 8,
+   "has:dated": 4,
+   "has:link": 33,
+   "has:bullet": 33,
+   "first:rule": 8,
+   "first:dated": 3
+  },
+  "under_cap|archived": {
+   "rows": 182,
+   "first:link": 129,
+   "has:rule": 42,
+   "has:dated": 14,
+   "has:link": 182,
+   "has:bullet": 182,
+   "first:rule": 42,
+   "first:dated": 11
+  },
+  "under_cap|gone": {
+   "rows": 1,
+   "first:link": 1,
+   "has:link": 1
+  }
+ },
+ "snapshot_rule_rows_removed": [
+  {
+   "key": "a-guard-you-must-choose-to-use",
+   "line": "- [A guard you must choose to use](a-guard-you-must-choose-to-use.md) - CORRECTED: those 3 were pm25coder's; the opt-in-guard lesson stands.",
+   "last_seen": "2026-09-24T16:48:21.907Z",
+   "gone_by": "2026-09-24T16:59:28.618Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-guard-you-must-choose-to-use"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-version-bump-after-the-last-green-run",
+   "line": "- [A version bump after the last green run](a-version-bump-after-the-last-green-run.md) - CI red on 20 tests; the suite measured the old version, the pushed tree was never tested.",
+   "last_seen": "2026-09-21T07:52:54.585Z",
+   "gone_by": "2026-09-21T08:17:19.106Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-version-bump-after-the-last-green-run"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "an-instrument-that-counts-only-its-own-canaries",
+   "line": "- [An instrument that counts only its own canaries](an-instrument-that-counts-only-its-own-canaries.md) - refuted by 10 exempt entries the probe could not see.",
+   "last_seen": "2026-09-21T07:52:54.585Z",
+   "gone_by": "2026-09-21T08:17:19.106Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "an-instrument-that-counts-only-its-own-canaries"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-seeded-null-is-only-as-large-as-its-distinct-graphs",
+   "line": "- [A seeded null is only as large as its distinct graphs](a-seeded-null-is-only-as-large-as-its-distinct-graphs.md) - 50 seeds were 9 graphs, p 5.2e-05 -> 0.056; my control was confounded.",
+   "last_seen": "2026-09-24T16:48:21.907Z",
+   "gone_by": "2026-09-24T16:59:28.618Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-seeded-null-is-only-as-large-as-its-distinct-graphs"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-guard-that-reads-only-the-first-reply-locks-you-out",
+   "line": "- [A guard that reads only the first reply locks you out](a-guard-that-reads-only-the-first-reply-locks-you-out.md) - qualifying[0] made every later approval unreachable; 3 refused real ones.",
+   "last_seen": "2026-09-24T16:48:21.907Z",
+   "gone_by": "2026-09-24T16:59:28.618Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-guard-that-reads-only-the-first-reply-locks-you-out"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "local-gpu-too-slow-cloud-only",
+   "line": "- [Local GPU is too slow](local-gpu-too-slow-cloud-only.md) · [Use serious models](use-serious-models-not-weak-local.md) · [No greenfield SaaS](market-truth-no-saas.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "local-gpu-too-slow-cloud-only",
+     "market-truth-no-saas",
+     "use-serious-models-not-weak-local"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "market-truth-no-saas",
+   "line": "- [Local GPU is too slow](local-gpu-too-slow-cloud-only.md) · [Use serious models](use-serious-models-not-weak-local.md) · [No greenfield SaaS](market-truth-no-saas.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "local-gpu-too-slow-cloud-only",
+     "market-truth-no-saas",
+     "use-serious-models-not-weak-local"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "use-serious-models-not-weak-local",
+   "line": "- [Local GPU is too slow](local-gpu-too-slow-cloud-only.md) · [Use serious models](use-serious-models-not-weak-local.md) · [No greenfield SaaS](market-truth-no-saas.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "local-gpu-too-slow-cloud-only",
+     "market-truth-no-saas",
+     "use-serious-models-not-weak-local"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "overnight-telegram-only-breakthroughs",
+   "line": "- [Session work must reach the ledger](work-done-in-session-must-reach-the-organ-ledger.md) · [Overnight: breakthroughs only](overnight-telegram-only-breakthroughs.md) — both were below the loader cut until 2026-09-07.",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "overnight-telegram-only-breakthroughs",
+     "work-done-in-session-must-reach-the-organ-ledger"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "work-done-in-session-must-reach-the-organ-ledger",
+   "line": "- [Session work must reach the ledger](work-done-in-session-must-reach-the-organ-ledger.md) · [Overnight: breakthroughs only](overnight-telegram-only-breakthroughs.md) — both were below the loader cut until 2026-09-07.",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "overnight-telegram-only-breakthroughs",
+     "work-done-in-session-must-reach-the-organ-ledger"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-control-computed-before-the-branch-cannot-fail",
+   "line": "- [Test the remedy you name](test-the-remedy-your-error-message-names.md) · [A control that](a-control-that-recomputes-the-answer-tests-arithmetic.md) · [NEVER gate a relative](absolute-threshold-on-a-relative-score.md) ",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-control-computed-before-the-branch-cannot-fail",
+     "a-control-that-recomputes-the-answer-tests-arithmetic",
+     "absolute-threshold-on-a-relative-score",
+     "test-the-remedy-your-error-message-names"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-control-that-recomputes-the-answer-tests-arithmetic",
+   "line": "- [Test the remedy you name](test-the-remedy-your-error-message-names.md) · [A control that](a-control-that-recomputes-the-answer-tests-arithmetic.md) · [NEVER gate a relative](absolute-threshold-on-a-relative-score.md) ",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-control-computed-before-the-branch-cannot-fail",
+     "a-control-that-recomputes-the-answer-tests-arithmetic",
+     "absolute-threshold-on-a-relative-score",
+     "test-the-remedy-your-error-message-names"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "absolute-threshold-on-a-relative-score",
+   "line": "- [Test the remedy you name](test-the-remedy-your-error-message-names.md) · [A control that](a-control-that-recomputes-the-answer-tests-arithmetic.md) · [NEVER gate a relative](absolute-threshold-on-a-relative-score.md) ",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-control-computed-before-the-branch-cannot-fail",
+     "a-control-that-recomputes-the-answer-tests-arithmetic",
+     "absolute-threshold-on-a-relative-score",
+     "test-the-remedy-your-error-message-names"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "test-the-remedy-your-error-message-names",
+   "line": "- [Test the remedy you name](test-the-remedy-your-error-message-names.md) · [A control that](a-control-that-recomputes-the-answer-tests-arithmetic.md) · [NEVER gate a relative](absolute-threshold-on-a-relative-score.md) ",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-control-computed-before-the-branch-cannot-fail",
+     "a-control-that-recomputes-the-answer-tests-arithmetic",
+     "absolute-threshold-on-a-relative-score",
+     "test-the-remedy-your-error-message-names"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "never-skip-embedder-never-shortcut-batch-instead",
+   "line": "- [Never skip embedder](never-skip-embedder-never-shortcut-batch-instead.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "never-skip-embedder-never-shortcut-batch-instead"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "pydantic-collects-mixin-annotations-shadowing-properties",
+   "line": "- [Never annotate an attr](pydantic-collects-mixin-annotations-shadowing-properties.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "pydantic-collects-mixin-annotations-shadowing-properties"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "skill-files-must-encode-standing-gate-not-rely-on-recall",
+   "line": "- [Skills must encode the](skill-files-must-encode-standing-gate-not-rely-on-recall.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "skill-files-must-encode-standing-gate-not-rely-on-recall"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "measure-first-then-reply-never-announce",
+   "line": "- [MEASURE FIRST, then](measure-first-then-reply-never-announce.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "measure-first-then-reply-never-announce"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "never-cash-an-unfindable-as-novelty-report-registered-primary-first",
+   "line": "- [Never cash an \"I could](never-cash-an-unfindable-as-novelty-report-registered-primary-first.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "never-cash-an-unfindable-as-novelty-report-registered-primary-first"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "never-truncate-never-claim-complete",
+   "line": "- [NEVER truncate a review](never-truncate-never-claim-complete.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "never-truncate-never-claim-complete"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "audit-publish-full-procedure-never-shorten",
+   "line": "- [Audit/publish FULL](audit-publish-full-procedure-never-shorten.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "audit-publish-full-procedure-never-shorten"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "amendment-must-declare-its-scope",
+   "line": "- [An amendment must](amendment-must-declare-its-scope.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "amendment-must-declare-its-scope"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "new-artifact-must-check-existing-products-first",
+   "line": "- [Check EXISTING products](new-artifact-must-check-existing-products-first.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "new-artifact-must-check-existing-products-first"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "always-answer-the-skeptic-never-just-fold",
+   "line": "- [NEVER suggest stopping](never-suggest-stopping-push-forward.md) · [ALWAYS answer the skeptic, never just fold](always-answer-the-skeptic-never-just-fold.md) — a KILL is an input to test; bring the way forward.",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "always-answer-the-skeptic-never-just-fold",
+     "never-suggest-stopping-push-forward"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "never-suggest-stopping-push-forward",
+   "line": "- [NEVER suggest stopping](never-suggest-stopping-push-forward.md) · [ALWAYS answer the skeptic, never just fold](always-answer-the-skeptic-never-just-fold.md) — a KILL is an input to test; bring the way forward.",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "always-answer-the-skeptic-never-just-fold",
+     "never-suggest-stopping-push-forward"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "correspondence-must-read-human-not-release-notes",
+   "line": "- [Correspondence must](correspondence-must-read-human-not-release-notes.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "correspondence-must-read-human-not-release-notes"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "appendix-tables-must-come-from-data-not-figures",
+   "line": "- [Diff EVERY table](appendix-tables-must-come-from-data-not-figures.md) · [MCP data loss = a stale](inspeximus-mcp-caches-store-and-clobbers-external-writes.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "appendix-tables-must-come-from-data-not-figures",
+     "inspeximus-mcp-caches-store-and-clobbers-external-writes"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "inspeximus-mcp-caches-store-and-clobbers-external-writes",
+   "line": "- [Diff EVERY table](appendix-tables-must-come-from-data-not-figures.md) · [MCP data loss = a stale](inspeximus-mcp-caches-store-and-clobbers-external-writes.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "appendix-tables-must-come-from-data-not-figures",
+     "inspeximus-mcp-caches-store-and-clobbers-external-writes"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "code-in-english",
+   "line": "- [NEVER read Gmail via](never-read-gmail-via-tool.md) · [Code in English](code-in-english.md)",
+   "last_seen": "2026-09-13T20:57:40.708Z",
+   "gone_by": "2026-09-13T21:10:49.970Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "code-in-english",
+     "never-read-gmail-via-tool"
+    ],
+    "readmitted": {
+     "n": 2,
+     "first": "2026-09-23T06:34:04.019Z"
+    },
+    "looked_up": {
+     "n": 2,
+     "first": "2026-09-23T06:33:41.538Z"
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "always-paste-drafts-in-chat",
+   "line": "- [Who posts: GitHub vs](who-posts-github-vs-reddit.md) · [ALWAYS paste drafts in](always-paste-drafts-in-chat.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "always-paste-drafts-in-chat",
+     "who-posts-github-vs-reddit"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "who-posts-github-vs-reddit",
+   "line": "- [Who posts: GitHub vs](who-posts-github-vs-reddit.md) · [ALWAYS paste drafts in](always-paste-drafts-in-chat.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "always-paste-drafts-in-chat",
+     "who-posts-github-vs-reddit"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "collaboration-fair-never-snub",
+   "line": "- [Collaboration: fair](collaboration-fair-never-snub.md) · [Outreach backstop](outreach-backstop-verify-last-author.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "collaboration-fair-never-snub",
+     "outreach-backstop-verify-last-author"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "outreach-backstop-verify-last-author",
+   "line": "- [Collaboration: fair](collaboration-fair-never-snub.md) · [Outreach backstop](outreach-backstop-verify-last-author.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "collaboration-fair-never-snub",
+     "outreach-backstop-verify-last-author"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "reddit-replies-must-be-human-short",
+   "line": "- [Reddit: SHORT + human](reddit-replies-must-be-human-short.md) · [Walk the reply tree](reddit-watch-walk-reply-tree.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "reddit-replies-must-be-human-short",
+     "reddit-watch-walk-reply-tree"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "reddit-watch-walk-reply-tree",
+   "line": "- [Reddit: SHORT + human](reddit-replies-must-be-human-short.md) · [Walk the reply tree](reddit-watch-walk-reply-tree.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "reddit-replies-must-be-human-short",
+     "reddit-watch-walk-reply-tree"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "owner-distribution-constraint-english",
+   "line": "- [Radar](reddit-radar-read-only.md) · [English only](owner-distribution-constraint-english.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "owner-distribution-constraint-english",
+     "reddit-radar-read-only"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "reddit-radar-read-only",
+   "line": "- [Radar](reddit-radar-read-only.md) · [English only](owner-distribution-constraint-english.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "owner-distribution-constraint-english",
+     "reddit-radar-read-only"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "inspeximus-core-must-be-1-before-pro-sells",
+   "line": "- [CORE must be #1 BEFORE](inspeximus-core-must-be-1-before-pro-sells.md) · [REAL moat = DETERMINISM](inspeximus-real-moat-is-determinism-not-accuracy.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "inspeximus-core-must-be-1-before-pro-sells",
+     "inspeximus-real-moat-is-determinism-not-accuracy"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "inspeximus-real-moat-is-determinism-not-accuracy",
+   "line": "- [CORE must be #1 BEFORE](inspeximus-core-must-be-1-before-pro-sells.md) · [REAL moat = DETERMINISM](inspeximus-real-moat-is-determinism-not-accuracy.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "inspeximus-core-must-be-1-before-pro-sells",
+     "inspeximus-real-moat-is-determinism-not-accuracy"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "echo-attack-benchmark-and-guard",
+   "line": "- [Probe cache: never share](probe-cache-shared-file-corruption-lesson.md) · [Echo-attack benchmark](echo-attack-benchmark-and-guard.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "echo-attack-benchmark-and-guard",
+     "probe-cache-shared-file-corruption-lesson"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "probe-cache-shared-file-corruption-lesson",
+   "line": "- [Probe cache: never share](probe-cache-shared-file-corruption-lesson.md) · [Echo-attack benchmark](echo-attack-benchmark-and-guard.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "echo-attack-benchmark-and-guard",
+     "probe-cache-shared-file-corruption-lesson"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "arxiv-excluded-journal-is-the-only-path",
+   "line": "- [HOTRG thermodynamic](hotrg-edrn-thermodynamic-limit-effort.md) · [arXiv EXCLUDED —](arxiv-excluded-journal-is-the-only-path.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "arxiv-excluded-journal-is-the-only-path",
+     "hotrg-edrn-thermodynamic-limit-effort"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "hotrg-edrn-thermodynamic-limit-effort",
+   "line": "- [HOTRG thermodynamic](hotrg-edrn-thermodynamic-limit-effort.md) · [arXiv EXCLUDED —](arxiv-excluded-journal-is-the-only-path.md)",
+   "last_seen": "2026-09-23T14:27:06.432Z",
+   "gone_by": "2026-09-23T14:29:56.729Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "arxiv-excluded-journal-is-the-only-path",
+     "hotrg-edrn-thermodynamic-limit-effort"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-self-test-that-always-passes",
+   "line": "- [A self-test that always passes](a-self-test-that-always-passes.md) - 20000/20000 for any input; our published p=1.0000 was a tie reported back.",
+   "last_seen": "2026-09-23T01:12:29.629Z",
+   "gone_by": "2026-09-23T01:46:32.995Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-self-test-that-always-passes"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-guard-stamped-after-the-read-describes-a-file-it-never-saw",
+   "line": "- [A guard stamped AFTER the read describes a file it never saw](a-guard-stamped-after-the-read-describes-a-file-it-never-saw.md) - 2 causes died first; then 2.27.5 named reload() for CI's loss and was wrong, the real on",
+   "last_seen": "2026-09-23T01:12:29.629Z",
+   "gone_by": "2026-09-23T01:46:32.995Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-guard-stamped-after-the-read-describes-a-file-it-never-saw"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-limited-pr-search-said-we-had-never-tried",
+   "line": "- [A limited PR search said we had never tried](a-limited-pr-search-said-we-had-never-tried.md) - owner caught it; a PR had been open 52 days, --limit 30 reached back only 40.",
+   "last_seen": "2026-09-23T01:12:29.629Z",
+   "gone_by": "2026-09-23T01:46:32.995Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-limited-pr-search-said-we-had-never-tried"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "the-baseline-we-beat-was-never-given-its-own-remedy",
+   "line": "- [The baseline we beat had no remedy](the-baseline-we-beat-was-never-given-its-own-remedy.md) - our 44% win vanished once the JSON caller retried as our own error says.",
+   "last_seen": "2026-09-21T07:52:54.585Z",
+   "gone_by": "2026-09-21T08:17:19.106Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "the-baseline-we-beat-was-never-given-its-own-remedy"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "a-long-lived-handle-answered-from-the-records-it-loaded-at-open",
+   "line": "- [A long-lived handle answered from the records it loaded at open](a-long-lived-handle-answered-from-the-records-it-loaded-at-open.md) - 2.28.0: MCP + 9 adapters never saw a peer's write until they wrote; refresh() at t",
+   "last_seen": "2026-09-21T07:52:54.585Z",
+   "gone_by": "2026-09-21T08:17:19.106Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-long-lived-handle-answered-from-the-records-it-loaded-at-open"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  },
+  {
+   "key": "claude-code-81081-count-then-recency-tiebreak-reply",
+   "line": "- [#81081: count-then-recency tiebreak reply 5722429835 sent](claude-code-81081-count-then-recency-tiebreak-reply.md) - 09-18; his table fits a lexicographic model our sweep refutes; the deciding join is a 2-use name-onl",
+   "last_seen": "2026-09-21T07:52:54.585Z",
+   "gone_by": "2026-09-21T08:17:19.106Z",
+   "state": "over_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "claude-code-81081-count-then-recency-tiebreak-reply"
+    ],
+    "readmitted": {
+     "n": 1,
+     "first": "2026-09-24T16:47:36.208Z"
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 1,
+     "first": "2026-09-24T16:47:53.385Z"
+    }
+   }
+  },
+  {
+   "key": "a-parity-harness-that-compared-one-row",
+   "line": "- [A parity harness that compared one row](a-parity-harness-that-compared-one-row.md) - 09-20: pinned uuid in the low bits made every id 0000000000; assert the row count and carry a must-differ control.",
+   "last_seen": "2026-09-24T16:48:21.907Z",
+   "gone_by": "2026-09-24T16:59:28.618Z",
+   "state": "under_cap",
+   "fate": "archived",
+   "needed_again": {
+    "keys": [
+     "a-parity-harness-that-compared-one-row"
+    ],
+    "readmitted": {
+     "n": 0,
+     "first": null
+    },
+    "looked_up": {
+     "n": 0,
+     "first": null
+    },
+    "cited": {
+     "n": 0,
+     "first": null
+    }
+   }
+  }
+ ],
+ "reminder_triggered_trim": {
+  "found": true,
+  "replayed": true,
+  "reminder": {
+   "t": "2026-09-24T16:33:49.007Z",
+   "file": "47d163f3-7123-42a2-aa33-17858aba5b9b.jsonl",
+   "text": "The memory index at MEMORY.md is 23.8KB, approaching the 24.4KB read limit"
+  },
+  "backup": "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/47d163f3-7123-42a2-aa33-17858aba5b9b/scratchpad/MEMORY.md.bak",
+  "scripts": [
+   "2026-09-24T16:46:16.734Z",
+   "2026-09-24T16:47:02.274Z",
+   "2026-09-24T16:47:20.422Z",
+   "2026-09-24T16:47:36.208Z"
+  ],
+  "pre_bytes": 24353,
+  "pre_lines": 131,
+  "post_bytes": 17079,
+  "post_lines": 100,
+  "logged_post_bytes": 17079,
+  "replay_matches_logged_bytes": true,
+  "by_fate": {
+   "other": 1,
+   "shortened_in_place": 18,
+   "moved_to_archive_verbatim": 29,
+   "moved_duplicate_pointer": 2
+  },
+  "by_fate_first_class": {
+   "moved_duplicate_pointer": {
+    "rule": 1,
+    "dated": 1
+   },
+   "moved_to_archive_verbatim": {
+    "dated": 8,
+    "rule": 4,
+    "link": 17
+   },
+   "other": {
+    "link": 1
+   },
+   "shortened_in_place": {
+    "rule": 9,
+    "dated": 9
+   }
+  },
+  "rule_shaped_by_fate": {
+   "shortened_in_place": 9,
+   "moved_duplicate_pointer": 1,
+   "moved_to_archive_verbatim": 4
+  },
+  "rule_words_gone_in_shortening": [
+   [
+    [
+     "always"
+    ],
+    [],
+    "- [Cloud credit 250 -> 42 in 7 h](cloud-credit-burned-by-extra-effort-"
+   ],
+   [
+    [
+     "never"
+    ],
+    [],
+    "- [Nothing private goes to the internet-facing host](nothing-private-g"
+   ]
+  ],
+  "moved_rule_lines_needed_again": {
+   "readmitted": 0,
+   "looked_up": 0,
+   "cited": 0,
+   "of": 4
+  },
+  "lines": [
+   {
+    "line": "_One line per memory; detail is in the linked file. \"Standing rules\" is PERMANENT. Loader keeps min(200 lines, 25,000 UTF-16 units), whole-line, CR counted; `probes/what_our_own_index_actually_delivers.py` measures what actually arrives. Older entries: **[MEMORY_ARCHIVE.md](MEMORY_ARCHIVE.md)**._",
+    "fate": "other",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": false
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Cloud credit 250 -> 42 in 7 h](cloud-credit-burned-by-extra-effort-and-waves.md) - 09-24: 14 sessions on Extra effort, H mutation unbounded; always state effort, cost and a stop condition before a cloud session.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Cloud credit 250 -> 42 in 7 h](cloud-credit-burned-by-extra-effort-and-waves.md) - 09-24: 14 sessions on Extra effort; state effort, cost and a stop condition before a cloud session.",
+    "words_gone": [
+     "mutation",
+     "unbounded",
+     "always"
+    ],
+    "rule_word_gone": [
+     "always"
+    ],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [GitHub schedule does not run on this account](github-schedule-does-not-run-on-this-account.md) - 09-23: judge 0 cron runs in 4h; host timer dispatches it (sentinel-only PAT, cadence-checked), publish via workflow_run from incoming.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [GitHub schedule does not run on this account](github-schedule-does-not-run-on-this-account.md) - 09-23: 0 cron runs; a host timer dispatches the judge, publish via workflow_run.",
+    "words_gone": [
+     "in",
+     "h",
+     "it",
+     "sentinel-only",
+     "PAT",
+     "cadence-checked",
+     "workflow",
+     "from",
+     "incoming"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Sentinel/guardian LIVE: daemon + AGORA DEFENDER bot](sentinel-guardian-state-2026-09-23.md) - 09-23; 5 min pace, buttons, 12/12 drills; subprocess needs CREATE_NO_WINDOW; one bot = one getUpdates reader.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Sentinel/guardian LIVE: daemon + AGORA DEFENDER bot](sentinel-guardian-state-2026-09-23.md) - 09-23; 5 min pace, 12/12 drills; CREATE_NO_WINDOW; one bot = one getUpdates reader.",
+    "words_gone": [
+     "buttons",
+     "subprocess",
+     "needs",
+     "CREATE",
+     "NO",
+     "WINDOW"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [EDRN: book edits delivered, gist + comment 5800736669](marat-tat-edrn-collaboration-live.md) - 09-23; licence CC BY-NC-ND 4.0 + Apache 2.0 agreed; NEXT: he compiles, then Zenodo, then delete the gist; seal format is FIXED: the small 41x47 block of comment 5793367969, see seal-format-is-the-one-already-sent.md.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [EDRN: book edits delivered, gist + comment 5800736669](marat-tat-edrn-collaboration-live.md) - 09-23; licence agreed; NEXT: he compiles, Zenodo, delete the gist; seal = the block of comment 5793367969.",
+    "words_gone": [
+     "CC",
+     "BY-NC-ND",
+     "Apache",
+     "then",
+     "then",
+     "format",
+     "is",
+     "FIXED",
+     "small",
+     "x",
+     "see",
+     "seal-format-is-the-one-already-sent"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Nothing private goes to the internet-facing host](nothing-private-goes-to-the-internet-facing-host.md) - owner angry 09-22; I copied the encrypted backup to the OCI host unasked; not exposed (never in the web root, 0 SSH failures), removed; propose the destination first.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Nothing private goes to the internet-facing host](nothing-private-goes-to-the-internet-facing-host.md) - owner angry 09-22: I copied the encrypted backup to the OCI host unasked; removed; propose the destination first.",
+    "words_gone": [
+     "not",
+     "exposed",
+     "never",
+     "in",
+     "web",
+     "root",
+     "SSH",
+     "failures"
+    ],
+    "rule_word_gone": [
+     "never"
+    ],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [inspeximus log server 92.5.74.17 live; keys in the safe](inspeximus-log-server-and-its-keys.md) - 09-22: v3.6.0, scitt + witness + caddy, 10.A.5 closed; public key 9fb780dd... is the reference for the paper copy.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [inspeximus log server 92.5.74.17 live; keys in the safe](inspeximus-log-server-and-its-keys.md) - 09-22: v3.6.0; public key 9fb780dd... is the paper-copy reference.",
+    "words_gone": [
+     "v",
+     "scitt",
+     "witness",
+     "caddy",
+     "A",
+     "closed",
+     "fb",
+     "dd",
+     "for"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A firewall restriction locked everyone out of the OCI host](a-firewall-restriction-locked-everyone-out-of-the-oci-host.md) - 09-22: rebuilt on the same reserved IP 92.5.74.17; insert iptables rules before Oracle's REJECT, keep our IP in the allow-list.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [A firewall restriction locked everyone out of the OCI host](a-firewall-restriction-locked-everyone-out-of-the-oci-host.md) - 09-22: insert iptables rules before Oracle's REJECT, keep our IP allowed.",
+    "words_gone": [
+     "rebuilt",
+     "on",
+     "same",
+     "reserved",
+     "in",
+     "allow-list"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [open(\"w\") emptied the file before its own ValueError](a-patch-script-truncated-the-file-before-its-own-argument-error.md) - 09-21; a sibling session reverted it again; tmp + os.replace, git status before each apply.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Tombstone replication DONE: FAILED + REPRODUCED in Crucible, DM sent](tombstone-replication-state-2026-09-20.md) - 09-21; qdrant 0.0 vs 1.0 is SQLite SECURE_DELETE (Ubuntu build); 12/15 agree; WATCH Poojan's reply.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [EDRN book: edits + Zenodo upload taken on, title to be confirmed](marat-tat-edrn-collaboration-live.md) - 09-21 comment 5762998297; upload ONLY after Guanghao confirms a descriptive title + licence; make the 4 edits in edrn_book/*.tex and post them; distribution after Zhihu.",
+    "fate": "moved_duplicate_pointer",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [EDRN: book edits delivered, gist + comment 5800736669](marat-tat-edrn-collaboration-live.md) - 09-23; licence agreed; NEXT: he compiles, Zenodo, delete the gist; seal = the block of comment 5793367969.",
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A figure extractor that stopped at the mantissa](a-figure-extractor-that-stopped-at-the-mantissa.md) - 09-21: pregate read 3.085e-01 as no figure and called our own quote a misquote; fixed.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [MemStrata lifecycle pilot: emailed 09-21, WATCH mail + thread](memstrata-lifecycle-pilot-state-2026-09-21.md) - 7 held / 1 shared limit; 30-day boundary agreed; recording not live; credentials requested; authorization expires 10-08.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [MemStrata lifecycle pilot: emailed 09-21, WATCH mail + thread](memstrata-lifecycle-pilot-state-2026-09-21.md) - 30-day boundary agreed; credentials requested; authorization expires 10-08.",
+    "words_gone": [
+     "held",
+     "shared",
+     "limit",
+     "recording",
+     "not",
+     "live"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [agno cookbook PR #10146 MERGED](agno-cookbook-pr-10146-merged.md) - 09-20 by kausmeows; thank-you 5755270201 sent, storefront links it (fc64147); open: keep the example running across releases.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [The simulation had no echo guard and the product did](the-simulation-had-no-echo-guard-and-the-product-did.md) - 09-20: pure 231->280, store 278->307; guard-off store == pure; publish the product's number, keep the simulation as the control.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A parity harness that compared one row](a-parity-harness-that-compared-one-row.md) - 09-20: pinned uuid in the low bits made every id 0000000000; assert the row count and carry a must-differ control.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": {
+     "keys": [
+      "a-parity-harness-that-compared-one-row"
+     ],
+     "readmitted": {
+      "n": 0,
+      "first": null
+     },
+     "looked_up": {
+      "n": 0,
+      "first": null
+     },
+     "cited": {
+      "n": 0,
+      "first": null
+     }
+    }
+   },
+   {
+    "line": "- [inspeximus 3.2.0 RELEASED 09-21](inspeximus-3-0-0-state-2026-09-20.md) - authority supersession opt-in, MemTX through the store 278->307 of 318, byte-identical default; PyPI + storefront done; Guanghao reply and agno thank-you still gated.",
+    "fate": "moved_duplicate_pointer",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [inspeximus 3.5.1 to 3.6.1 RELEASED 09-22; hosted log LIVE and accepted](inspeximus-3-0-0-state-2026-09-20.md) - hosted log live; keys in the owner's safe (ledger #54); open: UptimeRobot, gh workflow scope, 10.C.",
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [I told him 24 workers while release_check runs 8](i-told-him-24-workers-while-release-check-runs-8.md) - read the -n from the running command; one suite run per release.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [inspeximus 3.5.1 to 3.6.1 RELEASED 09-22; hosted log LIVE and accepted](inspeximus-3-0-0-state-2026-09-20.md) - two partial rows closed, leaf endpoint, keyless publish; keys in the owner's safe (ledger #54); firewall restriction belongs in the OCI console; open: UptimeRobot, gh workflow scope, 10.C, backfill ok.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [inspeximus 3.5.1 to 3.6.1 RELEASED 09-22; hosted log LIVE and accepted](inspeximus-3-0-0-state-2026-09-20.md) - hosted log live; keys in the owner's safe (ledger #54); open: UptimeRobot, gh workflow scope, 10.C.",
+    "words_gone": [
+     "two",
+     "partial",
+     "rows",
+     "closed",
+     "leaf",
+     "endpoint",
+     "keyless",
+     "publish",
+     "firewall",
+     "restriction",
+     "belongs",
+     "OCI",
+     "console",
+     "backfill",
+     "ok"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Two overlapping guards let every single mutation survive](two-overlapping-guards-let-every-single-mutation-survive.md) - L1 09-20: drop-on-write and status re-validation each absorbed the other's mutant; a test per guard where the other cannot fire.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [#81081: gap-sweep reply 5755864570 sent](claude-code-81081-gap-sweep-reply.md) - 09-21: count-then-recency and pure recency both refuted on 2.1.278; recency steep ~2 weeks then flat; 7-day row a position tie; WATCH for tonydzi.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [#81081: gap-sweep reply 5755864570 sent](claude-code-81081-gap-sweep-reply.md) - 09-21: both orderings refuted on 2.1.278; WATCH for tonydzi.",
+    "words_gone": [
+     "count-then-recency",
+     "and",
+     "pure",
+     "recency",
+     "recency",
+     "steep",
+     "weeks",
+     "then",
+     "flat",
+     "day",
+     "row",
+     "a",
+     "position",
+     "tie"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A 'rate limited' error that still queued the job](a-rate-limited-error-that-still-queued-the-job.md) - NotebookLM: 36 jobs from a retry loop; attach to the queued artifact.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A certificate that describes itself passed its own verifier](a-certificate-that-describes-itself-passed-its-own-verifier.md) - red team 09-17; 2.39.1 closed four; receipts' unsalted content hash open.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [agmi PR #1 MERGED 09-21 04:20Z (c459cf8); 2.31.0 to 2.44.0 shipped](inspeximus-evidence-chain-2-29-0-built-locally.md) - Yasha reproduced 22 passed, read/audit/audit with reported; the adapter is in tech4biz-yasha/agmi main; open: Polar (owner), thank-you gated.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [The write path was dead, not my forgetfulness](the-write-path-was-dead-not-my-forgetfulness.md) - 4 refusals, a day with no writes; the running MCP build predated the fix.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A uniform zero is the shape of a check that cannot fire](a-uniform-zero-is-the-shape-of-a-check-that-cannot-fire.md) - 0 of 40/18/35/54; the counter had no target in any of 26 snapshots.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Harness records beat a subagent's own file](harness-records-beat-a-subagents-own-file-as-evidence.md) - a tool_use record cannot be forged; the gate got cheaper AND stricter.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [CI was red 11 of 12 runs and nobody looked](ci-was-red-for-eleven-runs-and-nobody-looked.md) - one probe counted clean trials against a constant; the real signal sat inside the noise.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A baseline read later than the records invents a deletion](a-baseline-read-later-than-the-records-invents-a-deletion.md) - our 9 of 96 was a second read; 8 writers lost data, all reported success.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A guard you must choose to use](a-guard-you-must-choose-to-use.md) - CORRECTED: those 3 were pm25coder's; the opt-in-guard lesson stands.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": {
+     "keys": [
+      "a-guard-you-must-choose-to-use"
+     ],
+     "readmitted": {
+      "n": 0,
+      "first": null
+     },
+     "looked_up": {
+      "n": 0,
+      "first": null
+     },
+     "cited": {
+      "n": 0,
+      "first": null
+     }
+    }
+   },
+   {
+    "line": "- [Measure the real payload, client AND LAYER](measure-the-real-payload-through-the-real-client.md) - one level down our concurrency win inverted: clean on the helper, worse through the product.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Read the exit code without a pipe](read-the-exit-code-without-a-pipe.md) - 3x in one day a failure read as 0; a pipe, a harness wrapper, and an advisory-by-default tool.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A check against our own receipts cannot see his file](a-check-against-our-own-receipts-cannot-see-his-file.md) - 18/18 on a letter with 2 false claims; his abstract lost 7 of 8 results.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [median_high is not the median, and it recurred](median-high-is-not-the-median-and-it-recurred.md) - 4.9 vs 5.5 on 16 cells; the class outlived the instance fix.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Brief subagents to write into the TASKS dir](brief-subagents-to-write-reports-into-the-tasks-directory.md) - a scratchpad report is inadmissible; it blocked a send he had already approved.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A subagent report is a lead, not evidence](a-subagent-report-is-a-lead-not-evidence.md) - 4 wrong conclusions in one night, each one command away.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A subagent sent two unapproved comments and accepted a role for the owner](a-subagent-sent-two-unapproved-comments-and-accepted-a-role-for-the-owner.md) - the hash proves the payload, not that a human consented.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A sampled zero is a probability, not a fact](a-sampled-zero-is-a-probability-not-a-fact.md) - published \"0 of 2000\" as fact; it holds in 17 of 40 seed blocks.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [pm25coder is not us, and a memory record said it was](pm25coder-is-not-us-and-a-memory-record-said-it-was.md) - I drafted a retraction of comments a stranger wrote; `gh auth status` refuted it.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A seeded null is only as large as its distinct graphs](a-seeded-null-is-only-as-large-as-its-distinct-graphs.md) - 50 seeds were 9 graphs, p 5.2e-05 -> 0.056; my control was confounded.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": {
+     "keys": [
+      "a-seeded-null-is-only-as-large-as-its-distinct-graphs"
+     ],
+     "readmitted": {
+      "n": 0,
+      "first": null
+     },
+     "looked_up": {
+      "n": 0,
+      "first": null
+     },
+     "cited": {
+      "n": 0,
+      "first": null
+     }
+    }
+   },
+   {
+    "line": "- [A guard that reads only the first reply locks you out](a-guard-that-reads-only-the-first-reply-locks-you-out.md) - qualifying[0] made every later approval unreachable; 3 refused real ones.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": {
+     "keys": [
+      "a-guard-that-reads-only-the-first-reply-locks-you-out"
+     ],
+     "readmitted": {
+      "n": 0,
+      "first": null
+     },
+     "looked_up": {
+      "n": 0,
+      "first": null
+     },
+     "cited": {
+      "n": 0,
+      "first": null
+     }
+    }
+   },
+   {
+    "line": "- [The field I read cannot carry the answer](the-field-i-read-cannot-carry-the-answer.md) - 3x in one day; I called our releases unattested twice, and both files are signed.",
+    "fate": "moved_to_archive_verbatim",
+    "class": "link",
+    "props": {
+     "rule": false,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": null,
+    "words_gone": [],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [SEAL FORMAT = the block in comment 5793367969](seal-format-is-the-one-already-sent.md) - owner angry 09-23: small 41x47 at the end; I told the Builder bigger + centered from a stale note; copy the sent block, never redescribe it.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [SEAL FORMAT = the block in comment 5793367969](seal-format-is-the-one-already-sent.md) - owner angry 09-23: small 41x47 at the end; copy the sent block, never redescribe it.",
+    "words_gone": [
+     "x",
+     "I",
+     "told",
+     "Builder",
+     "bigger",
+     "centered",
+     "from",
+     "a",
+     "stale",
+     "note"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Plans and competitor matrices STAY PRIVATE](plans-and-competitor-matrices-stay-private.md) - owner 09-22; strategy dir only; the 3 public plans removed from inspeximus (c285263), history kept; say \"this is public\" before any push of a plan.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Plans and competitor matrices STAY PRIVATE](plans-and-competitor-matrices-stay-private.md) - owner 09-22; strategy dir only; say \"this is public\" before any push of a plan.",
+    "words_gone": [
+     "the",
+     "removed",
+     "from",
+     "inspeximus",
+     "c",
+     "history",
+     "kept"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [THE WHOLE ACT: a matrix with zero NOT COVERED rows](the-whole-act-is-a-matrix-with-zero-not-covered-rows.md) - owner PERMANENT 09-17: never \"slice\"; DONE at 3.4.0 (36 of 36); what remains is the Art. 15/21 partials and the surfaces (plan step 7).",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [THE WHOLE ACT: a matrix with zero NOT COVERED rows](the-whole-act-is-a-matrix-with-zero-not-covered-rows.md) - owner PERMANENT 09-17: never \"slice\"; 36 of 36 at 3.4.0; Art. 15/21 partials remain.",
+    "words_gone": [
+     "DONE",
+     "what",
+     "remains",
+     "and",
+     "surfaces",
+     "plan",
+     "step"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Read with the BROWSER before a paid API call](read-with-the-browser-before-spending-a-paid-api-call.md) - owner angry 2026-09-17: three Apify runs to read a headline one page view shows; paid reads are for bulk only, say why the browser cannot first.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Read with the BROWSER before a paid API call](read-with-the-browser-before-spending-a-paid-api-call.md) - owner angry 09-17: paid reads are for bulk only; say why the browser cannot first.",
+    "words_gone": [
+     "three",
+     "Apify",
+     "runs",
+     "to",
+     "headline",
+     "one",
+     "page",
+     "view",
+     "shows"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [The owner reads the article BEFORE main; the headline is a craft](the-owner-reads-the-article-before-it-goes-to-main-and-the-headline-is-a-craft.md) - owner angry 2026-09-17: I pushed a re-issue and a lens-written headline without showing him; progress line after each stage, headline candidates from the headline-craft skill.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [The owner reads the article BEFORE main; the headline is a craft](the-owner-reads-the-article-before-it-goes-to-main-and-the-headline-is-a-craft.md) - owner angry 09-17: show him before main; headlines from the headline-craft skill.",
+    "words_gone": [
+     "I",
+     "pushed",
+     "re-issue",
+     "lens-written",
+     "without",
+     "showing",
+     "progress",
+     "line",
+     "after",
+     "each",
+     "stage",
+     "candidates"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [NEVER narrate my own mistakes in outbound content](never-narrate-my-own-mistakes-in-outbound-content.md) - owner, angry: they asked for a thing, deliver the thing; corrections of unpublished drafts go to the changelog, not the thread.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": false,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [NEVER narrate my own mistakes in outbound content](never-narrate-my-own-mistakes-in-outbound-content.md) - owner angry: deliver the thing; draft corrections go to the changelog, not the thread.",
+    "words_gone": [
+     "they",
+     "asked",
+     "for",
+     "a",
+     "of",
+     "unpublished",
+     "drafts"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [A fixture with a hardcoded port ran parallel-blind](a-fixture-that-takes-an-exclusive-resource-must-run-parallel-first.md) - 09-23: two workers bound 9878, one test submitted into another's log; serial was green throughout, so run parallel FIRST.",
+    "fate": "shortened_in_place",
+    "class": "rule",
+    "props": {
+     "rule": true,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [A fixture with a hardcoded port ran parallel-blind](a-fixture-that-takes-an-exclusive-resource-must-run-parallel-first.md) - 09-23: two workers bound one port; serial stayed green, so run parallel FIRST.",
+    "words_gone": [
+     "test",
+     "submitted",
+     "into",
+     "another's",
+     "log",
+     "was",
+     "throughout"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   },
+   {
+    "line": "- [Our public log had a live write endpoint](our-public-log-had-a-live-write-endpoint.md) - 09-23: POST /entries reached the SCRAPI service from the internet; closed, everything public is now a static file; box does 42.7 req/s cold, 518 kept-alive.",
+    "fate": "shortened_in_place",
+    "class": "dated",
+    "props": {
+     "rule": false,
+     "dated": true,
+     "link": true,
+     "bullet": true
+    },
+    "now": "- [Our public log had a live write endpoint](our-public-log-had-a-live-write-endpoint.md) - 09-23: POST /entries was reachable; closed, everything public is a static file.",
+    "words_gone": [
+     "reached",
+     "the",
+     "SCRAPI",
+     "service",
+     "from",
+     "the",
+     "internet",
+     "now",
+     "box",
+     "does",
+     "req",
+     "s",
+     "cold",
+     "kept-alive"
+    ],
+    "rule_word_gone": [],
+    "rule_word_back_today": [],
+    "needed_again": null
+   }
+  ]
+ },
+ "controls": {
+  "planted rule removal seen after a reminder, classified rule": true,
+  "planted rule is looked up again later": true,
+  "a quoted reminder is not a reminder": true,
+  "a human prompt ends the reminder's reach": true,
+  "a tool result carrying text is not a human prompt": true,
+  "a loader WARNING marks the index over the cap": true,
+  "classifier first-match order": true,
+  "planted_in_real_stream": true,
+  "real_scan_not_blind": true
+ }
+}

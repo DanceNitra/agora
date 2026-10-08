@@ -5,39 +5,9 @@
  "cap_units": 25000,
  "transcripts": [
   {
-   "transcript": "ba363076",
-   "version": "2.1.234",
-   "first_ts": "2026-08-18T06:26:59.798Z",
-   "records": []
-  },
-  {
-   "transcript": "7dccb956",
-   "version": "2.1.235",
-   "first_ts": "2026-08-19T05:46:51.488Z",
-   "records": []
-  },
-  {
-   "transcript": "46de8dac",
-   "version": "2.1.237",
-   "first_ts": "2026-08-20T07:12:10.392Z",
-   "records": []
-  },
-  {
-   "transcript": "e6f8e2c8",
-   "version": "2.1.238",
-   "first_ts": "2026-08-21T02:08:20.842Z",
-   "records": []
-  },
-  {
    "transcript": "d58cd2cd",
    "version": "2.1.241",
    "first_ts": "2026-08-23T06:15:56.767Z",
-   "records": []
-  },
-  {
-   "transcript": "ce036cca",
-   "version": "2.1.241",
-   "first_ts": "2026-08-23T16:48:47.663Z",
    "records": []
   },
   {
@@ -415,19 +385,1488 @@
       "warning_text": null,
       "sha1": "22db12c004"
      }
+    },
+    {
+     "ts": "2026-09-17T11:43:27",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 135,
+      "units_delivered": 21129,
+      "body_lines": 135,
+      "body_units": 21129,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "22db12c004"
+     }
+    },
+    {
+     "ts": "2026-09-17T12:07:06",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 140,
+      "units_delivered": 22435,
+      "body_lines": 140,
+      "body_units": 22435,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "13df238a11"
+     }
+    },
+    {
+     "ts": "2026-09-17T22:42:37",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 140,
+      "units_delivered": 22435,
+      "body_lines": 140,
+      "body_units": 22435,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "13df238a11"
+     }
+    },
+    {
+     "ts": "2026-09-17T22:46:13",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 149,
+      "units_delivered": 24853,
+      "body_lines": 149,
+      "body_units": 24853,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "9d266f1bd7"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "1a4669bc",
+   "version": "2.1.271",
+   "first_ts": "2026-09-17T11:33:04.948Z",
+   "records": [
+    {
+     "ts": "2026-09-17T11:33:08",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 139,
+      "units_delivered": 22045,
+      "body_lines": 139,
+      "body_units": 22045,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "f67a48e416"
+     }
+    },
+    {
+     "ts": "2026-09-17T15:04:01",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 144,
+      "units_delivered": 23540,
+      "body_lines": 144,
+      "body_units": 23540,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "a3be36df55"
+     }
+    },
+    {
+     "ts": "2026-09-17T18:59:18",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 145,
+      "units_delivered": 23801,
+      "body_lines": 145,
+      "body_units": 23801,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "0340d96530"
+     }
+    },
+    {
+     "ts": "2026-09-17T19:27:53",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 145,
+      "units_delivered": 23801,
+      "body_lines": 145,
+      "body_units": 23801,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "0340d96530"
+     }
+    },
+    {
+     "ts": "2026-09-17T21:24:18",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24094,
+      "body_lines": 146,
+      "body_units": 24094,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "a532bb154e"
+     }
+    },
+    {
+     "ts": "2026-09-18T06:39:36",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24969,
+      "body_lines": 150,
+      "body_units": 24969,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "5d0248ba66"
+     }
+    },
+    {
+     "ts": "2026-09-18T11:14:37",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24917,
+      "body_lines": 150,
+      "body_units": 24917,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "0d1ef4dabc"
+     }
+    },
+    {
+     "ts": "2026-09-20T07:11:26",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24931,
+      "body_lines": 150,
+      "body_units": 24931,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "7c6b5ffb54"
+     }
+    },
+    {
+     "ts": "2026-09-20T14:24:19",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 149,
+      "units_delivered": 25264,
+      "body_lines": 147,
+      "body_units": 24943,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.2KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 6 of 153 lines were cut off, starti",
+      "sha1": "5bd039f1ce"
+     }
+    },
+    {
+     "ts": "2026-09-20T16:34:47",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 149,
+      "units_delivered": 25297,
+      "body_lines": 147,
+      "body_units": 24976,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.2KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 6 of 153 lines were cut off, starti",
+      "sha1": "70416b8110"
+     }
+    },
+    {
+     "ts": "2026-09-21T04:13:45",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24599,
+      "body_lines": 146,
+      "body_units": 24599,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "03c44319d3"
+     }
+    },
+    {
+     "ts": "2026-09-21T06:19:04",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 145,
+      "units_delivered": 24425,
+      "body_lines": 145,
+      "body_units": 24425,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "40d91ee15f"
+     }
+    },
+    {
+     "ts": "2026-09-21T07:35:56",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 145,
+      "units_delivered": 24340,
+      "body_lines": 145,
+      "body_units": 24340,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "747e2b7527"
+     }
+    },
+    {
+     "ts": "2026-09-21T09:39:20",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24375,
+      "body_lines": 146,
+      "body_units": 24375,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "3320d7d133"
+     }
+    },
+    {
+     "ts": "2026-09-21T10:19:14",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24377,
+      "body_lines": 146,
+      "body_units": 24377,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "8c3c6dd812"
+     }
+    },
+    {
+     "ts": "2026-09-21T12:06:56",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24377,
+      "body_lines": 146,
+      "body_units": 24377,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "8c3c6dd812"
+     }
+    },
+    {
+     "ts": "2026-09-21T14:08:24",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 147,
+      "units_delivered": 24496,
+      "body_lines": 147,
+      "body_units": 24496,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "a4c094d8a0"
+     }
+    },
+    {
+     "ts": "2026-09-21T15:05:32",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 148,
+      "units_delivered": 24514,
+      "body_lines": 148,
+      "body_units": 24514,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6e63c50f51"
+     }
+    },
+    {
+     "ts": "2026-09-21T20:25:44",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24493,
+      "body_lines": 150,
+      "body_units": 24493,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6f4e8f472a"
+     }
+    },
+    {
+     "ts": "2026-09-22T07:36:01",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24493,
+      "body_lines": 150,
+      "body_units": 24493,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6f4e8f472a"
+     }
+    },
+    {
+     "ts": "2026-09-22T07:38:44",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 24965,
+      "body_lines": 151,
+      "body_units": 24965,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "d4ec92e0a9"
+     }
+    },
+    {
+     "ts": "2026-09-22T19:59:54",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 24965,
+      "body_lines": 151,
+      "body_units": 24965,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "d4ec92e0a9"
+     }
+    },
+    {
+     "ts": "2026-09-22T20:07:24",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 149,
+      "units_delivered": 25201,
+      "body_lines": 147,
+      "body_units": 24889,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.3KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 9 of 156 lines were cut off, starti",
+      "sha1": "5fb7891098"
+     }
+    },
+    {
+     "ts": "2026-09-23T02:06:39",
+     "changed": true,
+     "reason": "session_start",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    },
+    {
+     "ts": "2026-09-23T02:09:30",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    },
+    {
+     "ts": "2026-09-23T12:36:19",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    },
+    {
+     "ts": "2026-09-23T12:41:14",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 117,
+      "units_delivered": 21699,
+      "body_lines": 117,
+      "body_units": 21699,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "f5af4f27b7"
+     }
+    },
+    {
+     "ts": "2026-09-23T17:23:22",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 117,
+      "units_delivered": 21699,
+      "body_lines": 117,
+      "body_units": 21699,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "f5af4f27b7"
+     }
+    },
+    {
+     "ts": "2026-09-23T17:25:08",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 123,
+      "units_delivered": 22946,
+      "body_lines": 123,
+      "body_units": 22946,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "9ab56219d7"
+     }
+    },
+    {
+     "ts": "2026-09-24T04:26:00",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 123,
+      "units_delivered": 22946,
+      "body_lines": 123,
+      "body_units": 22946,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "9ab56219d7"
+     }
+    },
+    {
+     "ts": "2026-09-24T04:31:44",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 126,
+      "units_delivered": 23642,
+      "body_lines": 126,
+      "body_units": 23642,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "af9e76175e"
+     }
+    },
+    {
+     "ts": "2026-09-24T16:48:21",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 126,
+      "units_delivered": 23642,
+      "body_lines": 126,
+      "body_units": 23642,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "af9e76175e"
+     }
+    },
+    {
+     "ts": "2026-09-24T16:59:28",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 99,
+      "units_delivered": 17066,
+      "body_lines": 99,
+      "body_units": 17066,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "31794a1d05"
+     }
+    },
+    {
+     "ts": "2026-09-25T04:46:36",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 100,
+      "units_delivered": 17305,
+      "body_lines": 100,
+      "body_units": 17305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "45f5a918f7"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "4d49f7ac",
+   "version": "2.1.276",
+   "first_ts": "2026-09-18T14:18:54.566Z",
+   "records": [
+    {
+     "ts": "2026-09-18T14:19:30",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24931,
+      "body_lines": 150,
+      "body_units": 24931,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "7c6b5ffb54"
+     }
+    },
+    {
+     "ts": "2026-09-20T20:11:01",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24931,
+      "body_lines": 150,
+      "body_units": 24931,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "7c6b5ffb54"
+     }
+    },
+    {
+     "ts": "2026-09-20T20:53:51",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 147,
+      "units_delivered": 25275,
+      "body_lines": 145,
+      "body_units": 24963,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.4KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 9 of 154 lines were cut off, starti",
+      "sha1": "941a7b78a4"
+     }
+    },
+    {
+     "ts": "2026-09-21T07:52:54",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 147,
+      "units_delivered": 25275,
+      "body_lines": 145,
+      "body_units": 24963,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.4KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 9 of 154 lines were cut off, starti",
+      "sha1": "941a7b78a4"
+     }
+    },
+    {
+     "ts": "2026-09-21T08:17:19",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24375,
+      "body_lines": 146,
+      "body_units": 24375,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "3320d7d133"
+     }
+    },
+    {
+     "ts": "2026-09-21T18:12:52",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24375,
+      "body_lines": 146,
+      "body_units": 24375,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "3320d7d133"
+     }
+    },
+    {
+     "ts": "2026-09-21T18:50:15",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24493,
+      "body_lines": 150,
+      "body_units": 24493,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6f4e8f472a"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "1e06e98b",
+   "version": "2.1.278",
+   "first_ts": "2026-09-21T19:21:12.144Z",
+   "records": [
+    {
+     "ts": "2026-09-21T19:21:45",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24493,
+      "body_lines": 150,
+      "body_units": 24493,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6f4e8f472a"
+     }
+    },
+    {
+     "ts": "2026-09-22T12:39:31",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 150,
+      "units_delivered": 24493,
+      "body_lines": 150,
+      "body_units": 24493,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "6f4e8f472a"
+     }
+    },
+    {
+     "ts": "2026-09-22T13:15:49",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 25225,
+      "body_lines": 149,
+      "body_units": 24904,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 24.8KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 4 of 153 lines were cut off, starti",
+      "sha1": "96a07d6e5d"
+     }
+    },
+    {
+     "ts": "2026-09-22T22:16:24",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 25225,
+      "body_lines": 149,
+      "body_units": 24904,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 24.8KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 4 of 153 lines were cut off, starti",
+      "sha1": "96a07d6e5d"
+     }
+    },
+    {
+     "ts": "2026-09-23T01:12:29",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 144,
+      "units_delivered": 25234,
+      "body_lines": 142,
+      "body_units": 24915,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 26.2KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 18 of 160 lines were cut off, start",
+      "sha1": "524c9580f8"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "0add1c53",
+   "version": "2.1.275",
+   "first_ts": "2026-09-22T15:56:41.235Z",
+   "records": [
+    {
+     "ts": "2026-09-22T15:56:48",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 25147,
+      "body_lines": 149,
+      "body_units": 24826,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.1KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 6 of 155 lines were cut off, starti",
+      "sha1": "a1894fdc60"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "8c9d2890",
+   "version": "2.1.275",
+   "first_ts": "2026-09-22T17:00:02.695Z",
+   "records": [
+    {
+     "ts": "2026-09-22T17:00:12",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 151,
+      "units_delivered": 25147,
+      "body_lines": 149,
+      "body_units": 24826,
+      "warning_line_present": true,
+      "warning_text": "> WARNING: MEMORY.md is 25.1KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded: 6 of 155 lines were cut off, starti",
+      "sha1": "a1894fdc60"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "5a142d67",
+   "version": "2.1.280",
+   "first_ts": "2026-09-23T01:45:43.774Z",
+   "records": [
+    {
+     "ts": "2026-09-23T01:46:32",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "29d714db",
+   "version": "2.1.275",
+   "first_ts": "2026-09-23T01:48:53.799Z",
+   "records": [
+    {
+     "ts": "2026-09-23T01:49:02",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "cf10d690",
+   "version": "2.1.280",
+   "first_ts": "2026-09-23T02:04:24.273Z",
+   "records": [
+    {
+     "ts": "2026-09-23T02:04:41",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    },
+    {
+     "ts": "2026-09-23T14:27:06",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 146,
+      "units_delivered": 24305,
+      "body_lines": 146,
+      "body_units": 24305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "91b09978ad"
+     }
+    },
+    {
+     "ts": "2026-09-23T14:29:56",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 120,
+      "units_delivered": 22289,
+      "body_lines": 120,
+      "body_units": 22289,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "69cb1fdb80"
+     }
+    },
+    {
+     "ts": "2026-09-24T00:04:00",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 120,
+      "units_delivered": 22289,
+      "body_lines": 120,
+      "body_units": 22289,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "69cb1fdb80"
+     }
+    },
+    {
+     "ts": "2026-09-24T00:29:47",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 125,
+      "units_delivered": 23457,
+      "body_lines": 125,
+      "body_units": 23457,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "32e612f69f"
+     }
+    },
+    {
+     "ts": "2026-09-24T14:46:54",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 125,
+      "units_delivered": 23457,
+      "body_lines": 125,
+      "body_units": 23457,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "32e612f69f"
+     }
+    },
+    {
+     "ts": "2026-09-24T15:44:04",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 127,
+      "units_delivered": 23846,
+      "body_lines": 127,
+      "body_units": 23846,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "2bc293802e"
+     }
+    },
+    {
+     "ts": "2026-09-25T03:28:03",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 100,
+      "units_delivered": 17305,
+      "body_lines": 100,
+      "body_units": 17305,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "45f5a918f7"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "fd429686",
+   "version": "2.1.280",
+   "first_ts": "2026-09-23T05:06:00.298Z",
+   "records": [
+    {
+     "ts": "2026-09-23T05:06:09",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 147,
+      "units_delivered": 24686,
+      "body_lines": 147,
+      "body_units": 24686,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "75512c15e0"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "8b947ff3",
+   "version": "2.1.281",
+   "first_ts": "2026-09-24T05:27:30.579Z",
+   "records": []
+  },
+  {
+   "transcript": "47d163f3",
+   "version": "2.1.280",
+   "first_ts": "2026-09-24T16:28:57.301Z",
+   "records": [
+    {
+     "ts": "2026-09-24T16:29:07",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 129,
+      "units_delivered": 24140,
+      "body_lines": 129,
+      "body_units": 24140,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "2d64a860c2"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "57e64297",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T06:00:54.512Z",
+   "records": [
+    {
+     "ts": "2026-09-25T06:01:04",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "b8c85454",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T08:49:35.737Z",
+   "records": [
+    {
+     "ts": "2026-09-25T08:49:46",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "3958a0fb",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T08:49:59.560Z",
+   "records": [
+    {
+     "ts": "2026-09-25T08:49:59",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "688630fa",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T09:21:44.533Z",
+   "records": [
+    {
+     "ts": "2026-09-25T09:21:44",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "9ec3e09f",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T09:26:04.467Z",
+   "records": [
+    {
+     "ts": "2026-09-25T09:26:04",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "7f5db5ab",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T09:26:49.309Z",
+   "records": [
+    {
+     "ts": "2026-09-25T09:26:49",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "d41a604b",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T09:45:43.667Z",
+   "records": [
+    {
+     "ts": "2026-09-25T09:45:43",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "fcbd2e22",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T09:49:41.680Z",
+   "records": [
+    {
+     "ts": "2026-09-25T09:49:41",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "88c526c9",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T10:44:13.356Z",
+   "records": [
+    {
+     "ts": "2026-09-25T10:44:24",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "b56f4505",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T12:41:10.106Z",
+   "records": [
+    {
+     "ts": "2026-09-25T12:41:51",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 101,
+      "units_delivered": 17517,
+      "body_lines": 101,
+      "body_units": 17517,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "199586df3b"
+     }
+    },
+    {
+     "ts": "2026-09-25T14:51:28",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 104,
+      "units_delivered": 18180,
+      "body_lines": 104,
+      "body_units": 18180,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "bb1f08e575"
+     }
+    },
+    {
+     "ts": "2026-09-25T22:12:49",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 111,
+      "units_delivered": 19714,
+      "body_lines": 111,
+      "body_units": 19714,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "ae07aebfc6"
+     }
+    },
+    {
+     "ts": "2026-09-26T19:11:08",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 111,
+      "units_delivered": 19714,
+      "body_lines": 111,
+      "body_units": 19714,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "ae07aebfc6"
+     }
+    },
+    {
+     "ts": "2026-09-26T19:16:50",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 111,
+      "units_delivered": 19776,
+      "body_lines": 111,
+      "body_units": 19776,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "17cf311b92"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "f675e3ad",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T14:12:40.640Z",
+   "records": [
+    {
+     "ts": "2026-09-25T14:12:52",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 104,
+      "units_delivered": 18180,
+      "body_lines": 104,
+      "body_units": 18180,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "bb1f08e575"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "2bd3daea",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T14:28:56.809Z",
+   "records": [
+    {
+     "ts": "2026-09-25T14:29:06",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 104,
+      "units_delivered": 18180,
+      "body_lines": 104,
+      "body_units": 18180,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "bb1f08e575"
+     }
+    },
+    {
+     "ts": "2026-09-26T11:27:14",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 116,
+      "units_delivered": 20657,
+      "body_lines": 116,
+      "body_units": 20657,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "da2fb961d9"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "9b48b877",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T15:28:47.344Z",
+   "records": [
+    {
+     "ts": "2026-09-25T15:28:57",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 105,
+      "units_delivered": 18495,
+      "body_lines": 105,
+      "body_units": 18495,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "1ca4d28926"
+     }
+    },
+    {
+     "ts": "2026-09-26T05:34:45",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 105,
+      "units_delivered": 18495,
+      "body_lines": 105,
+      "body_units": 18495,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "1ca4d28926"
+     }
+    },
+    {
+     "ts": "2026-09-26T05:41:03",
+     "changed": true,
+     "reason": "compaction",
+     "memory_md": {
+      "lines_delivered": 115,
+      "units_delivered": 20606,
+      "body_lines": 115,
+      "body_units": 20606,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "4fb3772139"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "133796bd",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T16:15:57.913Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:16:09",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 106,
+      "units_delivered": 18683,
+      "body_lines": 106,
+      "body_units": 18683,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "17d2835f82"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "1e42bf62",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T16:16:09.299Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:16:21",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 106,
+      "units_delivered": 18683,
+      "body_lines": 106,
+      "body_units": 18683,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "17d2835f82"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "4442afba",
+   "version": "2.1.280",
+   "first_ts": "2026-09-25T16:16:32.708Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:16:44",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 106,
+      "units_delivered": 18683,
+      "body_lines": 106,
+      "body_units": 18683,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "17d2835f82"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "e8f50bab",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T16:24:44.739Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:24:44",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 106,
+      "units_delivered": 18683,
+      "body_lines": 106,
+      "body_units": 18683,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "17d2835f82"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "0a151e81",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T16:35:17.543Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:35:17",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 107,
+      "units_delivered": 18941,
+      "body_lines": 107,
+      "body_units": 18941,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "c76baac759"
+     }
+    }
+   ]
+  },
+  {
+   "transcript": "113a6a7a",
+   "version": "2.1.282",
+   "first_ts": "2026-09-25T16:36:38.592Z",
+   "records": [
+    {
+     "ts": "2026-09-25T16:36:38",
+     "changed": null,
+     "reason": null,
+     "memory_md": {
+      "lines_delivered": 107,
+      "units_delivered": 18941,
+      "body_lines": 107,
+      "body_units": 18941,
+      "warning_line_present": false,
+      "warning_text": null,
+      "sha1": "c76baac759"
+     }
     }
    ]
   }
  ],
- "records": 21,
- "distinct_deliveries": 12,
- "newest_build_without_attachment": "2.1.260",
+ "records": 111,
+ "distinct_deliveries": 57,
+ "newest_build_without_attachment": "2.1.281",
  "oldest_build_with_attachment": "2.1.263",
  "verdicts": {
   "every_instructions_record_names_memory_md": true,
   "warning_only_where_the_body_reaches_a_cap": true,
   "capped_body_never_exceeds_the_unit_cap": true,
-  "changed_records_differ_and_untagged_records_repeat_the_previous_delivery": true,
-  "attachment_absent_before_and_present_from_a_single_build_edge": true
+  "changed_records_differ_and_untagged_records_repeat_the_previous_delivery": false,
+  "attachment_absent_before_and_present_from_a_single_build_edge": false
  }
 }

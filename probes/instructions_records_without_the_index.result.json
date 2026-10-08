@@ -1,0 +1,27 @@
+{
+ "records": 850,
+ "earliest_record": "2026-09-08T19:00:19.461Z",
+ "records_with_index": 252,
+ "record_shapes": {
+  "User": 577,
+  "AutoMem,Project,User": 107,
+  "AutoMem": 92,
+  "AutoMem,Project": 42,
+  "Project": 19,
+  "AutoMem,User": 6,
+  "AutoMem,Project,Project": 5,
+  "Project,User": 2
+ },
+ "absent_in_project_with_index": 21,
+ "absent_and_bracketed": 14,
+ "bracketed_builds": {
+  "2.1.271": 5,
+  "2.1.275": 9
+ },
+ "bracketed_reasons": {
+  "compaction": 3,
+  "session_start": 11
+ },
+ "user_claude_md_ctime_utc": "2026-09-25T10:27",
+ "records_after_it_with_index_but_no_user_file": 21
+}
