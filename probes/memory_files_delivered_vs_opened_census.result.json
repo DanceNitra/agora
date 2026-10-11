@@ -1,0 +1,18 @@
+{
+ "transcripts_read": 97,
+ "first_record": "2026-09-10T11:24:59.665Z",
+ "last_record": "2026-10-11T04:46:07.235Z",
+ "memory_files_on_disk": 664,
+ "instructions_records": 282,
+ "attachment_file_types_seen": {
+  "Project": 193,
+  "AutoMem": 282,
+  "User": 167
+ },
+ "index_deliveries_POSITIVE_CONTROL": 282,
+ "transcripts_with_an_index_delivery": 96,
+ "delivered_on_their_own": 0,
+ "opened_by_agent": 102,
+ "opened_share": 0.154,
+ "control_passed": true
+}
