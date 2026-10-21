@@ -8,16 +8,13 @@ import subprocess
 import sys
 import time
 
-# The 3.22 tree until 3.22.0 is installed from PyPI.
-TREE = "C:/Users/Danculus/wt-322em"
-
-
 def main():
     path, intent = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else "")
     raw = open(path, "rb").read()
     out = None
     if len(raw) >= 5000:
-        env = dict(os.environ, PYTHONPATH=TREE, INSPEXIMUS_EMBED_URL="http://127.0.0.1:11434/v1/embeddings",
+        # inspeximus 3.22.0 from PyPI. The embedder is the local bge-m3 by address, never by name.
+        env = dict(os.environ, INSPEXIMUS_EMBED_URL="http://127.0.0.1:11434/v1/embeddings",
                    INSPEXIMUS_EMBED_MODEL="bge-m3", PYTHONIOENCODING="utf-8")
         args = [sys.executable, "-m", "inspeximus.context_saver", "--without-reranker", "hybrid", "--file", path]
         if intent:
