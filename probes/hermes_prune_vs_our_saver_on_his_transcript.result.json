@@ -1,8 +1,8 @@
 {
  "measured": "2026-10-29",
- "inspeximus": "3.25.0",
- "store": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\f675e3ad-b1b0-4717-80f9-e378da8d74a5\\scratchpad\\hermescombo\\state.db",
- "hybrid_arm": true,
+ "inspeximus": "3.26.0",
+ "store": "C:\\Users\\Danculus\\AppData\\Local\\hermes\\state.db",
+ "hybrid_arm": false,
  "ranking": "lexical (no embedder, the saver hook's own default)",
  "intent": "the tool call's own description or command, the precedence the shipped PostToolUse hook uses (context_saver.post_tool_use_replacement)",
  "rows_over_2000_chars": 264,
@@ -90,16 +90,6 @@
    "answer_terms_kept_pct": 78.5,
    "buried_terms_kept": 133,
    "buried_terms_kept_pct": 58.8
-  },
-  "saver_hybrid": {
-   "bytes": 560031,
-   "kept_pct_of_baseline": 27.3,
-   "needles_kept": 771,
-   "needles_kept_pct": 58.4,
-   "answer_terms_kept": 422,
-   "answer_terms_kept_pct": 76.7,
-   "buried_terms_kept": 139,
-   "buried_terms_kept_pct": 61.5
   }
  },
  "controls": {
@@ -109,7 +99,7 @@
   "needles_kept_by_the_content_free_fallback": 0,
   "rows_with_no_answer_term": 78,
   "rows_whose_call_carried_no_intent": 14,
-  "rows_the_embedder_reordered": 62
+  "rows_the_embedder_reordered": null
  },
  "per_tool": {
   "terminal": {

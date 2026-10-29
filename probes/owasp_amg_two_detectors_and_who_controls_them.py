@@ -46,8 +46,9 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VENV = ("C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/"
-        "e6f8e2c8-b4c1-4269-a886-f10b2cd62521/scratchpad/amg/Scripts/python.exe")
+VENV = os.environ.get("AMG_PYTHON") or (
+    "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/"
+    "e6f8e2c8-b4c1-4269-a886-f10b2cd62521/scratchpad/amg/Scripts/python.exe")
 
 CHILD = r'''
 import json, sys

@@ -1,7 +1,7 @@
 {
  "measured": "2026-10-29",
  "corpus": "Claude Code transcripts under C:\\Users\\Danculus\\.claude\\projects",
- "transcripts_available": 4003,
+ "transcripts_available": 4001,
  "results_over_2000_chars": 400,
  "buried_terms_sampled": 225,
  "arms": {

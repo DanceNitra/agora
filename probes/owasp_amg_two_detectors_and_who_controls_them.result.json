@@ -1,16 +1,18 @@
 {
- "package_version": "0.3.0-dev",
+ "package_version": "0.3.3",
  "controls_reproduced": true,
- "finding_1_cooldown_reset_by_attacker": true,
+ "finding_1_cooldown_reset_by_attacker": false,
  "finding_2_cross_task_fails_open_without_task_id": false,
  "raw": {
-  "version": "0.3.0-dev",
+  "version": "0.3.3",
   "C1_no_interleave_flagged": true,
   "C1_events": [
    "self_reinforcement"
   ],
-  "A1_interleaved_flagged": false,
-  "A1_events": [],
+  "A1_interleaved_flagged": true,
+  "A1_events": [
+   "self_reinforcement"
+  ],
   "C2_with_task_id_flagged": true,
   "C2_events": [
    "cross_task_contamination"

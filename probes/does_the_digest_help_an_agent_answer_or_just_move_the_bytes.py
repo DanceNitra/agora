@@ -211,8 +211,10 @@ def facts(output, edge):
             continue
         if label.lower() in _KEYWORDS or label.split()[0].lower() in _KEYWORDS:
             continue                                  # a code keyword is not a label
-        if label.lower() in _KEYWORDS or label.split()[0].lower() in _KEYWORDS:
-            continue                                  # a code keyword is not a label
+        if value.startswith("{") and value.endswith("}"):
+            continue                                  # `{expected}` is a template hole, not a fact
+        if any(value.count(a) != value.count(b) for a, b in ("()", "[]")):
+            continue                                  # `signer.public_key_hex)` is half a line
         out.append((label, value))
     return out
 
@@ -462,6 +464,12 @@ def run_one(task, arm, visible, client, wrong_label=False):
         text, finish, tokens, secs = ask(client, visible, label, nonce)
     except Exception as exc:                                       # noqa: BLE001
         return {"task": task["id"], "arm": arm, "error": "%s: %s" % (type(exc).__name__, exc)}
+    # The FIRST turn is the measurement; the second is the price of having failed it. The first
+    # pilot missed this and every arm converged on the ceiling, including the two that see no
+    # output: with an escape hatch open to all of them, accuracy cannot separate the strategies.
+    first_text = text
+    first_correct = norm(first_text) == norm(task["answer"])
+    first_tokens = tokens
     asked_full = False
     if norm(text) == "need_full":
         asked_full = True
@@ -474,6 +482,8 @@ def run_one(task, arm, visible, client, wrong_label=False):
     return {"task": task["id"], "arm": arm, "wrong_label": wrong_label,
             "source": task["source"], "tool": task["tool"], "shape": task["shape"],
             "family": task["family"], "visible_bytes": len(visible),
+            "first_correct": first_correct, "first_tokens": first_tokens,
+            "first_reply": first_text[:200],
             "correct": norm(text) == norm(task["answer"]), "asked_for_full": asked_full,
             "tokens": tokens, "seconds": round(secs, 2), "finish": finish,
             "reply": text[:200], "expected": task["answer"][:200]}
@@ -612,16 +622,29 @@ def report(tasks, corpus, args, elapsed):
                  if l.strip() and "error" in json.loads(l))
 
     def agg(sel):
+        """FIRST-TURN accuracy is the headline. The second turn is the price of failing the first.
+
+        The first pilot reported final accuracy and every arm tied at the ceiling, no_output
+        included, because the escape hatch hands the whole output to whichever arm asks for it.
+        Final accuracy therefore measures the hatch, not the strategy. It is still reported, as
+        `accuracy_after_the_second_turn`, because the pair is the whole point: what the strategy
+        answered on its own, and what it cost to answer at all.
+        """
         s = [r for r in rows if sel(r)]
         n = len(s)
         if not n:
             return None
-        ok = sum(1 for r in s if r["correct"])
+        first = sum(1 for r in s if r.get("first_correct"))
+        final = sum(1 for r in s if r["correct"])
         tok = sum(r["tokens"] for r in s)
-        return {"n": n, "correct": ok, "accuracy_pct": round(100.0 * ok / n, 1),
-                "tokens": tok, "asked_for_full_pct": round(100.0 * sum(
+        ftok = sum(r.get("first_tokens") or 0 for r in s)
+        return {"n": n,
+                "first_correct": first, "accuracy_pct": round(100.0 * first / n, 1),
+                "accuracy_after_the_second_turn": round(100.0 * final / n, 1),
+                "tokens": tok, "first_turn_tokens": ftok,
+                "asked_for_full_pct": round(100.0 * sum(
                     1 for r in s if r.get("asked_for_full")) / n, 1),
-                "solved_per_1k_tokens": round(1000.0 * ok / max(tok, 1), 3)}
+                "solved_per_1k_tokens": round(1000.0 * first / max(tok, 1), 3)}
 
     out = {
         "measured": time.strftime("%Y-%m-%d"),
@@ -644,23 +667,31 @@ def report(tasks, corpus, args, elapsed):
             "full_is_the_ceiling": agg(lambda r: r["arm"] == "full" and not r.get("wrong_label")),
         },
     }
+    spend = _SPEND["in"] * USD_IN + _SPEND["out"] * USD_OUT
+    out["measured_spend"] = {"input_tokens": _SPEND["in"], "output_tokens": _SPEND["out"],
+                             "usd": round(spend, 4),
+                             "usd_per_cell": round(spend / max(len(rows), 1), 5)}
     RESULT.write_text(json.dumps(out, indent=1), encoding="utf-8")
 
-    print("\n%d tasks, model %s, edge %d, %.0fs, %d failed cells"
-          % (len(tasks), MODEL, args.edge, elapsed, errors))
-    print("  %-17s %5s %7s %9s %9s %s" % ("arm", "n", "correct", "askedfull", "tokens", "solved/1k"))
+    print("\n%d tasks, %s, edge %d, %.0fs, %d failed cells" % (
+        len(tasks), MODEL, args.edge, elapsed, errors))
+    print("  first turn is the measurement; after is what the escape hatch bought")
+    print("  %-17s %4s %9s %9s %9s %9s %s" % (
+        "arm", "n", "1st turn", "after", "askedfull", "tokens", "solved/1k"))
     for a in ARMS:
         r = out["by_arm"][a]
         if r:
-            print("  %-17s %5d %6.1f%% %8.1f%% %9d %9.3f" % (
-                a, r["n"], r["accuracy_pct"], r["asked_for_full_pct"], r["tokens"],
-                r["solved_per_1k_tokens"]))
-    print("\ncontrols (the first three must be near zero, the fourth high):")
+            print("  %-17s %4d %8.1f%% %8.1f%% %8.1f%% %9d %9.3f" % (
+                a, r["n"], r["accuracy_pct"], r["accuracy_after_the_second_turn"],
+                r["asked_for_full_pct"], r["tokens"], r["solved_per_1k_tokens"]))
+    print("\ncontrols, all on the FIRST turn (the first three near zero, the fourth high):")
     for k in ("wrong_label_on_the_full_arm", "no_output_must_be_near_zero",
               "bytecount_only_must_be_near_zero", "full_is_the_ceiling"):
         r = out["controls"][k]
         print("  %-36s %s" % (k, "n/a" if not r else "%.1f%% of %d" % (r["accuracy_pct"], r["n"])))
-    print("\nresult: %s\nledger: %s" % (RESULT, LEDGER))
+    print("\nmeasured spend: %d in + %d out tokens = %.4f USD (%.5f per cell)" % (
+        _SPEND["in"], _SPEND["out"], spend, spend / max(len(rows), 1)))
+    print("result: %s\nledger: %s" % (RESULT, LEDGER))
 
 
 if __name__ == "__main__":
