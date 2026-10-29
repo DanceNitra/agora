@@ -1,0 +1,188 @@
+{
+ "measured": "2026-10-29",
+ "inspeximus": "3.25.0",
+ "store": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\f675e3ad-b1b0-4717-80f9-e378da8d74a5\\scratchpad\\hermescombo\\state.db",
+ "hybrid_arm": true,
+ "ranking": "lexical (no embedder, the saver hook's own default)",
+ "intent": "the tool call's own description or command, the precedence the shipped PostToolUse hook uses (context_saver.post_tool_use_replacement)",
+ "rows_over_2000_chars": 264,
+ "needles_sampled": 1320,
+ "answer_terms_sampled": 550,
+ "buried_answer_terms_sampled": 226,
+ "rows_whose_question_shares_a_term_with_the_output": 186,
+ "strategies": {
+  "baseline": {
+   "bytes": 2051328,
+   "kept_pct_of_baseline": 100.0,
+   "needles_kept": 1320,
+   "needles_kept_pct": 100.0,
+   "answer_terms_kept": 550,
+   "answer_terms_kept_pct": 100.0,
+   "buried_terms_kept": 226,
+   "buried_terms_kept_pct": 100.0
+  },
+  "hermes": {
+   "bytes": 10960,
+   "kept_pct_of_baseline": 0.5,
+   "needles_kept": 11,
+   "needles_kept_pct": 0.8,
+   "answer_terms_kept": 14,
+   "answer_terms_kept_pct": 2.5,
+   "buried_terms_kept": 0,
+   "buried_terms_kept_pct": 0.0
+  },
+  "saver": {
+   "bytes": 560499,
+   "kept_pct_of_baseline": 27.3,
+   "needles_kept": 772,
+   "needles_kept_pct": 58.5,
+   "answer_terms_kept": 422,
+   "answer_terms_kept_pct": 76.7,
+   "buried_terms_kept": 139,
+   "buried_terms_kept_pct": 61.5
+  },
+  "combined": {
+   "bytes": 10782,
+   "kept_pct_of_baseline": 0.5,
+   "needles_kept": 11,
+   "needles_kept_pct": 0.8,
+   "answer_terms_kept": 14,
+   "answer_terms_kept_pct": 2.5,
+   "buried_terms_kept": 0,
+   "buried_terms_kept_pct": 0.0
+  },
+  "truncate_same_bytes": {
+   "bytes": 561089,
+   "kept_pct_of_baseline": 27.4,
+   "needles_kept": 801,
+   "needles_kept_pct": 60.7,
+   "answer_terms_kept": 444,
+   "answer_terms_kept_pct": 80.7,
+   "buried_terms_kept": 124,
+   "buried_terms_kept_pct": 54.9
+  },
+  "spared": {
+   "bytes": 560499,
+   "kept_pct_of_baseline": 27.3,
+   "needles_kept": 772,
+   "needles_kept_pct": 58.5,
+   "answer_terms_kept": 422,
+   "answer_terms_kept_pct": 76.7,
+   "buried_terms_kept": 139,
+   "buried_terms_kept_pct": 61.5
+  },
+  "head_tail_plus_digest": {
+   "bytes": 561679,
+   "kept_pct_of_baseline": 27.4,
+   "needles_kept": 781,
+   "needles_kept_pct": 59.2,
+   "answer_terms_kept": 426,
+   "answer_terms_kept_pct": 77.5,
+   "buried_terms_kept": 133,
+   "buried_terms_kept_pct": 58.8
+  },
+  "echo_head_plus_digest": {
+   "bytes": 561679,
+   "kept_pct_of_baseline": 27.4,
+   "needles_kept": 782,
+   "needles_kept_pct": 59.2,
+   "answer_terms_kept": 432,
+   "answer_terms_kept_pct": 78.5,
+   "buried_terms_kept": 133,
+   "buried_terms_kept_pct": 58.8
+  },
+  "saver_hybrid": {
+   "bytes": 560031,
+   "kept_pct_of_baseline": 27.3,
+   "needles_kept": 771,
+   "needles_kept_pct": 58.4,
+   "answer_terms_kept": 422,
+   "answer_terms_kept_pct": 76.7,
+   "buried_terms_kept": 139,
+   "buried_terms_kept_pct": 61.5
+  }
+ },
+ "controls": {
+  "rows_hermes_left_unchanged": 0,
+  "needles_missing_from_their_own_source": 0,
+  "hermes_generic_fallback_rows": 16,
+  "needles_kept_by_the_content_free_fallback": 0,
+  "rows_with_no_answer_term": 78,
+  "rows_whose_call_carried_no_intent": 14,
+  "rows_the_embedder_reordered": 62
+ },
+ "per_tool": {
+  "terminal": {
+   "rows": 154,
+   "baseline": 866910,
+   "hermes": 6627,
+   "saver": 380883
+  },
+  "read_file": {
+   "rows": 40,
+   "baseline": 389473,
+   "hermes": 1773,
+   "saver": 57236
+  },
+  "skill_view": {
+   "rows": 25,
+   "baseline": 300925,
+   "hermes": 841,
+   "saver": 46644
+  },
+  "web_search": {
+   "rows": 11,
+   "baseline": 189451,
+   "hermes": 483,
+   "saver": 11348
+  },
+  "search_files": {
+   "rows": 4,
+   "baseline": 103189,
+   "hermes": 222,
+   "saver": 3347
+  },
+  "web_extract": {
+   "rows": 7,
+   "baseline": 67914,
+   "hermes": 205,
+   "saver": 11963
+  },
+  "execute_code": {
+   "rows": 15,
+   "baseline": 49901,
+   "hermes": 510,
+   "saver": 38631
+  },
+  "mcp__inspeximus__recall": {
+   "rows": 1,
+   "baseline": 30070,
+   "hermes": 47,
+   "saver": 1183
+  },
+  "skills_list": {
+   "rows": 2,
+   "baseline": 28800,
+   "hermes": 77,
+   "saver": 1925
+  },
+  "tool_describe": {
+   "rows": 2,
+   "baseline": 11637,
+   "hermes": 72,
+   "saver": 1101
+  },
+  "patch": {
+   "rows": 2,
+   "baseline": 10880,
+   "hermes": 82,
+   "saver": 4060
+  },
+  "process_manage": {
+   "rows": 1,
+   "baseline": 2178,
+   "hermes": 21,
+   "saver": 2178
+  }
+ }
+}
