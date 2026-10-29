@@ -1,0 +1,61 @@
+{
+ "measured": "2026-10-29",
+ "what": "why the digest's recall does not rise with the budget. No model is called.",
+ "corpus": {
+  "rows_seen": 400,
+  "skipped_no_gradable_fact": 354,
+  "skipped_over_max_chars": 20,
+  "skipped_because_the_row_looked_like_a_credential": 3,
+  "rows_with_an_aligned_fact": 0,
+  "cells_available": {
+   "intent_independent/prose": 18,
+   "intent_independent/diff": 5
+  }
+ },
+ "tasks_that_had_to_be_cut": 23,
+ "budget_fraction": 0.2,
+ "preview_chars": 240,
+ "truncation_at_this_budget_pct": 47.8,
+ "by_chunk_size": {
+  "4096": {
+   "median_chunks_per_output": 7,
+   "median_digest_bytes": 2619,
+   "answers_located_in_a_chunk": 23,
+   "answers_inside_the_240_char_head_window": 0,
+   "coverable_pct": 0.0,
+   "digest_kept": 7,
+   "digest_kept_pct": 30.4
+  },
+  "1024": {
+   "median_chunks_per_output": 16,
+   "median_digest_bytes": 2686,
+   "answers_located_in_a_chunk": 23,
+   "answers_inside_the_240_char_head_window": 9,
+   "coverable_pct": 39.1,
+   "digest_kept": 8,
+   "digest_kept_pct": 34.8
+  },
+  "512": {
+   "median_chunks_per_output": 27,
+   "median_digest_bytes": 2686,
+   "answers_located_in_a_chunk": 23,
+   "answers_inside_the_240_char_head_window": 16,
+   "coverable_pct": 69.6,
+   "digest_kept": 7,
+   "digest_kept_pct": 30.4
+  },
+  "256": {
+   "median_chunks_per_output": 48,
+   "median_digest_bytes": 2686,
+   "answers_located_in_a_chunk": 23,
+   "answers_inside_the_240_char_head_window": 22,
+   "coverable_pct": 95.7,
+   "digest_kept": 10,
+   "digest_kept_pct": 43.5
+  }
+ },
+ "controls": {
+  "the_chunk_limit_is_a_default_argument_so_the_constant_is_not_the_lever": true,
+  "the_offset_is_measured_in_the_real_chunk_not_by_modulo": true
+ }
+}
