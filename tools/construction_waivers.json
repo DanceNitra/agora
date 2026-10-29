@@ -26,7 +26,7 @@
   "kinds": [
    "UNSWEPT-KNOB"
   ],
-  "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
+  "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file \u2014 neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
   "dated": "2026-08-08"
  },
  "C:/Users/Danculus/ramr-pub/ramr_trace_export.py": {
@@ -186,5 +186,26 @@
   ],
   "date": "2026-09-28",
   "reason": "Two context lines for the episode transcript check. They publish no number this project computed. They name the Qwen3.8 27B decider, verified in the docstring of research/probes/taste_outcome_not_ranking.py. They also restate that every lesson carries the true outcome, verified in the article's Limits section and in lesson() of ramr_taste_memory.py, which writes the labelled better option into every lesson."
+ },
+ "probes/hermes_prune_vs_our_saver_on_his_transcript.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "PROBE_HYBRID adds a second ranking arm and CAN change a number, so it is swept rather than dismissed: with it off (the published run, recorded as hybrid_arm false) and with it on, the hybrid arm scored identically to the lexical arm while reordering 62 of 264 rows.",
+  "dated": "2026-10-29"
+ },
+ "probes/the_digest_beats_truncation_on_a_second_corpus.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "PROBE_MAX_RESULTS caps how many Claude Code tool results are read and CAN change the numbers. The published run used the default, 400. The companion probe the_digest_win_survives_its_own_kill_tests.py sweeps the same cap at 400 and 900 and records both points in its result file; the direction of every arm is the same at both.",
+  "dated": "2026-10-29"
+ },
+ "probes/the_digest_win_survives_its_own_kill_tests.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "PROBE_MAX_ROWS caps the Claude Code arm only; the Hermes arm reads every row over the threshold and is identical at any cap. The knob is swept, not disclosed: the result file carries sample_cap_sweep with both 400 and 900, and the published run is 900.",
+  "dated": "2026-10-29"
  }
 }

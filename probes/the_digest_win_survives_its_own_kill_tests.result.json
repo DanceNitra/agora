@@ -66,66 +66,235 @@
    }
   },
   "claude_code": {
-   "rows_scored": 144,
-   "rows_skipped_because_the_output_already_fits": 256,
-   "baseline_bytes": 1690977,
+   "rows_scored": 351,
+   "rows_skipped_because_the_output_already_fits": 549,
+   "baseline_bytes": 3896795,
    "bytes_pct_of_baseline": {
-    "digest": 7.7,
-    "digest_no_footer": 6.9,
-    "digest_content_only": 4.4,
-    "even_spread": 7.7,
-    "truncate_same_bytes": 7.8
+    "digest": 8.0,
+    "digest_no_footer": 7.1,
+    "digest_content_only": 4.5,
+    "even_spread": 8.0,
+    "truncate_same_bytes": 8.0
    },
    "buried_terms_by_edge": {
-    "100": 57,
-    "200": 53,
-    "400": 40,
-    "800": 28,
-    "1600": 18
+    "100": 252,
+    "200": 219,
+    "400": 169,
+    "800": 113,
+    "1600": 66
    },
    "kept_pct_by_edge": {
     "100": {
-     "digest": 43.9,
-     "digest_no_footer": 36.8,
-     "digest_content_only": 36.8,
-     "even_spread": 29.8,
-     "truncate_same_bytes": 29.8
+     "digest": 35.7,
+     "digest_no_footer": 31.3,
+     "digest_content_only": 31.0,
+     "even_spread": 30.2,
+     "truncate_same_bytes": 36.9
     },
     "200": {
-     "digest": 39.6,
-     "digest_no_footer": 32.1,
-     "digest_content_only": 32.1,
-     "even_spread": 24.5,
-     "truncate_same_bytes": 24.5
+     "digest": 33.3,
+     "digest_no_footer": 29.2,
+     "digest_content_only": 28.8,
+     "even_spread": 23.7,
+     "truncate_same_bytes": 27.4
     },
     "400": {
-     "digest": 30.0,
-     "digest_no_footer": 22.5,
-     "digest_content_only": 22.5,
-     "even_spread": 10.0,
-     "truncate_same_bytes": 0.0
+     "digest": 29.6,
+     "digest_no_footer": 26.0,
+     "digest_content_only": 25.4,
+     "even_spread": 16.6,
+     "truncate_same_bytes": 8.3
     },
     "800": {
-     "digest": 3.6,
-     "digest_no_footer": 3.6,
-     "digest_content_only": 3.6,
-     "even_spread": 0.0,
+     "digest": 24.8,
+     "digest_no_footer": 23.9,
+     "digest_content_only": 23.9,
+     "even_spread": 16.8,
      "truncate_same_bytes": 0.0
     },
     "1600": {
-     "digest": 0.0,
-     "digest_no_footer": 0.0,
-     "digest_content_only": 0.0,
-     "even_spread": 0.0,
+     "digest": 24.2,
+     "digest_no_footer": 24.2,
+     "digest_content_only": 24.2,
+     "even_spread": 16.7,
      "truncate_same_bytes": 0.0
     }
    },
    "controls": {
     "needles_missing_from_their_own_source": 0,
-    "rows_where_the_footer_strip_shortened_the_digest": 144,
-    "rows_where_content_only_shortened_the_digest": 144,
+    "rows_where_the_footer_strip_shortened_the_digest": 351,
+    "rows_where_content_only_shortened_the_digest": 351,
     "the_arms_differ_at_edge_400": true
    }
   }
+ },
+ "published_run": "PROBE_MAX_ROWS=900",
+ "sample_cap_sweep": {
+  "why": "PROBE_MAX_ROWS caps the Claude Code arm only; the Hermes arm reads every row over the threshold. The cap moves the numbers, so both points are recorded.",
+  "PROBE_MAX_ROWS=400": {
+   "hermes": {
+    "rows_scored": 118,
+    "kept_pct_by_edge": {
+     "100": {
+      "digest": 24.7,
+      "digest_no_footer": 18.2,
+      "digest_content_only": 17.6,
+      "even_spread": 27.1,
+      "truncate_same_bytes": 36.5
+     },
+     "200": {
+      "digest": 20.7,
+      "digest_no_footer": 16.6,
+      "digest_content_only": 15.9,
+      "even_spread": 21.4,
+      "truncate_same_bytes": 25.5
+     },
+     "400": {
+      "digest": 19.6,
+      "digest_no_footer": 14.3,
+      "digest_content_only": 13.4,
+      "even_spread": 14.3,
+      "truncate_same_bytes": 7.1
+     },
+     "800": {
+      "digest": 16.9,
+      "digest_no_footer": 13.0,
+      "digest_content_only": 11.7,
+      "even_spread": 10.4,
+      "truncate_same_bytes": 0.0
+     },
+     "1600": {
+      "digest": 17.3,
+      "digest_no_footer": 15.4,
+      "digest_content_only": 13.5,
+      "even_spread": 11.5,
+      "truncate_same_bytes": 0.0
+     }
+    }
+   },
+   "claude_code": {
+    "rows_scored": 92,
+    "kept_pct_by_edge": {
+     "100": {
+      "digest": 35.4,
+      "digest_no_footer": 24.4,
+      "digest_content_only": 24.4,
+      "even_spread": 26.8,
+      "truncate_same_bytes": 18.3
+     },
+     "200": {
+      "digest": 34.7,
+      "digest_no_footer": 25.0,
+      "digest_content_only": 25.0,
+      "even_spread": 18.1,
+      "truncate_same_bytes": 6.9
+     },
+     "400": {
+      "digest": 36.5,
+      "digest_no_footer": 27.0,
+      "digest_content_only": 27.0,
+      "even_spread": 14.3,
+      "truncate_same_bytes": 0.0
+     },
+     "800": {
+      "digest": 35.6,
+      "digest_no_footer": 28.9,
+      "digest_content_only": 28.9,
+      "even_spread": 11.1,
+      "truncate_same_bytes": 0.0
+     },
+     "1600": {
+      "digest": 45.8,
+      "digest_no_footer": 33.3,
+      "digest_content_only": 33.3,
+      "even_spread": 4.2,
+      "truncate_same_bytes": 0.0
+     }
+    }
+   }
+  },
+  "PROBE_MAX_ROWS=900": {
+   "hermes": {
+    "rows_scored": 118,
+    "kept_pct_by_edge": {
+     "100": {
+      "digest": 24.7,
+      "digest_no_footer": 18.2,
+      "digest_content_only": 17.6,
+      "even_spread": 27.1,
+      "truncate_same_bytes": 36.5
+     },
+     "200": {
+      "digest": 20.7,
+      "digest_no_footer": 16.6,
+      "digest_content_only": 15.9,
+      "even_spread": 21.4,
+      "truncate_same_bytes": 25.5
+     },
+     "400": {
+      "digest": 19.6,
+      "digest_no_footer": 14.3,
+      "digest_content_only": 13.4,
+      "even_spread": 14.3,
+      "truncate_same_bytes": 7.1
+     },
+     "800": {
+      "digest": 16.9,
+      "digest_no_footer": 13.0,
+      "digest_content_only": 11.7,
+      "even_spread": 10.4,
+      "truncate_same_bytes": 0.0
+     },
+     "1600": {
+      "digest": 17.3,
+      "digest_no_footer": 15.4,
+      "digest_content_only": 13.5,
+      "even_spread": 11.5,
+      "truncate_same_bytes": 0.0
+     }
+    }
+   },
+   "claude_code": {
+    "rows_scored": 351,
+    "kept_pct_by_edge": {
+     "100": {
+      "digest": 35.7,
+      "digest_no_footer": 31.3,
+      "digest_content_only": 31.0,
+      "even_spread": 30.2,
+      "truncate_same_bytes": 36.9
+     },
+     "200": {
+      "digest": 33.3,
+      "digest_no_footer": 29.2,
+      "digest_content_only": 28.8,
+      "even_spread": 23.7,
+      "truncate_same_bytes": 27.4
+     },
+     "400": {
+      "digest": 29.6,
+      "digest_no_footer": 26.0,
+      "digest_content_only": 25.4,
+      "even_spread": 16.6,
+      "truncate_same_bytes": 8.3
+     },
+     "800": {
+      "digest": 24.8,
+      "digest_no_footer": 23.9,
+      "digest_content_only": 23.9,
+      "even_spread": 16.8,
+      "truncate_same_bytes": 0.0
+     },
+     "1600": {
+      "digest": 24.2,
+      "digest_no_footer": 24.2,
+      "digest_content_only": 24.2,
+      "even_spread": 16.7,
+      "truncate_same_bytes": 0.0
+     }
+    }
+   }
+  },
+  "conclusion": "The direction is the same at both caps: truncation wins at EDGE=100, the digest wins at EDGE>=400, and the footer is worth 3.6 to 7.1 points. The Hermes arm is identical at both caps because it is uncapped."
  }
 }
