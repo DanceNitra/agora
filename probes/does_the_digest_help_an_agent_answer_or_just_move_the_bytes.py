@@ -74,7 +74,7 @@ MIN_CHARS = 2000
 MAX_CHARS = 40000          # a prompt cap: the `full` arm carries the whole output, so a 300 KB row
                            # would price the ceiling control out by itself. Swept, see --max-chars.
 EDGE = 400                 # the window a head-and-tail cut keeps for free
-MODEL = "deepseek-v4.1-flash:1017"      # pinned to a dated build; :cloud floats, 0731 is 410 Gone
+MODEL = "claude-haiku-5-5"              # the owner's choice; billed to his Anthropic org
 MAX_TOKENS = 4000          # FLOORED, never capped: this model spends ~30 tokens thinking first
 ARMS = ("full", "digest", "digest_no_footer", "truncate", "even_spread", "bytecount_only", "no_output")
 
@@ -89,6 +89,27 @@ try except finally else elif if while for def class return yield import from wit
 assert lambda global nonlocal del await async match case switch default public private protected
 static void const let var function new delete typeof interface struct enum impl fn pub use mod
 """.split())
+
+#: A row that looks like it carries a credential is dropped WHOLE, because the `full` arm sends the
+#: whole output. Counted and reported, never silent.
+_SECRET = re.compile(
+    r"(sk-[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}"
+    r"|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_\-]{30,}"
+    r"|-----BEGIN [A-Z ]*PRIVATE KEY-----|ya29\.[A-Za-z0-9_\-]{20,}"
+    r"|eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}"
+    r"|\b(?:api[_\- ]?key|secret|token|password|passwd|bearer|authorization)\b[\"'\s:=]{1,6}"
+    r"[A-Za-z0-9+/=_\-]{20,})", re.I)
+
+
+def carries_a_secret(output):
+    """Does this output look like it holds a credential? Err toward yes."""
+    return bool(_SECRET.search(output))
+
+
+#: Billing, measured per call and summed, so the run reports what it cost rather than an estimate.
+#: Claude Haiku 5.5 list prices for prompts up to 100K tokens; thinking is billed as output.
+USD_IN, USD_OUT = 0.10 / 1e6, 0.50 / 1e6
+_SPEND = {"in": 0, "out": 0}
 
 _print_lock = threading.Lock()
 
@@ -190,11 +211,97 @@ def facts(output, edge):
             continue
         if label.lower() in _KEYWORDS or label.split()[0].lower() in _KEYWORDS:
             continue                                  # a code keyword is not a label
+        if label.lower() in _KEYWORDS or label.split()[0].lower() in _KEYWORDS:
+            continue                                  # a code keyword is not a label
         out.append((label, value))
     return out
 
 
-def build_tasks(limit, seed, edge, max_chars):
+PUBLIC_REPO = Path(os.path.expanduser("~")) / "inspeximus-repo"
+
+
+def public_rows(limit=400):
+    """(source, tool, intent, output) from real commands against the PUBLIC inspeximus repo.
+
+    The first corpus was the owner's own Hermes and Claude Code sessions, which is the right
+    material and the wrong thing to send to a third party: the credential filter above found 18 of
+    13,040 of his rows that looked like a key, and one prompt carried the name of a private
+    repository. These rows are real tool output with the same shapes, from a repository that is
+    already public, and only TRACKED files are read, so an untracked scratch file cannot leak.
+
+    Bounded and noisy on purpose: finding an aligned term costs one `git show` per file, and an
+    unbounded scan took longer than the measurement it feeds while printing nothing.
+    """
+    import subprocess
+    repo = str(PUBLIC_REPO)
+
+    def run(cmd):
+        try:
+            p = subprocess.run(cmd, cwd=repo, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=120)
+        except (OSError, subprocess.SubprocessError):
+            return None
+        out = (p.stdout or "") + (p.stderr or "")
+        return out if len(out) >= MIN_CHARS else None
+
+    shas = (run(["git", "log", "--format=%H", "-n", "120"]) or "").split()
+    tracked = (run(["git", "ls-files"]) or "").splitlines()
+
+    plans = []
+    for sha in shas:
+        plans.append((["git", "show", sha], "git show %s" % sha[:8]))
+        plans.append((["git", "show", "--stat", sha], "git show --stat %s" % sha[:8]))
+    plans.append((["git", "log", "-n", "200"], "git log -n 200"))
+    plans.append((["git", "log", "--pretty=format:%h,%an,%ad,%s", "-n", "300"],
+                  "git log --pretty=format:%h,%an,%ad,%s -n 300"))
+    for rel in tracked:
+        if rel.endswith((".json", ".md", ".py", ".toml", ".yaml", ".yml", ".csv")):
+            plans.append((["git", "show", "HEAD:" + rel], "git show HEAD:%s" % rel))
+    for snippet, why in (
+            ("import json;json.loads(open('tools/mutations.json',encoding='utf-8').read()[:500])",
+             "check that mutations.json parses"),
+            ("import sys;sys.path.insert(0,'.');from inspeximus import Inspeximus;"
+             "Inspeximus('/nope/x.json')", "open a store under a path that does not exist"),
+            ("import sys;sys.path.insert(0,'.');from inspeximus import Inspeximus;"
+             "Inspeximus('m.json').correct('no::such::key','x')",
+             "correct a key that was never written")):
+        plans.append((["python", "-c", snippet], "python -c %s" % why))
+
+    aligned_budget = 12          # the INTENT-ALIGNED family: a grep names the term it finds
+    for rel in tracked:
+        if aligned_budget <= 0:
+            break
+        if not rel.endswith((".py", ".md")):
+            continue
+        body = run(["git", "show", "HEAD:" + rel])
+        if not body:
+            continue
+        aligned_budget -= 1
+        mids = [lab for lab, _ in facts(body, EDGE)]
+        if not mids:
+            continue
+        term = mids[len(mids) // 2].split()[0]
+        if len(term) < 5:
+            continue
+        plans.append((["git", "grep", "-n", "-C", "6", term, "HEAD", "--", rel],
+                      "git grep -n -C 6 %s -- %s" % (term, rel)))
+
+    rng = random.Random(20261029)
+    rng.shuffle(plans)                      # so a cap does not take only `git show` of commits
+    kept, t0 = 0, time.time()
+    for cmd, intent in plans:
+        if kept >= limit:
+            break
+        out = run(cmd)
+        if out is None:
+            continue
+        kept += 1
+        if kept % 25 == 0:
+            print("  corpus %d/%d rows, %.0fs" % (kept, limit, time.time() - t0), flush=True)
+        yield "public_repo", "Bash", intent, out
+
+
+def build_tasks(limit, seed, edge, max_chars, corpus="public"):
     """A STRATIFIED task set: both intent families, and structured shapes on purpose.
 
     A first version drew one fact per row at random and produced 60 of 60 intent_independent tasks
@@ -204,13 +311,22 @@ def build_tasks(limit, seed, edge, max_chars):
     filled per (family, shape) cell rather than taken in corpus order.
     """
     rng = random.Random(seed)
-    rows = list(hermes_rows()) + list(claude_rows())
+    if corpus == "public":
+        rows = list(public_rows())
+    elif corpus == "sessions":
+        rows = list(hermes_rows()) + list(claude_rows())
+    else:
+        raise SystemExit("--corpus takes 'public' or 'sessions'")
     rng.shuffle(rows)
     pools: dict[tuple, list] = {}
     rows_seen = skipped_no_fact = skipped_too_big = rows_with_an_aligned_fact = 0
+    skipped_secret = 0
 
     for source, tool, intent, output in rows:
         rows_seen += 1
+        if carries_a_secret(output) or carries_a_secret(intent):
+            skipped_secret += 1
+            continue
         if len(output) > max_chars:
             skipped_too_big += 1
             continue
@@ -252,6 +368,7 @@ def build_tasks(limit, seed, edge, max_chars):
         })
     return tasks, {"rows_seen": rows_seen, "skipped_no_gradable_fact": skipped_no_fact,
                    "skipped_over_max_chars": skipped_too_big,
+                   "skipped_because_the_row_looked_like_a_credential": skipped_secret,
                    "rows_with_an_aligned_fact": rows_with_an_aligned_fact,
                    "cells_available": {"%s/%s" % k: len(v) + sum(
                        1 for t in tasks if (t["family"], t["shape"]) == k) for k, v in pools.items()}}
@@ -306,40 +423,52 @@ PROMPT = (
 )
 
 
-def ask(base, key, visible, label, nonce, timeout=240):
-    body = {"model": MODEL, "temperature": 0, "max_tokens": MAX_TOKENS,
-            "messages": [{"role": "user", "content": PROMPT.format(
-                nonce=nonce, visible=visible or "(the tool result was not kept)", label=label)}]}
-    req = urllib.request.Request(
-        base.rstrip("/") + "/chat/completions", data=json.dumps(body).encode(),
-        headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
+def ask(client, visible, label, nonce, timeout=240):
+    """One Messages call on Claude Haiku 5.5 at high effort.
+
+    Three things this model rejects, each a 400 and each one a real trap: `temperature` at any
+    non-default value, a `budget_tokens` thinking budget, and a thinking budget at any effort. So
+    depth is set with `output_config.effort`, which DEFAULTS TO MEDIUM on this model and therefore
+    has to be named. `max_tokens` is floored, not tight: thinking runs before the first visible
+    character, so a tight cap returns an empty completion.
+    """
     t0 = time.time()
-    r = json.loads(urllib.request.urlopen(req, timeout=timeout).read())
-    ch = r["choices"][0]
-    usage = r.get("usage") or {}
-    return ((ch["message"].get("content") or "").strip(),
-            ch.get("finish_reason"), int(usage.get("total_tokens") or 0), time.time() - t0)
+    r = client.with_options(timeout=timeout).messages.create(
+        model=MODEL,
+        max_tokens=MAX_TOKENS,
+        thinking={"type": "adaptive"},
+        output_config={"effort": "high"},
+        messages=[{"role": "user", "content": PROMPT.format(
+            nonce=nonce, visible=visible or "(the tool result was not kept)", label=label)}],
+    )
+    text = "".join(b.text for b in r.content if b.type == "text").strip()
+    tin = int(getattr(r.usage, "input_tokens", 0) or 0)
+    tout = int(getattr(r.usage, "output_tokens", 0) or 0)
+    with _print_lock:
+        _SPEND["in"] += tin
+        _SPEND["out"] += tout
+    return text, r.stop_reason, tin + tout, time.time() - t0
 
 
 def norm(s):
     return re.sub(r"\s+", " ", (s or "")).strip().strip("`'\"").lower()
 
 
-def run_one(task, arm, visible, base, key, wrong_label=False):
+def run_one(task, arm, visible, client, wrong_label=False):
     """One (task, arm) cell, including the NEED_FULL second turn."""
     label = task["label"] if not wrong_label else task["_wrong_label"]
     nonce = "%s-%s-%s" % (task["id"], arm, "w" if wrong_label else "a")
     try:
-        text, finish, tokens, secs = ask(base, key, visible, label, nonce)
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as exc:
+        text, finish, tokens, secs = ask(client, visible, label, nonce)
+    except Exception as exc:                                       # noqa: BLE001
         return {"task": task["id"], "arm": arm, "error": "%s: %s" % (type(exc).__name__, exc)}
     asked_full = False
     if norm(text) == "need_full":
         asked_full = True
         try:
-            text2, finish, more, secs2 = ask(base, key, task["output"], label, nonce + "-2")
+            text2, finish, more, secs2 = ask(client, task["output"], label, nonce + "-2")
             text, tokens, secs = text2, tokens + more, secs + secs2
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as exc:
+        except Exception as exc:                                   # noqa: BLE001
             return {"task": task["id"], "arm": arm, "asked_for_full": True,
                     "error": "%s: %s" % (type(exc).__name__, exc)}
     return {"task": task["id"], "arm": arm, "wrong_label": wrong_label,
@@ -368,7 +497,7 @@ def done_cells():
 
 def dry_run(a):
     """Everything except the model: proves the task set and the arms before anything is sent."""
-    tasks, corpus = build_tasks(a.tasks, a.seed, a.edge, a.max_chars)
+    tasks, corpus = build_tasks(a.tasks, a.seed, a.edge, a.max_chars, a.corpus)
     print("%d tasks  %s" % (len(tasks), corpus))
     if not tasks:
         return 1
@@ -410,18 +539,27 @@ def main():
     ap.add_argument("--pilot", action="store_true", help="12 tasks, to price the full run")
     ap.add_argument("--dry-run", action="store_true",
                     help="build the tasks and every arm's text, call no model, send nothing")
+    ap.add_argument("--model", default="", help="override the answering model")
+    ap.add_argument("--corpus", default="public", choices=("public", "sessions"),
+                    help="public: real commands against the public inspeximus repo. "
+                         "sessions: the owner's own transcripts, which would leave the machine")
     a = ap.parse_args()
     if a.pilot:
         a.tasks = 12
     if a.dry_run:
         return dry_run(a)
 
-    base, key = env("AGORA_API_BASE_URL"), env("AGORA_API_KEY")
-    if not base or not key:
-        print("no endpoint in server/.env")
+    global MODEL
+    if a.model:
+        MODEL = a.model
+    key = env("ANTHROPIC_API_KEY")
+    if not key:
+        print("no ANTHROPIC_API_KEY in server/.env")
         return 1
+    import anthropic
+    client = anthropic.Anthropic(api_key=key, max_retries=4)
 
-    tasks, corpus = build_tasks(a.tasks, a.seed, a.edge, a.max_chars)
+    tasks, corpus = build_tasks(a.tasks, a.seed, a.edge, a.max_chars, a.corpus)
     if not tasks:
         print("no gradable task built: %s" % corpus)
         return 1
@@ -429,8 +567,8 @@ def main():
     for t in tasks:                                   # the wrong-label control's decoy
         t["_wrong_label"] = rng.choice([o["label"] for o in tasks if o["label"] != t["label"]] or ["none"])
 
-    print("%d tasks (%s), %d workers, model %s" % (
-        len(tasks), corpus, a.workers, MODEL), flush=True)
+    print("%d tasks (%s corpus), %d workers, %s at effort high" % (
+        len(tasks), a.corpus, a.workers, MODEL), flush=True)
 
     already = done_cells()
     cells = []
@@ -448,7 +586,7 @@ def main():
 
     def work(cell):
         task, arm, visible, wrong = cell
-        row = run_one(task, arm, visible, base, key, wrong_label=wrong)
+        row = run_one(task, arm, visible, client, wrong_label=wrong)
         with _print_lock:
             with LEDGER.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(row) + "\n")
