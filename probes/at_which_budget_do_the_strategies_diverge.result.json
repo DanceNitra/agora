@@ -1,0 +1,168 @@
+{
+ "measured": "2026-10-29",
+ "what": "whether the four shortening strategies keep the answer on DIFFERENT tasks, swept over the byte budget. No model is called: keeping the answer is a precondition for answering it.",
+ "corpus": {
+  "rows_seen": 400,
+  "skipped_no_gradable_fact": 354,
+  "skipped_over_max_chars": 20,
+  "skipped_because_the_row_looked_like_a_credential": 3,
+  "rows_with_an_aligned_fact": 0,
+  "cells_available": {
+   "intent_independent/prose": 18,
+   "intent_independent/diff": 5
+  }
+ },
+ "tasks": 23,
+ "curve": {
+  "5%": {
+   "tasks_where_the_output_had_to_be_cut": 23,
+   "kept_the_answer": {
+    "digest": 7,
+    "digest_no_footer": 7,
+    "truncate": 7,
+    "even_spread": 7
+   },
+   "kept_pct": {
+    "digest": 30.4,
+    "digest_no_footer": 30.4,
+    "truncate": 30.4,
+    "even_spread": 30.4
+   },
+   "bytes_pct_of_baseline": {
+    "digest": 12.0,
+    "digest_no_footer": 11.3,
+    "truncate": 12.0,
+    "even_spread": 12.0
+   },
+   "the_arms_keep_it_on_the_same_tasks": true,
+   "distinct_answer_sets_across_the_four_arms": 1,
+   "digest_only": [],
+   "truncation_only": []
+  },
+  "10%": {
+   "tasks_where_the_output_had_to_be_cut": 23,
+   "kept_the_answer": {
+    "digest": 7,
+    "digest_no_footer": 7,
+    "truncate": 9,
+    "even_spread": 7
+   },
+   "kept_pct": {
+    "digest": 30.4,
+    "digest_no_footer": 30.4,
+    "truncate": 39.1,
+    "even_spread": 30.4
+   },
+   "bytes_pct_of_baseline": {
+    "digest": 16.0,
+    "digest_no_footer": 15.4,
+    "truncate": 16.1,
+    "even_spread": 16.0
+   },
+   "the_arms_keep_it_on_the_same_tasks": false,
+   "distinct_answer_sets_across_the_four_arms": 2,
+   "digest_only": [],
+   "truncation_only": [
+    "public_repo-1",
+    "public_repo-8"
+   ]
+  },
+  "20%": {
+   "tasks_where_the_output_had_to_be_cut": 23,
+   "kept_the_answer": {
+    "digest": 7,
+    "digest_no_footer": 7,
+    "truncate": 11,
+    "even_spread": 8
+   },
+   "kept_pct": {
+    "digest": 30.4,
+    "digest_no_footer": 30.4,
+    "truncate": 47.8,
+    "even_spread": 34.8
+   },
+   "bytes_pct_of_baseline": {
+    "digest": 24.3,
+    "digest_no_footer": 23.6,
+    "truncate": 24.3,
+    "even_spread": 24.3
+   },
+   "the_arms_keep_it_on_the_same_tasks": false,
+   "distinct_answer_sets_across_the_four_arms": 3,
+   "digest_only": [],
+   "truncation_only": [
+    "public_repo-1",
+    "public_repo-16",
+    "public_repo-3",
+    "public_repo-8"
+   ]
+  },
+  "30%": {
+   "tasks_where_the_output_had_to_be_cut": 23,
+   "kept_the_answer": {
+    "digest": 7,
+    "digest_no_footer": 7,
+    "truncate": 11,
+    "even_spread": 9
+   },
+   "kept_pct": {
+    "digest": 30.4,
+    "digest_no_footer": 30.4,
+    "truncate": 47.8,
+    "even_spread": 39.1
+   },
+   "bytes_pct_of_baseline": {
+    "digest": 26.6,
+    "digest_no_footer": 25.9,
+    "truncate": 26.6,
+    "even_spread": 26.6
+   },
+   "the_arms_keep_it_on_the_same_tasks": false,
+   "distinct_answer_sets_across_the_four_arms": 3,
+   "digest_only": [],
+   "truncation_only": [
+    "public_repo-1",
+    "public_repo-16",
+    "public_repo-3",
+    "public_repo-8"
+   ]
+  },
+  "50%": {
+   "tasks_where_the_output_had_to_be_cut": 23,
+   "kept_the_answer": {
+    "digest": 7,
+    "digest_no_footer": 7,
+    "truncate": 11,
+    "even_spread": 10
+   },
+   "kept_pct": {
+    "digest": 30.4,
+    "digest_no_footer": 30.4,
+    "truncate": 47.8,
+    "even_spread": 43.5
+   },
+   "bytes_pct_of_baseline": {
+    "digest": 26.7,
+    "digest_no_footer": 26.0,
+    "truncate": 26.7,
+    "even_spread": 26.7
+   },
+   "the_arms_keep_it_on_the_same_tasks": false,
+   "distinct_answer_sets_across_the_four_arms": 3,
+   "digest_only": [],
+   "truncation_only": [
+    "public_repo-1",
+    "public_repo-16",
+    "public_repo-3",
+    "public_repo-8"
+   ]
+  }
+ },
+ "budgets_where_the_arms_differ": [
+  "10%",
+  "20%",
+  "30%",
+  "50%"
+ ],
+ "verdict": "an A/B is worth paying for at 10%, 20%, 30%, 50%"
+}
