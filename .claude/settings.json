@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CC_GUARD_PROTECTED_REPOS": "C:/Users/Danculus/my-second-brain"
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -39,6 +42,23 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I \"$CLAUDE_PROJECT_DIR/.claude/hooks/kill_by_pid_only.py\""
+          },
+          {
+            "type": "command",
+            "command": "python -I \"$CLAUDE_PROJECT_DIR/.claude/hooks/destructive_guard.py\""
+          },
+          {
+            "type": "command",
+            "command": "python -I \"$CLAUDE_PROJECT_DIR/.claude/hooks/secrets_in_command.py\""
+          }
+        ]
+      },
       {
         "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
         "hooks": [
