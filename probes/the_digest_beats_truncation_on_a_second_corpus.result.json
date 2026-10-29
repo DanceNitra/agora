@@ -1,0 +1,37 @@
+{
+ "measured": "2026-10-29",
+ "corpus": "Claude Code transcripts under C:\\Users\\Danculus\\.claude\\projects",
+ "transcripts_available": 4003,
+ "results_over_2000_chars": 400,
+ "buried_terms_sampled": 225,
+ "arms": {
+  "baseline": {
+   "bytes": 1871920,
+   "kept_pct_of_baseline": 100.0,
+   "buried_terms_kept": 225,
+   "buried_terms_kept_pct": 100.0
+  },
+  "digest": {
+   "bytes": 1007463,
+   "kept_pct_of_baseline": 53.8,
+   "buried_terms_kept": 166,
+   "buried_terms_kept_pct": 73.8
+  },
+  "truncate_same_bytes": {
+   "bytes": 1008063,
+   "kept_pct_of_baseline": 53.9,
+   "buried_terms_kept": 137,
+   "buried_terms_kept_pct": 60.9
+  }
+ },
+ "controls": {
+  "results_whose_call_carried_no_intent": 0,
+  "needles_missing_from_their_own_source": 0,
+  "the_two_arms_differ": true
+ },
+ "hermes_corpus_for_comparison": {
+  "digest": 61.5,
+  "truncate_same_bytes": 54.9,
+  "buried_terms_sampled": 226
+ }
+}
