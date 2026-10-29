@@ -1,0 +1,131 @@
+{
+ "measured": "2026-10-29",
+ "inspeximus": "3.26.0",
+ "what": "the three kill tests the red-team panel named: footer, spread, and the EDGE constant",
+ "corpora": {
+  "hermes": {
+   "rows_scored": 118,
+   "rows_skipped_because_the_output_already_fits": 146,
+   "baseline_bytes": 1587462,
+   "bytes_pct_of_baseline": {
+    "digest": 6.1,
+    "digest_no_footer": 5.3,
+    "digest_content_only": 3.0,
+    "even_spread": 6.1,
+    "truncate_same_bytes": 6.1
+   },
+   "buried_terms_by_edge": {
+    "100": 170,
+    "200": 145,
+    "400": 112,
+    "800": 77,
+    "1600": 52
+   },
+   "kept_pct_by_edge": {
+    "100": {
+     "digest": 24.7,
+     "digest_no_footer": 18.2,
+     "digest_content_only": 17.6,
+     "even_spread": 27.1,
+     "truncate_same_bytes": 36.5
+    },
+    "200": {
+     "digest": 20.7,
+     "digest_no_footer": 16.6,
+     "digest_content_only": 15.9,
+     "even_spread": 21.4,
+     "truncate_same_bytes": 25.5
+    },
+    "400": {
+     "digest": 19.6,
+     "digest_no_footer": 14.3,
+     "digest_content_only": 13.4,
+     "even_spread": 14.3,
+     "truncate_same_bytes": 7.1
+    },
+    "800": {
+     "digest": 16.9,
+     "digest_no_footer": 13.0,
+     "digest_content_only": 11.7,
+     "even_spread": 10.4,
+     "truncate_same_bytes": 0.0
+    },
+    "1600": {
+     "digest": 17.3,
+     "digest_no_footer": 15.4,
+     "digest_content_only": 13.5,
+     "even_spread": 11.5,
+     "truncate_same_bytes": 0.0
+    }
+   },
+   "controls": {
+    "needles_missing_from_their_own_source": 0,
+    "rows_where_the_footer_strip_shortened_the_digest": 118,
+    "rows_where_content_only_shortened_the_digest": 118,
+    "the_arms_differ_at_edge_400": true
+   }
+  },
+  "claude_code": {
+   "rows_scored": 144,
+   "rows_skipped_because_the_output_already_fits": 256,
+   "baseline_bytes": 1690977,
+   "bytes_pct_of_baseline": {
+    "digest": 7.7,
+    "digest_no_footer": 6.9,
+    "digest_content_only": 4.4,
+    "even_spread": 7.7,
+    "truncate_same_bytes": 7.8
+   },
+   "buried_terms_by_edge": {
+    "100": 57,
+    "200": 53,
+    "400": 40,
+    "800": 28,
+    "1600": 18
+   },
+   "kept_pct_by_edge": {
+    "100": {
+     "digest": 43.9,
+     "digest_no_footer": 36.8,
+     "digest_content_only": 36.8,
+     "even_spread": 29.8,
+     "truncate_same_bytes": 29.8
+    },
+    "200": {
+     "digest": 39.6,
+     "digest_no_footer": 32.1,
+     "digest_content_only": 32.1,
+     "even_spread": 24.5,
+     "truncate_same_bytes": 24.5
+    },
+    "400": {
+     "digest": 30.0,
+     "digest_no_footer": 22.5,
+     "digest_content_only": 22.5,
+     "even_spread": 10.0,
+     "truncate_same_bytes": 0.0
+    },
+    "800": {
+     "digest": 3.6,
+     "digest_no_footer": 3.6,
+     "digest_content_only": 3.6,
+     "even_spread": 0.0,
+     "truncate_same_bytes": 0.0
+    },
+    "1600": {
+     "digest": 0.0,
+     "digest_no_footer": 0.0,
+     "digest_content_only": 0.0,
+     "even_spread": 0.0,
+     "truncate_same_bytes": 0.0
+    }
+   },
+   "controls": {
+    "needles_missing_from_their_own_source": 0,
+    "rows_where_the_footer_strip_shortened_the_digest": 144,
+    "rows_where_content_only_shortened_the_digest": 144,
+    "the_arms_differ_at_edge_400": true
+   }
+  }
+ }
+}
