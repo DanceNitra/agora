@@ -1,0 +1,13 @@
+{
+ "measured": "2026-10-29",
+ "crewai": "1.15.18",
+ "output_bytes": 13689,
+ "no_hook_bytes": 13689,
+ "observer_hook_bytes": 13689,
+ "digest_hook_bytes": 877,
+ "controls": {
+  "no_hook_keeps_the_whole_output": true,
+  "an_observer_hook_changes_nothing": true
+ },
+ "verdict": "REPLACED"
+}
