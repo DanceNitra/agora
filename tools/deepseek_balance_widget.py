@@ -105,7 +105,62 @@ def ollama_usage():
     lim = d24.get("limits") or d7.get("limits")                       # if Ollama returns percentages again
     pct = (float(lim["session"]["usage"]), float(lim["weekly"]["usage"])) if lim else None
     h5 = sum(b.get("request_count", 0) for b in d24.get("buckets", [])[-5:])
-    return h5, d24["totals"]["request_count"], d7["totals"]["request_count"], pct
+    est = None if pct else ollama_estimate(buckets(d24, 3600), buckets(d7, 86400))
+    return h5, d24["totals"]["request_count"], d7["totals"]["request_count"], pct, est
+
+
+# 19. 10. 2026: the plan percentages are only on ollama.com/dashboard (web login, not the API key).
+# `--calibrate WEEK% SESSION% WEEK_RESET_H SESSION_RESET_H` stores one dashboard reading; the widget
+# then scales request counts by it and shows "~X %" (an estimate; recalibrate from a new reading).
+CALIB = Path(__file__).resolve().parent / "ollama_calib.json"
+SESSION_H, WEEK_H = 5, 7 * 24       # session length is an assumption (dashboard shows only "Resets in")
+
+
+def buckets(d, width_s):
+    return [(datetime.fromisoformat(b["from"].replace("Z", "+00:00")).timestamp(), width_s, b.get("request_count", 0))
+            for b in d.get("buckets", [])]
+
+
+def requests_since(t, hourly, daily):
+    """Requests from t until now: hourly buckets where they reach, daily before; a bucket cut by t counts pro rata."""
+    now = time.time()
+    h0 = hourly[0][0] if hourly else now
+    def part(bs, lo, hi):
+        return sum(c * max(0.0, min(a + w, hi) - max(a, lo)) / w for a, w, c in bs)
+    return part(hourly, max(t, h0), now) + (part(daily, t, h0) if t < h0 else 0.0)
+
+
+def window_start(anchor, length_h, now):
+    return anchor + ((now - anchor) // (length_h * 3600)) * length_h * 3600
+
+
+def ollama_estimate(hourly, daily):
+    """(session, weekly) as fractions estimated from request counts, or None without a calibration."""
+    try:
+        c = json.loads(CALIB.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    now = time.time()
+    s = requests_since(window_start(c["session_start"], SESSION_H, now), hourly, daily) / c["req_per_pct_session"]
+    w = requests_since(window_start(c["week_start"], WEEK_H, now), hourly, daily) / c["req_per_pct_week"]
+    return s / 100, w / 100
+
+
+def calibrate(week_pct, session_pct, week_reset_h, session_reset_h):
+    key = re.search(r'^AGORA_API_KEY\s*=\s*"?([^"\n]+)', AGORA_ENV.read_text(encoding="utf-8"), re.M).group(1).strip()
+    def get(rng):
+        req = urllib.request.Request(f"https://ollama.com/api/usage?range={rng}", headers={"Authorization": f"Bearer {key}"})
+        return json.load(urllib.request.urlopen(req, timeout=15))
+    hourly, daily = buckets(get("24h"), 3600), buckets(get("7d"), 86400)
+    now = time.time()
+    ws, ss = now + (week_reset_h - WEEK_H) * 3600, now + (session_reset_h - SESSION_H) * 3600
+    wr, sr = requests_since(ws, hourly, daily), requests_since(ss, hourly, daily)
+    c = dict(at=datetime.now(timezone.utc).isoformat(timespec="seconds"), week_pct=week_pct, session_pct=session_pct,
+             week_reset_h=week_reset_h, session_reset_h=session_reset_h, week_start=ws, session_start=ss,
+             week_requests=round(wr), session_requests=round(sr), req_per_pct_week=wr / week_pct,
+             req_per_pct_session=sr / session_pct)
+    CALIB.write_text(json.dumps(c, indent=1), encoding="utf-8")
+    return c
 
 
 def price_at(ts):
@@ -339,13 +394,16 @@ class Widget:
 
     def fetch_ollama(self):
         try:
-            h5, h24, d7, pct = ollama_usage()
+            h5, h24, d7, pct, est = ollama_usage()
         except Exception as e:
             self.root.after(0, lambda: self.label.config(text=f"Ollama ? ({type(e).__name__})", fg=FG))
             return
         if pct:
             text = f"Ollama 5h {pct[0] * 100:.0f}%  týž {pct[1] * 100:.0f}%"
             color = FG_WARN if max(pct) >= 0.9 else FG
+        elif est:   # odhad z počtu dopytov podľa poslednej kalibrácie z ollama.com/dashboard
+            text = f"Ollama relácia ~{est[0] * 100:.0f}%  týž ~{est[1] * 100:.0f}%"
+            color = FG_WARN if max(est) >= 0.9 else FG
         else:   # API dáva len počty požiadaviek (% plánu je len na ollama.com/settings)
             text = f"Ollama dotazy: 5 h {h5} · deň {h24} · týž {d7:,}".replace(",", " ")
             color = FG
@@ -353,4 +411,8 @@ class Widget:
 
 
 if __name__ == "__main__":
-    Widget()
+    import sys
+    if sys.argv[1:2] == ["--calibrate"]:     # --calibrate 16.8 19 156 3.5  (týž %, relácia %, reset týž h, reset relácia h)
+        print(json.dumps(calibrate(*map(float, sys.argv[2:6])), indent=1))
+    else:
+        Widget()

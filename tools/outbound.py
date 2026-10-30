@@ -195,7 +195,22 @@ def _sealed(slug):
 
 
 def _publish_cmd(meta):
+    """The gh command that publishes this text.
+
+    A text that OPENS a pull request is not a comment on one. Without this branch the command came
+    out as `gh pr comment <thread>`, which would have posted a catalog submission into an unrelated
+    issue in the same repository -- the thread that only exists so the pregate has prior statements
+    to compare against. `creates` says the destination does not exist yet; send_approved already
+    recognises `gh pr create` and runs its new-thread gate instead of the repeat check.
+    """
     repo, num = _thread_parts(meta["thread"])
+    c = meta.get("creates") or {}
+    if c:
+        missing = [k for k in ("repo", "title", "head", "base") if not c.get(k)]
+        if missing:
+            raise SystemExit("REFUSED: meta.creates is missing %s" % ", ".join(missing))
+        return ["gh", meta.get("kind", "pr"), "create", "--repo", c["repo"],
+                "--title", c["title"], "--head", c["head"], "--base", c["base"]]
     return ["gh", meta.get("kind", "issue"), "comment", num, "--repo", repo]
 
 
