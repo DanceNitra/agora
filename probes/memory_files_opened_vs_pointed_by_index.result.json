@@ -1,0 +1,8 @@
+{
+ "memory_files_on_disk": 664,
+ "files_pointed_at_by_the_live_index": 121,
+ "files_not_pointed_at": 543,
+ "opened_by_agent": 102,
+ "opened_and_pointed_at": 61,
+ "opened_and_not_pointed_at": 41
+}

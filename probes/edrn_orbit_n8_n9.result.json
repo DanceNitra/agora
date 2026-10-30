@@ -1,0 +1,55 @@
+{
+ "7": {
+  "so_same": 6729,
+  "so_diff": 0,
+  "do_same": 382,
+  "do_diff": 44142,
+  "n": 7,
+  "graphs_done": 853,
+  "graphs_total": 853,
+  "graphs_with_coincidence": 98,
+  "coincident_pairs_in_asymmetric_graphs": 0,
+  "asymmetric_graphs": 144,
+  "max_pairs_in_one_graph": 32,
+  "control": "reproduces the published count with zero same-orbit counterexamples"
+ },
+ "6": {
+  "so_same": 1066,
+  "so_diff": 0,
+  "do_same": 32,
+  "do_diff": 2699,
+  "n": 6,
+  "graphs_done": 112,
+  "graphs_total": 112,
+  "graphs_with_coincidence": 11,
+  "coincident_pairs_in_asymmetric_graphs": 0,
+  "asymmetric_graphs": 8,
+  "max_pairs_in_one_graph": 9
+ },
+ "8": {
+  "so_same": 66787,
+  "so_diff": 0,
+  "do_same": 3452,
+  "do_diff": 1047659,
+  "n": 8,
+  "graphs_done": 11117,
+  "graphs_total": 11117,
+  "graphs_with_coincidence": 981,
+  "coincident_pairs_in_asymmetric_graphs": 0,
+  "asymmetric_graphs": 3552,
+  "max_pairs_in_one_graph": 50
+ },
+ "9": {
+  "so_same": 981626,
+  "so_diff": 4,
+  "do_same": 35930,
+  "do_diff": 41201460,
+  "n": 9,
+  "graphs_done": 261080,
+  "graphs_total": 261080,
+  "graphs_with_coincidence": 13042,
+  "coincident_pairs_in_asymmetric_graphs": 0,
+  "asymmetric_graphs": 131452,
+  "max_pairs_in_one_graph": 125
+ }
+}

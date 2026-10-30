@@ -1,0 +1,27 @@
+{
+ "records_naming_a_memory_file": 75,
+ "by_record_type": {
+  "file": 33,
+  "edited_text_file": 41,
+  "compact_file_reference": 1
+ },
+ "agent_had_touched_the_file_earlier": 72,
+ "not_touched_earlier": 3,
+ "not_touched_examples": [
+  [
+   "1e06e98b",
+   "edited_text_file",
+   "successfully-installed-is-not-evidence-the-package-works.md"
+  ],
+  [
+   "cf10d690",
+   "edited_text_file",
+   "agmi-issue3-defended-row-commitment.md"
+  ],
+  [
+   "e551f16c",
+   "edited_text_file",
+   "never-delete-outside-the-sandbox-run-probes-through-safe-run.md"
+  ]
+ ]
+}

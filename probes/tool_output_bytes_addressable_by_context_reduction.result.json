@@ -1,0 +1,150 @@
+{
+ "measured": "2026-10-19 11:21",
+ "transcripts": 3777,
+ "tool_result_bytes_total": 85907148,
+ "bytes_in_results_over_5KB": 34341879,
+ "share_over_5KB": 0.4,
+ "bytes_in_results_over_100KB": 0,
+ "by_tool_top": [
+  {
+   "tool": "Bash",
+   "calls": 48789,
+   "bytes": 61588007,
+   "bytes_over_5KB": 21659602,
+   "calls_over_5KB": 2478
+  },
+  {
+   "tool": "Read",
+   "calls": 4267,
+   "bytes": 6560181,
+   "bytes_over_5KB": 5525033,
+   "calls_over_5KB": 325
+  },
+  {
+   "tool": "mcp:3d8ff204-9faa-4eaa-823b-",
+   "calls": 1028,
+   "bytes": 2870946,
+   "bytes_over_5KB": 2603734,
+   "calls_over_5KB": 151
+  },
+  {
+   "tool": "mcp:claude-in-chrome",
+   "calls": 2962,
+   "bytes": 2883705,
+   "bytes_over_5KB": 1057146,
+   "calls_over_5KB": 90
+  },
+  {
+   "tool": "mcp:unreal-mcp",
+   "calls": 1875,
+   "bytes": 1162944,
+   "bytes_over_5KB": 784995,
+   "calls_over_5KB": 57
+  },
+  {
+   "tool": "mcp:notebooklm-mcp",
+   "calls": 271,
+   "bytes": 842084,
+   "bytes_over_5KB": 755579,
+   "calls_over_5KB": 30
+  },
+  {
+   "tool": "mcp:Claude_Browser",
+   "calls": 2593,
+   "bytes": 2223630,
+   "bytes_over_5KB": 604532,
+   "calls_over_5KB": 72
+  },
+  {
+   "tool": "PowerShell",
+   "calls": 1903,
+   "bytes": 1025376,
+   "bytes_over_5KB": 285446,
+   "calls_over_5KB": 34
+  },
+  {
+   "tool": "mcp:ccd_session_mgmt",
+   "calls": 358,
+   "bytes": 354876,
+   "bytes_over_5KB": 216650,
+   "calls_over_5KB": 17
+  },
+  {
+   "tool": "WebFetch",
+   "calls": 405,
+   "bytes": 590692,
+   "bytes_over_5KB": 174058,
+   "calls_over_5KB": 12
+  },
+  {
+   "tool": "mcp:inspeximus",
+   "calls": 358,
+   "bytes": 311396,
+   "bytes_over_5KB": 145731,
+   "calls_over_5KB": 7
+  },
+  {
+   "tool": "Artifact",
+   "calls": 34,
+   "bytes": 185473,
+   "bytes_over_5KB": 144701,
+   "calls_over_5KB": 5
+  },
+  {
+   "tool": "mcp:visualize",
+   "calls": 7,
+   "bytes": 138420,
+   "bytes_over_5KB": 137892,
+   "calls_over_5KB": 3
+  },
+  {
+   "tool": "Grep",
+   "calls": 458,
+   "bytes": 368645,
+   "bytes_over_5KB": 84271,
+   "calls_over_5KB": 11
+  },
+  {
+   "tool": "WebSearch",
+   "calls": 344,
+   "bytes": 1012532,
+   "bytes_over_5KB": 62940,
+   "calls_over_5KB": 10
+  },
+  {
+   "tool": "mcp:1a59c906-04da-521d-bda7-",
+   "calls": 14,
+   "bytes": 48137,
+   "bytes_over_5KB": 35309,
+   "calls_over_5KB": 1
+  },
+  {
+   "tool": "TaskStop",
+   "calls": 199,
+   "bytes": 203818,
+   "bytes_over_5KB": 35293,
+   "calls_over_5KB": 5
+  },
+  {
+   "tool": "mcp:3ad79330-0d1b-414e-a8ad-",
+   "calls": 1,
+   "bytes": 9401,
+   "bytes_over_5KB": 9401,
+   "calls_over_5KB": 1
+  },
+  {
+   "tool": "Glob",
+   "calls": 13,
+   "bytes": 10570,
+   "bytes_over_5KB": 8873,
+   "calls_over_5KB": 1
+  },
+  {
+   "tool": "TaskOutput",
+   "calls": 35,
+   "bytes": 22854,
+   "bytes_over_5KB": 5515,
+   "calls_over_5KB": 1
+  }
+ ]
+}

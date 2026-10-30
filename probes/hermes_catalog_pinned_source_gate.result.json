@@ -1,0 +1,13 @@
+{
+  "probe": "hermes_catalog_pinned_source_gate.py",
+  "repo": "https://github.com/DanceNitra/inspeximus",
+  "pinned_sha": "2a4141cf89e0bbe5bcca9d2e167df41477ef5463",
+  "subdir": "integrations/hermes-plugin-inspeximus",
+  "hermes_version": "0.21.3",
+  "hermes_built_from_pr_checkout": false,
+  "attestation_verified": false,
+  "verdict": "Validation passed",
+  "checks_passed": 13,
+  "python_dependencies": 1,
+  "control_verdict": "Validation failed"
+}

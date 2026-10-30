@@ -1,0 +1,185 @@
+{
+ "measured": "2026-10-19 11:03",
+ "compactions": 172,
+ "transcripts": 20,
+ "summary_chars_median": 18437,
+ "summary_has_transcript_pointer": 172,
+ "aggregate_mean_and_n": {
+  "last_prompt": {
+   "real": [
+    0.74,
+    146
+   ],
+   "positive_control": [
+    1.0,
+    146
+   ],
+   "negative_control": [
+    0.125,
+    146
+   ]
+  },
+  "files_last10": {
+   "real": [
+    0.65,
+    170
+   ],
+   "positive_control": [
+    0.998,
+    170
+   ],
+   "negative_control": [
+    0.026,
+    170
+   ]
+  },
+  "open_errors": {
+   "real": [
+    0.111,
+    9
+   ],
+   "positive_control": [
+    1.0,
+    9
+   ],
+   "negative_control": [
+    0.111,
+    9
+   ]
+  },
+  "corrections": {
+   "real": [
+    0.652,
+    46
+   ],
+   "positive_control": [
+    1.0,
+    46
+   ],
+   "negative_control": [
+    0.043,
+    46
+   ]
+  }
+ },
+ "lowest_last_prompt": [
+  {
+   "file": "C--Users-Danculus-Desktop-ftmo-lab\\3a561741-02a7-43c2-8202-8ed9f3c8e4ad.jsonl",
+   "cov": 0.0,
+   "prompt": "áno, sprav 2 a 3"
+  },
+  {
+   "file": "C--Users-Danculus-Desktop-ftmo-lab\\f94ac1c6-cf5f-496c-b710-fc6e3376de07.jsonl",
+   "cov": 0.0,
+   "prompt": "dokoncime tie nahladovky nehc uzavreme aspon tych"
+  },
+  {
+   "file": "C--Users-Danculus-Desktop-ftmo-lab\\f94ac1c6-cf5f-496c-b710-fc6e3376de07.jsonl",
+   "cov": 0.0,
+   "prompt": "ruky su spojene jak retardi nelogicke a prepletene muzska ruka so zenskou ale nie realisticky a hlavne obidve z jednej strany WTF??? a  v 1 mam stale ruku jak odpyleny pahyl!!!"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\1a4669bc-47b6-448b-a355-2b47c7f5e449.jsonl",
+   "cov": 0.0,
+   "prompt": "CDN zadarmo"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\236f62f4-15e6-4e57-a0c7-015d69592d1a.jsonl",
+   "cov": 0.0,
+   "prompt": "/compact"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\3e159c2e-15f3-40f4-bbe9-bd70a4ee759d.jsonl",
+   "cov": 0.0,
+   "prompt": "/compact"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\b56f4505-b79d-4248-b55c-1cc4855efdb5.jsonl",
+   "cov": 0.0,
+   "prompt": "/compact"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\cf10d690-9c87-46a7-8037-e03235d73f13.jsonl",
+   "cov": 0.0,
+   "prompt": "/compact"
+  }
+ ],
+ "files_missed_sample": [
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/32cf2916-fe3a-4afd-9f88-fe4b2bd942f9/scratchpad/vs_update.cmd",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/32cf2916-fe3a-4afd-9f88-fe4b2bd942f9/scratchpad/vs_update.cmd",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/choir_question.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/lyrics_timeline_draft.md",
+  "C:/Users/Danculus/game-directive51/02 Audio/01 Music/LEVEL 1 EGYPT — hudba v2 (po posudku stabu).md",
+  "C:/Users/Danculus/game-directive51/02 Audio/01 Music/LEVEL 1 EGYPT — hudba (draft).md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/horror_dir_brief.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/lod3_review_brief.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/lod_review_brief.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/mom_review_brief.md",
+  "C:/Users/Danculus/game-directive51/01 Design/TODO - zachytit stream o nasvietení (7. 10.).md",
+  "C:/Users/Danculus/Desktop/codex/1hra/SFX/story/D51_story_texts_EN_v1_53_54_63_31.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/35bc4c7f-8413-45ca-aae4-6fbd66d40435/scratchpad/story_music_brief.md",
+  "C:/Users/Danculus/Desktop/codex/1hra/SFX/story/D51_story_podmaz_Suno_prompts_EN_v5_hudba_podla_priebehu.md",
+  "C:/Users/Danculus/Desktop/codex/1hra/SFX/story/D51_story_podmaz_Suno_prompts_EN_v4_Routine_Survey_Half_Minute_Twice.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-codex-1hra-SFX/32cf2916-fe3a-4afd-9f88-fe4b2bd942f9/scratchpad/vs_update.cmd",
+  "C:/Users/Danculus/Desktop/ftmo-lab/ctrader/strategies/MoPullStocks/MoPullStocks/MoPullStocks.cs",
+  "C:/Users/Danculus/Desktop/ftmo-lab/ctrader/strategies/MoPullM15/MoPullM15/MoPullM15.cs",
+  "C:/Users/Danculus/Desktop/ftmo-lab/ctrader/strategies/TrendD1/TrendD1/TrendD1.cs",
+  "C:/Users/Danculus/Desktop/ftmo-lab/research/freqtrade/_patch6.py",
+  "C:/Users/Danculus/Desktop/ftmo-lab/research/freqtrade/_patch5.py",
+  "C:/Users/Danculus/research-os/08 Sessions/2026-09-21 — Zavedenie ResearchOS disciplíny.md",
+  "C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-ftmo-lab/3a561741-02a7-43c2-8202-8ed9f3c8e4ad/scratchpad/cp6_both.py",
+  "C:/Users/Danculus/research-os/07 Workflow/Pipeline stratégií.md",
+  "C:/Users/Danculus/Desktop/ftmo-lab/research/live/_cancel_snippet.js"
+ ],
+ "files_missed_total": 576,
+ "open_errors_missed_sample": [
+  {
+   "file": "C--Users-Danculus-Desktop-ftmo-lab\\3a561741-02a7-43c2-8202-8ed9f3c8e4ad.jsonl",
+   "tool": "PowerShell",
+   "what": "Get-CimInstance Win32_Process | ? { $_.CommandLine -like '*dashboard.py*' } | % { Stop-Process -Id $_.ProcessId -Force }; Start-Sleep 2; Start-Process wscript.exe -ArgumentList '//B','//Nologo','C:\\Users\\Danculus\\Desktop\\ftmo-lab\\research\\live\\dashboard.vbs'; Start-Sleep 10; (Invoke-RestMethod http:",
+   "error": "Exit code 1"
+  },
+  {
+   "file": "C--Users-Danculus-Desktop-ftmo-lab\\f94ac1c6-cf5f-496c-b710-fc6e3376de07.jsonl",
+   "tool": "Bash",
+   "what": "C:/ComfyUI/venv/Scripts/python.exe - <<'PYEOF'\nimport json\nst = json.load(open(r'C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-Desktop-ftmo-lab/f94ac1c6-cf5f-496c-b710-fc6e3376de07/scratchpad/cast_stats.json', encoding='utf-8'))\nmd = f\"\"\"---\ntitle: Brief 20. kolo – noví členovia štáb",
+   "error": "Exit code 1"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\1a4669bc-47b6-448b-a355-2b47c7f5e449.jsonl",
+   "tool": "mcp__Claude_Browser__computer",
+   "what": "{\"action\": \"zoom\", \"region\": [0, 0, 100, 100], \"scale\": 0.1}",
+   "error": "There is no page to screenshot, zoom into or click — this tool only acts on a page in the Browser pane (not on files, the desktop or other apps). No preview is open. Use `preview_start` or `navigate` "
+  },
+  {
+   "file": "C--Users-Danculus-agora\\1e06e98b-4663-4e5e-a1be-dfc219d47715.jsonl",
+   "tool": "mcp__inspeximus__record_qms",
+   "what": "{\"actor\": \"builder\", \"procedure\": \"key custody for the hosted transparency service\", \"version\": \"2026-09-22\", \"owner\": \"Agora (owner)\", \"review_due_ts\": \"1806019200\", \"aspect\": \"l\", \"ref\": \"deploy/RUN",
+   "error": "<tool_use_error>Error: No such tool available: mcp__inspeximus__record_qms</tool_use_error>"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\4d49f7ac-02eb-407b-91cf-709934857455.jsonl",
+   "tool": "Bash",
+   "what": "cd /c/Users/Danculus/agmi-fork && git fetch -q origin && git remote add upstream https://github.com/tech4biz-yasha/agmi 2>/dev/null; git fetch -q upstream && git checkout -q -B inspeximus-3.5.0-row upstream/master && git log --oneline -1 && sed -n 60,100p agmi/measure.py && ls tests | grep -i inspex",
+   "error": "Exit code 128"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\b56f4505-b79d-4248-b55c-1cc4855efdb5.jsonl",
+   "tool": "Bash",
+   "what": "D=\"$TEMP/claude/C--Users-Danculus-agora/b56f4505-b79d-4248-b55c-1cc4855efdb5/scratchpad/om_ci\"; rm -rf \"$D\"; gh run download 36263606672 -R DanceNitra/inspeximus -D \"$D\" 2>&1 | tail -1; for f in \"$D\"/*/one_memory.json; do python -c \"\nimport json,sys;r=json.load(open(sys.argv[1]));n=sys.argv[1].repla",
+   "error": "Exit code 1"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\e551f16c-6eb8-44bd-b5c8-9d1231baf718.jsonl",
+   "tool": "Bash",
+   "what": "python - <<'PYEOF'\np = \"C:/Users/Danculus/agora/agora_output/strategy/pc1_repin_318_report.md\"\ns = open(p, encoding=\"utf-8\").read()\ns = s.replace(\"Status: steps 1 and 2 are done. Step 3 waits for the owner's reconnect (see \\\"What the owner does\\\").\",\n              \"Status: done. Steps 1 to 3 pass. T",
+   "error": "Exit code 1"
+  },
+  {
+   "file": "C--Users-Danculus-agora\\f675e3ad-b1b0-4717-80f9-e378da8d74a5.jsonl",
+   "tool": "Grep",
+   "what": "cannot read collaborators",
+   "error": "Ripgrep search timed out after 20 seconds. The search may have matched files but did not complete in time. Try searching a more specific path or pattern."
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "user_claude_md_ctime_utc": "2026-09-25T10:27",
+ "a_bracketed_omitting_index": {
+  "records": 15,
+  "tagged": 15,
+  "index_copies_differ": 9,
+  "listed_file_first": 3,
+  "listed_file_changed": 14,
+  "index_copies_identical": 6
+ },
+ "b_after_user_file_index_without_user": {
+  "records": 146,
+  "untagged": 4,
+  "reason_None": 4,
+  "listed_file_first": 11,
+  "tagged": 142,
+  "reason_session_start": 104,
+  "listed_file_changed": 149,
+  "reason_compaction": 38
+ },
+ "b_untagged_without_user_detail": [
+  {
+   "version": "2.1.282",
+   "sole_record_in_transcript": true,
+   "day": "2026-09-25"
+  },
+  {
+   "version": "2.1.282",
+   "sole_record_in_transcript": true,
+   "day": "2026-09-25"
+  },
+  {
+   "version": "2.1.282",
+   "sole_record_in_transcript": true,
+   "day": "2026-09-25"
+  },
+  {
+   "version": "2.1.282",
+   "sole_record_in_transcript": true,
+   "day": "2026-09-25"
+  }
+ ],
+ "records_total": 1360,
+ "builds_first": "2.1.270",
+ "builds_last": "2.1.306",
+ "control_records_with_index": 561
+}
