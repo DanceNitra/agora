@@ -443,3 +443,30 @@ probes/_*_work/
 
 # Screenshots a redesign session took to look at its own output.
 agora_output/inspeximus_redesign/shots/
+
+# 2026-10-30, finishing the badge sweep. This remote is PUBLIC
+# (github.com/DanceNitra/agora) and this branch is pushed to it, so the test is
+# not "is it debris" but "may it be published".
+#
+# Real email, read by the night shift: 25 thread dumps, every one carrying a
+# correspondent's address. It must never reach a public history.
+agora_output/night_shift/
+# A copy of the inspeximus.eu build taken to redesign against: 2.4 MB of
+# minified bundles that belong to the inspeximus repo. The redesign SCRIPTS
+# beside it are ours and are tracked.
+agora_output/inspeximus_redesign/original/
+agora_output/inspeximus_redesign/v2/
+agora_output/inspeximus_redesign/*.txt
+# The owner's own business facts, taken in a grill-me interview.
+agora_output/grill/
+# Journal and repository submissions, ignored the same way
+# agora_output/edrn_submission/ already is: built PDFs plus a cover letter
+# carrying personal data.
+agora_output/jphysa_submission/
+agora_output/zenodo_edrn/
+# A draft whose own header says it stays private until the owner approves it.
+agora_output/install_prompt/
+# Runtime state, rewritten on every calibration, and a per-machine dev-server
+# config that points into the ignored strategy directory.
+tools/ollama_calib.json
+.claude/launch.json
