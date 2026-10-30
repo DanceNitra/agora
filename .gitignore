@@ -428,3 +428,18 @@ agora_output/episodes/*/wer_slice/
 
 # 2026-10-08 (owner, 1a): pre-checks of outbound texts are private working material
 agora_output/pregate/
+
+# The reverse-engineering WORKSPACE, not our writing (2026-10-30). It held 2,282 of the 2,503
+# untracked entries in this tree, which is what put "2K+" on the editor's source-control badge.
+# What is in there: source trees of other people's software pulled apart for study, their own
+# documentation, and hundreds of generated per-item CARD.md and ledger.md files. None of it is a
+# deliverable, and some of it is someone else's code, which does not belong in our history.
+# A report that IS a deliverable belongs in agora_output/strategy/ with the rest of them.
+agora_output/reverse/
+
+# Scratch directories a probe writes beside itself: a cache it can rebuild and a working copy.
+probes/_*_cache/
+probes/_*_work/
+
+# Screenshots a redesign session took to look at its own output.
+agora_output/inspeximus_redesign/shots/
