@@ -164,7 +164,7 @@ no jump, and a jump while running plays the run. He asked to use Unreal's free a
 - [ue_retarget_setup.py](../ue_retarget_setup.py): auto IK Rigs for `SKM_Manny_Simple` (29 chains) and our
   character (21 chains), root motion bone `root` on both, IK Retargeter with default ops, all 21 target
   chains mapped, target auto-aligned. [ue_retarget_run.py](../ue_retarget_run.py): `ABP_Unarmed` plus 20
-  animations and the blend space duplicated to `/Game/AgoraChar/Retarget/Anims2`.
+  animations and the blend space duplicated to `/Game/AgoraChar/Retarget/Anims2` (broken, see the fix below; Anims6 is current).
 - First attempt collapsed every bone onto the pelvis (head and feet within 1 cm of it). Cause: the
   ActionForge FBX keeps bone translations in metres under a scaled root (pelvis local z 1.036; Manny 95.9).
   Fix: the ActionForge rest-pose GLB re-exported from the owner's Blender in centimetres (unit scale 0.01,
@@ -178,6 +178,32 @@ no jump, and a jump while running plays the run. He asked to use Unreal's free a
   the pelvis stays 12 to 16 cm from the capsule and the camera 350 cm behind.
   Frames: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/abp3_*.png`.
 - Not checked: hand test with keyboard and mouse, 8-way strafing look, foot sliding at 500 cm/s.
+
+### Owner hand test: crooked body, broken feet. Fixed in Anims6, 2026-11-07
+
+The owner's screenshots: the body leaned forward and the feet stood twisted and tilted. My frame checks before
+had looked at the whole character from 350 cm and never at the feet. Four separate defects, each measured
+against Epic's source clip with [ue_check_anims.py](../ue_check_anims.py) (it runs on Anims2 as the control and
+fails all 20 clips there):
+
+| Defect | Measured | Cause | Fix |
+|---|---|---|---|
+| Body tipped forward | idle pelvis-to-head 24.6 degrees forward, Manny 8.2 | our `root` has a -13.3 degree roll in the reference pose; `ue_inplace.py` wrote identity | root keys = reference transform |
+| Soles tilted | 10-12 degrees off flat in idle, Manny 2-3 | auto-align turns thigh and calf, the foot inherits it | [ue_retarget_feet.py](../ue_retarget_feet.py): foot offset keeps the reference sole orientation |
+| Toes splayed | 12 degrees further out than Manny per foot | our rest pose | same script turns each foot about the vertical to Manny's toe direction |
+| Head hung, spine too upright | neck-to-head 45 degrees forward, Manny 23; spine 4-6 degrees more upright | auto-align leaves neck and spine line alone | [ue_retarget_spine_neck.py](../ue_retarget_spine_neck.py) aims spine_01 and neck_01 at Manny's lines, head stays level |
+
+Result in `/Game/AgoraChar/Retarget/Anims6`, used by `BP_AgoraChar` through
+[ue_use_anims.py](../ue_use_anims.py): all 20 clips within 5.5 degrees body lean, 0.0 degrees sole tilt and 3.5
+degrees neck of Epic's; knee bend in the jog within 9 degrees; stride range -68 to 34 cm against Manny's -67 to
+41. Ankles sit 2-3 cm lower than Manny's in stance (thicker boots), so the mesh is raised 3 cm (offset z -87).
+
+Video: [ue_record_play.py](../ue_record_play.py) renders the play session through Unreal itself at time
+dilation 0.1 and captures each frame (a desktop grab picked up another window on top of the editor).
+`agora_output/reverse/yt_bEiW6L7Y7NM/unreal/agora_char_play_2026-11-07.mp4`, 6.7 frames per second real time.
+
+Still open: the back of the shirt creases into a dark V while jogging (skin weights from ActionForge), not
+fixed. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 
 ## The chain
 
