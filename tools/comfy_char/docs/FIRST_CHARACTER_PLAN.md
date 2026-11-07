@@ -66,6 +66,29 @@ Graph: [workflows/AGORA_CHAR_02_character_v2_api.json](../workflows/AGORA_CHAR_0
 - Screenshots: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/` (local only).
 - Unreal MCP client used while the session's connector stayed stale: [uemcp.py](../uemcp.py).
 
+## Rig comparison, 2026-11-07 (in progress)
+
+Same mesh (`v2_cage010`), same test pose from [pose_test_blender.py](../pose_test_blender.py): arms 60 degrees
+down, elbows 90 degrees forward, left leg 45 degrees forward with the knee at 60 degrees, fingers curled.
+
+**Rigify** (owner's Blender, `agora_output/reverse/yt_bEiW6L7Y7NM/blender/char_rig_compare.blend`):
+- Metarig fitted from measured mesh sections; palms face forward, so arm and finger rolls are turned 90 degrees.
+- Heat weights straight on the GLB failed on 128 vertices and tore the trousers: the glTF import splits the
+  mesh along UV seams into hundreds of pieces (largest 300 faces). Fix: voxel proxy (5 mm, decimated to 40k,
+  loose bits removed), heat weights on the proxy (0 unweighted), Data Transfer to the character.
+- Result: no tears, fist closes, knee folds plausibly, inner elbow creases into facets at 90 degrees.
+  73 deform bones, five 3-joint fingers per hand.
+
+**ActionForge** (Chrome, actionforge.app):
+- Network watch: upload, rig, finger detection, and bind made GET requests to actionforge.app only
+  (page assets, the MediaPipe hand model, `rig-human.glb`) plus local `blob:` and `data:`. No POST, no upload.
+- Dots placed by hand with mirror off: the centre dots stayed locked off the body's midline with mirror on.
+- Detect Fingers failed: left hand read in 1 of 10 views, right in 0 of 10 (dark gloves). Finger bones stay
+  guessed, bunched in the palm, short of the fingertips.
+- Bind: 10,317 vertices weighted to 48 bones in 0.4 s. The idle clip plays with no visible tearing.
+- Not yet compared in the same test pose: needs the "Character only (rest pose)" GLB export, which is a
+  file download and waits for the owner's approval.
+
 ## The chain
 
 | Stage | Tool | Our model | Output |
