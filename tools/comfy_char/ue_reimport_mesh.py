@@ -3,9 +3,9 @@ skeleton, materials and every reference to it (BP_AgoraChar, the retargeted anim
 mesh is kept first as SK_AgoraChar_<BACKUP_SUFFIX>."""
 import unreal
 
-FBX = "C:/Users/Danculus/agora/agora_output/reverse/yt_bEiW6L7Y7NM/actionforge_export/AgoraChar_AF_cm_w5.fbx"
+FBX = "C:/Users/Danculus/agora/agora_output/reverse/yt_bEiW6L7Y7NM/actionforge_export/AgoraChar_AF_cm_w8.fbx"
 MESH = "/Game/AgoraChar/AF2/SK_AgoraChar"
-BACKUP_SUFFIX = "AFweights"
+BACKUP_SUFFIX = "W6arms"
 lib = unreal.EditorAssetLibrary
 backup = f"{MESH}_{BACKUP_SUFFIX}"
 if not lib.does_asset_exist(backup):

@@ -228,8 +228,17 @@ the shirt into a V. The jog was exported from Unreal and copied bone by bone ont
 the spine, pelvis to spine_03 by height, blended into the original weights at its edges. Exported as
 `AgoraChar_AF_cm_w5.fbx` and reimported over `SK_AgoraChar` by [ue_reimport_mesh.py](../ue_reimport_mesh.py);
 the previous mesh is kept as `SK_AgoraChar_AFweights`, the Blender original as `UEX_AgoraChar_Mesh_AFweights`.
-In play the hem stays straight. Not fixed: square shoulder tops when the arms swing forward (present with the
-original weights too). The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
+In play the hem stays straight.
+
+Shoulders, same day. On the shoulder top the clavicle held the skin out to 24 cm from the centre line (the joint is
+at 19 cm), and lowerarm reached into the middle of the upper arm (0.11-0.34). The arm band was reweighted along the
+arm: clavicle to upperarm from 15 to 27 cm, upperarm alone to 37, upperarm to lowerarm from 37 to 46 (elbow at 42);
+under 26 cm only the shoulder cap above 139-145 cm changes, so the chest, back and armpit keep their weights. Edges
+stretched or squashed over 20 % across 8 jog frames: shoulder 26.5 % to 20.3 %, elbow 23.7 % to 17.7 %. Two
+variants were rejected on the play video: one that reached the armpit, and one that smoothed weights over the whole
+mesh; both drew a diagonal crease across the back that the edge metric did not show. The kept version smooths only
+the 1,127 vertices it changed and leaves every other vertex identical. Exported as `AgoraChar_AF_cm_w8.fbx`;
+`SK_AgoraChar_W5torso` and `SK_AgoraChar_W6arms` are the earlier meshes in Unreal. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 
 ## The chain
 
