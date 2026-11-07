@@ -55,8 +55,9 @@ Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is 
 
 ## State after the Unreal import, 2026-11-07
 
-Owner chose ActionForge. The character and 3 clips are in Unreal under `/Game/AgoraChar/AF/`. Next: an
-Animation Blueprint or a character Blueprint that plays idle and jog, then the CREW brief for the real character.
+Owner chose ActionForge. `BP_AgoraChar` plays idle and jog with third-person control in
+`/Game/AgoraChar/Maps/L_AgoraChar_Test` (press Play there). Next: hand test by the owner, then the CREW brief
+for the real character.
 
 ## Next steps (written before the resume)
 

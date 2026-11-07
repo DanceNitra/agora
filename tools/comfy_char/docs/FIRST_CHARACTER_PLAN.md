@@ -126,6 +126,32 @@ Unreal names its 85 clips use. Its code is (c) CGstuff with no terms for output;
   `L_Tomb_S03_Ambience` with a test actor in it. The actor was removed and the level saved again; it is back
   to 146,598 bytes, the size of the committed version. Pass explicit asset paths to `save_assets`.
 
+## Character Blueprint, 2026-11-07
+
+`/Game/AgoraChar/AF/BP_AgoraChar` (parent Character), graph in [BP_AgoraChar.dsl](../BP_AgoraChar.dsl), written with
+`BlueprintTools.write_graph_dsl` through [ue.py](../ue.py):
+- Mesh `SK_AgoraChar_AF`, offset z -89, yaw -90, single-node animation mode. Capsule 89 / 34 cm.
+- Camera boom 350 cm with pawn control rotation, follow camera, orient rotation to movement, MaxWalkSpeed 500.
+- Input: `IMC_Default` and `IMC_MouseLook` added on BeginPlay; Tick reads `IA_Move`, `IA_Look`,
+  `IA_MouseLook`, `IA_Jump` through the "Get IA_*" value nodes, because the DSL cannot declare Enhanced
+  Input events and has no way to add function parameters.
+- Idle/jog switch by ground speed above 20 cm/s; jog plays at rate 0.78.
+- `bAutoWalkTest` (instance editable) walks forward without input, for automated tests.
+
+Traps met: `Pawn|GetControlRotation` resolves to the Controller version unless given `:self (Pawn|GetController)`;
+positional DSL arguments land on `self`, so pin keywords are needed; `write_graph_dsl` replaces only the
+events it defines; `CaptureViewport` renders the editor world, not the play session, so play frames come
+from `CaptureEditorImage`.
+
+Root motion: the first jog export (In place off) carries 5.8 m of root travel per 0.93 s cycle. Setting
+`bForceRootLock` through ObjectTools did not stop the mesh running ahead of the capsule. Fix: re-export
+from ActionForge with "In place X Z" on, imported as `A_AgoraChar_JogInPlace`.
+
+Test level `/Game/AgoraChar/Maps/L_AgoraChar_Test` (copy of Template_Default, 80 m floor): standing, the
+capsule holds z 90.7 for 10 s; walking, measured speed 499 to 502 cm/s at z 91; play frames show the jog
+staying at a constant distance from the camera. Frames: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/`.
+Not tested: keyboard and mouse by hand, jump, the kneel clip (imported, not wired).
+
 ## The chain
 
 | Stage | Tool | Our model | Output |
