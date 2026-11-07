@@ -31,6 +31,19 @@ Code is restarted for an upgrade. Read this file first, then [docs/FIRST_CHARACT
   `C:\Users\Danculus\Desktop\codex\1hra\SFX\MyProject\MyProject.uproject`, MCP autostart is on
   (`bAutoStartServer=True`), port 8000. Start it only when the GPU is free; the concept graph peaks at 23 GB.
 
+## Concept v2 result (finished after the pause, 906 s, GPU peak 23.1 GB)
+
+All four images show five fingers spread with background visible between them. Not yet meshed.
+
+| # | Arms | Fingers | Shoes | Other |
+|---|---|---|---|---|
+| 1 | slightly above horizontal | wide, clear gaps | tall laced boots | olive gloves, yellow cuffs |
+| 2 | slightly above horizontal | spread, gaps narrower at the little finger | low shoes | |
+| 3 | horizontal | wide, clear gaps | tall laced boots | the model drew a woman; the prompt names no gender; knee seams |
+| 4 | about 10 degrees above horizontal | widest | tall laced boots | yellow gloves |
+
+Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is wanted. The owner picks.
+
 ## Next steps
 
 1. Check `C:\Users\Danculus\.claude\compute\` for locks and the ComfyUI queue. Shorts-studio renders
