@@ -202,6 +202,13 @@ Video: [ue_record_play.py](../ue_record_play.py) renders the play session throug
 dilation 0.1 and captures each frame (a desktop grab picked up another window on top of the editor).
 `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/agora_char_play_2026-11-07.mp4`, 6.7 frames per second real time.
 
+Second hand test, same day: one boot still stood sideways. Side by side in play, Epic's own `MM_Idle` has the
+right foot turned 47 degrees out (toe yaw 137, forward 90) and the left straight; we had copied it exactly.
+[ue_idle_feet.py](../ue_idle_feet.py) turns the whole right leg about the vertical through the hip in
+`MM_Idle_Agora` so the toes point 10 degrees out; ankle height and sole tilt unchanged, the Epic stance kept as
+`MM_Idle_Agora_EpicStance`. [ue_turntable.py](../ue_turntable.py) shows the result from 8 directions. The feet
+stay staggered about 30 cm front to back, as in Epic's stance; from the side the rear boot shows behind the front leg.
+
 Still open: the back of the shirt creases into a dark V while jogging (skin weights from ActionForge), not
 fixed. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 

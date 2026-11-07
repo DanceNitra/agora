@@ -35,6 +35,8 @@ for path in sorted(lib.list_assets(FOLDER, recursive=False)):
     if not isinstance(t, unreal.AnimSequence):
         continue
     sname = t.get_name().replace("_Agora", "")
+    if sname not in src_by_name:  # backups such as MM_Idle_Agora_EpicStance
+        continue
     s = lib.load_asset(src_by_name[sname])
     sref, tref = E.get_reference_pose(s.get_skeleton()), E.get_reference_pose(t.get_skeleton())
     n = unreal.AnimationLibrary.get_num_frames(s)
