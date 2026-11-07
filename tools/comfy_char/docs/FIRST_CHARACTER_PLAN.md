@@ -209,6 +209,16 @@ right foot turned 47 degrees out (toe yaw 137, forward 90) and the left straight
 `MM_Idle_Agora_EpicStance`. [ue_turntable.py](../ue_turntable.py) shows the result from 8 directions. The feet
 stay staggered about 30 cm front to back, as in Epic's stance; from the side the rear boot shows behind the front leg.
 
+Fifth hand test: still hunched from the side. The plumb line was fine; the body was not square. Epic's idle turns
+hips and shoulders 20-23 degrees from the facing direction (with the right foot turned out to match); with the feet
+straightened, the legs were twisted under a turned body. [ue_idle_neutral.py](../ue_idle_neutral.py) supersedes
+`ue_idle_feet.py` and `ue_idle_stand.py`: from the untouched `MM_Idle_Agora_EpicStance` it turns the body square
+(hip line 0.6 degrees, shoulders 3.7 in play), plants the feet symmetric 12 cm either side of the centre line,
+toes 8 degrees out, and solves both legs; Epic's breathing stays. In play: head 9 cm, pelvis 1.4 cm in front of
+the ankles. Its first version deleted and recreated the clip, which cleared the AnimBP and blend space references
+and blocked Play with a compile-error dialog; [ue_relink_idle.py](../ue_relink_idle.py) restored them and the
+script now writes in place.
+
 Fourth hand test: the standing pose looked hunched (owner: "ohnuta jak quasimodo"). Measured in play beside Manny:
 pelvis 7.4 cm behind the feet (Manny 3.3 in front), right shin leaning 15 degrees back (Manny 17 forward), knees
 15-21 degrees. [ue_idle_stand.py](../ue_idle_stand.py), run after `ue_idle_feet.py`, moves the pelvis 9.8 cm forward
