@@ -221,8 +221,15 @@ edges stretched or squashed over 30 percent): ActionForge 5.57 % overall, torso 
 voxel proxy 5.51, 10.38, 10.28, but fused left fingers and tore the inner thighs; ActionForge with far and
 wrong-side weights removed 5.04, 8.21, 16.83, faceted. None clearly better, none applied.
 
-Still open: the back of the shirt creases into a dark V while jogging (skin weights from ActionForge), not
-fixed. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
+Shirt crease fixed the same day. Down the back centre line the ActionForge weights put 0.3-0.5 on each clavicle
+from 112 to 132 cm and almost nothing on spine_01-03, and the thighs pulled the belt line, so swinging arms dragged
+the shirt into a V. The jog was exported from Unreal and copied bone by bone onto the Blender rig (all bones within
+3 cm) to reproduce the crease; the torso band (96-146 cm, arms and shoulder tips excluded) was then reweighted along
+the spine, pelvis to spine_03 by height, blended into the original weights at its edges. Exported as
+`AgoraChar_AF_cm_w5.fbx` and reimported over `SK_AgoraChar` by [ue_reimport_mesh.py](../ue_reimport_mesh.py);
+the previous mesh is kept as `SK_AgoraChar_AFweights`, the Blender original as `UEX_AgoraChar_Mesh_AFweights`.
+In play the hem stays straight. Not fixed: square shoulder tops when the arms swing forward (present with the
+original weights too). The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 
 ## The chain
 
