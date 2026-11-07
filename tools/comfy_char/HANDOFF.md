@@ -50,7 +50,8 @@ Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is 
 - ComfyUI restarted (server PID 108904, Idle, models freed). Blender PID 106484 with `AGORA_CHAR_v2_final`
   and `AGORA_CHAR_v2_raw`. Unreal MyProject PID 108456, MCP listening on 8000; the session's unreal-mcp
   connection needs a manual reconnect (`/mcp`).
-- Next: import the v2 GLB into Unreal, then rig in ActionForge with network watch.
+- Done: normal-map fix (cage 0.1) and Unreal import, see the plan, round 2b. Next: rig in ActionForge with
+  network watch, then 3 clips and a skeletal import.
 
 ## Next steps (written before the resume)
 

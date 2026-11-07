@@ -551,7 +551,7 @@
     0
    ],
    "resolution": 2048,
-   "cage_distance": 0.05,
+   "cage_distance": 0.1,
    "ignore_backfaces": true
   }
  },

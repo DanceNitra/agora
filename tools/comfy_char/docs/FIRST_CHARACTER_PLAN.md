@@ -49,6 +49,23 @@ Input `concept_v2_00003_.png`, same graph, 90 s, GPU total peak 12.5 GB. Output 
 The fix was the input image, not a node setting: gaps wide enough survive the `RemeshMesh` udf offset.
 Graph: [workflows/AGORA_CHAR_02_character_v2_api.json](../workflows/AGORA_CHAR_02_character_v2_api.json).
 
+## Round 2b, 2026-11-07: normal map and Unreal
+
+- In Unreal the round 2 mesh showed black triangular patches on the shirt, nose, hair, and boots. A
+  two-sided material did not remove them and flipping the normal map green channel made shading worse,
+  so both were reverted. Blender showed the same patches on the pocket: the defect was in the baked
+  normal map (0.56 % of texels with z below 0.3).
+- `BakeNormalMapFromMesh` `cage_distance` 0.05 to 0.1 removed the patches in Blender and in Unreal.
+  Fingers stay separate. All workflows now use 0.1.
+- Unreal import: the MCP importer accepts FBX or OBJ, not GLB. Exported FBX from the owner's Blender.
+  Assets saved in `/Game/AgoraChar/` (`SM_AgoraChar_v2b` is current). Scale 1.8 gives 180 cm when the
+  FBX is exported without unit scaling. The metal/roughness map does not survive the Blender FBX export
+  (it passes through a Separate Color node); base colour and normal do.
+- A test actor `AGORA_CHAR_TEST_v2b` stands in the open level `L_Tomb_S03_Ambience` at (1800, 0, 90).
+  The level is NOT saved; the owner decides whether to keep or delete the actor.
+- Screenshots: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/` (local only).
+- Unreal MCP client used while the session's connector stayed stale: [uemcp.py](../uemcp.py).
+
 ## The chain
 
 | Stage | Tool | Our model | Output |

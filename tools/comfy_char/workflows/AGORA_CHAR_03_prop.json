@@ -2373,7 +2373,7 @@
    },
    "widgets_values": [
     2048,
-    0.05,
+    0.1,
     true
    ],
    "widgets_values_named": {

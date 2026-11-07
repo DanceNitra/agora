@@ -114,7 +114,7 @@ def mesh_graph(target_faces, prefix, input_image):
         "70": n("BakeTextureFromVoxel", "Bake colour, metal, roughness", mesh=["64", 0], voxel_colors=["52", 0],
                 texture_size=2048, reference_mesh=["46", 0]),
         "71": n("BakeNormalMapFromMesh", "Bake normal map", low_poly=["64", 0], high_poly=["60", 0], resolution=2048,
-                cage_distance=0.05, ignore_backfaces=True),
+                cage_distance=0.1, ignore_backfaces=True),
         "72": n("ApplyTextureToMesh", "Attach all maps", mesh=["64", 0], base_color=["70", 0], metallic=["70", 1],
                 roughness=["70", 2], normal_map=["71", 0]),
         "73": n("MeshSmoothNormals", "Smooth final normals", mesh=["72", 0], crease_angle=180.0),
