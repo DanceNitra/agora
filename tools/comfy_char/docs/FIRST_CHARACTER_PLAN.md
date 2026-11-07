@@ -66,7 +66,7 @@ Graph: [workflows/AGORA_CHAR_02_character_v2_api.json](../workflows/AGORA_CHAR_0
 - Screenshots: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/` (local only).
 - Unreal MCP client used while the session's connector stayed stale: [uemcp.py](../uemcp.py).
 
-## Rig comparison, 2026-11-07 (in progress)
+## Rig comparison, 2026-11-07
 
 Same mesh (`v2_cage010`), same test pose from [pose_test_blender.py](../pose_test_blender.py): arms 60 degrees
 down, elbows 90 degrees forward, left leg 45 degrees forward with the knee at 60 degrees, fingers curled.
@@ -86,8 +86,30 @@ down, elbows 90 degrees forward, left leg 45 degrees forward with the knee at 60
 - Detect Fingers failed: left hand read in 1 of 10 views, right in 0 of 10 (dark gloves). Finger bones stay
   guessed, bunched in the palm, short of the fingertips.
 - Bind: 10,317 vertices weighted to 48 bones in 0.4 s. The idle clip plays with no visible tearing.
-- Not yet compared in the same test pose: needs the "Character only (rest pose)" GLB export, which is a
-  file download and waits for the owner's approval.
+- First rig was wrong because of my dots: Hip (L) on the body's right crossed the legs, shoulders sat at
+  x 0.30 and wrists at 0.60. ActionForge's L is the character's left, the screen's right when it faces you.
+- Corrected dots (shoulder 0.19, elbow 0.42, wrist 0.64): Detect Fingers then read both hands in 10 of 10
+  views. The earlier failure was the wrist dots, not the gloves. Bind: 10,317 vertices to 52 bones in 0.5 s.
+- Export "Character only (rest pose)" GLB, 2.8 MB, owner approved the download. Its skeleton uses Unreal
+  Mannequin names (`pelvis`, `spine_01`, `upperarm_l`, `lowerarm_l`, `thigh_l`, `calf_l`, fingers `_01`-`_03`).
+  The glTF import leaves a pose on all 71 bones; clearing it gives back the exact rest mesh.
+
+**Result, same test pose, edges stretched or compressed by more than 30 %** (control: rest pose = 0 on both):
+
+| Region | Rigify | ActionForge |
+|---|---|---|
+| Arm and shoulder | 7.67 % | 11.89 % |
+| Hand | 7.56 % | 6.60 % |
+| Leg | 1.43 % | 2.78 % |
+| Torso and head | 1.19 % | 1.84 % |
+| Whole body | 645 of 21,830 (2.95 %) | 958 of 21,830 (4.39 %) |
+
+By eye the two are close: both close a fist, both crease the inner elbow into facets, both fold the knee
+with a dark slit. ActionForge leaves one small loose fragment near the left hand.
+
+What the numbers do not include: Rigify's joints came from measured mesh sections and its weights needed a
+proxy fix; ActionForge took about 5 minutes of dots and 0.5 s to bind, and its skeleton already carries the
+Unreal names its 85 clips use. Its code is (c) CGstuff with no terms for output; its clips are CC0.
 
 ## The chain
 
