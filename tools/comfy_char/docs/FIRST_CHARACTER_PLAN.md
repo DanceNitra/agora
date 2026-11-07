@@ -111,6 +111,21 @@ What the numbers do not include: Rigify's joints came from measured mesh section
 proxy fix; ActionForge took about 5 minutes of dots and 0.5 s to bind, and its skeleton already carries the
 Unreal names its 85 clips use. Its code is (c) CGstuff with no terms for output; its clips are CC0.
 
+## Unreal import, 2026-11-07 (ActionForge chosen by the owner)
+
+- Export per clip from ActionForge: FBX, Unreal units, skeleton Default, Include character mesh on, In place off.
+  Files `idle_loop_unreal_fit.fbx`, `jog_fwd_loop_unreal_fit.fbx`, `fixing_kneeling_unreal_fit.fbx`, about 15 MB
+  each, copied to `agora_output/reverse/yt_bEiW6L7Y7NM/actionforge_export/`. The UE5 skeleton preset exports
+  animation only, retargeted to Epic's Manny (`set1_ue5_manny_anim_only.fbx`), with no character.
+- Chrome blocks repeated downloads from one site until the owner allows it in the address bar.
+- Unreal 5.8 (`SkeletalMeshTools.import_file`, import_animations on): `/Game/AgoraChar/AF/` holds
+  `SK_AgoraChar_AF`, `SK_AgoraChar_AF_Skeleton`, `A_AgoraChar_Idle` (2.5 s), `A_AgoraChar_Jog` (0.93 s),
+  `A_AgoraChar_Kneel` (5.2 s), one material and two textures. All three animations share the one skeleton.
+- Checked with `CaptureAssetImage` thumbnails (no actor placed in any level).
+- Incident: `save_assets` with an empty list saves EVERY dirty asset, which saved the open level
+  `L_Tomb_S03_Ambience` with a test actor in it. The actor was removed and the level saved again; it is back
+  to 146,598 bytes, the size of the committed version. Pass explicit asset paths to `save_assets`.
+
 ## The chain
 
 | Stage | Tool | Our model | Output |

@@ -53,6 +53,11 @@ Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is 
 - Done: normal-map fix (cage 0.1) and Unreal import, see the plan, round 2b. Next: rig in ActionForge with
   network watch, then 3 clips and a skeletal import.
 
+## State after the Unreal import, 2026-11-07
+
+Owner chose ActionForge. The character and 3 clips are in Unreal under `/Game/AgoraChar/AF/`. Next: an
+Animation Blueprint or a character Blueprint that plays idle and jog, then the CREW brief for the real character.
+
 ## Next steps (written before the resume)
 
 1. Check `C:\Users\Danculus\.claude\compute\` for locks and the ComfyUI queue. Shorts-studio renders
