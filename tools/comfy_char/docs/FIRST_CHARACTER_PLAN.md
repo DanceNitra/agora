@@ -256,6 +256,29 @@ mesh; both drew a diagonal crease across the back that the edge metric did not s
 the 1,127 vertices it changed and leaves every other vertex identical. Exported as `AgoraChar_AF_cm_w8.fbx`;
 `SK_AgoraChar_W5torso` and `SK_AgoraChar_W6arms` are the earlier meshes in Unreal. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 
+## MetaHuman instead of the generated mesh, 2026-11-07
+
+The owner stopped the ActionForge/TRELLIS character: the mesh itself (one lumpy shell with painted folds) cannot
+deform well under any rig. AccuRIG was installed but not used. The character is now a MetaHuman, built entirely by
+script in UE 5.8:
+
+1. `MyProject.uproject` enables MetaHumanCharacter and MetaHumanGenerator (backup `.bak-before-metahuman-20261107`);
+   the Epic Launcher installed "MetaHuman Creator Core Data" (the generator toolset registers only with it).
+2. [ue_mh_create.py](../ue_mh_create.py): `MH_AgoraSoldier`, female, 172 cm, athletic. [ue_mh_build.py](../ue_mh_build.py):
+   updo hair, natural eyebrows, fine eyelashes, the default garment; Epic's cloud auto-rig (owner signed in once)
+   and texture download; Optimized/High build into `/Game/AgoraChar/MetaHuman/Built` (79 assets).
+3. [ue_mh_retarget.py](../ue_mh_retarget.py): ABP_Unarmed retargeted Manny -> MetaHuman body, 29/29 chains. All 20
+   clips pass `ue_check_anims.py` out of the box (lean 1.4-4, soles 2.7, neck 0.6 degrees). Foot IK rig off as before.
+4. [ue_mh_character.py](../ue_mh_character.py): `BP_AgoraMH` = BP_AgoraChar input/camera + MetaHuman body (Mesh), face,
+   outfit, grooms and MetaHumanComponent; [BP_AgoraMH_beginplay.dsl](../BP_AgoraMH_beginplay.dsl) makes the outfit
+   follow the body (leader pose; measured 0.00 cm). [ue_mh_grooms_fix.py](../ue_mh_grooms_fix.py) copies groom
+   materials and attachment and adds LODSync: without them the head rendered bald at 4 m.
+5. Idle made neutral with `ue_idle_neutral.py` (hips 0, shoulders -1.2 degrees, knees 10-12).
+
+`BP_AgoraMH_C_0` is the player in L_AgoraChar_Test; the old character is hidden and moved aside.
+Video: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/metahuman_play_2026-11-07.mp4`.
+Open: the default garment is a white T-shirt and shorts and she is barefoot; no uniform yet.
+
 ## The chain
 
 | Stage | Tool | Our model | Output |

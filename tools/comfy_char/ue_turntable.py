@@ -12,7 +12,7 @@ OUT = Path(sys.argv[1])
 TMP = Path(tempfile.mkdtemp(prefix="agora_tt_"))
 CAM = """import unreal
 w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
-ch = next(a for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Character) if "AgoraChar" in a.get_class().get_name())
+ch = unreal.GameplayStatics.get_player_character(w, 0)
 boom = ch.get_component_by_class(unreal.SpringArmComponent)
 boom.set_editor_property("target_arm_length", 260.0)
 boom.set_editor_property("enable_camera_lag", False)

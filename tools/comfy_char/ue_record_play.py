@@ -20,7 +20,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 PRE = """import unreal
 w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
-ch = next(a for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Character) if "AgoraChar" in a.get_class().get_name())
+ch = unreal.GameplayStatics.get_player_character(w, 0)
 def setv(names, v):
     for n in names:
         try:
