@@ -35,7 +35,7 @@ raw mesh is not usable without it. Next designs, one at a time: a concept prompt
 
 ## Round 2 result, 2026-11-07: concept v2, wide-spread fingers
 
-Input `concept_v2_00003_.png`, same graph, 90 s, GPU total peak 12.5 GB. Output `C:\ComfyUI\outputgora_char2\`.
+Input `concept_v2_00003_.png`, same graph, 90 s, GPU total peak 12.5 GB. Output `C:/ComfyUI/output/agora_char/v2/`.
 
 | Check | Result |
 |---|---|
