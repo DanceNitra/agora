@@ -1,10 +1,8 @@
 ; BP_AgoraChar EventGraph, written with BlueprintTools.write_graph_dsl by build_bp_agorachar.
 ; Third-person control on the project's Enhanced Input actions, read each tick through the
-; "Get IA_*" value nodes (the DSL cannot declare Enhanced Input events). Idle/jog switched by speed.
+; "Get IA_*" value nodes (the DSL cannot declare Enhanced Input events). Animation comes from ABP_Unarmed_Agora (Epic ABP_Unarmed retargeted).
 
 (event EventBeginPlay
-  (Variables|Default|SetJogging false)
-  (Components|Animation|PlayAnimation :self (Variables|Character|GetMesh) :NewAnimToPlay "/Game/AgoraChar/AF/A_AgoraChar_Idle.A_AgoraChar_Idle" :bLooping true)
   (bind pc (Utilities|Casting|CastToPlayerController :Object (Pawn|GetController))
     (:then
       (bind sub (PlayerController|LocalPlayerSubsystems|GetEnhancedInputLocalPlayerSubsystem :PlayerController pc))
@@ -25,22 +23,10 @@
   (Pawn|Input|AddControllerYawInput :Val (+ lx ux))
   (Pawn|Input|AddControllerPitchInput :Val (+ ly uy))
   ; jump while held
-  (if (Input|EnhancedActionValues|IA_Jump)
+  (if (or (Input|EnhancedActionValues|IA_Jump) (Variables|Default|GetJumpTest))
     (Character|Jump)
     (else
       (Character|StopJumping)))
   ; test switch: walk forward without input
   (if (Variables|Default|GetAutoWalkTest)
-    (Pawn|Input|AddMovementInput :WorldDirection (Transformation|GetActorForwardVector) :ScaleValue 1.0))
-  ; idle / jog by ground speed
-  (bind speed (Math|Vector|VectorLengthXY (Transformation|GetVelocity)))
-  (bind moving (> speed 20.0))
-  (bind jogging (Variables|Default|GetJogging))
-  (if (and moving (not jogging))
-    (Variables|Default|SetJogging true)
-    (Components|Animation|PlayAnimation :self (Variables|Character|GetMesh) :NewAnimToPlay "/Game/AgoraChar/AF/A_AgoraChar_JogInPlace.A_AgoraChar_JogInPlace" :bLooping true)
-    (Components|Animation|SetPlayRate :self (Variables|Character|GetMesh) :Rate 0.78)
-    (elif (and (not moving) jogging)
-      (Variables|Default|SetJogging false)
-      (Components|Animation|PlayAnimation :self (Variables|Character|GetMesh) :NewAnimToPlay "/Game/AgoraChar/AF/A_AgoraChar_Idle.A_AgoraChar_Idle" :bLooping true)
-      (Components|Animation|SetPlayRate :self (Variables|Character|GetMesh) :Rate 1.0))))
+    (Pawn|Input|AddMovementInput :WorldDirection (Transformation|GetActorForwardVector) :ScaleValue 1.0)))

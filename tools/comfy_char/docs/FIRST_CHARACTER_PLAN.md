@@ -152,6 +152,33 @@ capsule holds z 90.7 for 10 s; walking, measured speed 499 to 502 cm/s at z 91; 
 staying at a constant distance from the camera. Frames: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/`.
 Not tested: keyboard and mouse by hand, jump, the kneel clip (imported, not wired).
 
+## Epic Mannequin animations on our character, 2026-11-07
+
+Owner's verdict on the ActionForge clips in play: the idle pose is wrong, the jog looks unnatural, there is
+no jump, and a jump while running plays the run. He asked to use Unreal's free animations instead.
+
+- The project already holds Epic's Mannequin set: `ABP_Unarmed` (idle, 8-way walk and jog blend space,
+  jump, fall loop, land). Usable in Unreal Engine products under Epic's terms.
+- Unreal MCP cannot import `unreal`; MyProject has Python Remote Execution on, so [ue_py.py](../ue_py.py)
+  runs editor scripts through Epic's `remote_execution.py`.
+- [ue_retarget_setup.py](../ue_retarget_setup.py): auto IK Rigs for `SKM_Manny_Simple` (29 chains) and our
+  character (21 chains), root motion bone `root` on both, IK Retargeter with default ops, all 21 target
+  chains mapped, target auto-aligned. [ue_retarget_run.py](../ue_retarget_run.py): `ABP_Unarmed` plus 20
+  animations and the blend space duplicated to `/Game/AgoraChar/Retarget/Anims2`.
+- First attempt collapsed every bone onto the pelvis (head and feet within 1 cm of it). Cause: the
+  ActionForge FBX keeps bone translations in metres under a scaled root (pelvis local z 1.036; Manny 95.9).
+  Fix: the ActionForge rest-pose GLB re-exported from the owner's Blender in centimetres (unit scale 0.01,
+  model x100, scale applied) as `AgoraChar_AF_cm.fbx`, imported as `/Game/AgoraChar/AF2/SK_AgoraChar`.
+- Second problem: the retargeted jog carries 12 m of root travel per 1.77 s loop, so the mesh ran up to
+  8.3 m ahead of the capsule. `force_root_lock` did not stop it in play. Fix: [ue_inplace.py](../ue_inplace.py)
+  zeroes the `root` track of all 20 animations; the jog pelvis then stays within 2 cm of its start.
+- `BP_AgoraChar` now uses `SK_AgoraChar` (offset z -90, yaw -90, capsule 90) and `ABP_Unarmed_Agora`;
+  its graph only handles input. `bJumpTest` (instance editable) triggers a jump for automated tests.
+- Play test: idle upright; jump in place and while running both play the jump pose; jogging at 500 cm/s
+  the pelvis stays 12 to 16 cm from the capsule and the camera 350 cm behind.
+  Frames: `agora_output/reverse/yt_bEiW6L7Y7NM/unreal/abp3_*.png`.
+- Not checked: hand test with keyboard and mouse, 8-way strafing look, foot sliding at 500 cm/s.
+
 ## The chain
 
 | Stage | Tool | Our model | Output |

@@ -55,9 +55,9 @@ Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is 
 
 ## State after the Unreal import, 2026-11-07
 
-Owner chose ActionForge. `BP_AgoraChar` plays idle and jog with third-person control in
-`/Game/AgoraChar/Maps/L_AgoraChar_Test` (press Play there). Next: hand test by the owner, then the CREW brief
-for the real character.
+Owner chose ActionForge for the rig; the clips are Epic's Mannequin set retargeted (`ABP_Unarmed_Agora`).
+`BP_AgoraChar` in `/Game/AgoraChar/Maps/L_AgoraChar_Test` walks, jogs, and jumps. Next: owner hand test,
+then the CREW brief for the real character.
 
 ## Next steps (written before the resume)
 
