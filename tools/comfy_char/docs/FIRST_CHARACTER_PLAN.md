@@ -209,6 +209,12 @@ right foot turned 47 degrees out (toe yaw 137, forward 90) and the left straight
 `MM_Idle_Agora_EpicStance`. [ue_turntable.py](../ue_turntable.py) shows the result from 8 directions. The feet
 stay staggered about 30 cm front to back, as in Epic's stance; from the side the rear boot shows behind the front leg.
 
+Fourth hand test: the standing pose looked hunched (owner: "ohnuta jak quasimodo"). Measured in play beside Manny:
+pelvis 7.4 cm behind the feet (Manny 3.3 in front), right shin leaning 15 degrees back (Manny 17 forward), knees
+15-21 degrees. [ue_idle_stand.py](../ue_idle_stand.py), run after `ue_idle_feet.py`, moves the pelvis 9.8 cm forward
+and 1.8 cm up as one constant offset (the breathing motion stays) and solves both legs onto the unchanged feet:
+pelvis 2.0 cm in front of the feet, knees 9.8 degrees, shins within 6 degrees of vertical, feet moved at most 0.2 cm.
+
 Third hand test: in play the left foot pointed backward (172 degrees from the actor's forward) while the clip
 itself had it forward. Cause: `ABP_Unarmed` ends in a Control Rig node running `CR_Mannequin_FootIK`, built for
 Manny's bones; our skeleton has no `ik_foot_*` bones. It reversed the left foot, pulled both feet about 6 cm down
