@@ -209,6 +209,18 @@ right foot turned 47 degrees out (toe yaw 137, forward 90) and the left straight
 `MM_Idle_Agora_EpicStance`. [ue_turntable.py](../ue_turntable.py) shows the result from 8 directions. The feet
 stay staggered about 30 cm front to back, as in Epic's stance; from the side the rear boot shows behind the front leg.
 
+Third hand test: in play the left foot pointed backward (172 degrees from the actor's forward) while the clip
+itself had it forward. Cause: `ABP_Unarmed` ends in a Control Rig node running `CR_Mannequin_FootIK`, built for
+Manny's bones; our skeleton has no `ik_foot_*` bones. It reversed the left foot, pulled both feet about 6 cm down
+and crouched the jog into a shuffle. Every check on the clips missed it because they evaluated the clips without
+the AnimBP. Fix: the node's Alpha set to 0 in `Anims6/ABP_Unarmed_Agora` (MCP `set_pin_value`). In play the toes
+then point 6.6 and 9.9 degrees out, as in the clip. Lesson: measure the character in play, not only the assets.
+
+Skin weights tried in Blender the same day (test pose plus a 25 degree spine bend and a right leg swung back;
+edges stretched or squashed over 30 percent): ActionForge 5.57 % overall, torso 9.07, hips 16.44; heat weights on a
+voxel proxy 5.51, 10.38, 10.28, but fused left fingers and tore the inner thighs; ActionForge with far and
+wrong-side weights removed 5.04, 8.21, 16.83, faceted. None clearly better, none applied.
+
 Still open: the back of the shirt creases into a dark V while jogging (skin weights from ActionForge), not
 fixed. The deep-knee jog is Epic's `MF_Unarmed_Jog_Fwd` itself; knees match it.
 
