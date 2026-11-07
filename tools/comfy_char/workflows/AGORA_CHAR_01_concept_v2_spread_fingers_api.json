@@ -1,0 +1,141 @@
+{
+ "1": {
+  "class_type": "UNETLoader",
+  "_meta": {
+   "title": "Qwen-Image 2512"
+  },
+  "inputs": {
+   "unet_name": "qwen_image_2512_fp8_e4m3fn.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "_meta": {
+   "title": "Qwen text encoder"
+  },
+  "inputs": {
+   "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+   "type": "qwen_image",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "_meta": {
+   "title": "Qwen VAE"
+  },
+  "inputs": {
+   "vae_name": "qwen_image_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "ModelSamplingAuraFlow",
+  "_meta": {
+   "title": "Shift"
+  },
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "shift": 3.1
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "_meta": {
+   "title": "Positive: edit the character here"
+  },
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "Full body game character concept, a stocky field engineer in fitted canvas work clothes, short sleeves, thin tight-fitting work gloves, sturdy boots, short dark hair, calm face. Exact front view, symmetrical T-pose, arms straight out at shoulder height, palms down, all five fingers spread wide apart like a starfish with a clear gap of background visible between every finger, legs straight and slightly apart, both feet flat on the floor, empty hands. Even soft studio light with no cast shadow, plain light grey seamless background, the whole body in frame with margin on all sides, realistic painted PBR game asset."
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "_meta": {
+   "title": "Negative: keeps the pose animation-ready"
+  },
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "low resolution, deformed limbs, deformed fingers, merged fingers, oversaturated, waxy skin, blurry, three-quarter view, side view, turned head, bent arms, crossed legs, spikes, large shoulder armour, cape, loose robe, long coat, glass, transparent objects, held objects, weapon, cast shadow, floor reflection, text, watermark, logo, cluttered background, fingers touching, fingers together, closed hand, fist, thick gloves, mittens"
+  }
+ },
+ "7": {
+  "class_type": "EmptySD3LatentImage",
+  "_meta": {
+   "title": "Square frame leaves room for the arms"
+  },
+  "inputs": {
+   "width": 1328,
+   "height": 1328,
+   "batch_size": 4
+  }
+ },
+ "8": {
+  "class_type": "KSampler",
+  "_meta": {
+   "title": "Sampler"
+  },
+  "inputs": {
+   "model": [
+    "4",
+    0
+   ],
+   "positive": [
+    "5",
+    0
+   ],
+   "negative": [
+    "6",
+    0
+   ],
+   "latent_image": [
+    "7",
+    0
+   ],
+   "seed": 2026110601,
+   "steps": 50,
+   "cfg": 4.0,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "9": {
+  "class_type": "VAEDecode",
+  "_meta": {
+   "title": "Decode"
+  },
+  "inputs": {
+   "samples": [
+    "8",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "SaveImage",
+  "_meta": {
+   "title": "Save: pick the best one for 02"
+  },
+  "inputs": {
+   "images": [
+    "9",
+    0
+   ],
+   "filename_prefix": "agora_char/concept_v2"
+  }
+ }
+}

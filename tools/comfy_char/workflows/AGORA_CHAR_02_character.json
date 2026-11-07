@@ -1,0 +1,3419 @@
+{
+ "id": "00000000-0000-0000-0000-000000000000",
+ "revision": 0,
+ "last_node_id": 79,
+ "last_link_id": 132,
+ "nodes": [
+  {
+   "id": 10,
+   "type": "LoadImage",
+   "pos": [
+    30,
+    120
+   ],
+   "size": [
+    340,
+    102
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "COMBO",
+     "widget": {
+      "name": "image"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "choose file to upload",
+     "name": "upload",
+     "type": "IMAGEUPLOAD",
+     "widget": {
+      "name": "upload"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "IMAGE",
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      68,
+      69
+     ]
+    },
+    {
+     "localized_name": "MASK",
+     "name": "MASK",
+     "type": "MASK",
+     "links": null
+    }
+   ],
+   "title": "INPUT: front T-pose, empty hands, plain background",
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "agora_char_input.png",
+    "image"
+   ],
+   "widgets_values_named": {
+    "image": "agora_char_input.png",
+    "upload": "image"
+   }
+  },
+  {
+   "id": 11,
+   "type": "LoadBackgroundRemovalModel",
+   "pos": [
+    30,
+    292
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "bg_removal_name",
+     "name": "bg_removal_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "bg_removal_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "bg_model",
+     "name": "bg_model",
+     "type": "BACKGROUND_REMOVAL",
+     "links": [
+      67
+     ]
+    }
+   ],
+   "title": "BiRefNet",
+   "properties": {
+    "Node name for S&R": "LoadBackgroundRemovalModel"
+   },
+   "widgets_values": [
+    "birefnet.safetensors"
+   ],
+   "widgets_values_named": {
+    "bg_removal_name": "birefnet.safetensors"
+   }
+  },
+  {
+   "id": 12,
+   "type": "RemoveBackground",
+   "pos": [
+    30,
+    420
+   ],
+   "size": [
+    340,
+    46
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "bg_removal_model",
+     "name": "bg_removal_model",
+     "type": "BACKGROUND_REMOVAL",
+     "link": 67
+    },
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "IMAGE",
+     "link": 68
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mask",
+     "name": "mask",
+     "type": "MASK",
+     "links": [
+      70
+     ]
+    }
+   ],
+   "title": "Remove background",
+   "properties": {
+    "Node name for S&R": "RemoveBackground"
+   }
+  },
+  {
+   "id": 13,
+   "type": "ImageCropToMask",
+   "pos": [
+    30,
+    536
+   ],
+   "size": [
+    340,
+    174
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 69
+    },
+    {
+     "localized_name": "masks",
+     "name": "masks",
+     "type": "MASK",
+     "link": 70
+    },
+    {
+     "localized_name": "width",
+     "name": "width",
+     "type": "INT",
+     "widget": {
+      "name": "width"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "height",
+     "name": "height",
+     "type": "INT",
+     "widget": {
+      "name": "height"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "pad_factor",
+     "name": "pad_factor",
+     "type": "FLOAT",
+     "widget": {
+      "name": "pad_factor"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "grow_mask",
+     "name": "grow_mask",
+     "type": "INT",
+     "widget": {
+      "name": "grow_mask"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "background",
+     "name": "background",
+     "type": "COLOR",
+     "widget": {
+      "name": "background"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": [
+      71,
+      73
+     ]
+    }
+   ],
+   "title": "Crop to subject (pad 1.0 for TRELLIS.2)",
+   "properties": {
+    "Node name for S&R": "ImageCropToMask"
+   },
+   "widgets_values": [
+    1024,
+    1024,
+    1,
+    0,
+    "#000000"
+   ],
+   "widgets_values_named": {
+    "width": 1024,
+    "height": 1024,
+    "pad_factor": 1,
+    "grow_mask": 0,
+    "background": "#000000"
+   }
+  },
+  {
+   "id": 14,
+   "type": "SaveImage",
+   "pos": [
+    30,
+    780
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 71
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": null
+    }
+   ],
+   "title": "CHECK 1: the crop must show the whole body",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/crop"
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/crop"
+   }
+  },
+  {
+   "id": 20,
+   "type": "UNETLoader",
+   "pos": [
+    460,
+    120
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "unet_name",
+     "name": "unet_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "unet_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "weight_dtype",
+     "name": "weight_dtype",
+     "type": "COMBO",
+     "widget": {
+      "name": "weight_dtype"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      74,
+      83,
+      105
+     ]
+    }
+   ],
+   "title": "TRELLIS.2",
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "trellis_2_int8_convrot.safetensors",
+    "default"
+   ],
+   "widgets_values_named": {
+    "unet_name": "trellis_2_int8_convrot.safetensors",
+    "weight_dtype": "default"
+   }
+  },
+  {
+   "id": 21,
+   "type": "VAELoader",
+   "pos": [
+    460,
+    272
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "vae_name",
+     "name": "vae_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "vae_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "VAE",
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      82,
+      95,
+      101
+     ]
+    }
+   ],
+   "title": "Shape VAE",
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "trellis_2_shape_vae_bf16.safetensors"
+   ],
+   "widgets_values_named": {
+    "vae_name": "trellis_2_shape_vae_bf16.safetensors"
+   }
+  },
+  {
+   "id": 22,
+   "type": "VAELoader",
+   "pos": [
+    460,
+    400
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "vae_name",
+     "name": "vae_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "vae_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "VAE",
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      110
+     ]
+    }
+   ],
+   "title": "Texture VAE",
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "trellis_2_texture_vae_bf16.safetensors"
+   ],
+   "widgets_values_named": {
+    "vae_name": "trellis_2_texture_vae_bf16.safetensors"
+   }
+  },
+  {
+   "id": 23,
+   "type": "CLIPVisionLoader",
+   "pos": [
+    460,
+    528
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip_name",
+     "name": "clip_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "clip_name"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "CLIP_VISION",
+     "name": "CLIP_VISION",
+     "type": "CLIP_VISION",
+     "links": [
+      72
+     ]
+    }
+   ],
+   "title": "DINOv3 image encoder",
+   "properties": {
+    "Node name for S&R": "CLIPVisionLoader"
+   },
+   "widgets_values": [
+    "dino_v3_L_naf_fp32.safetensors"
+   ],
+   "widgets_values_named": {
+    "clip_name": "dino_v3_L_naf_fp32.safetensors"
+   }
+  },
+  {
+   "id": 24,
+   "type": "Trellis2Conditioning",
+   "pos": [
+    460,
+    656
+   ],
+   "size": [
+    340,
+    46
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "clip_vision_model",
+     "name": "clip_vision_model",
+     "type": "CLIP_VISION",
+     "link": 72
+    },
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "IMAGE",
+     "link": 73
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      78,
+      85
+     ]
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      79,
+      86
+     ]
+    }
+   ],
+   "title": "Image conditioning",
+   "properties": {
+    "Node name for S&R": "Trellis2Conditioning"
+   }
+  },
+  {
+   "id": 30,
+   "type": "CFGOverride",
+   "pos": [
+    890,
+    120
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 74
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "start_percent",
+     "name": "start_percent",
+     "type": "FLOAT",
+     "widget": {
+      "name": "start_percent"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "end_percent",
+     "name": "end_percent",
+     "type": "FLOAT",
+     "widget": {
+      "name": "end_percent"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      75
+     ]
+    }
+   ],
+   "title": "Structure CFG schedule",
+   "properties": {
+    "Node name for S&R": "CFGOverride"
+   },
+   "widgets_values": [
+    1,
+    0.667,
+    1
+   ],
+   "widgets_values_named": {
+    "cfg": 1,
+    "start_percent": 0.667,
+    "end_percent": 1
+   }
+  },
+  {
+   "id": 31,
+   "type": "RescaleCFG",
+   "pos": [
+    890,
+    296
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 75
+    },
+    {
+     "localized_name": "multiplier",
+     "name": "multiplier",
+     "type": "FLOAT",
+     "widget": {
+      "name": "multiplier"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      76
+     ]
+    }
+   ],
+   "title": "Structure rescale",
+   "properties": {
+    "Node name for S&R": "RescaleCFG"
+   },
+   "widgets_values": [
+    0.7
+   ],
+   "widgets_values_named": {
+    "multiplier": 0.7
+   }
+  },
+  {
+   "id": 32,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    890,
+    424
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 76
+    },
+    {
+     "localized_name": "shift",
+     "name": "shift",
+     "type": "FLOAT",
+     "widget": {
+      "name": "shift"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      77
+     ]
+    }
+   ],
+   "title": "Structure shift",
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    5
+   ],
+   "widgets_values_named": {
+    "shift": 5
+   }
+  },
+  {
+   "id": 33,
+   "type": "EmptyTrellis2LatentStructure",
+   "pos": [
+    890,
+    552
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "batch_size",
+     "name": "batch_size",
+     "type": "INT",
+     "widget": {
+      "name": "batch_size"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      80
+     ]
+    }
+   ],
+   "title": "Empty structure",
+   "properties": {
+    "Node name for S&R": "EmptyTrellis2LatentStructure"
+   },
+   "widgets_values": [
+    1
+   ],
+   "widgets_values_named": {
+    "batch_size": 1
+   }
+  },
+  {
+   "id": 34,
+   "type": "KSampler",
+   "pos": [
+    890,
+    680
+   ],
+   "size": [
+    340,
+    262
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 77
+    },
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 78
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 79
+    },
+    {
+     "localized_name": "latent_image",
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 80
+    },
+    {
+     "localized_name": "seed",
+     "name": "seed",
+     "type": "INT",
+     "widget": {
+      "name": "seed"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "steps",
+     "name": "steps",
+     "type": "INT",
+     "widget": {
+      "name": "steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sampler_name",
+     "name": "sampler_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "sampler_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "scheduler",
+     "name": "scheduler",
+     "type": "COMBO",
+     "widget": {
+      "name": "scheduler"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "denoise",
+     "name": "denoise",
+     "type": "FLOAT",
+     "widget": {
+      "name": "denoise"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      81
+     ]
+    }
+   ],
+   "title": "SEED: change this one for a different body",
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    56,
+    "randomize",
+    12,
+    7.5,
+    "euler",
+    "normal",
+    1
+   ],
+   "widgets_values_named": {
+    "seed": 56,
+    "control_after_generate": "randomize",
+    "steps": 12,
+    "cfg": 7.5,
+    "sampler_name": "euler",
+    "scheduler": "normal",
+    "denoise": 1
+   }
+  },
+  {
+   "id": 35,
+   "type": "VaeDecodeStructureTrellis2",
+   "pos": [
+    890,
+    1012
+   ],
+   "size": [
+    340,
+    78
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "samples",
+     "name": "samples",
+     "type": "LATENT",
+     "link": 81
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 82
+    },
+    {
+     "localized_name": "resolution",
+     "name": "resolution",
+     "type": "COMBO",
+     "widget": {
+      "name": "resolution"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "voxel",
+     "name": "voxel",
+     "type": "VOXEL",
+     "links": [
+      87
+     ]
+    }
+   ],
+   "title": "Decode structure",
+   "properties": {
+    "Node name for S&R": "VaeDecodeStructureTrellis2"
+   },
+   "widgets_values": [
+    "32"
+   ],
+   "widgets_values_named": {
+    "resolution": "32"
+   }
+  },
+  {
+   "id": 40,
+   "type": "CFGOverride",
+   "pos": [
+    1320,
+    120
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 83
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "start_percent",
+     "name": "start_percent",
+     "type": "FLOAT",
+     "widget": {
+      "name": "start_percent"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "end_percent",
+     "name": "end_percent",
+     "type": "FLOAT",
+     "widget": {
+      "name": "end_percent"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      84
+     ]
+    }
+   ],
+   "title": "Shape CFG schedule",
+   "properties": {
+    "Node name for S&R": "CFGOverride"
+   },
+   "widgets_values": [
+    1,
+    0.769,
+    1
+   ],
+   "widgets_values_named": {
+    "cfg": 1,
+    "start_percent": 0.769,
+    "end_percent": 1
+   }
+  },
+  {
+   "id": 41,
+   "type": "RescaleCFG",
+   "pos": [
+    1320,
+    296
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 84
+    },
+    {
+     "localized_name": "multiplier",
+     "name": "multiplier",
+     "type": "FLOAT",
+     "widget": {
+      "name": "multiplier"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "MODEL",
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      88,
+      96
+     ]
+    }
+   ],
+   "title": "Shape rescale",
+   "properties": {
+    "Node name for S&R": "RescaleCFG"
+   },
+   "widgets_values": [
+    0.5
+   ],
+   "widgets_values_named": {
+    "multiplier": 0.5
+   }
+  },
+  {
+   "id": 42,
+   "type": "Trellis2ShapeStage",
+   "pos": [
+    1320,
+    424
+   ],
+   "size": [
+    340,
+    66
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 85
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 86
+    },
+    {
+     "localized_name": "voxel",
+     "name": "voxel",
+     "type": "VOXEL",
+     "link": 87
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      89,
+      92
+     ]
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      90,
+      93
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      91
+     ]
+    }
+   ],
+   "title": "Shape stage",
+   "properties": {
+    "Node name for S&R": "Trellis2ShapeStage"
+   }
+  },
+  {
+   "id": 43,
+   "type": "KSampler",
+   "pos": [
+    1320,
+    560
+   ],
+   "size": [
+    340,
+    262
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 88
+    },
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 89
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 90
+    },
+    {
+     "localized_name": "latent_image",
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 91
+    },
+    {
+     "localized_name": "seed",
+     "name": "seed",
+     "type": "INT",
+     "widget": {
+      "name": "seed"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "steps",
+     "name": "steps",
+     "type": "INT",
+     "widget": {
+      "name": "steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sampler_name",
+     "name": "sampler_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "sampler_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "scheduler",
+     "name": "scheduler",
+     "type": "COMBO",
+     "widget": {
+      "name": "scheduler"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "denoise",
+     "name": "denoise",
+     "type": "FLOAT",
+     "widget": {
+      "name": "denoise"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      94
+     ]
+    }
+   ],
+   "title": "Shape sampler",
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    42,
+    "randomize",
+    20,
+    7.5,
+    "euler",
+    "normal",
+    1
+   ],
+   "widgets_values_named": {
+    "seed": 42,
+    "control_after_generate": "randomize",
+    "steps": 20,
+    "cfg": 7.5,
+    "sampler_name": "euler",
+    "scheduler": "normal",
+    "denoise": 1
+   }
+  },
+  {
+   "id": 44,
+   "type": "Trellis2UpsampleStage",
+   "pos": [
+    1320,
+    892
+   ],
+   "size": [
+    340,
+    118
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 92
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 93
+    },
+    {
+     "localized_name": "shape_latent",
+     "name": "shape_latent",
+     "type": "LATENT",
+     "link": 94
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 95
+    },
+    {
+     "localized_name": "target_resolution",
+     "name": "target_resolution",
+     "type": "INT",
+     "widget": {
+      "name": "target_resolution"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      97,
+      102
+     ]
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      98,
+      103
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      99
+     ]
+    }
+   ],
+   "title": "Upsample: 1536 default, 1024 if VRAM runs out",
+   "properties": {
+    "Node name for S&R": "Trellis2UpsampleStage"
+   },
+   "widgets_values": [
+    1536
+   ],
+   "widgets_values_named": {
+    "target_resolution": 1536
+   }
+  },
+  {
+   "id": 45,
+   "type": "KSampler",
+   "pos": [
+    1320,
+    1080
+   ],
+   "size": [
+    340,
+    262
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 96
+    },
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 97
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 98
+    },
+    {
+     "localized_name": "latent_image",
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 99
+    },
+    {
+     "localized_name": "seed",
+     "name": "seed",
+     "type": "INT",
+     "widget": {
+      "name": "seed"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "steps",
+     "name": "steps",
+     "type": "INT",
+     "widget": {
+      "name": "steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sampler_name",
+     "name": "sampler_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "sampler_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "scheduler",
+     "name": "scheduler",
+     "type": "COMBO",
+     "widget": {
+      "name": "scheduler"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "denoise",
+     "name": "denoise",
+     "type": "FLOAT",
+     "widget": {
+      "name": "denoise"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      100,
+      104
+     ]
+    }
+   ],
+   "title": "Upsample sampler",
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    42,
+    "randomize",
+    12,
+    7.5,
+    "euler",
+    "simple",
+    1
+   ],
+   "widgets_values_named": {
+    "seed": 42,
+    "control_after_generate": "randomize",
+    "steps": 12,
+    "cfg": 7.5,
+    "sampler_name": "euler",
+    "scheduler": "simple",
+    "denoise": 1
+   }
+  },
+  {
+   "id": 46,
+   "type": "VaeDecodeShapeTrellis",
+   "pos": [
+    1320,
+    1412
+   ],
+   "size": [
+    340,
+    46
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "samples",
+     "name": "samples",
+     "type": "LATENT",
+     "link": 100
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 101
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      112,
+      119
+     ]
+    },
+    {
+     "localized_name": "shape_subdivides",
+     "name": "shape_subdivides",
+     "type": "SHAPE_SUBDIVIDES",
+     "links": [
+      111
+     ]
+    }
+   ],
+   "title": "Decode shape",
+   "properties": {
+    "Node name for S&R": "VaeDecodeShapeTrellis"
+   }
+  },
+  {
+   "id": 50,
+   "type": "Trellis2TextureStage",
+   "pos": [
+    1750,
+    120
+   ],
+   "size": [
+    340,
+    66
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 102
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 103
+    },
+    {
+     "localized_name": "shape_latent",
+     "name": "shape_latent",
+     "type": "LATENT",
+     "link": 104
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      106
+     ]
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      107
+     ]
+    },
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      108
+     ]
+    }
+   ],
+   "title": "Texture stage",
+   "properties": {
+    "Node name for S&R": "Trellis2TextureStage"
+   }
+  },
+  {
+   "id": 51,
+   "type": "KSampler",
+   "pos": [
+    1750,
+    256
+   ],
+   "size": [
+    340,
+    262
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "model",
+     "name": "model",
+     "type": "MODEL",
+     "link": 105
+    },
+    {
+     "localized_name": "positive",
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 106
+    },
+    {
+     "localized_name": "negative",
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 107
+    },
+    {
+     "localized_name": "latent_image",
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 108
+    },
+    {
+     "localized_name": "seed",
+     "name": "seed",
+     "type": "INT",
+     "widget": {
+      "name": "seed"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "steps",
+     "name": "steps",
+     "type": "INT",
+     "widget": {
+      "name": "steps"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "cfg",
+     "name": "cfg",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cfg"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sampler_name",
+     "name": "sampler_name",
+     "type": "COMBO",
+     "widget": {
+      "name": "sampler_name"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "scheduler",
+     "name": "scheduler",
+     "type": "COMBO",
+     "widget": {
+      "name": "scheduler"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "denoise",
+     "name": "denoise",
+     "type": "FLOAT",
+     "widget": {
+      "name": "denoise"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "LATENT",
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      109
+     ]
+    }
+   ],
+   "title": "Texture sampler",
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    43,
+    "randomize",
+    12,
+    1,
+    "euler",
+    "normal",
+    1
+   ],
+   "widgets_values_named": {
+    "seed": 43,
+    "control_after_generate": "randomize",
+    "steps": 12,
+    "cfg": 1,
+    "sampler_name": "euler",
+    "scheduler": "normal",
+    "denoise": 1
+   }
+  },
+  {
+   "id": 52,
+   "type": "VaeDecodeTextureTrellis",
+   "pos": [
+    1750,
+    588
+   ],
+   "size": [
+    340,
+    66
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "samples",
+     "name": "samples",
+     "type": "LATENT",
+     "link": 109
+    },
+    {
+     "localized_name": "vae",
+     "name": "vae",
+     "type": "VAE",
+     "link": 110
+    },
+    {
+     "localized_name": "shape_subdivides",
+     "name": "shape_subdivides",
+     "type": "SHAPE_SUBDIVIDES",
+     "link": 111
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "voxel_colors",
+     "name": "voxel_colors",
+     "type": "VOXEL",
+     "links": [
+      118
+     ]
+    }
+   ],
+   "title": "Decode texture",
+   "properties": {
+    "Node name for S&R": "VaeDecodeTextureTrellis"
+   }
+  },
+  {
+   "id": 60,
+   "type": "RemeshMesh",
+   "pos": [
+    2180,
+    120
+   ],
+   "size": [
+    340,
+    298
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 112
+    },
+    {
+     "localized_name": "resolution",
+     "name": "resolution",
+     "type": "INT",
+     "widget": {
+      "name": "resolution"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "sign_mode",
+     "name": "sign_mode",
+     "type": "COMFY_DYNAMICCOMBO_V3",
+     "widget": {
+      "name": "sign_mode"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "qef",
+     "name": "sign_mode.qef",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "sign_mode.qef"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "drop_inverted_components",
+     "name": "sign_mode.drop_inverted_components",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "sign_mode.drop_inverted_components"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "drop_enclosed_components",
+     "name": "sign_mode.drop_enclosed_components",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "sign_mode.drop_enclosed_components"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "band",
+     "name": "band",
+     "type": "FLOAT",
+     "widget": {
+      "name": "band"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "project_back",
+     "name": "project_back",
+     "type": "FLOAT",
+     "widget": {
+      "name": "project_back"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "fix_poles",
+     "name": "fix_poles",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "fix_poles"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "smooth_iters",
+     "name": "smooth_iters",
+     "type": "INT",
+     "widget": {
+      "name": "smooth_iters"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "drop_small_components",
+     "name": "drop_small_components",
+     "type": "FLOAT",
+     "widget": {
+      "name": "drop_small_components"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "precluster_max_verts",
+     "name": "precluster_max_verts",
+     "type": "INT",
+     "widget": {
+      "name": "precluster_max_verts"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      113,
+      114,
+      121
+     ]
+    }
+   ],
+   "title": "Clean closed high poly",
+   "properties": {
+    "Node name for S&R": "RemeshMesh"
+   },
+   "widgets_values": [
+    768,
+    "udf",
+    false,
+    false,
+    false,
+    1,
+    0,
+    false,
+    20,
+    0.01,
+    20000000
+   ],
+   "widgets_values_named": {
+    "resolution": 768,
+    "sign_mode": "udf",
+    "sign_mode.qef": false,
+    "sign_mode.drop_inverted_components": false,
+    "sign_mode.drop_enclosed_components": false,
+    "band": 1,
+    "project_back": 0,
+    "fix_poles": false,
+    "smooth_iters": 20,
+    "drop_small_components": 0.01,
+    "precluster_max_verts": 20000000
+   }
+  },
+  {
+   "id": 61,
+   "type": "SaveGLB",
+   "pos": [
+    2180,
+    488
+   ],
+   "size": [
+    400,
+    550
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH,FILE_3D_GLB,FILE_3D_GLTF,FILE_3D_OBJ,FILE_3D_FBX,FILE_3D_STL,FILE_3D_USDZ,FILE_3D_PLY,FILE_3D_SPLAT,FILE_3D_SPZ,FILE_3D_KSPLAT,FILE_3D_SPLAT_ANY,FILE_3D_POINT_CLOUD_ANY,FILE_3D",
+     "link": 113
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "PREVIEW_3D",
+     "widget": {
+      "name": "image"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [],
+   "title": "High poly without texture, for comparison",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/highpoly",
+    ""
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/highpoly",
+    "image": ""
+   }
+  },
+  {
+   "id": 62,
+   "type": "DecimateMesh",
+   "pos": [
+    2180,
+    1108
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 114
+    },
+    {
+     "localized_name": "target_face_count",
+     "name": "target_face_count",
+     "type": "INT",
+     "widget": {
+      "name": "target_face_count"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "placement_mode",
+     "name": "placement_mode",
+     "type": "COMFY_DYNAMICCOMBO_V3",
+     "widget": {
+      "name": "placement_mode"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      115
+     ]
+    }
+   ],
+   "title": "TARGET: 12000 triangles",
+   "properties": {
+    "Node name for S&R": "DecimateMesh"
+   },
+   "widgets_values": [
+    12000,
+    "midpoint"
+   ],
+   "widgets_values_named": {
+    "target_face_count": 12000,
+    "placement_mode": "midpoint"
+   }
+  },
+  {
+   "id": 63,
+   "type": "MeshSmoothNormals",
+   "pos": [
+    2180,
+    1260
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 115
+    },
+    {
+     "localized_name": "crease_angle",
+     "name": "crease_angle",
+     "type": "FLOAT",
+     "widget": {
+      "name": "crease_angle"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      116
+     ]
+    }
+   ],
+   "title": "Smooth normals",
+   "properties": {
+    "Node name for S&R": "MeshSmoothNormals"
+   },
+   "widgets_values": [
+    180
+   ],
+   "widgets_values_named": {
+    "crease_angle": 180
+   }
+  },
+  {
+   "id": 64,
+   "type": "UnwrapMesh",
+   "pos": [
+    2180,
+    1388
+   ],
+   "size": [
+    340,
+    130
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 116
+    },
+    {
+     "localized_name": "segmenter",
+     "name": "segmenter",
+     "type": "COMBO",
+     "widget": {
+      "name": "segmenter"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "resolution",
+     "name": "resolution",
+     "type": "INT",
+     "widget": {
+      "name": "resolution"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "padding",
+     "name": "padding",
+     "type": "INT",
+     "widget": {
+      "name": "padding"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "weld_distance",
+     "name": "weld_distance",
+     "type": "FLOAT",
+     "widget": {
+      "name": "weld_distance"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      117,
+      120,
+      122
+     ]
+    }
+   ],
+   "title": "UV unwrap",
+   "properties": {
+    "Node name for S&R": "UnwrapMesh"
+   },
+   "widgets_values": [
+    "pec",
+    2048,
+    2,
+    0.0002
+   ],
+   "widgets_values_named": {
+    "segmenter": "pec",
+    "resolution": 2048,
+    "padding": 2,
+    "weld_distance": 0.0002
+   }
+  },
+  {
+   "id": 70,
+   "type": "BakeTextureFromVoxel",
+   "pos": [
+    2670,
+    120
+   ],
+   "size": [
+    340,
+    98
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 117
+    },
+    {
+     "localized_name": "voxel_colors",
+     "name": "voxel_colors",
+     "type": "VOXEL",
+     "link": 118
+    },
+    {
+     "localized_name": "reference_mesh",
+     "name": "reference_mesh",
+     "shape": 7,
+     "type": "MESH",
+     "link": 119
+    },
+    {
+     "localized_name": "resolution",
+     "name": "texture_size",
+     "type": "INT",
+     "widget": {
+      "name": "texture_size"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "base_color",
+     "name": "base_color",
+     "type": "IMAGE",
+     "links": [
+      123,
+      129
+     ]
+    },
+    {
+     "localized_name": "metallic",
+     "name": "metallic",
+     "type": "IMAGE",
+     "links": [
+      124,
+      130
+     ]
+    },
+    {
+     "localized_name": "roughness",
+     "name": "roughness",
+     "type": "IMAGE",
+     "links": [
+      125,
+      131
+     ]
+    }
+   ],
+   "title": "Bake colour, metal, roughness",
+   "properties": {
+    "Node name for S&R": "BakeTextureFromVoxel"
+   },
+   "widgets_values": [
+    2048
+   ],
+   "widgets_values_named": {
+    "texture_size": 2048
+   }
+  },
+  {
+   "id": 71,
+   "type": "BakeNormalMapFromMesh",
+   "pos": [
+    2670,
+    288
+   ],
+   "size": [
+    340,
+    126
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "low_poly",
+     "name": "low_poly",
+     "type": "MESH",
+     "link": 120
+    },
+    {
+     "localized_name": "high_poly",
+     "name": "high_poly",
+     "type": "MESH",
+     "link": 121
+    },
+    {
+     "localized_name": "resolution",
+     "name": "resolution",
+     "type": "INT",
+     "widget": {
+      "name": "resolution"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "cage_distance",
+     "name": "cage_distance",
+     "type": "FLOAT",
+     "widget": {
+      "name": "cage_distance"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "ignore_backfaces",
+     "name": "ignore_backfaces",
+     "type": "BOOLEAN",
+     "widget": {
+      "name": "ignore_backfaces"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "normal_map",
+     "name": "normal_map",
+     "type": "IMAGE",
+     "links": [
+      126,
+      132
+     ]
+    }
+   ],
+   "title": "Bake normal map",
+   "properties": {
+    "Node name for S&R": "BakeNormalMapFromMesh"
+   },
+   "widgets_values": [
+    2048,
+    0.05,
+    true
+   ],
+   "widgets_values_named": {
+    "resolution": 2048,
+    "cage_distance": 0.05,
+    "ignore_backfaces": true
+   }
+  },
+  {
+   "id": 72,
+   "type": "ApplyTextureToMesh",
+   "pos": [
+    2670,
+    484
+   ],
+   "size": [
+    340,
+    126
+   ],
+   "flags": {},
+   "order": 37,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 122
+    },
+    {
+     "localized_name": "base_color",
+     "name": "base_color",
+     "type": "IMAGE",
+     "link": 123
+    },
+    {
+     "localized_name": "metallic",
+     "name": "metallic",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 124
+    },
+    {
+     "localized_name": "roughness",
+     "name": "roughness",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 125
+    },
+    {
+     "localized_name": "occlusion",
+     "name": "occlusion",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": null
+    },
+    {
+     "localized_name": "normal_map",
+     "name": "normal_map",
+     "shape": 7,
+     "type": "IMAGE",
+     "link": 126
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      127
+     ]
+    }
+   ],
+   "title": "Attach all maps",
+   "properties": {
+    "Node name for S&R": "ApplyTextureToMesh"
+   }
+  },
+  {
+   "id": 73,
+   "type": "MeshSmoothNormals",
+   "pos": [
+    2670,
+    680
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 39,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "link": 127
+    },
+    {
+     "localized_name": "crease_angle",
+     "name": "crease_angle",
+     "type": "FLOAT",
+     "widget": {
+      "name": "crease_angle"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH",
+     "links": [
+      128
+     ]
+    }
+   ],
+   "title": "Smooth final normals",
+   "properties": {
+    "Node name for S&R": "MeshSmoothNormals"
+   },
+   "widgets_values": [
+    180
+   ],
+   "widgets_values_named": {
+    "crease_angle": 180
+   }
+  },
+  {
+   "id": 74,
+   "type": "SaveGLB",
+   "pos": [
+    2670,
+    808
+   ],
+   "size": [
+    400,
+    550
+   ],
+   "flags": {},
+   "order": 40,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "mesh",
+     "name": "mesh",
+     "type": "MESH,FILE_3D_GLB,FILE_3D_GLTF,FILE_3D_OBJ,FILE_3D_FBX,FILE_3D_STL,FILE_3D_USDZ,FILE_3D_PLY,FILE_3D_SPLAT,FILE_3D_SPZ,FILE_3D_KSPLAT,FILE_3D_SPLAT_ANY,FILE_3D_POINT_CLOUD_ANY,FILE_3D",
+     "link": 128
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    },
+    {
+     "localized_name": "image",
+     "name": "image",
+     "type": "PREVIEW_3D",
+     "widget": {
+      "name": "image"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [],
+   "title": "FINAL: this file goes to rigging",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/final",
+    ""
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/final",
+    "image": ""
+   }
+  },
+  {
+   "id": 75,
+   "type": "SaveImage",
+   "pos": [
+    3160,
+    120
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 129
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": null
+    }
+   ],
+   "title": "Base colour map",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/base_color"
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/base_color"
+   }
+  },
+  {
+   "id": 76,
+   "type": "SaveImage",
+   "pos": [
+    3160,
+    248
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 130
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": null
+    }
+   ],
+   "title": "Metallic map",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/metallic"
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/metallic"
+   }
+  },
+  {
+   "id": 77,
+   "type": "SaveImage",
+   "pos": [
+    3160,
+    376
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 131
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": null
+    }
+   ],
+   "title": "Roughness map",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/roughness"
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/roughness"
+   }
+  },
+  {
+   "id": 78,
+   "type": "SaveImage",
+   "pos": [
+    3160,
+    504
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 38,
+   "mode": 0,
+   "inputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "link": 132
+    },
+    {
+     "localized_name": "filename_prefix",
+     "name": "filename_prefix",
+     "type": "STRING",
+     "widget": {
+      "name": "filename_prefix"
+     },
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "localized_name": "images",
+     "name": "images",
+     "type": "IMAGE",
+     "links": null
+    }
+   ],
+   "title": "Normal map",
+   "properties": {},
+   "widgets_values": [
+    "agora_char/character/normal"
+   ],
+   "widgets_values_named": {
+    "filename_prefix": "agora_char/character/normal"
+   }
+  },
+  {
+   "id": 79,
+   "type": "Note",
+   "pos": [
+    0,
+    1648
+   ],
+   "size": [
+    760,
+    420
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "title": "Start here",
+   "properties": {},
+   "widgets_values": [
+    "AGORA 03: image to 2,000-triangle prop\n\nBEFORE THE FIRST RUN\nModels (ComfyUI/models): diffusion_models/trellis_2_int8_convrot.safetensors, vae/trellis_2_shape_vae_bf16.safetensors, vae/trellis_2_texture_vae_bf16.safetensors, clip_vision/dino_v3_L_naf_fp32.safetensors, background_removal/birefnet.safetensors. Links and licences: agora_output/reverse/yt_bEiW6L7Y7NM/FIRST_CHARACTER_PLAN.md\n\nHOW TO RUN\n1. Load Image: full body, exact front view, T-pose, empty hands, plain background, fitted clothing.\n2. Run.\n3. Check the saved crop: the whole body must be visible.\n4. Check the final GLB: tools/comfy_char/check_glb.py <file> --target 2000\n\nWHAT TO CHANGE\nDifferent body: the seed on the \"SEED\" sampler.\nOut of VRAM: Upsample target_resolution 1024.\nFingers or straps break: Decimate target 20000.\nWrong patches in the normal map: raise cage_distance.\n\nNATIVE NODES ONLY: no WTiVo, LODTailor, Bake Forger, UltraTex, or FLUX.2."
+   ],
+   "widgets_values_named": {
+    "text": "AGORA 03: image to 2,000-triangle prop\n\nBEFORE THE FIRST RUN\nModels (ComfyUI/models): diffusion_models/trellis_2_int8_convrot.safetensors, vae/trellis_2_shape_vae_bf16.safetensors, vae/trellis_2_texture_vae_bf16.safetensors, clip_vision/dino_v3_L_naf_fp32.safetensors, background_removal/birefnet.safetensors. Links and licences: agora_output/reverse/yt_bEiW6L7Y7NM/FIRST_CHARACTER_PLAN.md\n\nHOW TO RUN\n1. Load Image: full body, exact front view, T-pose, empty hands, plain background, fitted clothing.\n2. Run.\n3. Check the saved crop: the whole body must be visible.\n4. Check the final GLB: tools/comfy_char/check_glb.py <file> --target 2000\n\nWHAT TO CHANGE\nDifferent body: the seed on the \"SEED\" sampler.\nOut of VRAM: Upsample target_resolution 1024.\nFingers or straps break: Decimate target 20000.\nWrong patches in the normal map: raise cage_distance.\n\nNATIVE NODES ONLY: no WTiVo, LODTailor, Bake Forger, UltraTex, or FLUX.2."
+   },
+   "color": "#432",
+   "bgcolor": "#653"
+  }
+ ],
+ "links": [
+  [
+   67,
+   11,
+   0,
+   12,
+   0,
+   "BACKGROUND_REMOVAL"
+  ],
+  [
+   68,
+   10,
+   0,
+   12,
+   1,
+   "IMAGE"
+  ],
+  [
+   69,
+   10,
+   0,
+   13,
+   0,
+   "IMAGE"
+  ],
+  [
+   70,
+   12,
+   0,
+   13,
+   1,
+   "MASK"
+  ],
+  [
+   71,
+   13,
+   0,
+   14,
+   0,
+   "IMAGE"
+  ],
+  [
+   72,
+   23,
+   0,
+   24,
+   0,
+   "CLIP_VISION"
+  ],
+  [
+   73,
+   13,
+   0,
+   24,
+   1,
+   "IMAGE"
+  ],
+  [
+   74,
+   20,
+   0,
+   30,
+   0,
+   "MODEL"
+  ],
+  [
+   75,
+   30,
+   0,
+   31,
+   0,
+   "MODEL"
+  ],
+  [
+   76,
+   31,
+   0,
+   32,
+   0,
+   "MODEL"
+  ],
+  [
+   77,
+   32,
+   0,
+   34,
+   0,
+   "MODEL"
+  ],
+  [
+   78,
+   24,
+   0,
+   34,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   79,
+   24,
+   1,
+   34,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   80,
+   33,
+   0,
+   34,
+   3,
+   "LATENT"
+  ],
+  [
+   81,
+   34,
+   0,
+   35,
+   0,
+   "LATENT"
+  ],
+  [
+   82,
+   21,
+   0,
+   35,
+   1,
+   "VAE"
+  ],
+  [
+   83,
+   20,
+   0,
+   40,
+   0,
+   "MODEL"
+  ],
+  [
+   84,
+   40,
+   0,
+   41,
+   0,
+   "MODEL"
+  ],
+  [
+   85,
+   24,
+   0,
+   42,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   86,
+   24,
+   1,
+   42,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   87,
+   35,
+   0,
+   42,
+   2,
+   "VOXEL"
+  ],
+  [
+   88,
+   41,
+   0,
+   43,
+   0,
+   "MODEL"
+  ],
+  [
+   89,
+   42,
+   0,
+   43,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   90,
+   42,
+   1,
+   43,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   91,
+   42,
+   2,
+   43,
+   3,
+   "LATENT"
+  ],
+  [
+   92,
+   42,
+   0,
+   44,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   93,
+   42,
+   1,
+   44,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   94,
+   43,
+   0,
+   44,
+   2,
+   "LATENT"
+  ],
+  [
+   95,
+   21,
+   0,
+   44,
+   3,
+   "VAE"
+  ],
+  [
+   96,
+   41,
+   0,
+   45,
+   0,
+   "MODEL"
+  ],
+  [
+   97,
+   44,
+   0,
+   45,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   98,
+   44,
+   1,
+   45,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   99,
+   44,
+   2,
+   45,
+   3,
+   "LATENT"
+  ],
+  [
+   100,
+   45,
+   0,
+   46,
+   0,
+   "LATENT"
+  ],
+  [
+   101,
+   21,
+   0,
+   46,
+   1,
+   "VAE"
+  ],
+  [
+   102,
+   44,
+   0,
+   50,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   103,
+   44,
+   1,
+   50,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   104,
+   45,
+   0,
+   50,
+   2,
+   "LATENT"
+  ],
+  [
+   105,
+   20,
+   0,
+   51,
+   0,
+   "MODEL"
+  ],
+  [
+   106,
+   50,
+   0,
+   51,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   107,
+   50,
+   1,
+   51,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   108,
+   50,
+   2,
+   51,
+   3,
+   "LATENT"
+  ],
+  [
+   109,
+   51,
+   0,
+   52,
+   0,
+   "LATENT"
+  ],
+  [
+   110,
+   22,
+   0,
+   52,
+   1,
+   "VAE"
+  ],
+  [
+   111,
+   46,
+   1,
+   52,
+   2,
+   "SHAPE_SUBDIVIDES"
+  ],
+  [
+   112,
+   46,
+   0,
+   60,
+   0,
+   "MESH"
+  ],
+  [
+   113,
+   60,
+   0,
+   61,
+   0,
+   "MESH"
+  ],
+  [
+   114,
+   60,
+   0,
+   62,
+   0,
+   "MESH"
+  ],
+  [
+   115,
+   62,
+   0,
+   63,
+   0,
+   "MESH"
+  ],
+  [
+   116,
+   63,
+   0,
+   64,
+   0,
+   "MESH"
+  ],
+  [
+   117,
+   64,
+   0,
+   70,
+   0,
+   "MESH"
+  ],
+  [
+   118,
+   52,
+   0,
+   70,
+   1,
+   "VOXEL"
+  ],
+  [
+   119,
+   46,
+   0,
+   70,
+   2,
+   "MESH"
+  ],
+  [
+   120,
+   64,
+   0,
+   71,
+   0,
+   "MESH"
+  ],
+  [
+   121,
+   60,
+   0,
+   71,
+   1,
+   "MESH"
+  ],
+  [
+   122,
+   64,
+   0,
+   72,
+   0,
+   "MESH"
+  ],
+  [
+   123,
+   70,
+   0,
+   72,
+   1,
+   "IMAGE"
+  ],
+  [
+   124,
+   70,
+   1,
+   72,
+   2,
+   "IMAGE"
+  ],
+  [
+   125,
+   70,
+   2,
+   72,
+   3,
+   "IMAGE"
+  ],
+  [
+   126,
+   71,
+   0,
+   72,
+   5,
+   "IMAGE"
+  ],
+  [
+   127,
+   72,
+   0,
+   73,
+   0,
+   "MESH"
+  ],
+  [
+   128,
+   73,
+   0,
+   74,
+   0,
+   "MESH"
+  ],
+  [
+   129,
+   70,
+   0,
+   75,
+   0,
+   "IMAGE"
+  ],
+  [
+   130,
+   70,
+   1,
+   76,
+   0,
+   "IMAGE"
+  ],
+  [
+   131,
+   70,
+   2,
+   77,
+   0,
+   "IMAGE"
+  ],
+  [
+   132,
+   71,
+   0,
+   78,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 Input",
+   "bounding": [
+    0,
+    30,
+    400,
+    1578
+   ],
+   "color": "#3f789e",
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 Models + conditioning",
+   "bounding": [
+    430,
+    30,
+    400,
+    1578
+   ],
+   "color": "#8a5a2b",
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "3 Sparse structure",
+   "bounding": [
+    860,
+    30,
+    400,
+    1578
+   ],
+   "color": "#3f7a5a",
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "4 Shape",
+   "bounding": [
+    1290,
+    30,
+    400,
+    1578
+   ],
+   "color": "#6b4f9e",
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "5 Texture voxels",
+   "bounding": [
+    1720,
+    30,
+    400,
+    1578
+   ],
+   "color": "#9e4f6b",
+   "flags": {}
+  },
+  {
+   "id": 6,
+   "title": "6 Low poly",
+   "bounding": [
+    2150,
+    30,
+    460,
+    1578
+   ],
+   "color": "#4f7a9e",
+   "flags": {}
+  },
+  {
+   "id": 7,
+   "title": "7 Bake + save",
+   "bounding": [
+    2640,
+    30,
+    460,
+    1578
+   ],
+   "color": "#7a7a3f",
+   "flags": {}
+  },
+  {
+   "id": 8,
+   "title": "Maps",
+   "bounding": [
+    3130,
+    30,
+    400,
+    1578
+   ],
+   "color": "#3f789e",
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.45,
+   "offset": [
+    20,
+    20
+   ]
+  }
+ },
+ "version": 0.4
+}
