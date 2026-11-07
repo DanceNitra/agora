@@ -33,6 +33,22 @@ Where the fingers are lost, measured by saving each stage:
 raw mesh is not usable without it. Next designs, one at a time: a concept prompt with fingers spread wide
 (bigger gaps survive the offset), or accept mitten hands and rig with fingers off.
 
+## Round 2 result, 2026-11-07: concept v2, wide-spread fingers
+
+Input `concept_v2_00003_.png`, same graph, 90 s, GPU total peak 12.5 GB. Output `C:\ComfyUI\outputgora_char2\`.
+
+| Check | Result |
+|---|---|
+| Triangles | 11,922 |
+| Components | 1 (round 1: 3) |
+| Open edges | 0 boundary, 22 non-manifold (round 1: 2 and 31) |
+| Fingers | PASS: five separate fingers on both hands |
+| Face | no split seam this time; blurry, mouth slightly uneven, faint vertical line at the nose |
+| Defects | light texture slivers between fingers, an orange spot on the back of the left glove, a hair bun on the back that the front-only source does not show |
+
+The fix was the input image, not a node setting: gaps wide enough survive the `RemeshMesh` udf offset.
+Graph: [workflows/AGORA_CHAR_02_character_v2_api.json](../workflows/AGORA_CHAR_02_character_v2_api.json).
+
 ## The chain
 
 | Stage | Tool | Our model | Output |

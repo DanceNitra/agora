@@ -44,7 +44,15 @@ All four images show five fingers spread with background visible between them. N
 
 Recommended input: 3 (horizontal arms, clear gaps), or 1 if a male character is wanted. The owner picks.
 
-## Next steps
+## Resumed 2026-11-07 afternoon
+
+- Concept v2 image 3 meshed: fingers PASS on both hands, 11,922 triangles, 1 component. Details in the plan.
+- ComfyUI restarted (server PID 108904, Idle, models freed). Blender PID 106484 with `AGORA_CHAR_v2_final`
+  and `AGORA_CHAR_v2_raw`. Unreal MyProject PID 108456, MCP listening on 8000; the session's unreal-mcp
+  connection needs a manual reconnect (`/mcp`).
+- Next: import the v2 GLB into Unreal, then rig in ActionForge with network watch.
+
+## Next steps (written before the resume)
 
 1. Check `C:\Users\Danculus\.claude\compute\` for locks and the ComfyUI queue. Shorts-studio renders
    have priority.

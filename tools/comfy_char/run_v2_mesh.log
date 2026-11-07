@@ -1,0 +1,16 @@
+queued 7e616c18-281a-4b89-945a-e0e6483c0200
+       0 s  running=1 pending=0 vram_peak=4546 MiB
+      16 s  running=1 pending=0 vram_peak=7741 MiB
+      32 s  running=1 pending=0 vram_peak=12267 MiB
+      48 s  running=1 pending=0 vram_peak=12536 MiB
+      64 s  running=1 pending=0 vram_peak=12536 MiB
+      80 s  running=1 pending=0 vram_peak=12536 MiB
+output/agora_char\character/crop_00002_.png
+output/agora_char\v2/raw_before_remesh_00001_.glb
+output/agora_char\v2/highpoly_00001_.glb
+output/agora_char\v2/base_color_00001_.png
+output/agora_char\v2/metallic_00001_.png
+output/agora_char\v2/roughness_00001_.png
+output/agora_char\v2/normal_00001_.png
+output/agora_char\v2/final_00001_.glb
+{"prompt_id": "7e616c18-281a-4b89-945a-e0e6483c0200", "status": "success", "seconds": 90.3, "vram_baseline_mib": 4539, "vram_peak_mib": 12536, "files": 8}
