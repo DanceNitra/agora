@@ -1,0 +1,14 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "Agora Makeup",
+  "Description": "Makeup library for MetaHumans: 23 trend looks and about 5,000 variants painted onto the baked face textures of any built MetaHuman, without a rebuild.",
+  "Category": "Agora",
+  "CreatedBy": "Agora",
+  "EnabledByDefault": true,
+  "CanContainContent": true,
+  "IsBetaVersion": true,
+  "Installed": false,
+  "Plugins": [ { "Name": "PythonScriptPlugin", "Enabled": true } ]
+}
