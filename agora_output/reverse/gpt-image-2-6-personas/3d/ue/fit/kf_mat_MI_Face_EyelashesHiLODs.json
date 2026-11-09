@@ -1,0 +1,24 @@
+{
+ "scalar": {
+  "Metallic": 0.0,
+  "Specular": 0.0,
+  "Roughness": 0.25,
+  "HairRedness": 0.2800000011920929,
+  "HairMelanin": 0.30000001192092896,
+  "Exp": 1.0,
+  "Opacity": 1.0,
+  "OpacityRT": 1.0,
+  "ExpRT": 1.600000023841858
+ },
+ "vector": {
+  "DyeColor": [
+   1.0,
+   1.0,
+   1.0,
+   1.0
+  ]
+ },
+ "texture": {
+  "Texture": "/MetaHumanCharacter/Textures/Eyelashes/T_Eyelashes_L_ThickCurl_Coverage.T_Eyelashes_L_ThickCurl_Coverage"
+ }
+}

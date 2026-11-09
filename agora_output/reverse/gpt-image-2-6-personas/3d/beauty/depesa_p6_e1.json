@@ -1,0 +1,21 @@
+{
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "medium",
+  "prompt_file": "e1_p6_refine.md",
+  "usage": {
+    "input_tokens": 1728,
+    "input_tokens_details": {
+      "image_tokens": 1536,
+      "text_tokens": 192
+    },
+    "output_tokens": 1132,
+    "total_tokens": 2860,
+    "output_tokens_details": {
+      "image_tokens": 1132,
+      "text_tokens": 0
+    }
+  },
+  "usd": 0.047208,
+  "seconds": 30.4,
+  "sha256": "661fa090b50438e91efb806a7c760f88a2ff4aaf22ccec3d24a1769fe25fb699"
+}

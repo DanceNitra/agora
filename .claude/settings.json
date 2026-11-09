@@ -80,6 +80,15 @@
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent_budget.py\""
           }
         ]
+      },
+      {
+        "matcher": "SendUserFile",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/look_review_gate.py\""
+          }
+        ]
       }
     ]
   }

@@ -1,0 +1,30 @@
+{
+ "eyes.type": "SOFT_SMOKEY",
+ "eyes.primary_color": [
+  0.05,
+  0.026,
+  0.016,
+  1.0
+ ],
+ "eyes.secondary_color": [
+  0.002,
+  0.002,
+  0.002,
+  1.0
+ ],
+ "eyes.opacity": 0.75,
+ "eyes.roughness": 0.5,
+ "eyes.metalness": 0.12,
+ "lips.type": "NATURAL",
+ "lips.color": [
+  0.42,
+  0.15,
+  0.14,
+  1.0
+ ],
+ "lips.opacity": 0.4,
+ "lips.roughness": 0.05,
+ "lips.metalness": 0.0,
+ "blush.type": "NONE",
+ "foundation.apply_foundation": false
+}

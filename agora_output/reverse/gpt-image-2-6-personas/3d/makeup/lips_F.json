@@ -1,0 +1,28 @@
+{
+ "note": "deep berry-red, blurred edge, centre glow, overline, wet gloss",
+ "colour": [
+  150,
+  47,
+  59
+ ],
+ "tint_opacity": 0.92,
+ "upper_dL": -5,
+ "rim_colour": [
+  117,
+  32,
+  47
+ ],
+ "rim_opacity": 0.65,
+ "rim_width": 0.07,
+ "core_colour": [
+  177,
+  55,
+  66
+ ],
+ "core_opacity": 0.55,
+ "core_size": 0.22,
+ "overline_lower": 0.02,
+ "overline_upper": 0.01,
+ "overline_bow": 0.008,
+ "edge_soft": 0.016
+}

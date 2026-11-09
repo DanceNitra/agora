@@ -1,0 +1,21 @@
+{
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "medium",
+  "prompt_file": "e2_frontal.md",
+  "usage": {
+    "input_tokens": 1784,
+    "input_tokens_details": {
+      "image_tokens": 1536,
+      "text_tokens": 248
+    },
+    "output_tokens": 1132,
+    "total_tokens": 2916,
+    "output_tokens_details": {
+      "image_tokens": 1132,
+      "text_tokens": 0
+    }
+  },
+  "usd": 0.047488,
+  "seconds": 25.9,
+  "sha256": "063eb3c7496cb233a400f5d73fbac13da47ce001c617e16e9b9b26744cc3f7c0"
+}

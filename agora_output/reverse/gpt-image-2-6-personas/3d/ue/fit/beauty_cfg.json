@@ -1,0 +1,1 @@
+{"eyes": {"iris.primary_color_u": 0.95, "iris.primary_color_v": 0.75, "iris.secondary_color_u": 0.9, "iris.secondary_color_v": 0.4}, "makeup": {"eyes.type": "THIN_LINER", "eyes.primary_color": [0.005, 0.004, 0.004, 1.0], "eyes.opacity": 0.7, "lips.type": "NONE", "blush.type": "NONE", "foundation.apply_foundation": false}, "head": {"eyelashes.type": "LONG_THICK_CURL"}}

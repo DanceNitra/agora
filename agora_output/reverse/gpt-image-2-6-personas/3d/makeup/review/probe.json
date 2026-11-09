@@ -1,0 +1,17 @@
+{
+ "tag": "probe",
+ "render": "ue/fit/render_eyetest/0057.png",
+ "brow_holes": 0.801,
+ "control_p6_brow_holes": 0.295,
+ "brow_to_ridge": {
+  "img_left": {
+   "top_minus_crest_ew_median": -0.164,
+   "bottom_minus_crest_ew_median": 0.025
+  },
+  "img_right": {
+   "top_minus_crest_ew_median": -0.162,
+   "bottom_minus_crest_ew_median": 0.033
+  }
+ },
+ "brow_mask_symmetry_iou": 0.511
+}

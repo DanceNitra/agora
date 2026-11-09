@@ -1,0 +1,56 @@
+{
+ "sheet": "review/lips_S3_sheet.png",
+ "overlay": "review/lips_rea/shape_overlay_S3.png",
+ "units": "inner-eye-corner distances, MediaPipe",
+ "shape": {
+  "p6": {
+   "width": 1.667,
+   "upper": 0.15,
+   "lower": 0.312,
+   "ratio": 2.088,
+   "gap": 0.013
+  },
+  "old_0000": {
+   "width": 1.445,
+   "upper": 0.181,
+   "lower": 0.32,
+   "ratio": 1.772,
+   "gap": 0.002
+  },
+  "lips_S2_0000": {
+   "width": 1.573,
+   "upper": 0.206,
+   "lower": 0.395,
+   "ratio": 1.913,
+   "gap": 0.036
+  },
+  "lips_S3_0000": {
+   "width": 1.573,
+   "upper": 0.196,
+   "lower": 0.374,
+   "ratio": 1.907,
+   "gap": 0.02
+  },
+  "lips_G_0057": {
+   "width": 1.689,
+   "upper": 0.349,
+   "lower": 0.473,
+   "ratio": 1.354,
+   "gap": 0.318
+  },
+  "lips_S2_0057": {
+   "width": 1.836,
+   "upper": 0.37,
+   "lower": 0.515,
+   "ratio": 1.392,
+   "gap": 0.364
+  },
+  "lips_S3_0057": {
+   "width": 1.84,
+   "upper": 0.353,
+   "lower": 0.507,
+   "ratio": 1.434,
+   "gap": 0.372
+  }
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "tag": "v25",
+ "render": "makeup/review/v25_0057.png",
+ "brow_holes": 0.549,
+ "control_p6_brow_holes": 0.295,
+ "brow_to_ridge": {
+  "img_left": {
+   "top_minus_crest_ew_median": -0.187,
+   "bottom_minus_crest_ew_median": 0.052
+  },
+  "img_right": {
+   "top_minus_crest_ew_median": -0.189,
+   "bottom_minus_crest_ew_median": 0.051
+  }
+ },
+ "brow_mask_symmetry_iou": 0.885
+}

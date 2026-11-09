@@ -1,0 +1,28 @@
+{
+ "note": "more seductive: deeper rose-red, lower lip overlined at centre, raised cupid's bow, stronger ombre, soft gloss",
+ "colour": [
+  163,
+  69,
+  67
+ ],
+ "tint_opacity": 0.9,
+ "upper_dL": -5,
+ "rim_colour": [
+  132,
+  51,
+  52
+ ],
+ "rim_opacity": 0.6,
+ "rim_width": 0.06,
+ "core_colour": [
+  190,
+  77,
+  72
+ ],
+ "core_opacity": 0.55,
+ "core_size": 0.22,
+ "overline_lower": 0.025,
+ "overline_upper": 0.012,
+ "overline_bow": 0.01,
+ "edge_soft": 0.01
+}

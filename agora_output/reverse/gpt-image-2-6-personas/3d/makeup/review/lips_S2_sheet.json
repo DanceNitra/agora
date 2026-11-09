@@ -1,0 +1,37 @@
+{
+ "sheet": "review/lips_S2_sheet.png",
+ "overlay": "review/lips_rea/shape_overlay_S2.png",
+ "units": "lip measures in inner-eye-corner distances, from MediaPipe landmarks",
+ "shape": {
+  "p6": {
+   "width": 1.667,
+   "upper": 0.15,
+   "lower": 0.312,
+   "ratio": 2.088
+  },
+  "before_closed": {
+   "width": 1.445,
+   "upper": 0.181,
+   "lower": 0.32,
+   "ratio": 1.772
+  },
+  "new_closed": {
+   "width": 1.573,
+   "upper": 0.206,
+   "lower": 0.395,
+   "ratio": 1.913
+  },
+  "before_smile": {
+   "width": 1.689,
+   "upper": 0.349,
+   "lower": 0.473,
+   "ratio": 1.354
+  },
+  "new_smile": {
+   "width": 1.836,
+   "upper": 0.37,
+   "lower": 0.515,
+   "ratio": 1.392
+  }
+ }
+}

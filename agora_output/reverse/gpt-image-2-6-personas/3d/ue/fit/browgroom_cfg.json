@@ -1,0 +1,34 @@
+{
+ "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\depesa_lashes_clump.abc",
+ "asset": "GA_Depesa_LashesClump",
+ "rot": [
+  90,
+  0,
+  0
+ ],
+ "scale": [
+  1,
+  -1,
+  1
+ ],
+ "width": 0.02,
+ "seq": "/Game/Companions/Lipsync/LS_KF_Depesa_lajk_confidence_v5",
+ "component": "Face",
+ "socket": "FACIAL_C_FacialRoot",
+ "material": "/Game/Companions/Brows/MI_Depesa_Brows",
+ "face_mesh": "/Game/Companions/MetaHuman/BuiltKF/MH_DepesaKF/Face/SKM_MH_DepesaKF_FaceMesh",
+ "parts": [
+  {
+   "name": "R",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\brow_R.abc",
+   "asset": "GA_Depesa_Brow_R",
+   "socket": "head"
+  },
+  {
+   "name": "L",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\brow_L.abc",
+   "asset": "GA_Depesa_Brow_L",
+   "socket": "head"
+  }
+ ]
+}

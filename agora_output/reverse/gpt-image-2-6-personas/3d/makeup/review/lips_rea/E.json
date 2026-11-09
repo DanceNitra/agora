@@ -1,0 +1,38 @@
+{
+ "mouth_width_px": 235.9,
+ "upper_height_mw": 0.098,
+ "lower_height_mw": 0.167,
+ "mouth_open_mw": 0.178,
+ "lab_upper": [
+  40.4,
+  36.0,
+  22.0
+ ],
+ "lab_lower": [
+  51.0,
+  40.0,
+  22.0
+ ],
+ "lab_rim": [
+  45.1,
+  36.0,
+  21.0
+ ],
+ "lab_lower_core": [
+  49.8,
+  42.0,
+  23.0
+ ],
+ "lab_skin_ring": [
+  59.2,
+  16.0,
+  20.0
+ ],
+ "lower_specular_fraction": 0.0,
+ "lower_L_p95_minus_median": 16.9,
+ "liner_dL_rim_minus_body": -0.6,
+ "ombre_dL_core_minus_rim": 4.7,
+ "lip_vs_skin_dL": -13.5,
+ "lip_chroma": 45.7,
+ "lip_hue_deg": 28.8
+}

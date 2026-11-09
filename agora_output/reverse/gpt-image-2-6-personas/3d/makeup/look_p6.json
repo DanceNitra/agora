@@ -1,0 +1,215 @@
+{
+ "name": "p6 v4: stronger smoky eyes, glossier lips, deeper contour",
+ "base": "C:/Users/Danculus/agora/agora_output/reverse/gpt-image-2-6-personas/3d/keenface/mh_zip/texture/Head_Color_olive.jpg",
+ "srmf": "C:/Users/Danculus/agora/agora_output/reverse/gpt-image-2-6-personas/3d/keenface/mh_zip/texture/Head_SRMF.png",
+ "landmarks": "C:/Users/Danculus/agora/agora_output/reverse/gpt-image-2-6-personas/3d/keenface/alb_landmarks.json",
+ "landmarks_size": 2048,
+ "layers": [
+  {
+   "name": "1 foundation",
+   "kind": "foundation",
+   "colour": [
+    201,
+    150,
+    118
+   ],
+   "opacity": 0.05,
+   "mode": "color",
+   "soft": 40,
+   "on": true
+  },
+  {
+   "name": "2 concealer",
+   "kind": "concealer",
+   "on": false
+  },
+  {
+   "name": "3 contour",
+   "kind": "contour",
+   "colour": [
+    140,
+    92,
+    70
+   ],
+   "opacity": 0.32,
+   "mode": "multiply",
+   "soft": 70,
+   "on": true
+  },
+  {
+   "name": "4 blush",
+   "kind": "blush",
+   "colour": [
+    205,
+    112,
+    98
+   ],
+   "opacity": 0.16,
+   "mode": "color",
+   "soft": 80,
+   "on": true
+  },
+  {
+   "name": "5 highlight",
+   "kind": "highlight",
+   "colour": [
+    255,
+    236,
+    214
+   ],
+   "opacity": 0.12,
+   "mode": "screen",
+   "soft": 40,
+   "roughness_delta": -0.15,
+   "on": true
+  },
+  {
+   "name": "6 brows",
+   "kind": "brows_seg",
+   "colour": [
+    30,
+    22,
+    20
+   ],
+   "opacity": 0.45,
+   "mode": "multiply",
+   "soft": 3,
+   "on": false
+  },
+  {
+   "name": "7a eyeshadow lid",
+   "kind": "eyeshadow_lid",
+   "colour": [
+    120,
+    82,
+    66
+   ],
+   "opacity": 0.4,
+   "mode": "multiply",
+   "soft": 26,
+   "on": false
+  },
+  {
+   "name": "7b outer V",
+   "kind": "eyeshadow_outer_v",
+   "colour": [
+    62,
+    40,
+    34
+   ],
+   "opacity": 0.45,
+   "mode": "multiply",
+   "soft": 30,
+   "on": false
+  },
+  {
+   "name": "7c lower smudge",
+   "kind": "lower_smudge",
+   "colour": [
+    80,
+    56,
+    48
+   ],
+   "opacity": 0.4,
+   "mode": "multiply",
+   "soft": 12,
+   "width": 0.05,
+   "on": false
+  },
+  {
+   "name": "8 eyeliner",
+   "kind": "eyeliner_seg",
+   "colour": [
+    14,
+    11,
+    11
+   ],
+   "opacity": 0.9,
+   "mode": "normal",
+   "soft": 2,
+   "outer_w": 0.05,
+   "inner_w": 0.012,
+   "wing_len": 0.28,
+   "wing_angle": 18,
+   "on": false
+  },
+  {
+   "name": "9 lower lash line",
+   "kind": "lash_line_lower",
+   "colour": [
+    22,
+    16,
+    16
+   ],
+   "opacity": 0.45,
+   "mode": "normal",
+   "soft": 3,
+   "on": false
+  },
+  {
+   "name": "11 lipstick",
+   "kind": "lipstick_seg",
+   "colour": [
+    190,
+    108,
+    104
+   ],
+   "opacity": 0.6,
+   "mode": "lab_tint",
+   "soft": 4,
+   "on": true
+  },
+  {
+   "name": "12 gloss",
+   "kind": "gloss_seg",
+   "opacity": 0.0,
+   "soft": 6,
+   "roughness_delta": -0.3,
+   "on": false
+  },
+  {
+   "name": "12b gloss lower lip",
+   "kind": "gloss_lower_lip",
+   "colour": [
+    255,
+    240,
+    235
+   ],
+   "opacity": 0.05,
+   "mode": "screen",
+   "soft": 12,
+   "roughness_delta": -0.12,
+   "on": false
+  }
+ ],
+ "metahuman_makeup": {
+  "eyes.type": "DRAMATIC_SMUDGE",
+  "eyes.primary_color": [
+   0.035,
+   0.018,
+   0.012,
+   1.0
+  ],
+  "eyes.secondary_color": [
+   0.002,
+   0.002,
+   0.002,
+   1.0
+  ],
+  "eyes.opacity": 1.0,
+  "eyes.roughness": 0.45,
+  "eyes.metalness": 0.35,
+  "lips.type": "NATURAL",
+  "lips.color": [
+   0.42,
+   0.15,
+   0.14,
+   1.0
+  ],
+  "lips.opacity": 0.4,
+  "lips.roughness": 0.05,
+  "lips.metalness": 0.0,
+  "blush.type": "NONE",
+  "foundation.apply_foundation": false
+ }
+}

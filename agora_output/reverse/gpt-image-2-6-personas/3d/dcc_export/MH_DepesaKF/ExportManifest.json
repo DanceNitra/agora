@@ -1,0 +1,51 @@
+{
+	"metaHumanName": "MH_DepesaKF",
+	"exportPluginVersion": "1.0.0",
+	"exportEngineVersion": "5.8.4-58902052+++UE5+Release-5.8",
+	"exportedAt": "2026.11.08-12.02.36",
+	"dna":
+	{
+		"head": "head.dna",
+		"body": "body.dna"
+	},
+	"thumbnail": "MH_DepesaKF.png",
+	"folders":
+	{
+		"maps": "Maps",
+		"masks": "Masks"
+	},
+	"files":
+	{
+		"maps": [
+			"Body_Basecolor.png",
+			"Body_Normal.png",
+			"Body_SRMF.png",
+			"Eyelashes_Color.png",
+			"Eyes_Color.png",
+			"Eyes_Normal.png",
+			"Head_Basecolor.png",
+			"Head_Basecolor_Animated_CM1.png",
+			"Head_Basecolor_Animated_CM2.png",
+			"Head_Basecolor_Animated_CM3.png",
+			"Head_Normal.png",
+			"Head_Normal_Animated_WM1.png",
+			"Head_Normal_Animated_WM2.png",
+			"Head_Normal_Animated_WM3.png",
+			"Head_SRMF.png",
+			"Teeth_Color.png",
+			"Teeth_Normal.png"
+		],
+		"masks": [
+			"head_wm13_msk_01.tga",
+			"head_wm1_msk_01.tga",
+			"head_wm1_msk_02.tga",
+			"head_wm1_msk_03.tga",
+			"head_wm1_msk_04.tga",
+			"head_wm2_msk_01.tga",
+			"head_wm2_msk_02.tga",
+			"head_wm2_msk_03.tga",
+			"head_wm3_msk_01.tga",
+			"head_wm3_msk_02.tga"
+		]
+	}
+}

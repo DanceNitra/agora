@@ -1,0 +1,46 @@
+{
+ "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\depesa_lashes_clump.abc",
+ "asset": "GA_Depesa_LashesClump",
+ "rot": [
+  90,
+  0,
+  0
+ ],
+ "scale": [
+  1,
+  -1,
+  1
+ ],
+ "width": 0.02,
+ "seq": "/Game/Companions/Lipsync/LS_KF_Depesa_lajk_confidence_v5",
+ "component": "Face",
+ "socket": "FACIAL_C_FacialRoot",
+ "material": "/Game/Companions/MetaHuman/BuiltKF/MH_DepesaKF/Grooms/MI_WI_Eyelashes_L_ThickCurl_None_12_Hair",
+ "face_mesh": "/Game/Companions/MetaHuman/BuiltKF/MH_DepesaKF/Face/SKM_MH_DepesaKF_FaceMesh",
+ "parts": [
+  {
+   "name": "L_upper",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\lashes_L_upper.abc",
+   "asset": "GA_Depesa_Lashes_L_upper",
+   "socket": "FACIAL_L_EyelashesUpperA2"
+  },
+  {
+   "name": "R_upper",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\lashes_R_upper.abc",
+   "asset": "GA_Depesa_Lashes_R_upper",
+   "socket": "FACIAL_R_EyelashesUpperA2"
+  },
+  {
+   "name": "L_lower",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\lashes_L_lower.abc",
+   "asset": "GA_Depesa_Lashes_L_lower",
+   "socket": "FACIAL_L_EyelidLowerA2"
+  },
+  {
+   "name": "R_lower",
+   "abc": "C:\\Users\\Danculus\\agora\\agora_output\\reverse\\gpt-image-2-6-personas\\3d\\lashes\\lashes_R_lower.abc",
+   "asset": "GA_Depesa_Lashes_R_lower",
+   "socket": "FACIAL_R_EyelidLowerA2"
+  }
+ ]
+}

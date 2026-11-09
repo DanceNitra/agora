@@ -1,0 +1,8 @@
+{
+ "width": 80,
+ "height": 160,
+ "fps": 30,
+ "frames": 491,
+ "format": "RGB565 little-endian, row-major, frames concatenated",
+ "audio": "AJ_JEDEN_LAJK master 6.0-22.4 s"
+}

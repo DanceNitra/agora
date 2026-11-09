@@ -1,0 +1,21 @@
+{
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "medium",
+  "prompt_file": "beauty\\p3.md",
+  "usage": {
+    "input_tokens": 266,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 266
+    },
+    "output_tokens": 1132,
+    "total_tokens": 1398,
+    "output_tokens_details": {
+      "image_tokens": 1132,
+      "text_tokens": 0
+    }
+  },
+  "usd": 0.03529,
+  "seconds": 28.8,
+  "sha256": "e5cc78255922bf7c74e07f2aeada0bd5212048e04de911d02c4580abc5bbc3cf"
+}

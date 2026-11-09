@@ -1,0 +1,25 @@
+{
+ "note": "p6 match: warm rose, satin, ombre centre, soft deeper edge, no overline",
+ "colour": [
+  165,
+  86,
+  80
+ ],
+ "tint_opacity": 0.85,
+ "upper_dL": -4,
+ "rim_colour": [
+  138,
+  67,
+  66
+ ],
+ "rim_opacity": 0.5,
+ "rim_width": 0.06,
+ "core_colour": [
+  184,
+  91,
+  81
+ ],
+ "core_opacity": 0.45,
+ "core_size": 0.2,
+ "edge_soft": 0.012
+}

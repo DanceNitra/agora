@@ -1,0 +1,11 @@
+{
+ "scalar": {
+  "Metallic": 1.0,
+  "FadeStart": 0.20000000298023224,
+  "FadeEnd": 0.5,
+  "Opacity": 0.014999999664723873,
+  "DepthOffset": 0.10000000149011612
+ },
+ "vector": {},
+ "texture": {}
+}

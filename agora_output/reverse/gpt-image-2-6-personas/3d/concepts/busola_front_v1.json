@@ -1,0 +1,21 @@
+{
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "medium",
+  "prompt_file": "concept_busola_front.md",
+  "usage": {
+    "input_tokens": 393,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 393
+    },
+    "output_tokens": 1132,
+    "total_tokens": 1525,
+    "output_tokens_details": {
+      "image_tokens": 1132,
+      "text_tokens": 0
+    }
+  },
+  "usd": 0.035925,
+  "seconds": 27.0,
+  "sha256": "6a4c2c6041f5360a24890197676331f0160f2b33222ea6141987912da8094962"
+}
