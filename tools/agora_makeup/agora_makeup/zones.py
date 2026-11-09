@@ -20,11 +20,11 @@ EYE = {
     "A": {"upper": [33, 246, 161, 160, 159, 158, 157, 173, 133], "lower": [33, 7, 163, 144, 145, 153, 154, 155, 133],
           "outer": 33, "inner": 133, "brow_up": [70, 63, 105, 66, 107], "brow_lo": [46, 53, 52, 65, 55],
           "cheek": [116, 117, 118, 119, 100, 101, 50, 123], "hollow": (234, 61), "temple": [54, 21, 162, 127],
-          "jaw": [172, 136, 150, 149, 176, 148], "nose_side": [193, 122, 196, 3, 51, 45], "corner": 61},
+          "jaw": [172, 136, 150, 149], "nose_side": [193, 122, 196, 3, 51, 45], "corner": 61},
     "B": {"upper": [263, 466, 388, 387, 386, 385, 384, 398, 362], "lower": [263, 249, 390, 373, 374, 380, 381, 382, 362],
           "outer": 263, "inner": 362, "brow_up": [300, 293, 334, 296, 336], "brow_lo": [276, 283, 282, 295, 285],
           "cheek": [345, 346, 347, 348, 329, 330, 280, 352], "hollow": (454, 291), "temple": [284, 251, 389, 356],
-          "jaw": [397, 365, 379, 378, 400, 377], "nose_side": [417, 351, 419, 248, 281, 275], "corner": 291},
+          "jaw": [397, 365, 379, 378], "nose_side": [417, 351, 419, 248, 281, 275], "corner": 291},
 }
 LIPS_OUT = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146]
 LIPS_IN = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
@@ -164,8 +164,10 @@ def z_blush(f, p):
             _ellipse(m, c + np.array([0, ew * 0.15]), ew * 0.5, ew * 0.38)
         elif pl == "high":
             d = (out - inn) / np.linalg.norm(out - inn)
-            cc = lo.mean(0) - tb * 0.9 + d * ew * 0.12  # frontal view: right under the aegyo-sal, Douyin high blush
-            _ellipse(m, cc, ew * 0.5, ew * 0.28, -8 if e == "A" else 8)
+            # audit 11-09 round 7: at 0.9 the blush ran into the lower lash line and read as a bruise; an artist
+            # keeps high blush 3-4 mm (about 0.12 eye widths) below the lashes and toward the outer cheek
+            cc = lo.mean(0) - tb * 1.2 + d * ew * 0.2
+            _ellipse(m, cc, ew * 0.55, ew * 0.26, -8 if e == "A" else 8)
         elif pl == "draped":
             t = np.array([f.P(i) for i in EYE[e]["temple"]]).mean(0)
             _line(m, [c, t], ew * 0.55)
@@ -196,8 +198,8 @@ def z_highlight(f, p):
             _line(m, b[:3] - tb * 0.18, ew * 0.12)
         if "inner_corner" in spots:
             _ellipse(m, inn, ew * 0.09, ew * 0.07)
-    if "nose_bridge" in spots:
-        _line(m, [f.P(i) for i in NOSE_BRIDGE[1:]], w * 0.07)
+    if "nose_bridge" in spots:  # audit 11-09: a 0.07 line read as a hard stripe; wider and fading toward the tip
+        _line(m, [f.P(i) for i in NOSE_BRIDGE[1:4]], w * 0.1)
     if "nose_tip" in spots:
         _ellipse(m, f.P(NOSE_TIP[0]), w * 0.06, w * 0.05)
     if "cupid" in spots:
@@ -337,8 +339,24 @@ def z_lip_gloss(f, p):
 ZONES = {k[2:]: v for k, v in globals().items() if k.startswith("z_")}
 
 
+def lash_keepout(f):
+    """A soft band under each lower lash line where cheek products must not reach (blush, contour)."""
+    m = f.blank()
+    for e in "AB":
+        up, lo, out, inn, tb = _eye_geo(f, e)
+        _poly(m, list(up) + list(lo[::-1]))
+        _line(m, lo - tb * 0.15, f.eye_w(e) * 0.3)
+    return soften(m, 0.1 * f.eye_w("A"))
+
+
+KEEPOUT = ("blush", "contour_cheek", "contour_temple", "bronzer")
+
+
 def mask(face, zone, params, soft_ew=None):
     """Zone mask, softened by params['soft'] eye widths (default per zone family)."""
     m = ZONES[zone](face, params)
     s = params.get("soft", 0.08 if zone.startswith(("lip", "liner", "inner")) else 0.25)
-    return soften(m, s * face.eye_w("A"))
+    m = soften(m, s * face.eye_w("A"))
+    if zone in KEEPOUT:
+        m = m * (1 - lash_keepout(face))
+    return m

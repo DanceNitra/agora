@@ -37,6 +37,12 @@ def _blend(img, color, a, mode, keep_l=0.6):
         lab[..., 1:] = tc[1:]
         lab[..., 0] = lab[..., 0] * keep_l + tc[0] * (1 - keep_l)
         tgt = cv2.cvtColor(np.clip(lab, 0, 255).astype(np.uint8), cv2.COLOR_LAB2BGR).astype(np.float32) / 255.0
+    elif mode == "glow":  # highlight: lightness toward the colour, a tenth of its chroma (screen greyed
+        lab = _lab(img)          # and cooled the bridge: audit 11-09, db -6.8)
+        tc = _lab(np.array(color[::-1], np.float32).reshape(1, 1, 3) / 255.0)[0, 0]
+        lab[..., 0] = tc[0]
+        lab[..., 1:] = lab[..., 1:] + (tc[1:] - lab[..., 1:]) * 0.1
+        tgt = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
     elif mode == "color":
         lum = img.mean(2, keepdims=True)
         tgt = np.clip(c * (lum / max(float(c.mean()), 1e-3)), 0, 1)
@@ -58,7 +64,7 @@ def _sparkle(shape, density, seed):
 # brightness +6.4 L was still the strongest element.
 RENDER_GAIN = {"blush": 2.6, "lid": 1.3, "crease": 2.0, "outer_v": 2.4, "lower_lash": 1.6, "contour_cheek": 3.0,
                "contour_temple": 3.0, "contour_jaw": 2.6, "contour_nose": 3.0, "bronzer": 2.6, "liner": 1.2,
-               "conceal_undereye": 0.35, "aegyo_sal": 0.4, "conceal_tzone": 0.6, "highlight": 1.8}
+               "conceal_undereye": 0.35, "aegyo_sal": 0.4, "conceal_tzone": 1.5, "highlight": 1.8}
 
 
 def _protect(face, vm, W):
@@ -93,12 +99,33 @@ def base_target(bc, skin, sigma):
     return np.median(low[skin > 0], axis=0)
 
 
-def even_skin(img, skin_w, even, target, sigma, tone=None):
+def _lab(bgr):
+    return cv2.cvtColor(np.clip(bgr, 0, 1).astype(np.float32), cv2.COLOR_BGR2LAB)
+
+
+def skin_likeness(img, sigma):
+    """0..1: how much a texel is skin by its colour. Clothing baked into the MetaHuman texture (grey tank-top
+    straps) has Lab chroma near 0, skin about 15-30; the base must not paint the straps (check 11-09)."""
+    lab = _lab(cv2.GaussianBlur(img, (0, 0), sigma))
+    c = np.hypot(lab[..., 1], lab[..., 2])
+    w = np.clip((c - 7.0) / 6.0, 0, 1)
+    return (w * w * (3 - 2 * w)).astype(np.float32)
+
+
+def even_skin(img, skin_w, even, target, sigma, tone=None, lift=0.0, even_l=0.15):
     """Foundation: keep the high frequencies (pores, texture), pull the low frequencies toward one colour.
-    img float BGR 0..1; skin_w 0..1 weight; target BGR 0..1; tone optional BGR 0..1 the foundation shade."""
+    Colour (Lab a, b) is evened by `even`; lightness only by `even_l`, because a foundation evens redness and
+    blotches but must not erase the face's own light and shade (at even_l = even, the under-eye area rose
+    +14.7 L against +4 L on the chin and the face went flat; 0.25 still gave +8.6). lift: L units added on every texel alike, so the
+    face, ears, neck and body all move together. img float BGR 0..1; target and tone BGR 0..1."""
     low = cv2.GaussianBlur(img, (0, 0), sigma)
     tgt = target if tone is None else target * 0.5 + np.array(tone, np.float32) * 0.5
-    new_low = low * (1 - even) + tgt[None, None, :] * even
+    lab = _lab(low)
+    t = _lab(np.asarray(tgt, np.float32).reshape(1, 1, 3))[0, 0]
+    k = np.array([even_l, even, even], np.float32)
+    new = lab + (t[None, None, :] - lab) * k
+    new[..., 0] += lift
+    new_low = cv2.cvtColor(new.astype(np.float32), cv2.COLOR_LAB2BGR)
     return img + (new_low - low) * skin_w[..., None]
 
 
@@ -121,14 +148,15 @@ def paint(bc, srmf, look, face=None, seed=7, gain=None, body_bc=None):
             prm = L["params"]
             sig = W * 0.012
             skin_mask = cv2.resize(vm.uv_skin.astype(np.float32), (W, H), interpolation=cv2.INTER_NEAREST)
-            skin_mask = cv2.GaussianBlur(skin_mask, (0, 0), 2) * (1 - _protect(face, vm, W))
+            skin_mask = cv2.GaussianBlur(skin_mask, (0, 0), 2) * (1 - _protect(face, vm, W)) * skin_likeness(img, 3)
             tgt = base_target(img, skin_mask > 0.5, sig)
             tone = None if "color" not in L else np.array(L["color"][::-1], np.float32) / 255.0
-            img = np.clip(even_skin(img, skin_mask, float(prm["even"]), tgt, sig, tone), 0, 1)
+            lift = float(prm.get("lift", 0.0))
+            img = np.clip(even_skin(img, skin_mask, float(prm["even"]), tgt, sig, tone, lift), 0, 1)
             if body is not None:
-                bw = (body.max(2) > 0.02).astype(np.float32)
+                bw = (body.max(2) > 0.02).astype(np.float32) * skin_likeness(body, 3)
                 body = np.clip(even_skin(body, cv2.GaussianBlur(bw, (0, 0), 2), float(prm["even"]), tgt,
-                                         body.shape[1] * 0.012, tone), 0, 1)
+                                         body.shape[1] * 0.012, tone, lift), 0, 1)
             if "rough" in L:
                 rough = rough + skin_mask * float(L["rough"]) if rough is not None else rough
             continue
