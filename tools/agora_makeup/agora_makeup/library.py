@@ -135,7 +135,7 @@ def base_looks():
              liner={"color": [40, 26, 20], "len": 0.3, "w": 0.07, "soft": 0.08, "lower": True}),
              lips(*LIP["espresso"], overline=0.025, ombre=0.4, finish="vinyl")),
         look("luvpauli_doll", "Douyin Doll Glam (@luvpauli)", "douyin", "TikTok 7688402180574874902", skin("satin", 0.45, 0.3, lift=4.0),
-             sculpt("cool", 0.26, nose=True), blush(BLUSH["pink"], "high", 0.36, nose=True), glow(("nose_bridge", "nose_tip"), 0.3, -0.05),
+             sculpt("cool", 0.26, nose=True), blush(BLUSH["pink"], "high", 0.5, nose=True), glow(("nose_bridge", "nose_tip"), 0.3, -0.05),
              eyes(*EYE["white_pink"], shape="cut", liner={"color": BLACK, "angle": -4, "len": 0.45, "w": 0.1}, lashline=0.0, inner=WHITE, aegyo=0.08, glitter=0.9),
              lips(*LIP["taupe_mauve"], overline=0.03, ombre=0.5, finish="satin", keep_l=0.85)),
         look("douyin_aegyo", "Douyin Aegyo-sal Doll Eye", "douyin", S, skin("dewy", 0.3), sculpt("cool", 0.22, nose=True, jaw=False),

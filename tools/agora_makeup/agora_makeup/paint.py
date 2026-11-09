@@ -67,13 +67,18 @@ RENDER_GAIN = {"blush": 2.6, "lid": 1.3, "crease": 2.0, "outer_v": 2.4, "lower_l
                "conceal_undereye": 0.35, "aegyo_sal": 0.4, "conceal_tzone": 1.5, "highlight": 1.8}
 
 
-def _protect(face, vm, W):
-    """Lips, eyes and brows are not evened by the base (they keep their own colour)."""
-    m = np.maximum.reduce([Z.ZONES["lips"](face, {"overline": 0.01}),
-                           Z.ZONES["lid"](face, {"height": 0.35}),
-                           _brows(face), _eye_openings(face)])
-    m = Z.soften(m, 0.06 * face.eye_w("A"))
-    return vm.view_to_uv(m, W) if vm is not None else m
+def _protect(face, vm, W, keep_brows=None):
+    """Lips, eyes and brows are not evened by the base (they keep their own colour). With keep_brows (UV mask of
+    the approved brows) only those are protected, so old painted brow strokes around them get the base too."""
+    parts = [Z.ZONES["lips"](face, {"overline": 0.01}), Z.ZONES["lid"](face, {"height": 0.35}), _eye_openings(face)]
+    if keep_brows is None:
+        parts.append(_brows(face))
+    m = Z.soften(np.maximum.reduce(parts), 0.06 * face.eye_w("A"))
+    m = vm.view_to_uv(m, W) if vm is not None else m
+    if keep_brows is not None:
+        k = cv2.resize((keep_brows > 127).astype(np.float32), (m.shape[1], m.shape[0]), interpolation=cv2.INTER_LINEAR)
+        m = np.maximum(m, cv2.GaussianBlur(k, (0, 0), 2))
+    return m
 
 
 def _brows(face):
@@ -91,6 +96,38 @@ def _eye_openings(face):
         E = Z.EYE[e]
         Z._poly(m, [face.P(i) for i in E["upper"]] + [face.P(i) for i in E["lower"]][::-1])
     return cv2.dilate(m, np.ones((int(face.eye_w("A") * 0.1),) * 2, np.uint8))
+
+
+def brow_blockout(img, face, vm, keep_brows, W, H):
+    """Conceal painted brow strokes the character no longer wears, the way an artist blocks out a brow before
+    drawing a new one. The approved brows (keep_brows, a UV mask of the brow fill under the groom) stay
+    untouched; every dark stroke in a band around the brows outside that mask is inpainted from the skin around
+    it. Found 2026-11-09 by the owner on the four-view check: a second brow line above the outer end of Depesa's
+    approved brows, left over from the preset texture, which the base had skipped by protecting the whole area."""
+    ew = face.eye_w("A")
+    band = cv2.dilate(_brows(face), np.ones((int(ew * 0.3),) * 2, np.uint8))
+    band = band * (1 - cv2.dilate(_eye_openings(face) + Z.ZONES["lid"](face, {"height": 0.45}),
+                                  np.ones((int(ew * 0.06),) * 2, np.uint8)).clip(0, 1))
+    band = (vm.view_to_uv(band, W) > 0.3) if vm is not None else band > 0.3
+    band = cv2.resize(band.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST) > 0
+    keep = cv2.resize((keep_brows > 127).astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST)
+    keep = cv2.dilate(keep, np.ones((5, 5), np.uint8)) > 0
+    u8 = (np.clip(img, 0, 1) * 255).astype(np.uint8)
+    L = cv2.cvtColor(u8, cv2.COLOR_BGR2LAB)[..., 0]
+    bg = cv2.medianBlur(L, 31).astype(np.int16)
+    dark = ((np.abs(L.astype(np.int16) - bg) > 4) & band & ~keep).astype(np.uint8)  # dark strokes and pale
+    # patches left by an earlier brow removal (a lighter smudge beside the approved brow, check 11-09)
+    # strokes only: connected dark areas of real size; pores and freckles stay. The stroke edge fades into the
+    # skin, so each stroke is grown well past its threshold edge (a 3 px grow left a visible ghost line)
+    n, lab_, st, _ = cv2.connectedComponentsWithStats(dark, connectivity=8)
+    big = np.isin(lab_, [i for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= max(60, W * W // 30000)])
+    dark = cv2.dilate(big.astype(np.uint8), np.ones((max(9, W // 120),) * 2, np.uint8))
+    dark[keep] = 0
+    fixed = cv2.inpaint(u8, dark * 255, 15, cv2.INPAINT_TELEA).astype(np.float32) / 255.0
+    a = cv2.GaussianBlur(dark.astype(np.float32), (0, 0), 3)
+    a = np.maximum(a, dark.astype(np.float32))
+    a[keep] = 0
+    return img * (1 - a[..., None]) + fixed * a[..., None], dark
 
 
 def base_target(bc, skin, sigma):
@@ -129,8 +166,9 @@ def even_skin(img, skin_w, even, target, sigma, tone=None, lift=0.0, even_l=0.15
     return img + (new_low - low) * skin_w[..., None]
 
 
-def paint(bc, srmf, look, face=None, seed=7, gain=None, body_bc=None):
-    """bc: HxWx3 uint8 BGR; srmf: HxWx3/4 uint8 or None (G = roughness). Returns (bc, srmf, masks)."""
+def paint(bc, srmf, look, face=None, seed=7, gain=None, body_bc=None, keep_brows=None):
+    """bc: HxWx3 uint8 BGR; srmf: HxWx3/4 uint8 or None (G = roughness); keep_brows: UV mask (uint8) of the
+    approved brows, everything brow-like outside it is concealed. Returns (bc, srmf, masks)."""
     H, W = bc.shape[:2]
     vm = None
     if face is None:  # default: zones drawn on the frontal view and carried to UV exactly
@@ -147,8 +185,10 @@ def paint(bc, srmf, look, face=None, seed=7, gain=None, body_bc=None):
             # and the body texture) with one shared colour transform, so nothing shows an edge or a tone change.
             prm = L["params"]
             sig = W * 0.012
+            if keep_brows is not None:
+                img, _ = brow_blockout(img, face, vm, keep_brows, W, H)
             skin_mask = cv2.resize(vm.uv_skin.astype(np.float32), (W, H), interpolation=cv2.INTER_NEAREST)
-            skin_mask = cv2.GaussianBlur(skin_mask, (0, 0), 2) * (1 - _protect(face, vm, W)) * skin_likeness(img, 3)
+            skin_mask = cv2.GaussianBlur(skin_mask, (0, 0), 2) * (1 - _protect(face, vm, W, keep_brows)) * skin_likeness(img, 3)
             tgt = base_target(img, skin_mask > 0.5, sig)
             tone = None if "color" not in L else np.array(L["color"][::-1], np.float32) / 255.0
             lift = float(prm.get("lift", 0.0))

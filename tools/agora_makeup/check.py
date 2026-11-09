@@ -47,7 +47,9 @@ def render(tex, yaw, pitch, px=520):
 def main():
     base = cv2.imread(sys.argv[1])
     look = cli.find(sys.argv[2])
-    out, _, _ = paint.paint(base, None, look)
+    kp = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), "keep_brows.png")
+    keep = cv2.imread(kp, cv2.IMREAD_GRAYSCALE) if os.path.exists(kp) else None
+    out, _, _ = paint.paint(base, None, look, keep_brows=keep)
     views = [(0, 0), (40, 0), (-40, 0), (0, -35)]
     rows = [np.hstack([render(t, y, p) for y, p in views]) for t in (base, out)]
     sheet = np.vstack(rows)

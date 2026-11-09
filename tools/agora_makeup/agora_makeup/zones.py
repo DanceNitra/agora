@@ -166,7 +166,7 @@ def z_blush(f, p):
             d = (out - inn) / np.linalg.norm(out - inn)
             # audit 11-09 round 7: at 0.9 the blush ran into the lower lash line and read as a bruise; an artist
             # keeps high blush 3-4 mm (about 0.12 eye widths) below the lashes and toward the outer cheek
-            cc = lo.mean(0) - tb * 1.2 + d * ew * 0.2
+            cc = lo.mean(0) - tb * 1.5 + d * ew * 0.25
             _ellipse(m, cc, ew * 0.55, ew * 0.26, -8 if e == "A" else 8)
         elif pl == "draped":
             t = np.array([f.P(i) for i in EYE[e]["temple"]]).mean(0)
@@ -176,7 +176,9 @@ def z_blush(f, p):
             _line(m, [c + (t - c) * 0.1, c + (t - c) * 0.7], ew * 0.5)
     if pl in ("high", "nose") or p.get("nose", False):
         _line(m, [f.P(195), f.P(5), f.P(4)], w * 0.16, 0.8)
-        _line(m, [f.P(EYE["A"]["cheek"][4]), f.P(197), f.P(EYE["B"]["cheek"][4])], w * 0.12, 0.5)
+        # across the nose only, at mid-nose height: the old band from cheek point 100 through 197 ran right
+        # under both eyes and was the red ring the audit and the layer check found (11-09)
+        _line(m, [f.P(EYE["A"]["nose_side"][2]), f.P(5), f.P(EYE["B"]["nose_side"][2])], w * 0.12, 0.5)
     return m
 
 

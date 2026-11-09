@@ -54,6 +54,7 @@ def main():
     ap.add_argument("--no-gain", action="store_true", help="UV preview strength (no render calibration)")
     ap.add_argument("--body-bc")
     ap.add_argument("--out-body-bc")
+    ap.add_argument("--keep-brows", help="UV mask of the approved brows; default keep_brows.png beside --bc")
     a = ap.parse_args()
     if a.cmd == "list":
         print(json.dumps({"base": [{"id": b["id"], "name": b["name"], "family": b["family"]} for b in library.base_looks()],
@@ -67,7 +68,10 @@ def main():
     bc = cv2.imread(a.bc, cv2.IMREAD_COLOR)
     srmf = cv2.imread(a.srmf, cv2.IMREAD_UNCHANGED) if a.srmf else None
     body = cv2.imread(a.body_bc, cv2.IMREAD_COLOR) if a.body_bc else None
-    out_bc, out_srmf, extra = paint.paint(bc, srmf, look, None, gain={} if a.no_gain else None, body_bc=body)
+    kp = a.keep_brows or os.path.join(os.path.dirname(os.path.abspath(a.bc)), "keep_brows.png")
+    keep = cv2.imread(kp, cv2.IMREAD_GRAYSCALE) if os.path.exists(kp) else None
+    out_bc, out_srmf, extra = paint.paint(bc, srmf, look, None, gain={} if a.no_gain else None, body_bc=body,
+                                          keep_brows=keep)
     if body is not None and a.out_body_bc:
         cv2.imwrite(a.out_body_bc, dict(extra)["body"])
     cv2.imwrite(a.out_bc, out_bc)

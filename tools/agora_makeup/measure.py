@@ -47,7 +47,7 @@ def points(lm):
     a, b = P(E["hollow"][0]), P(E["hollow"][1])
     down = np.array([0.0, 1.0]) * ew
     pts = {
-        "blush_high_A": lo.mean(0) - tb * 0.9 + d * ew * 0.12,
+        "blush_high_A": lo.mean(0) - tb * 1.5 + d * ew * 0.25,
         "blush_high_B": None,
         "under_eye_A": lo.mean(0) - tb * 0.35,
         "lash_inner_A": lo[-3] - tb * 0.12,
@@ -67,7 +67,7 @@ def points(lm):
     upb = np.array([P(i) for i in B["upper"]])
     tbb = np.array([P(i) for i in B["brow_lo"]]).mean(0) - upb.mean(0)
     db_ = (P(B["outer"]) - P(B["inner"])) / np.linalg.norm(P(B["outer"]) - P(B["inner"]))
-    pts["blush_high_B"] = lob.mean(0) - tbb * 0.9 + db_ * ew * 0.12
+    pts["blush_high_B"] = lob.mean(0) - tbb * 1.5 + db_ * ew * 0.25
     return pts, ew
 
 
@@ -118,7 +118,9 @@ def view(look_id, base_path=SAVED):
     base = cv2.imread(base_path)
     if base is None:
         raise SystemExit("base texture missing: " + base_path)
-    out, _, _ = paint.paint(base, None, cli.find(look_id))
+    kp = os.path.join(os.path.dirname(os.path.abspath(base_path)), "keep_brows.png")
+    keep = cv2.imread(kp, cv2.IMREAD_GRAYSCALE) if os.path.exists(kp) else None
+    out, _, _ = paint.paint(base, None, cli.find(look_id), keep_brows=keep)
     b, a = vm.frontal(base), vm.frontal(out)
     lm = json.load(open(os.path.join(HERE, "agora_makeup", "data", "view_landmarks.json")))
     return deltas(b, a, lm), (b, a)
