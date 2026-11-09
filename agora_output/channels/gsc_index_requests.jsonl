@@ -152,3 +152,29 @@
 {"at": "2026-10-30T14:37", "url": "https://dancenitra.github.io/promarkt-web/vytycenie-stavby.html", "state_before": "not on Google", "result": "Indexovanie bolo vyziadane"}
 {"at": "2026-10-30T14:37", "url": "https://dancenitra.github.io/promarkt-web/geometricky-plan.html", "state_before": "not on Google", "result": "Indexovanie bolo vyziadane"}
 {"at": "2026-10-30T14:37", "url": "https://dancenitra.github.io/promarkt-web/hranica-pozemku.html", "state_before": "not on Google", "result": "Indexovanie bolo vyziadane"}
+{"date": "2026-11-03", "url": "https://dancenitra.github.io/promarkt-web/", "inspection": "URL is on Google (indexed)", "action": "re-requested indexing after prices + new hero", "result": "Indexovanie bolo vyziadane"}
+{"date": "2026-11-03", "url": "https://dancenitra.github.io/promarkt-web/vytycenie-stavby.html", "inspection": "URL is on Google (indexed)", "action": "re-requested indexing after prices + new hero", "result": "Indexovanie bolo vyziadane"}
+{"date": "2026-11-03", "url": "https://dancenitra.github.io/promarkt-web/geometricky-plan.html", "inspection": "URL is on Google (indexed)", "action": "re-requested indexing after prices + new hero", "result": "Indexovanie bolo vyziadane"}
+{"date": "2026-11-03", "url": "https://dancenitra.github.io/promarkt-web/hranica-pozemku.html", "inspection": "URL is on Google (indexed)", "action": "re-requested indexing after prices + new hero", "result": "Indexovanie bolo vyziadane"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/rising-above/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/running-away/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/s-i-n/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/saxobass-beat/", "inspection": "URL is not on Google", "note": "sent twice: first dialog unread after a batch timeout, second confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/searching-for-the-feeling/", "inspection": "URL is not on Google", "note": "confirmed (dialog, read after a batch timeout)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/spove/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/stay-awhile-and-listen/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/stitches/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-06", "url": "https://dancenitra.github.io/danchi/releases/sunset-groove/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/danchi/releases/sunset-reflection/", "inspection": "URL is not on Google", "note": "confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/danchi/releases/the-road-ahead/", "inspection": "URL is not on Google", "note": "refused: quota exceeded (Kvota bola prekrocena); stays in queue"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/leaderboard/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/inspeximus/ai-act.html", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (inline status 'Indexovanie bolo vyziadane' after the click; dialog not captured)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/inspeximus/erasure.html", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/inspeximus/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/ramr/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/integrity/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/aiaudit/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/ai-claims/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/crucible/", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
+{"date": "2026-11-07", "url": "https://dancenitra.github.io/agora/public/research-digest.html", "inspection": "URL is on Google", "note": "reindex after title change; confirmed (dialog)"}
