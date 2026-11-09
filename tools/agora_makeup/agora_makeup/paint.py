@@ -8,7 +8,20 @@ Order follows a makeup artist: base, conceal, sculpt, powder, blush, highlight, 
 import cv2
 import numpy as np
 
+import os
+
 from . import zones as Z
+from . import viewmap as VM
+
+_VIEW = {}
+
+
+def view_face():
+    """Landmarks detected on the frontal view of the MetaHuman face (exact UV via viewmap)."""
+    if "vm" not in _VIEW:
+        _VIEW["vm"] = VM.ViewMap()
+        _VIEW["face"] = Z.Face(_VIEW["vm"].view_px, os.path.join(VM.DATA, "view_landmarks.json"), _VIEW["vm"].view_px)
+    return _VIEW["vm"], _VIEW["face"]
 
 
 def _blend(img, color, a, mode, keep_l=0.6):
@@ -41,22 +54,87 @@ def _sparkle(shape, density, seed):
 # Render calibration, measured 2026-11-09 on Depesa (MH_DepesaKF, closed-mouth frame): the first in-engine pass
 # moved blush by +3 a* (target about +10), lid colour by about 1 L, and under-eye brightness by +11 L (too much).
 # Light and subsurface scattering in the render damp pigment, so colour layers get a gain per zone family.
-RENDER_GAIN = {"blush": 2.6, "lid": 2.2, "crease": 2.0, "outer_v": 2.0, "lower_lash": 1.6, "contour_cheek": 1.8,
-               "contour_temple": 1.8, "contour_jaw": 1.6, "contour_nose": 1.6, "bronzer": 1.8,
-               "conceal_undereye": 0.45, "aegyo_sal": 0.5, "conceal_tzone": 0.6, "highlight": 0.8}
+# Second pass (audit 11-09): contour, nose contour and the nose highlight line were still invisible; under-eye
+# brightness +6.4 L was still the strongest element.
+RENDER_GAIN = {"blush": 2.6, "lid": 1.3, "crease": 2.0, "outer_v": 2.4, "lower_lash": 1.6, "contour_cheek": 3.0,
+               "contour_temple": 3.0, "contour_jaw": 2.6, "contour_nose": 3.0, "bronzer": 2.6, "liner": 1.2,
+               "conceal_undereye": 0.35, "aegyo_sal": 0.4, "conceal_tzone": 0.6, "highlight": 1.8}
 
 
-def paint(bc, srmf, look, face=None, seed=7, gain=None):
+def _protect(face, vm, W):
+    """Lips, eyes and brows are not evened by the base (they keep their own colour)."""
+    m = np.maximum.reduce([Z.ZONES["lips"](face, {"overline": 0.01}),
+                           Z.ZONES["lid"](face, {"height": 0.35}),
+                           _brows(face), _eye_openings(face)])
+    m = Z.soften(m, 0.06 * face.eye_w("A"))
+    return vm.view_to_uv(m, W) if vm is not None else m
+
+
+def _brows(face):
+    m = face.blank()
+    for e in "AB":
+        E = Z.EYE[e]
+        pts = [face.P(i) for i in E["brow_up"]] + [face.P(i) for i in E["brow_lo"]][::-1]
+        Z._poly(m, pts)
+    return cv2.dilate(m, np.ones((int(face.eye_w("A") * 0.12),) * 2, np.uint8))
+
+
+def _eye_openings(face):
+    m = face.blank()
+    for e in "AB":
+        E = Z.EYE[e]
+        Z._poly(m, [face.P(i) for i in E["upper"]] + [face.P(i) for i in E["lower"]][::-1])
+    return cv2.dilate(m, np.ones((int(face.eye_w("A") * 0.1),) * 2, np.uint8))
+
+
+def base_target(bc, skin, sigma):
+    """The base colour the whole skin is evened toward: the median of the low frequencies over the skin."""
+    low = cv2.GaussianBlur(bc.astype(np.float32), (0, 0), sigma)
+    return np.median(low[skin > 0], axis=0)
+
+
+def even_skin(img, skin_w, even, target, sigma, tone=None):
+    """Foundation: keep the high frequencies (pores, texture), pull the low frequencies toward one colour.
+    img float BGR 0..1; skin_w 0..1 weight; target BGR 0..1; tone optional BGR 0..1 the foundation shade."""
+    low = cv2.GaussianBlur(img, (0, 0), sigma)
+    tgt = target if tone is None else target * 0.5 + np.array(tone, np.float32) * 0.5
+    new_low = low * (1 - even) + tgt[None, None, :] * even
+    return img + (new_low - low) * skin_w[..., None]
+
+
+def paint(bc, srmf, look, face=None, seed=7, gain=None, body_bc=None):
     """bc: HxWx3 uint8 BGR; srmf: HxWx3/4 uint8 or None (G = roughness). Returns (bc, srmf, masks)."""
     H, W = bc.shape[:2]
-    face = face or Z.Face(W)
+    vm = None
+    if face is None:  # default: zones drawn on the frontal view and carried to UV exactly
+        vm, face = view_face()
     img = bc.astype(np.float32) / 255.0
     rough = None if srmf is None else np.zeros((H, W), np.float32)  # roughness DELTA at BC size
     masks = []
+    body = None if body_bc is None else body_bc.astype(np.float32) / 255.0
     for i, L in enumerate(look["layers"]):
         if not L.get("on", True):
             continue
+        if L["zone"] == "foundation" and L.get("params", {}).get("even", 0) > 0 and vm is not None:
+            # METHOD.md rule 2: the base covers ALL skin (face, ears, neck to the collarbones on the face texture,
+            # and the body texture) with one shared colour transform, so nothing shows an edge or a tone change.
+            prm = L["params"]
+            sig = W * 0.012
+            skin_mask = cv2.resize(vm.uv_skin.astype(np.float32), (W, H), interpolation=cv2.INTER_NEAREST)
+            skin_mask = cv2.GaussianBlur(skin_mask, (0, 0), 2) * (1 - _protect(face, vm, W))
+            tgt = base_target(img, skin_mask > 0.5, sig)
+            tone = None if "color" not in L else np.array(L["color"][::-1], np.float32) / 255.0
+            img = np.clip(even_skin(img, skin_mask, float(prm["even"]), tgt, sig, tone), 0, 1)
+            if body is not None:
+                bw = (body.max(2) > 0.02).astype(np.float32)
+                body = np.clip(even_skin(body, cv2.GaussianBlur(bw, (0, 0), 2), float(prm["even"]), tgt,
+                                         body.shape[1] * 0.012, tone), 0, 1)
+            if "rough" in L:
+                rough = rough + skin_mask * float(L["rough"]) if rough is not None else rough
+            continue
         m = Z.mask(face, L["zone"], L.get("params", {}))
+        if vm is not None:
+            m = vm.view_to_uv(m, W)
         g = (RENDER_GAIN if gain is None else gain).get(L["zone"], 1.0)
         op = min(1.0, float(L.get("opacity", 0.5)) * g)
         if op > 0 and "color" in L:
@@ -70,6 +148,8 @@ def paint(bc, srmf, look, face=None, seed=7, gain=None):
             rough = rough + m * float(L["rough"])
         masks.append((L["zone"], m))
     out_bc = np.clip(img * 255, 0, 255).astype(np.uint8)
+    if body is not None:
+        masks.append(("body", np.clip(body * 255, 0, 255).astype(np.uint8)))
     out_srmf = None
     if srmf is not None:
         out_srmf = srmf.copy()
@@ -88,3 +168,25 @@ def face_crop(img, face, pad=0.9):
     x0, x1 = int(max(0, x0 - w * 0.05)), int(min(img.shape[1], x1 + w * 0.05))
     y0, y1 = int(max(0, y0 - w * 0.05)), int(min(img.shape[0], y1 + w * 0.05))
     return img[y0:y1, x0:x1]
+
+
+def preview_view(base_view, look, gain=None, seed=7):
+    """Paint a look directly on the frontal view (no UV round trip): the fast path for comparing many looks."""
+    vm, face = view_face()
+    img = base_view.astype(np.float32) / 255.0
+    valid = np.isfinite(vm.view_uv[..., 0]).astype(np.float32)
+    for i, L in enumerate(look["layers"]):
+        if not L.get("on", True) or "color" not in L:
+            continue
+        key = (L["zone"], repr(sorted(L.get("params", {}).items())))
+        m = _MASKS.get(key)
+        if m is None:
+            m = _MASKS[key] = Z.mask(face, L["zone"], L.get("params", {})) * valid
+        g = (RENDER_GAIN if gain is None else gain).get(L["zone"], 1.0)
+        op = min(1.0, float(L.get("opacity", 0.5)) * g)
+        if op > 0:
+            img = _blend(img, L["color"], m * op, L.get("blend", "normal"), L.get("keep_l", 0.6))
+    return np.clip(img * 255, 0, 255).astype(np.uint8)
+
+
+_MASKS = {}

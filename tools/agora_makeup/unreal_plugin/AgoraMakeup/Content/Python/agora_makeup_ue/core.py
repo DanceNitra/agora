@@ -109,6 +109,11 @@ def _import(png, key, name, like):
     return tex
 
 
+def body_materials_for(face_folder):
+    body = face_folder.rsplit("/", 1)[0] + "/Body"
+    return [lib.load_asset(a) for a in lib.list_assets(body, recursive=True) if "MI_Body" in a]
+
+
 def apply(look_id, actor=None, folder=None, refresh_base=False):
     """Paint look_id onto the target. Target: actor (default: the first selected actor) or a built folder."""
     if folder:
@@ -126,7 +131,28 @@ def apply(look_id, actor=None, folder=None, refresh_base=False):
     args = ["paint", "--look", look_id, "--bc", os.path.join(d, "base_BC.png"), "--out-bc", out_bc]
     if "SRMF" in orig:
         args += ["--srmf", os.path.join(d, "base_SRMF.png"), "--out-srmf", out_srmf]
+    # METHOD.md rule 2: the base evens the BODY texture with the same colour transform as the face
+    bmats = body_materials_for(mats[0].get_path_name().split("/Materials/")[0].rsplit("/", 1)[0] + "/Face") if folder is None else body_materials_for(folder)
+    borig = None
+    if bmats:
+        bside = os.path.join(d, "body_originals.json")
+        if os.path.exists(bside) and not refresh_base:
+            borig = json.load(open(bside))
+        else:
+            t = mel.get_material_instance_texture_parameter_value(bmats[0], PARAMS["BC"])
+            if t and "/AgoraMakeup/" not in t.get_path_name():
+                _export(t, os.path.join(d, "base_body_BC.png"))
+                borig = {"BC": t.get_path_name()}
+                json.dump(borig, open(bside, "w"))
+    if borig:
+        args += ["--body-bc", os.path.join(d, "base_body_BC.png"), "--out-body-bc", os.path.join(d, "look_body_BC.png")]
     res = _cli(*args)
+    if borig:
+        btex = _import(os.path.join(d, "look_body_BC.png"), key, "T_%s_Makeup_Body_BC" % key, lib.load_asset(borig["BC"]))
+        for m in bmats:
+            mel.set_material_instance_texture_parameter_value(m, PARAMS["BC"], btex)
+            mel.update_material_instance(m)
+            lib.save_loaded_asset(m, only_if_is_dirty=False)
     new = {"BC": _import(out_bc, key, "T_%s_Makeup_BC" % key, lib.load_asset(orig["BC"]))}
     if "SRMF" in orig:
         new["SRMF"] = _import(out_srmf, key, "T_%s_Makeup_SRMF" % key, lib.load_asset(orig["SRMF"]))
@@ -147,6 +173,13 @@ def reset(actor=None, folder=None):
     mats = face_materials_in_folder(folder) if folder else face_materials_of_actor(
         actor or unreal.EditorLevelLibrary.get_selected_level_actors()[0])
     key = _key_for(mats)
+    bside = os.path.join(_saved(key), "body_originals.json")
+    if os.path.exists(bside):
+        borig = json.load(open(bside))
+        for m in body_materials_for(folder) if folder else []:
+            mel.set_material_instance_texture_parameter_value(m, PARAMS["BC"], lib.load_asset(borig["BC"]))
+            mel.update_material_instance(m)
+            lib.save_loaded_asset(m, only_if_is_dirty=False)
     orig = json.load(open(os.path.join(_saved(key), "originals.json")))
     for m in mats:
         for k, p in PARAMS.items():
@@ -156,3 +189,22 @@ def reset(actor=None, folder=None):
         mel.update_material_instance(m)
         lib.save_loaded_asset(m, only_if_is_dirty=False)
     return {"reset": key}
+
+
+def compare(n=1000, workers=16):
+    """Generate n looks, paint them on the frontal face view, rank them; returns the sheet path and the top ids."""
+    out = os.path.join(_saved("compare"), "compare_top.png")
+    r = subprocess.run([CFG["python"], os.path.join(CFG["tool_dir"], "compare.py"), "--n", str(n), "--out", out,
+                        "--workers", str(workers)], capture_output=True, text=True, timeout=600)
+    if r.returncode:
+        raise RuntimeError("compare failed: " + r.stderr[-2000:])
+    res = json.loads(r.stdout.strip().splitlines()[-1])
+    unreal.log("Agora Makeup: compared %d looks in %.1f s, sheet %s" % (res["looks"], res["painted_and_ranked_s"], out))
+    os.startfile(out)
+    return res
+
+
+def apply_rank(rank=1, actor=None, folder=None):
+    """Apply the look at this rank from the last comparison."""
+    rk = json.load(open(os.path.join(_saved("compare"), "compare_top_ranking.json")))
+    return apply(rk[rank - 1]["id"], actor=actor, folder=folder)

@@ -15,7 +15,7 @@ LIP = {
     "berry": ([120, 34, 62], [90, 26, 46]),
     "espresso": ([96, 54, 44], [70, 40, 34]),
     "pink_frost": ([214, 150, 160], [160, 100, 100]),
-    "taupe_mauve": ([150, 100, 104], [104, 74, 70]),
+    "taupe_mauve": ([176, 96, 108], [112, 70, 62]),   # rose-mauve fill, brown-taupe liner (audit 11-09: was ashy grey)
 }
 EYE = {
     "warm_brown": ([196, 150, 112], [120, 80, 56]),    # (lid, depth)
@@ -27,15 +27,17 @@ EYE = {
     "white_pink": ([246, 236, 236], [226, 150, 160]),
 }
 BLUSH = {
-    "pink": [232, 120, 140], "peach": [240, 150, 120], "terracotta": [196, 104, 80],
+    "pink": [236, 96, 140], "peach": [240, 150, 120], "terracotta": [196, 104, 80],
     "berry": [180, 70, 100], "rosy_mauve": [200, 120, 130],
 }
 CONTOUR_WARM, CONTOUR_COOL = [150, 100, 76], [128, 102, 92]
 WHITE, BLACK, BROWN_LINER = [250, 248, 246], [16, 12, 12], [62, 40, 30]
 
 
-def L(zone, color=None, opacity=0.5, blend="normal", rough=0.0, glitter=0.0, **params):
+def L(zone, color=None, opacity=0.5, blend="normal", rough=0.0, glitter=0.0, keep_l=None, **params):
     d = {"zone": zone, "opacity": opacity, "blend": blend, "params": params}
+    if keep_l is not None:
+        d["keep_l"] = keep_l
     if color is not None:
         d["color"] = list(color)
     if rough:
@@ -48,7 +50,7 @@ def L(zone, color=None, opacity=0.5, blend="normal", rough=0.0, glitter=0.0, **p
 def skin(finish="satin", conceal=0.35, tzone=0.2):
     """finish: matte (+rough) | satin | dewy (-rough) | glass (--rough)"""
     r = {"matte": 0.12, "satin": 0.0, "dewy": -0.12, "glass": -0.22}[finish]
-    out = [L("foundation", opacity=0.0, rough=r, soft=0.4),
+    out = [L("foundation", opacity=0.0, rough=r, soft=0.4, even=0.35),
            L("conceal_undereye", [236, 200, 176], conceal, "color", soft=0.35)]
     if tzone:
         out.append(L("conceal_tzone", [236, 204, 182], tzone, "color", soft=0.35))
@@ -85,18 +87,18 @@ def eyes(lid, depth, shape="soft", liner=None, lashline=0.0, inner=None, aegyo=0
 
 
 def blush(color, placement="apple", strength=0.35, nose=False):
-    return [L("blush", color, strength, "multiply", placement=placement, nose=nose, soft=0.45)]
+    return [L("blush", color, strength, "tint", keep_l=0.95, placement=placement, nose=nose, soft=0.45)]
 
 
 def glow(spots=("cheek", "nose_bridge"), strength=0.25, rough=-0.15):
     return [L("highlight", [255, 240, 226], strength, "screen", rough=rough, spots=list(spots), soft=0.12)]
 
 
-def lips(fill, liner, overline=0.0, ombre=0.0, finish="satin", strength=0.85):
+def lips(fill, liner, overline=0.0, ombre=0.0, finish="satin", strength=0.85, keep_l=None):
     r = {"matte": 0.15, "satin": -0.05, "gloss": -0.3, "vinyl": -0.4}[finish]
-    out = [L("lips", fill, strength, "tint", rough=r, overline=overline, soft=0.012)]
+    out = [L("lips", fill, strength, "tint", rough=r, keep_l=keep_l, overline=overline, soft=0.012)]
     if liner is not None:
-        out.append(L("lip_liner", liner, 0.6, "tint", overline=overline, soft=0.02))
+        out.append(L("lip_liner", liner, 0.85, "tint", keep_l=0.7, overline=overline, soft=0.02))
     if ombre:
         light = [min(255, int(c * 1.15 + 20)) for c in fill]
         out.append(L("lip_center", light, ombre, "tint", soft=0.12))
@@ -127,9 +129,9 @@ def base_looks():
              liner={"color": [40, 26, 20], "len": 0.3, "w": 0.07, "soft": 0.08, "lower": True}),
              lips(*LIP["espresso"], overline=0.025, ombre=0.4, finish="vinyl")),
         look("luvpauli_doll", "Douyin Doll Glam (@luvpauli)", "douyin", "TikTok 7688402180574874902", skin("satin", 0.45, 0.3),
-             sculpt("cool", 0.3, nose=True), blush(BLUSH["pink"], "high", 0.45, nose=True), glow(("nose_bridge", "nose_tip"), 0.3),
-             eyes(*EYE["white_pink"], liner={"color": BLACK, "angle": -6, "len": 0.3, "w": 0.075}, lashline=0.45, inner=WHITE, aegyo=0.35, glitter=0.5),
-             lips(*LIP["taupe_mauve"], overline=0.03, ombre=0.4, finish="satin")),
+             sculpt("cool", 0.45, nose=True), blush(BLUSH["pink"], "high", 0.32, nose=True), glow(("nose_bridge", "nose_tip"), 0.3),
+             eyes(*EYE["white_pink"], shape="cut", liner={"color": BLACK, "angle": -4, "len": 0.45, "w": 0.1}, lashline=0.0, inner=WHITE, aegyo=0.25, glitter=0.9),
+             lips(*LIP["taupe_mauve"], overline=0.03, ombre=0.3, finish="satin", keep_l=0.85)),
         look("douyin_aegyo", "Douyin Aegyo-sal Doll Eye", "douyin", S, skin("dewy", 0.3), sculpt("cool", 0.22, nose=True, jaw=False),
              blush([244, 160, 140], "high", 0.35), glow(("cheek", "inner_corner"), 0.3), eyes(*EYE["pink_peach"], liner={"color": BLACK, "angle": 14, "len": 0.2, "w": 0.035},
              lashline=0.3, aegyo=0.4, glitter=0.6), lips([204, 110, 120], None, ombre=0.5, finish="gloss", strength=0.7)),

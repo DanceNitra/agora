@@ -17,7 +17,17 @@ import cv2  # noqa: E402
 from agora_makeup import library, paint, zones  # noqa: E402
 
 
+ZONEMAP = [("blush", [255, 0, 255], {"placement": "high"}), ("contour_cheek", [0, 0, 255], {}), ("contour_nose", [0, 160, 255], {}),
+           ("conceal_undereye", [255, 255, 0], {}), ("lid", [0, 255, 0], {}), ("outer_v", [255, 128, 0], {}),
+           ("liner", [255, 0, 0], {"wing_len": 0.4}), ("inner_corner", [255, 255, 255], {}), ("aegyo_sal", [0, 255, 255], {}),
+           ("highlight", [128, 255, 128], {"spots": ["cheek", "nose_bridge", "nose_tip", "cupid", "browbone"]}),
+           ("contour_temple", [128, 0, 255], {}), ("contour_jaw", [0, 90, 120], {}), ("lip_liner", [255, 60, 0], {"overline": 0.03})]
+
+
 def find(look_id):
+    if look_id == "zonemap":  # calibration: every zone a flat, opaque, distinct colour
+        return {"id": "zonemap", "name": "Zone map", "family": "debug", "source": "", "layers":
+                [{"zone": z, "color": c, "opacity": 0.85, "blend": "normal", "params": {**p, "soft": 0.02}} for z, c, p in ZONEMAP]}
     for b in library.base_looks():
         if b["id"] == look_id:
             return b
@@ -42,6 +52,8 @@ def main():
     ap.add_argument("--out-bc")
     ap.add_argument("--out-srmf")
     ap.add_argument("--no-gain", action="store_true", help="UV preview strength (no render calibration)")
+    ap.add_argument("--body-bc")
+    ap.add_argument("--out-body-bc")
     a = ap.parse_args()
     if a.cmd == "list":
         print(json.dumps({"base": [{"id": b["id"], "name": b["name"], "family": b["family"]} for b in library.base_looks()],
@@ -54,7 +66,10 @@ def main():
         return
     bc = cv2.imread(a.bc, cv2.IMREAD_COLOR)
     srmf = cv2.imread(a.srmf, cv2.IMREAD_UNCHANGED) if a.srmf else None
-    out_bc, out_srmf, _ = paint.paint(bc, srmf, look, zones.Face(bc.shape[1]), gain={} if a.no_gain else None)
+    body = cv2.imread(a.body_bc, cv2.IMREAD_COLOR) if a.body_bc else None
+    out_bc, out_srmf, extra = paint.paint(bc, srmf, look, None, gain={} if a.no_gain else None, body_bc=body)
+    if body is not None and a.out_body_bc:
+        cv2.imwrite(a.out_body_bc, dict(extra)["body"])
     cv2.imwrite(a.out_bc, out_bc)
     if out_srmf is not None and a.out_srmf:
         cv2.imwrite(a.out_srmf, out_srmf)

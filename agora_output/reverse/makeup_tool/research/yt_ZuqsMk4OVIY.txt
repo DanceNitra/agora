@@ -1,0 +1,240 @@
+[watch] working dir: C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY
+[watch] checking metadata/captions via yt-dlp…
+[youtube] Extracting URL: https://www.youtube.com/watch?v=ZuqsMk4OVIY
+[youtube] ZuqsMk4OVIY: Downloading webpage
+[youtube] ZuqsMk4OVIY: Downloading visionos player API JSON
+[youtube] ZuqsMk4OVIY: Downloading m3u8 information
+[info] ZuqsMk4OVIY: Downloading subtitles: en-orig, en
+[info] ZuqsMk4OVIY: Downloading 1 format(s): 401+251-7
+[info] Writing video subtitles to: C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY\download\video.en-orig.vtt
+[download] Destination: C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY\download\video.en-orig.vtt
+[download]    1.00KiB at  999.36KiB/s (00:00:00)[download]    3.00KiB at    1.95MiB/s (00:00:00)[download]    7.00KiB at    4.54MiB/s (00:00:00)[download]   15.00KiB at    5.83MiB/s (00:00:00)[download]   31.00KiB at    4.05MiB/s (00:00:00)[download]   63.00KiB at    4.73MiB/s (00:00:00)[download]   68.35KiB at    5.13MiB/s (00:00:00)[download] 100% of   68.35KiB in 00:00:00 at 437.28KiB/s
+[info] Writing video subtitles to: C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY\download\video.en.vtt
+WARNING: Unable to download video subtitles for 'en': HTTP Error 429: Too Many Requests
+[info] Writing video metadata as JSON to: C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY\download\video.info.json
+[SubtitlesConvertor] Converting subtitles
+[SubtitlesConvertor] Subtitle file for vtt is already in the requested format
+WARNING: Skipping embedding en subtitle because the file is missing
+
+# watch: video report
+
+- **Source:** https://www.youtube.com/watch?v=ZuqsMk4OVIY
+- **Title:** Custom Textures for Metahuman Skin in 5.6
+- **Uploader:** Joey Lombardi 
+- **Duration:** 08:28 (508.0s)
+- **Detail:** transcript
+- **Frames:** skipped (transcript detail)
+- **Transcript:** 199 segments (via captions)
+
+## Frames
+
+_No frames extracted._
+
+## Transcript
+
+_Source: captions._
+
+```
+[00:01] What's up everybody? Welcome back to a new video. We are very quickly going to
+[00:03] new video. We are very quickly going to put some textures onto the Metahuman
+[00:05] put some textures onto the Metahuman skin in Substance Painter. Do a little
+[00:08] skin in Substance Painter. Do a little bit of this.
+[00:13] Let's go ahead and jump right in. We've got our Metahuman Jared here in his
+[00:16] got our Metahuman Jared here in his skiibbies. First things first, we're
+[00:18] skiibbies. First things first, we're going to want to go ahead and open up
+[00:19] going to want to go ahead and open up our Metahuman character creator here for
+[00:22] our Metahuman character creator here for Jared. You'll notice here that my
+[00:24] Jared. You'll notice here that my textures are already downloaded. They're
+[00:25] textures are already downloaded. They're at 4K. Make sure you've downloaded your
+[00:27] at 4K. Make sure you've downloaded your desired texture resolution set. Once you
+[00:29] desired texture resolution set. Once you have your textures exported, you're
+[00:31] have your textures exported, you're going to come up here to Metahuman
+[00:32] going to come up here to Metahuman character and we're going to export our
+[00:34] character and we're going to export our combined skeletal mesh. Right, we'll
+[00:37] combined skeletal mesh. Right, we'll save that. So, now that we've downloaded
+[00:38] save that. So, now that we've downloaded our Metahuman face and body textures,
+[00:41] our Metahuman face and body textures, now we're going to export the face and
+[00:43] now we're going to export the face and body textures as well as that metahuman
+[00:45] body textures as well as that metahuman mesh we just made. Let's come in here to
+[00:47] mesh we just made. Let's come in here to our blueprint. We're going to want to
+[00:49] our blueprint. We're going to want to select our body skeletal mesh. Come over
+[00:52] select our body skeletal mesh. Come over and open up our skeletal mesh asset.
+[00:55] and open up our skeletal mesh asset. We're going to come down here into our
+[00:56] We're going to come down here into our material slots and we're going to open
+[00:59] material slots and we're going to open up our material instance bodybaked. And
+[01:02] up our material instance bodybaked. And now we'll find our base color baked. So
+[01:05] now we'll find our base color baked. So that's what we want. So let's go ahead
+[01:06] that's what we want. So let's go ahead and click this. So now that we have our
+[01:10] and click this. So now that we have our body base color and we also have our
+[01:13] body base color and we also have our body normal here. Going to right click
+[01:15] body normal here. Going to right click on the body, come down to asset actions
+[01:19] on the body, come down to asset actions and export. Do the same for the normal.
+[01:21] and export. Do the same for the normal. Right click asset actions.
+[01:24] Right click asset actions. export.
+[01:26] export. Save that as well. So, that was our body
+[01:28] Save that as well. So, that was our body mesh. So, now let's come up here to our
+[01:31] mesh. So, now let's come up here to our face and we're going to come over here
+[01:33] face and we're going to come over here to our skeletal face mesh. Double click
+[01:35] to our skeletal face mesh. Double click this and we'll come down here to our
+[01:37] this and we'll come down here to our material slots and our material instant
+[01:40] material slots and our material instant face skin baked LOD zero. That's what we
+[01:43] face skin baked LOD zero. That's what we want to open up. Now, it's the same
+[01:44] want to open up. Now, it's the same thing. We found our base color baked for
+[01:46] thing. We found our base color baked for the head. So, I'm going to come over
+[01:48] the head. So, I'm going to come over here and browse to that. Now, you'll
+[01:49] here and browse to that. Now, you'll notice that there's a couple different
+[01:51] notice that there's a couple different LODs for the head. So, these all you
+[01:54] LODs for the head. So, these all you would export and basically apply to the
+[01:56] would export and basically apply to the textures to all of these if you are
+[01:58] textures to all of these if you are going to be using um different LODs. I
+[02:01] going to be using um different LODs. I just always force my LODs to the highest
+[02:03] just always force my LODs to the highest resolution. And I'm not going to do all
+[02:05] resolution. And I'm not going to do all these extra steps today of exporting and
+[02:07] these extra steps today of exporting and applying the same texture to those. But
+[02:09] applying the same texture to those. But that's all you basically do. You would
+[02:11] that's all you basically do. You would do the same process that we're doing for
+[02:13] do the same process that we're doing for this this texture and just apply it to
+[02:15] this this texture and just apply it to the other LODs and then reimpport them
+[02:17] the other LODs and then reimpport them back into here. Anyway, so we found our
+[02:20] back into here. Anyway, so we found our head base color and our head normal
+[02:23] head base color and our head normal right here. So, I'm going to right click
+[02:26] right here. So, I'm going to right click on this guy, come down here to asset
+[02:28] on this guy, come down here to asset actions, and click on export again. And
+[02:31] actions, and click on export again. And let's do the same for the normal.
+[02:35] let's do the same for the normal. We have the two base colors for our head
+[02:37] We have the two base colors for our head and our body and the normals as well.
+[02:39] and our body and the normals as well. So, now that we have exported our face
+[02:41] So, now that we have exported our face and body textures, let's go ahead and
+[02:43] and body textures, let's go ahead and export our skeletal mesh that we made.
+[02:45] export our skeletal mesh that we made. So, I'm going to right click on this as
+[02:47] So, I'm going to right click on this as well. Come down here to asset actions
+[02:49] well. Come down here to asset actions and also export. Now, this is going to
+[02:51] and also export. Now, this is going to export it as an FBX and let's save this.
+[02:55] export it as an FBX and let's save this. I don't need the skeletal mesh and I
+[02:56] I don't need the skeletal mesh and I don't need any of the animation and I
+[02:59] don't need any of the animation and I definitely um don't need any of the
+[03:01] definitely um don't need any of the levels of detail. So, I'm just going to
+[03:03] levels of detail. So, I'm just going to leave the static mesh, the export source
+[03:05] leave the static mesh, the export source mesh on for the static mesh. And then
+[03:07] mesh on for the static mesh. And then let's export that. And now that we have
+[03:09] let's export that. And now that we have exported our face and body textures and
+[03:12] exported our face and body textures and our normals and we've also exported the
+[03:14] our normals and we've also exported the static mesh skeleton, let's go ahead and
+[03:16] static mesh skeleton, let's go ahead and prep and import these assets to
+[03:18] prep and import these assets to Substance Painter. All right, let's go
+[03:19] Substance Painter. All right, let's go ahead and open up Substance Painter
+[03:21] ahead and open up Substance Painter here. Let's go ahead and create a new
+[03:23] here. Let's go ahead and create a new file with the demo uh mesh that we just
+[03:28] file with the demo uh mesh that we just exported for our Metahuman. Make sure
+[03:30] exported for our Metahuman. Make sure that we preserve our UV udim tiles. So
+[03:34] that we preserve our UV udim tiles. So you'll notice that we have two udims for
+[03:37] you'll notice that we have two udims for our metahuman. Basically this is the
+[03:39] our metahuman. Basically this is the face here and then this is the body.
+[03:41] face here and then this is the body. We're going to rename the face and body
+[03:43] We're going to rename the face and body base color and normals so that they
+[03:45] base color and normals so that they match up with the udims that we need to
+[03:47] match up with the udims that we need to apply them to. We're going to rename
+[03:49] apply them to. We're going to rename this. So this is the body base color. So
+[03:52] this. So this is the body base color. So we're going to rename this to Jared base
+[03:55] we're going to rename this to Jared base color. And because the body is on the 00
+[03:58] color. And because the body is on the 00 Z uh one Z2, we're gonna put our one Z2.
+[04:06] Z uh one Z2, we're gonna put our one Z2. And this is also for the body. So we'll
+[04:08] And this is also for the body. So we'll put one 02.
+[04:14] Then we'll come here. We'll rename this Jared. This is for the head. Um this is
+[04:18] Jared. This is for the head. Um this is the base color. And we'll put since this
+[04:21] the base color. And we'll put since this is the head, we're going to put UDM
+[04:23] is the head, we're going to put UDM 10001.
+[04:25] 10001. one. Great. And then since this is the
+[04:32] one. Great. And then since this is the normal,
+[04:33] normal, we're going to put one 01 as well. All
+[04:37] we're going to put one 01 as well. All right. Now that our naming is all
+[04:38] right. Now that our naming is all correct, let's grab all four of these.
+[04:41] correct, let's grab all four of these. We're going to drag them in here
+[04:44] We're going to drag them in here and we're going to mark them all as
+[04:46] and we're going to mark them all as textures.
+[04:49] textures. All right. And if they work correctly,
+[04:51] All right. And if they work correctly, you will see the twos show up. That
+[04:53] you will see the twos show up. That means that you have two slots. These are
+[04:55] means that you have two slots. These are double stacked in your UDMs. So, we'll
+[04:57] double stacked in your UDMs. So, we'll come over here. Let's delete this layer.
+[04:59] come over here. Let's delete this layer. We're just going to create a new fill
+[05:01] We're just going to create a new fill layer. Great. And we're going to come
+[05:02] layer. Great. And we're going to come down here. Let's disable our height map
+[05:05] down here. Let's disable our height map and our metallic roughness. Let's just
+[05:08] and our metallic roughness. Let's just set this at default, which would be
+[05:11] set this at default, which would be five. And then let's go ahead and take
+[05:13] five. And then let's go ahead and take our base color here. And we're going to
+[05:15] our base color here. And we're going to drag this down into the base color.
+[05:17] drag this down into the base color. Let's go ahead and take our normal map,
+[05:19] Let's go ahead and take our normal map, and we're going to drag this down into
+[05:21] and we're going to drag this down into the normal. There we go. Oh, now we got
+[05:23] the normal. There we go. Oh, now we got some nice textures. And there we go. Now
+[05:25] some nice textures. And there we go. Now we have our Metahuman
+[05:27] we have our Metahuman textured.
+[05:29] textured. Once you have your Metahuman textured in
+[05:32] Once you have your Metahuman textured in Substance Painter, you can do anything
+[05:34] Substance Painter, you can do anything you want with it. This is not a
+[05:35] you want with it. This is not a Substance Painter tutorial at all.
+[05:38] Substance Painter tutorial at all. Please pause this video and go watch um
+[05:40] Please pause this video and go watch um all of those amazing talented uh
+[05:42] all of those amazing talented uh artists. But yeah, let's jump into some
+[05:44] artists. But yeah, let's jump into some quick uh texturing work real quick. So,
+[05:47] quick uh texturing work real quick. So, what we're going to do here, I'm going
+[05:48] what we're going to do here, I'm going to create another fill layer.
+[05:52] to create another fill layer. I'm going to add a black mask. Let's
+[05:54] I'm going to add a black mask. Let's drag this one in.
+[06:07] [Music] I think these are pretty cool tattoos,
+[06:09] I think these are pretty cool tattoos, right?
+[06:11] right? [Music]
+[06:15] All right. All right, now that we have finished texturing in Substance Painter,
+[06:17] finished texturing in Substance Painter, let's go ahead and export those face and
+[06:18] let's go ahead and export those face and body textures and bring them back into
+[06:20] body textures and bring them back into Unreal Engine. Let's come up here to
+[06:22] Unreal Engine. Let's come up here to file, export textures.
+[06:26] file, export textures. Let's go ahead and change our directory.
+[06:29] Let's go ahead and change our directory. Great. And they're going to export on
+[06:31] Great. And they're going to export on the size that they are.
+[06:34] the size that they are. Now, we're exporting an emissive and
+[06:36] Now, we're exporting an emissive and occlusion map that we don't really need,
+[06:38] occlusion map that we don't really need, but um those will be there for us. So,
+[06:41] but um those will be there for us. So, great. Let's go ahead and jump back to
+[06:42] great. Let's go ahead and jump back to Unreal Engine here and open up our
+[06:45] Unreal Engine here and open up our location that we just saved our
+[06:48] location that we just saved our new skin textures to. Don't need these
+[06:51] new skin textures to. Don't need these guys. All right. Here are fresh face and
+[06:55] guys. All right. Here are fresh face and body textures we just exported. So, I'm
+[06:57] body textures we just exported. So, I'm going to select all of these one.
+[07:01] going to select all of these one. Dust for this Jared face color body
+[07:07] Dust for this Jared face color body one. Jared
+[07:10] one. Jared to normal face one
+[07:19] over here. Jared normal body.
+[07:21] body. All right. So, let's highlight all of
+[07:23] All right. So, let's highlight all of these textures and bring them in.
+[07:27] these textures and bring them in. And there they are. We've got our
+[07:29] And there they are. We've got our textures imported. So, we're going to
+[07:31] textures imported. So, we're going to come back to our material instance body
+[07:33] come back to our material instance body baked. Let's drag in our new body baked
+[07:38] baked. Let's drag in our new body baked and our new body normal. Save that.
+[07:43] and our new body normal. Save that. And then let's come up to our material
+[07:45] And then let's come up to our material instant face baked. And let's add our
+[07:49] instant face baked. And let's add our facial texture
+[07:51] facial texture and our facial normal. So now if we go
+[07:55] and our facial normal. So now if we go to our viewport,
+[07:57] to our viewport, we can see our new skin texture and our
+[08:02] we can see our new skin texture and our face texture on our meticum. There he
+[08:04] face texture on our meticum. There he is. It's a sick new facial
+[08:07] is. It's a sick new facial and tats.
+[08:11] and tats. That's it. There we go. So that's our
+[08:12] That's it. There we go. So that's our whole video. So this is just my way of
+[08:14] whole video. So this is just my way of how I quickly import and texture
+[08:16] how I quickly import and texture metahumans. There's a ton of different
+[08:17] metahumans. There's a ton of different other ways to do it. Hopefully this was
+[08:19] other ways to do it. Hopefully this was helpful and let me know if you liked it.
+[08:21] helpful and let me know if you liked it. If you did, please like and subscribe.
+[08:23] If you did, please like and subscribe. I've got more coming. Let me know what
+[08:25] I've got more coming. Let me know what else you would like to learn. Thanks,
+[08:26] else you would like to learn. Thanks, guys. See you on the next one.
+```
+
+---
+_Work dir: `C:\Users\Danculus\agora\agora_output\reverse\makeup_tool\research\yt_ZuqsMk4OVIY` — delete when done._

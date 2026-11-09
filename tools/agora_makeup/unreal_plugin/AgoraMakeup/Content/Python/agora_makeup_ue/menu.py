@@ -39,5 +39,13 @@ def register():
     r.set_label("Reset makeup on selected")
     r.set_string_command(unreal.ToolMenuStringCommandType.PYTHON, "", "import agora_makeup_ue.core as c; c.reset()")
     menus.find_menu("LevelEditor.MainMenu.Tools.AgoraMakeup").add_menu_entry("Reset", r)
+    for name, label, cmd in (("AgoraMakeupCompare", "Compare 1000 looks (sheet of the best)", "c.compare(1000)"),
+                             ("AgoraMakeupBest", "Apply #1 from the last comparison", "c.apply_rank(1)"),
+                             ("AgoraMakeupBest2", "Apply #2 from the last comparison", "c.apply_rank(2)"),
+                             ("AgoraMakeupBest3", "Apply #3 from the last comparison", "c.apply_rank(3)")):
+        e = unreal.ToolMenuEntry(name=name, type=unreal.MultiBlockType.MENU_ENTRY)
+        e.set_label(label)
+        e.set_string_command(unreal.ToolMenuStringCommandType.PYTHON, "", "import agora_makeup_ue.core as c; " + cmd)
+        menus.find_menu("LevelEditor.MainMenu.Tools.AgoraMakeup").add_menu_entry("Compare", e)
     menus.refresh_all_widgets()
     unreal.log("Agora Makeup: %d base looks, %d variants" % (len(data["base"]), data["variants"]))

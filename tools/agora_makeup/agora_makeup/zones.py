@@ -117,8 +117,8 @@ def z_contour_cheek(f, p):
     for e in _sides(p):
         a, b = f.P(EYE[e]["hollow"][0]), f.P(EYE[e]["hollow"][1])
         w = f.eye_w(e)
-        lift = np.array([0, -w * p.get("lift", 0.15)])
-        _line(m, [a + (b - a) * 0.08 + lift, a + (b - a) * p.get("reach", 0.5) + lift], w * p.get("width", 0.42))
+        lift = np.array([0, -w * p.get("lift", 0.55)])  # zone map 11-09: reach 0.5 painted only the face edge
+        _line(m, [a + (b - a) * 0.08 + lift, a + (b - a) * p.get("reach", 0.55) + lift * 0.8], w * p.get("width", 0.38))
     return m
 
 
@@ -163,8 +163,9 @@ def z_blush(f, p):
         if pl == "apple":
             _ellipse(m, c + np.array([0, ew * 0.15]), ew * 0.5, ew * 0.38)
         elif pl == "high":
-            cc = lo.mean(0) - tb * 0.55
-            _ellipse(m, cc, ew * 0.62, ew * 0.3, -8 if e == "A" else 8)
+            d = (out - inn) / np.linalg.norm(out - inn)
+            cc = lo.mean(0) - tb * 0.9 + d * ew * 0.12  # frontal view: right under the aegyo-sal, Douyin high blush
+            _ellipse(m, cc, ew * 0.5, ew * 0.28, -8 if e == "A" else 8)
         elif pl == "draped":
             t = np.array([f.P(i) for i in EYE[e]["temple"]]).mean(0)
             _line(m, [c, t], ew * 0.55)
@@ -172,8 +173,8 @@ def z_blush(f, p):
             t = np.array([f.P(i) for i in EYE[e]["temple"]]).mean(0)
             _line(m, [c + (t - c) * 0.1, c + (t - c) * 0.7], ew * 0.5)
     if pl in ("high", "nose") or p.get("nose", False):
-        _line(m, [f.P(195), f.P(5), f.P(4)], w * 0.25)
-        _line(m, [f.P(EYE["A"]["cheek"][4]), f.P(197), f.P(EYE["B"]["cheek"][4])], w * 0.18, 0.7)
+        _line(m, [f.P(195), f.P(5), f.P(4)], w * 0.16, 0.8)
+        _line(m, [f.P(EYE["A"]["cheek"][4]), f.P(197), f.P(EYE["B"]["cheek"][4])], w * 0.12, 0.5)
     return m
 
 
@@ -211,7 +212,7 @@ def z_lid(f, p):
     m = f.blank()
     for e in _sides(p):
         up, lo, out, inn, tb = _eye_geo(f, e)
-        crease = up + tb * p.get("height", 0.45)
+        crease = up + tb * p.get("height", 0.6)
         _poly(m, list(up) + list(crease[::-1]))
     return m
 
