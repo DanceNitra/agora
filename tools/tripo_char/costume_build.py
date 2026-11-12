@@ -237,6 +237,9 @@ cuff = {sgn: (FC[blue & (FC[:, 0] * sgn > 0.3), 0] * sgn).max() for sgn in (1, -
 neck_skin_low = FC[skin & (ax < 0.1) & (FC[:, 2] > 1.3), 2].min()
 head = (ax < 0.16) & (FC[:, 2] > neck_skin_low) & ~blue
 head |= (FC[:, 2] > collar_top + 0.005)
+# Hair is neither skin nor blue, and dark hair can read as blue and lift `collar_top` to the crown (1.837 on the A-pose
+# mesh), which left the hair on the head. Nothing of the costume is higher than 15 cm above the lowest neck skin.
+head |= (FC[:, 2] > neck_skin_low + 0.15)
 hands = np.zeros(len(FC), bool)
 for sgn in (1, -1):
     hands |= (FC[:, 0] * sgn > cuff[sgn] + 0.003) | ((FC[:, 0] * sgn > cuff[sgn] - 0.06) & skin)
