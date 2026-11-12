@@ -33,7 +33,8 @@ ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
 ues.set_level_viewport_camera_info(unreal.Vector({CAM[0]}, {CAM[1]}, {CAM[2]}), unreal.Rotator(roll=0, pitch={CAM[3]}, yaw={CAM[4]}))
 unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).editor_invalidate_viewports()
 """
-STATE = SETUP.split("ues = ")[0] + """
+import os  # noqa: E402
+STATE = SETUP.split("ues = ")[0] + "COSTUME = %r\n" % os.environ.get("COSTUME", "") + """
 # The clip is set on the play copy only. A clip set on the editor actor poses the body while the face mesh stays in
 # the reference pose outside play, which shows as a grey flap around the neck.
 w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
@@ -42,6 +43,18 @@ for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
         for c in a.get_components_by_class(unreal.SkeletalMeshComponent):
             if c.get_name() == "Body":
                 c.play_animation(anim, True)
+                if COSTUME:
+                    # Test only, on the play copy: the costume follows the body's pose as a leader-pose follower and the
+                    # MetaHuman default outfit is hidden. Nothing in the level or the Blueprint changes.
+                    # The costume actor `Hero01_Costume` stands in the preview level (ue_place_costume.py); this is its play copy.
+                    sa = next(x for x in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.SkeletalMeshActor)
+                              if x.skeletal_mesh_component.get_skeletal_mesh_asset() and x.skeletal_mesh_component.get_skeletal_mesh_asset().get_path_name().split(".")[0] == COSTUME)
+                    sc = sa.skeletal_mesh_component
+                    sa.attach_to_component(c, "", unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.KEEP_WORLD, False)
+                    sc.set_leader_pose_component(c, True)
+                    print("COSTUME", sc.get_skeletal_mesh_asset().get_name(), "materials", [m.get_name() for m in sc.get_materials()])
+            if COSTUME and c.get_name() == "SkeletalMesh":
+                c.set_visibility(False, True)
             print("PIE", c.get_name(), "anim mode", c.get_animation_mode(), "playing", c.is_playing(), "pos", round(c.get_position(), 2), "leader", bool(c.get_editor_property("leader_pose_component")) if hasattr(c, "leader_pose_component") else "?")
 """
 
@@ -65,6 +78,14 @@ pc = unreal.GameplayStatics.get_player_controller(w, 0)
 pc.set_control_rotation(unreal.Rotator(roll=0, pitch=-5, yaw=-90))
 print("pawn", pawn.get_actor_location())
 """ % (115 if view == "face" else int(sys.argv[6]) if len(sys.argv) > 6 else 1000))
+    time.sleep(1.5)
+if os.environ.get("PAWN"):  # "x,y,z,yaw": the play camera from any side, for example "260,0,110,180" for the hero's left
+    py("""import unreal
+w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
+x, y, z, yaw = [float(v) for v in "%s".split(",")]
+unreal.GameplayStatics.get_player_pawn(w, 0).set_actor_location(unreal.Vector(x, y, z), False, True)
+unreal.GameplayStatics.get_player_controller(w, 0).set_control_rotation(unreal.Rotator(roll=0, pitch=-5, yaw=yaw))
+""" % os.environ["PAWN"])
     time.sleep(1.5)
 try:
     for i in range(frames):

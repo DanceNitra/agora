@@ -208,6 +208,10 @@ be.to_mesh_clear()
 
 # ---- 3. cut head and hands from the dressed mesh by texture colour and place -----------------------------------
 mat = dr.data.materials[0]
+# Tripo's material is single-sided (glTF doubleSided false). Looking into a cuff, the far inner wall of the sleeve was
+# culled and the background showed as light spots beside the wrist. Cloth is two-sided; in Unreal the costume material
+# needs Two Sided as well, because FBX does not carry this flag.
+mat.use_backface_culling = False
 tex = {}
 for node in mat.node_tree.nodes:
     if node.type == "TEX_IMAGE" and node.image:
@@ -244,7 +248,28 @@ hands = np.zeros(len(FC), bool)
 for sgn in (1, -1):
     hands |= (FC[:, 0] * sgn > cuff[sgn] + 0.003) | ((FC[:, 0] * sgn > cuff[sgn] - 0.06) & skin)
 drop = head | hands | (skin & (FC[:, 2] > 1.25))
-rep["cut"] = {"faces": int(len(FC)), "dropped": int(drop.sum()), "collar_top_z": round(float(collar_top), 3),
+# Ragged rims. The colour cut leaves faces that are neither skin nor cloth on the open edges: dark hair on the back of
+# the collar (b-r 0.03 to 0.05, lum under 0.39 on the A-pose mesh) and pink blended texels around the cuff opening.
+# Cloth is b-r 0.10 and more. Such faces are removed ring by ring, only while they touch a face already removed.
+# Touching is by a shared vertex: with shared edges only, hair faces hanging on one corner stayed (v31).
+_lv = np.zeros(len(me.loops), dtype=np.int64)
+me.loops.foreach_get("vertex_index", _lv)
+_lf = np.repeat(np.arange(len(me.polygons)), [p.loop_total for p in me.polygons])
+ragged = (ax < 0.16) & (FC[:, 2] > neck_skin_low) & (b - r < 0.07) & (lum < 0.40)
+for sgn in (1, -1):
+    ragged |= (FC[:, 0] * sgn > cuff[sgn] - 0.06) & (b - r < 0.06)
+_n0 = int(drop.sum())
+for _ in range(12):
+    vd = np.zeros(len(me.vertices), bool)
+    vd[_lv[drop[_lf]]] = True
+    touch = np.zeros(len(FC), bool)
+    touch[_lf[vd[_lv]]] = True
+    new = touch & ragged & ~drop
+    if not new.any():
+        break
+    drop |= new
+print("RIMTRIM", int(drop.sum()) - _n0, flush=True)
+rep["cut"] = {"rim_trim_faces": int(drop.sum()) - _n0,"faces": int(len(FC)), "dropped": int(drop.sum()), "collar_top_z": round(float(collar_top), 3),
               "neck_skin_low_z": round(float(neck_skin_low), 3), "cuff_x": {str(k): round(float(v), 3) for k, v in cuff.items()},
               "skin_faces_left": int((skin & ~drop).sum())}
 reg = (ax > 0.3) & (ax < 0.62)
