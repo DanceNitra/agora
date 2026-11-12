@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "status": "success",
+  "data": {
+    "type": "image_to_image",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "prompt": "Change only the arm pose to an A-pose: both arms straight, lowered symmetrically to 45 degrees below horizontal, held well away from the torso with a clear gap between each arm and the body, elbows straight, palms facing down and back, all fingers straight and apart. Keep everything else exactly the same: the same man, the same face and bald head, the same dark short fitted coat with the high collar and embroidered hem, the same plain leather belt, dark fitted trousers and brown leather boots, the same body proportions, legs straight and slightly apart, exact front view, plain light grey background and even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible.",
+      "model_version": "seedream_v5"
+    },
+    "output": {
+      "generated_image_url": "https://openapi-dl.data.tripo3d.com/tcli_cbb3d5674f044f2eacf149a92f37bee4/20261112/e0d23671-dd18-42c9-bbaa-38adcbb87cff/generated_image.png?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9vcGVuYXBpLWRsLmRhdGEudHJpcG8zZC5jb20vdGNsaV9jYmIzZDU2NzRmMDQ0ZjJlYWNmMTQ5YTkyZjM3YmVlNC8yMDI2MTExMi9lMGQyMzY3MS1kZDE4LTQyYzktYmJhYS0zOGFkY2JiODdjZmYvZ2VuZXJhdGVkX2ltYWdlLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NDU2ODg3Nn19fV19&Signature=QYQWQxjKQRG7Xbu3o2hc55jae-n79hz8hc-tdedAFJKC2ewJDp3w-NViBBz-JFxBM2XPW-9K7nwHs3strF~7Y2YQi6GceU4QbrIyUGP3mNw2oFURtPf-BVYUysEiaZTQYzC9xlcrZ5~FEQWrGBw8uG2zTDkT~Use-JoV7CReODeoYbrX2PjfeTfN9-JqqhKEPoTwP6uX16HH9oniBDxjtf6NJdnovE8xPlxCGxsJk0S8dx2zT47Qj1C6I79Fgbv1uUlr3131oykfPEFt7-pcbws3ZhGtXMxGPDkpERG8vRWLQz0Dgbdg720zj4LQG~ZL1dqDYboVnJUEdc0M67n3xg__&Key-Pair-Id=K1676C64NMVM2J"
+    },
+    "task_id": "e0d23671-dd18-42c9-bbaa-38adcbb87cff",
+    "created_at": "2026-11-12T11:20:41.999114Z",
+    "completed_at": "2026-11-12T11:21:15.075995Z",
+    "credits_consumed": 5.0
+  }
+}

@@ -1,0 +1,7 @@
+{
+ "input": "3836b18f-4b6a-4244-a220-d6e05efee1c4",
+ "prompt": "Make the man completely bald with a smooth shaved head and completely clean-shaven with no beard, no moustache and no stubble; keep his eyebrows. Remove the undershirt and the shorts: he now has a bare chest and wears only plain small tight dark grey briefs. No other clothing, no folds, no accessories. Make the body lean and athletic, not bulky. Eyes open, neutral relaxed face, mouth closed. Keep the same man, the same facial features, body proportions, T-pose, front view, plain light grey background and even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible, arms horizontal at shoulder height, palms down, fingers straight and apart, bare feet with visible toes.",
+ "model": "seedream_v5",
+ "size": "2048x2048",
+ "output_format": "png"
+}

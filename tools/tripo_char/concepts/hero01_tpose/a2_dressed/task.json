@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "status": "success",
+  "data": {
+    "type": "image_to_image",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "prompt": "Remove the leather satchel, its shoulder strap, and the belt pouch. Keep the dark short fitted coat with the high collar and embroidered hem, the plain leather belt, the dark fitted trousers and the brown leather boots. Keep the same man, the same face, hair, beard, body proportions, T-pose, front view, plain light grey background and even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible. Arms exactly horizontal at shoulder height, palms down, all fingers straight and apart.",
+      "model_version": "seedream_v5"
+    },
+    "output": {
+      "generated_image_url": "https://openapi-dl.data.tripo3d.com/tcli_cbb3d5674f044f2eacf149a92f37bee4/20261111/18058f20-b833-4356-be95-275efb5ef9e6/generated_image.png?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9vcGVuYXBpLWRsLmRhdGEudHJpcG8zZC5jb20vdGNsaV9jYmIzZDU2NzRmMDQ0ZjJlYWNmMTQ5YTkyZjM3YmVlNC8yMDI2MTExMS8xODA1OGYyMC1iODMzLTQzNTYtYmU5NS0yNzVlZmI1ZWY5ZTYvZ2VuZXJhdGVkX2ltYWdlLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NDUxOTY5N319fV19&Signature=PAEU5HXK1KNimK-p76GZzEt1gLI6P8fEzNanExn0rgBbHROehlLfwHORXvWw-qnhNeCDnBR7m46f~77w3Z69l4AkSHQ~aIBGNTaI4LHonzHm24ErERv2ZUaLlqmBhO0kisaWxzm5Jz2zjYe1MqiB7x-eCDdX0a5rVH~4Id~s0LxWHPFcic0xXvBISzQDImFYbVYNiinbafnZuXRT9Fv4FG9I~ITHzuovSmZulSJ9WLNHU0EwAI5Thlz1-hYiHjgTCzdS82PbIOH1lBX4K7ONeSFAC6U7~QC4QT90pGFsH1u2gV3FhyNzMHyoL6YWaI3UyxdhZ~-~LIi~i1alRFRRnQ__&Key-Pair-Id=K1676C64NMVM2J"
+    },
+    "task_id": "18058f20-b833-4356-be95-275efb5ef9e6",
+    "created_at": "2026-11-11T21:41:06.035652Z",
+    "completed_at": "2026-11-11T21:41:36.259982Z",
+    "credits_consumed": 5.0
+  }
+}

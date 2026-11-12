@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "status": "success",
+  "data": {
+    "type": "text_to_image",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "prompt": "Completely show the full body of the character in T-pose. Standing upright, facing forward. Arms raise horizontally at shoulder height. Palms facing down, remove handheld objects but keep hand-worn equipment and accessories. Legs straight, feet shoulder-width apart. Keep natural body proportions and anatomy. Front view, neutral background.\nFull body character concept of a heroic man in his early thirties, lean athletic build, calm determined face, short dark hair, short dark beard. He wears a modern technical jacket in charcoal and deep blue with thin panels showing softly glowing Glagolitic letters, straps, fingerless gloves, dark fitted trousers, technical boots. Exact front view, T-pose, arms straight out to the sides at shoulder height, palms down, fingers apart, legs straight and slightly apart, standing, empty hands. Plain light grey background, even soft light, whole body from head to feet in frame, realistic game character, detailed fabric and leather materials. --no weapon, cape, long robe, text, watermark, logo, side view, cropped feet",
+      "model_version": "seedream_v5"
+    },
+    "output": {
+      "generated_image_url": "https://openapi-dl.data.tripo3d.com/tcli_cbb3d5674f044f2eacf149a92f37bee4/20261111/50ab3594-23f0-4edd-8575-4d4409d5cd8c/generated_image.png?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9vcGVuYXBpLWRsLmRhdGEudHJpcG8zZC5jb20vdGNsaV9jYmIzZDU2NzRmMDQ0ZjJlYWNmMTQ5YTkyZjM3YmVlNC8yMDI2MTExMS81MGFiMzU5NC0yM2YwLTRlZGQtODU3NS00ZDQ0MDlkNWNkOGMvZ2VuZXJhdGVkX2ltYWdlLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NDUxODk2M319fV19&Signature=qc3UvEYJKpWO7S2In7AiW2h1qps6JiqZx3Ut1Mjsq719X8MJ6QtlMKjDbYRpW6mMHkaW-sKZpGscY9xapGe4B55VxfWbcZOLRVy4soU68f0OA8T575P94H64qSH~XDycK4GdG3dga5tJEENlSzjtfeXQ10RiQQkxQIbvAAfAYlar5wbe1HFDJ0Iwe0qq7AXvurNF8NIcKiVa338ExGm~AuAScRXeNIzetobtIQmK8AIyQr0LNHQlUN6TBCPZ60f9~Dao94hh~8hkwOOL8j5Tnm1Y2VeQ2iwavHGtcTLS8IlAvOYz7lySm66rtmxAJR-0ev8A05aplqf~S3KhKZNabw__&Key-Pair-Id=K1676C64NMVM2J"
+    },
+    "task_id": "50ab3594-23f0-4edd-8575-4d4409d5cd8c",
+    "created_at": "2026-11-11T21:28:35.399999Z",
+    "completed_at": "2026-11-11T21:29:21.336735Z",
+    "credits_consumed": 5.0
+  }
+}

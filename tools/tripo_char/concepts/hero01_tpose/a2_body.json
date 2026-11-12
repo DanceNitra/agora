@@ -1,0 +1,7 @@
+{
+ "input": "20504839-8b5e-4b9e-b9af-21c7d8b5ed8c",
+ "prompt": "Remove the coat, belt, satchel, trousers and boots. The man now wears only a plain tight dark grey sleeveless undershirt and plain tight dark grey knee-length shorts, with bare arms, bare lower legs and bare feet with visible toes. No loose cloth, no folds, no accessories. Keep the same man, the same face, hair, beard, body proportions, T-pose, front view, plain light grey background and even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible. Arms exactly horizontal at shoulder height, palms down, all fingers straight and apart.",
+ "model": "seedream_v5",
+ "size": "2048x2048",
+ "output_format": "png"
+}

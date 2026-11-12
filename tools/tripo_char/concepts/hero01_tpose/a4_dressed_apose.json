@@ -1,0 +1,7 @@
+{
+ "input": "18058f20-b833-4356-be95-275efb5ef9e6",
+ "prompt": "Change only the arm pose to an A-pose: both arms straight, lowered symmetrically to 45 degrees below horizontal, held well away from the torso with a clear gap between each arm and the body, elbows straight, palms facing down and back, all fingers straight and apart. Keep everything else exactly the same: the same man, the same face and bald head, the same dark short fitted coat with the high collar and embroidered hem, the same plain leather belt, dark fitted trousers and brown leather boots, the same body proportions, legs straight and slightly apart, exact front view, plain light grey background and even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible.",
+ "model": "seedream_v5",
+ "size": "2048x2048",
+ "output_format": "png"
+}

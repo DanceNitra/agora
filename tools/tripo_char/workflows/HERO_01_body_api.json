@@ -1,0 +1,12 @@
+{
+  "1": {"class_type": "UNETLoader", "inputs": {"unet_name": "qwen_image_2512_fp8_e4m3fn.safetensors", "weight_dtype": "default"}},
+  "2": {"class_type": "CLIPLoader", "inputs": {"clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors", "type": "qwen_image", "device": "default"}},
+  "3": {"class_type": "VAELoader", "inputs": {"vae_name": "qwen_image_vae.safetensors"}},
+  "4": {"class_type": "ModelSamplingAuraFlow", "inputs": {"model": ["1", 0], "shift": 3.1}},
+  "5": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["2", 0], "text": "Full body anatomy reference photograph of a realistic adult man in his early thirties, slim average build, narrow shoulders, upright posture, calm attentive face, short dark hair close to the head, short dark beard. He wears only plain tight charcoal athletic shorts and a plain tight sleeveless athletic top, bare arms, bare legs, barefoot. Exact front view, symmetrical A-pose, both arms straight and held away from the body about 45 degrees down from horizontal, palms facing the thighs, all five fingers of each hand straight and slightly apart with background visible between the fingers, legs straight, feet apart at hip width, both feet flat on the floor, toes visible. Even soft studio light with no cast shadow, plain light grey seamless background, the whole body from head to toes in frame with margin on all sides, natural skin, photorealistic."}},
+  "6": {"class_type": "CLIPTextEncode", "inputs": {"clip": ["2", 0], "text": "low resolution, deformed limbs, deformed fingers, merged fingers, extra fingers, oversaturated, waxy skin, blurry, three-quarter view, side view, turned head, tilted head, bent arms, arms raised to shoulder height, T-pose, hands touching the body, crossed legs, feet together, shoes, socks, loose clothing, folds, robe, coat, cape, jewellery, watch, tattoo, held objects, cast shadow, floor reflection, text, watermark, logo, cluttered background, cropped feet, cropped head, fist, closed hand, cartoon, stylized, muscular bodybuilder"}},
+  "7": {"class_type": "EmptySD3LatentImage", "inputs": {"width": 1104, "height": 1472, "batch_size": 4}},
+  "8": {"class_type": "KSampler", "inputs": {"model": ["4", 0], "positive": ["5", 0], "negative": ["6", 0], "latent_image": ["7", 0], "seed": 2026111101, "steps": 50, "cfg": 4.0, "sampler_name": "euler", "scheduler": "simple", "denoise": 1.0}},
+  "9": {"class_type": "VAEDecode", "inputs": {"samples": ["8", 0], "vae": ["3", 0]}},
+  "10": {"class_type": "SaveImage", "inputs": {"images": ["9", 0], "filename_prefix": "tripo_char/hero01_body"}}
+}

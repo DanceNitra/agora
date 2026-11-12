@@ -1,0 +1,7 @@
+models/
+reports/
+__pycache__/
+.env
+concepts/**/*.png
+concepts/**/*.jpg
+concepts/**/*.webp

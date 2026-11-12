@@ -1,0 +1,8 @@
+{
+ "prompt": "Full body character concept of a heroic man in his early thirties, lean athletic build, calm determined face, short dark hair, short dark beard. He wears a modern technical jacket in charcoal and deep blue with thin panels showing softly glowing Glagolitic letters, straps, fingerless gloves, dark fitted trousers, technical boots. Exact front view, T-pose, arms straight out to the sides at shoulder height, palms down, fingers apart, legs straight and slightly apart, standing, empty hands. Plain light grey background, even soft light, whole body from head to feet in frame, realistic game character, detailed fabric and leather materials. --no weapon, cape, long robe, text, watermark, logo, side view, cropped feet",
+ "model": "seedream_v5",
+ "size": "2K",
+ "output_format": "png",
+ "watermark": false,
+ "template": "t_pose"
+}
