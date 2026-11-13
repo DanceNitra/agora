@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "status": "success",
+  "data": {
+    "type": "image_to_image",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "prompt": "Make the woman completely bald with a smooth bare scalp and a natural round skull: remove all of the pink hair, the fringe and every strand, and remove the cat ears. Keep her eyebrows, eyelashes, eyeliner and lip colour. Remove the collar and the bell; she wears a plain dark grey tank top. Keep exactly the same young East Asian woman: the same face shape, jaw and chin, the same eye shape and amber eyes, the same nose, lips and skin tone. Relaxed neutral expression, mouth closed, eyes open looking straight ahead. Head and shoulders, exact front view, head straight and level, symmetric, both ears visible, plain light grey background, soft even light with no strong shadows, sharp detail.",
+      "model_version": "seedream_v5"
+    },
+    "output": {
+      "generated_image_url": "https://openapi-dl.data.tripo3d.com/tcli_cbb3d5674f044f2eacf149a92f37bee4/20261113/87dd269e-cbf6-49e9-a3b4-63c10fdfda6a/generated_image.png?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9vcGVuYXBpLWRsLmRhdGEudHJpcG8zZC5jb20vdGNsaV9jYmIzZDU2NzRmMDQ0ZjJlYWNmMTQ5YTkyZjM3YmVlNC8yMDI2MTExMy84N2RkMjY5ZS1jYmY2LTQ5ZTktYTNiNC02M2MxMGZkZmRhNmEvZ2VuZXJhdGVkX2ltYWdlLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NDY2OTA0MH19fV19&Signature=HQbZW7u~56PGvTo4zaYbzNdCYZ~WnAs8xvV5rj1vdwom80E~fy8vI7sL~vrmHFTUfM~7qY46jRytpuwtC0F8AmwShFP2WR15MuZ8PyM9ZLqfCMOXNe7hPPLT4Sb0vLtR4DOtKWkJwFKBBFOrfL8qdWPtsl8AVZkfdUSASGC3zc17VfaYxkPt0V~wuNlKHnBhQtxp0zgKo-LFxVBM3CcEu92RdHCjLt53K6ovePQK8ERXMZrHSva2GqGdrNw-cintP8jcIiDfCr-1vE2IS~qWYnAXM3CNn-4FOz7t7rN9-gngY-956Rjl2MI1a0cW0JmL1KbH4kLu8MiStEyLgz~onA__&Key-Pair-Id=K1676C64NMVM2J"
+    },
+    "task_id": "87dd269e-cbf6-49e9-a3b4-63c10fdfda6a",
+    "created_at": "2026-11-13T15:10:17.833786Z",
+    "completed_at": "2026-11-13T15:10:38.226792Z",
+    "credits_consumed": 5.0
+  }
+}

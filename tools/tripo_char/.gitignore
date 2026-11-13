@@ -5,3 +5,4 @@ __pycache__/
 concepts/**/*.png
 concepts/**/*.jpg
 concepts/**/*.webp
+.venv_mp/

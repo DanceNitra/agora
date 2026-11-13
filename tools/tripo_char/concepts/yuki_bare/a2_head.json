@@ -1,0 +1,7 @@
+{
+ "input": "file_8952401c-2ed7-439a-b1e7-f8a44dc59cc1",
+ "prompt": "Make the woman completely bald with a smooth bare scalp and a natural round skull: remove all of the pink hair, the fringe and every strand, and remove the cat ears. Keep her eyebrows, eyelashes, eyeliner and lip colour. Remove the collar and the bell; she wears a plain dark grey tank top. Keep exactly the same young East Asian woman: the same face shape, jaw and chin, the same eye shape and amber eyes, the same nose, lips and skin tone. Relaxed neutral expression, mouth closed, eyes open looking straight ahead. Head and shoulders, exact front view, head straight and level, symmetric, both ears visible, plain light grey background, soft even light with no strong shadows, sharp detail.",
+ "model": "seedream_v5",
+ "size": "2048x2048",
+ "output_format": "png"
+}

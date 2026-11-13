@@ -1,0 +1,20 @@
+{
+  "code": 0,
+  "status": "success",
+  "data": {
+    "type": "image_to_image",
+    "status": "success",
+    "progress": 100,
+    "input": {
+      "prompt": "Make the woman completely bald with a smooth bare scalp: remove all of the pink hair, the fringe and the long strands, and remove the cat ears and the cat tail. Keep her eyebrows and eyelashes. Remove the corset, skirt, collar, arm bands, gloves and boots: she now wears only a plain tight dark grey sports bra and plain tight dark grey shorts, with bare arms, bare legs and bare feet with visible toes. No other clothing, no folds, no accessories, no glowing lines. Eyes open, neutral relaxed face, mouth closed. Keep the same young East Asian woman, the same face, eye shape, nose, lips and skin tone, the same body proportions. A-pose: both arms straight, lowered to 45 degrees below horizontal, held away from the torso with a clear gap, palms facing down, fingers straight and apart; legs straight and slightly apart. Front view, plain light grey background, even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible.",
+      "model_version": "seedream_v5"
+    },
+    "output": {
+      "generated_image_url": "https://openapi-dl.data.tripo3d.com/tcli_cbb3d5674f044f2eacf149a92f37bee4/20261113/38627181-fead-4024-a312-5ea0875a95d5/generated_image.png?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9vcGVuYXBpLWRsLmRhdGEudHJpcG8zZC5jb20vdGNsaV9jYmIzZDU2NzRmMDQ0ZjJlYWNmMTQ5YTkyZjM3YmVlNC8yMDI2MTExMy8zODYyNzE4MS1mZWFkLTQwMjQtYTMxMi01ZWEwODc1YTk1ZDUvZ2VuZXJhdGVkX2ltYWdlLnBuZyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5NDY2ODMwNH19fV19&Signature=gK8FB5P8pa-egYvukhPO1U3gboc1MamedtoLUBOSleSxmHpcy7b0OxNH6k4pxS6ijAdrUcsTd96eoByN0weBpV3kAh0eGKIDpmn~LCNhyXHNX2wrSV4DzFN-U8YOxU4~ganiffH-4AQUJJPMFOroZphou72QPZ0cP2ULYRA8o7DX9TyU76ZntCTHt7YWrrdJRILIQhoNBRTcx6JXk6ccIMS-6cUlux7R4MyxjiCqyAnyBYRGc~GCH2g05HzhyR3QxAixpqE02~XNVi0AjzygVpz0gDNYl31pncJ1A9fPX~dFz4Q7kTsnDkjKAk89fu0EpnyCcQsqiveuF6tuJv2XMg__&Key-Pair-Id=K1676C64NMVM2J"
+    },
+    "task_id": "38627181-fead-4024-a312-5ea0875a95d5",
+    "created_at": "2026-11-13T14:58:01.716626Z",
+    "completed_at": "2026-11-13T14:58:22.182452Z",
+    "credits_consumed": 5.0
+  }
+}

@@ -1,0 +1,7 @@
+{
+ "input": "file_ece64b91-597d-44d4-9221-e37f8c51bdc0",
+ "prompt": "Make the woman completely bald with a smooth bare scalp: remove all of the pink hair, the fringe and the long strands, and remove the cat ears and the cat tail. Keep her eyebrows and eyelashes. Remove the corset, skirt, collar, arm bands, gloves and boots: she now wears only a plain tight dark grey sports bra and plain tight dark grey shorts, with bare arms, bare legs and bare feet with visible toes. No other clothing, no folds, no accessories, no glowing lines. Eyes open, neutral relaxed face, mouth closed. Keep the same young East Asian woman, the same face, eye shape, nose, lips and skin tone, the same body proportions. A-pose: both arms straight, lowered to 45 degrees below horizontal, held away from the torso with a clear gap, palms facing down, fingers straight and apart; legs straight and slightly apart. Front view, plain light grey background, even light. Whole body from head to feet in frame with margin on all sides, both hands fully visible.",
+ "model": "seedream_v5",
+ "size": "2048x2048",
+ "output_format": "png"
+}
