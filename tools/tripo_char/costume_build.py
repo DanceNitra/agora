@@ -515,10 +515,24 @@ for sfx, (a0, a1) in ARM_AX.items():
     # the same upper envelope as on the torso, so the sleeve does not copy the biceps and the deltoid
     # One smooth radial field for the whole sleeve. A per-vertex minimum radius put both sides of every fold on the same
     # shell, which crumpled the sleeve into overlapping triangles.
-    env = envelope(CP[si], np.minimum(extra, np.percentile(extra, 98)), reach=0.08, sigma=0.045)  # bridges deltoid to biceps
+    # reach 0.08, sigma 0.045 bridge deltoid to biceps, but they spread the deltoid's push over the whole sleeve: v33
+    # added 18 to 25 mm of radius everywhere, which read as a thick round tube with the arm overhead (dance clip).
+    env = envelope(CP[si], np.minimum(extra, np.percentile(extra, 98)), reach=float(os.environ.get("SLEEVE_REACH", 0.08)),
+                   sigma=float(os.environ.get("SLEEVE_SIGMA", 0.045)))
+    bands = np.clip((t[si] / L * 5).astype(int), 0, 4)
+    before["sleeve_need_vs_extra_mm_by_fifth_" + sfx] = [[round(float(np.percentile(extra[bands == b], 50)) * 1000, 1),
+                                                         round(float(np.percentile(env[bands == b], 50)) * 1000, 1)]
+                                                        for b in range(5) if (bands == b).any()]
     extra = np.where(env > 0.0005, env + 0.002, 0.0)
     before["sleeve_extra_radius_mm_" + sfx] = [round(float(x) * 1000, 1) for x in np.percentile(extra, [50, 95, 100])]
-    target = bfoot[si] + U * (rc[si] + extra)[:, None]
+    # Slack: the Tripo sleeve is a loose tube, 2 to 3 cm wider than the MetaHuman arm, which reads as a thick round tube
+    # with the arm overhead. SLEEVE_SLACK keeps that fraction of the room between skin + MARGIN and the cloth.
+    rad = rc[si] + extra
+    base = FAR + MARGIN
+    k = float(os.environ.get("SLEEVE_SLACK", 1.0))
+    rad = np.where(FAR > 0, base + k * np.maximum(rad - base, 0) + np.minimum(rad - base, 0), rad)
+    before["sleeve_slack_mm_" + sfx] = [round(float(x) * 1000, 1) for x in np.percentile(np.maximum(rc[si] + extra - base, 0)[FAR > 0], [50, 90])]
+    target = bfoot[si] + U * rad[:, None]
     TUBE[si], WA[si] = target, ramp[si]
     TREL[si] = t[si] / L
     CP[si] = CP[si] + ramp[si][:, None] * (target - CP[si])
@@ -606,6 +620,13 @@ for a0_ in range(0, nc, 400):
     cdir[a0_:a0_ + 400] = wgt @ cvec
 cdir /= np.maximum(np.linalg.norm(cdir, axis=1), 1e-9)[:, None]
 ramp_t = np.clip((CP0[ti][:, 2] - 0.95) / 0.1, 0, 1) * np.clip((neck_skin_low - CP0[ti][:, 2]) / 0.03 + 1, 0, 1)  # not the collar
+# Sleeve root: in the dance clip a dark crevice opens at the back root of a raised sleeve, where the MetaHuman's own tight
+# shirt (7 mm off the body) stays smooth. The drape lifts the tunic up to 3 cm here, and that slack is squeezed between
+# the raised arm and the back. DRAPE_SHOULDER_R fades the lift to nothing within that radius of each shoulder joint.
+_dsr = float(os.environ.get("DRAPE_SHOULDER_R", 0))
+if _dsr:
+    _dj = np.minimum(*[np.linalg.norm(CP0[ti] - ARM_AX[s_][0], axis=1) for s_ in ("l", "r")])
+    ramp_t = ramp_t * np.clip((_dj - 0.5 * _dsr) / (0.5 * _dsr), 0, 1)
 want = ramp_t * cenv[inv]
 lift = np.maximum(want - (Dg[ti] * cdir[inv]).sum(1), 0)
 Dg[ti] += cdir[inv] * lift[:, None]
@@ -648,6 +669,32 @@ for it in range(8):
     CP = CP + np.where((amt > 0)[:, None], need, smooth(need, 2))
 rep["cover_fix"] = cover_log
 CW, dist, LOC, NRM = nearest(CP)
+# cloth standoff at the back root of each sleeve: within 12 cm of the shoulder joint, behind it, not above it
+rep["sleeve_root_back_standoff_mm"] = {}
+for s_ in ("l", "r"):
+    j_ = ARM_AX[s_][0]
+    m_ = (np.linalg.norm(CP - j_, axis=1) < 0.12) & (CP[:, 1] > j_[1] + 0.02) & (CP[:, 2] < j_[2] + 0.02)
+    rep["sleeve_root_back_standoff_mm"][s_] = [int(m_.sum())] + [round(float(x) * 1000, 1) for x in np.percentile(dist[m_], [50, 90, 99])]
+print("ROOT", rep["sleeve_root_back_standoff_mm"], flush=True)
+# The drape fade above left this at 18 mm (v38): the slack is in the Tripo garment itself. SHOULDER_TIGHT pulls the cloth
+# within SHOULDER_TIGHT_R of each shoulder joint in to at most that distance from the skin, as one smoothed field, so the
+# root of the sleeve sits as close as the MetaHuman shirt (7 mm) and has nothing to squeeze into a crevice.
+_st = float(os.environ.get("SHOULDER_TIGHT", 0))
+if _st:
+    _sr = float(os.environ.get("SHOULDER_TIGHT_R", 0.14))
+    _dj = np.minimum(*[np.linalg.norm(CP - ARM_AX[s_][0], axis=1) for s_ in ("l", "r")])
+    _fade = np.clip((_sr - _dj) / (0.35 * _sr), 0, 1)
+    _pull = np.where(((dist > _st) & (_fade > 0))[:, None], -NRM * (dist - _st)[:, None] * _fade[:, None], 0.0)
+    _pull = smooth(_pull, 6)
+    CP = CP + _pull
+    CW, dist, LOC, NRM = nearest(CP)
+    rep["shoulder_tight"] = {"moved": int((np.abs(_pull).sum(1) > 1e-4).sum()), "pull_max_mm": round(float(np.linalg.norm(_pull, axis=1).max()) * 1000, 1),
+                             "inside_after": int(((dist < 0) & (_fade > 0)).sum())}
+    for s_ in ("l", "r"):
+        j_ = ARM_AX[s_][0]
+        m_ = (np.linalg.norm(CP - j_, axis=1) < 0.12) & (CP[:, 1] > j_[1] + 0.02) & (CP[:, 2] < j_[2] + 0.02)
+        rep["shoulder_tight"]["root_after_mm_" + s_] = [round(float(x) * 1000, 1) for x in np.percentile(dist[m_], [50, 90, 99])]
+    print("TIGHT", rep["shoulder_tight"], flush=True)
 me.vertices.foreach_set("co", CP.ravel())
 me.update()
 # Underlayer: the skin that lies under or beside the cloth, to be copied 2 mm out as a plain cloth-coloured layer with
@@ -726,7 +773,73 @@ zone = (TREL > 0.25) & (TREL < 0.75)
 widen_blend(zone, np.clip(np.minimum(TREL[zone] - 0.25, 0.75 - TREL[zone]) / 0.1, 0, 1))
 # Shoulder: measured in v27, 89 of the 113 sleeve edges that gain more than 25 degrees of fold on the way back lie at
 # 0.1 to 0.3 of the arm. Widening the weight blend there the same way was tried in v28 and made it worse (686 edges):
-# the diffusion runs through the armpit and brings spine weights into the sleeve. Not applied.
+# the diffusion runs through the armpit and brings spine weights into the sleeve. Not applied there.
+# Shoulder cap: measured 2026-11-13 on v35 with the arm raised 140 degrees, 260 edges within 20 cm of the shoulder joint
+# gain more than 35 degrees of fold, 5 to 12 cm from the joint and 0.5 to 4 cm above it, half at the back, weighted
+# mostly to clavicle and upperarm_out. In the dance clip this reads as a crease where the raised sleeve meets the back,
+# and the MetaHuman's own shirt has none in the same view. Diffusing our weights over the shoulder top (150 passes,
+# 13 cm) made it worse: 303 edges. OUTFIT_WEIGHTS takes the shoulder weights from the MetaHuman outfit instead, a garment
+# authored for these bones and their correctives, at the nearest point of the posed outfit.
+_ow = os.environ.get("OUTFIT_WEIGHTS")
+if _ow:
+    _sr = float(os.environ.get("SHOULDER_RADIUS", 0.15))
+    onew = imported(bpy.ops.import_scene.fbx, str(Path(_ow).resolve()))
+    om = max((o for o in onew if o.type == "MESH"), key=lambda o: len(o.data.vertices))
+    bpy.context.view_layer.update()
+    _mw = om.matrix_world.copy()
+    om.parent = None
+    om.matrix_world = _mw  # same exporter as the body, so its armature sits where `arm` does
+    for md_ in om.modifiers:
+        if md_.type == "ARMATURE":
+            md_.object = arm
+    for o in onew:
+        if o is not om:
+            bpy.data.objects.remove(o)
+    bpy.context.view_layer.update()
+    dg = bpy.context.evaluated_depsgraph_get()
+    dg.update()
+    oe = om.evaluated_get(dg)
+    ome = oe.to_mesh()
+    ome.calc_loop_triangles()
+    OP = np.array([oe.matrix_world @ v.co for v in ome.vertices])
+    OT = np.array([t.vertices[:] for t in ome.loop_triangles])
+    oe.to_mesh_clear()
+    on = [g.name for g in om.vertex_groups]
+    OW = np.zeros((len(OP), len(bones)), dtype=np.float32)
+    for v in om.data.vertices:
+        for g in v.groups:
+            if on[g.group] in bidx:
+                OW[v.index, bidx[on[g.group]]] = g.weight
+    OW /= np.maximum(OW.sum(1), 1e-9)[:, None]
+    obvh = BVHTree.FromPolygons([Vector(q) for q in OP], [tuple(int(i) for i in t) for t in OT])
+    # The outfit must sit on the posed body: its distance to the body is the check that the frames agree.
+    od = np.array([(Vector(q) - bvh.find_nearest(Vector(q))[0]).length for q in OP[::50]])
+    rep["outfit_weights"] = {"outfit_vertices": int(len(OP)), "outfit_to_body_mm_50_90": [round(float(x) * 1000, 1) for x in np.percentile(od, [50, 90])]}
+    if np.percentile(od, 50) > 0.03:
+        raise RuntimeError("outfit does not sit on the posed body: %s" % rep["outfit_weights"])
+    for sfx in ("l", "r"):
+        j = ARM_AX[sfx][0]
+        dj = np.linalg.norm(CP - j, axis=1)
+        sel = np.nonzero((dj < _sr) & (CP[:, 2] > j[2] - 0.02))[0]
+        fade = np.clip((_sr - dj[sel]) / (0.3 * _sr), 0, 1) * np.clip((CP[sel, 2] - j[2] + 0.02) / 0.02, 0, 1)
+        far_ = 0
+        for k, i in enumerate(sel):
+            loc, _, fi, dd = obvh.find_nearest(Vector(CP[i]))
+            if dd > 0.05:  # no outfit near this point (the shirt is short-sleeved): keep the body weights
+                far_ += 1
+                continue
+            t = OT[fi]
+            a, b_, c = OP[t[0]], OP[t[1]], OP[t[2]]
+            v0, v1, v2 = b_ - a, c - a, np.array(loc) - a
+            d00, d01, d11, d20, d21 = v0 @ v0, v0 @ v1, v1 @ v1, v2 @ v0, v2 @ v1
+            den = d00 * d11 - d01 * d01 or 1e-12
+            bv = (d11 * d20 - d01 * d21) / den
+            bw = (d00 * d21 - d01 * d20) / den
+            w = (1 - bv - bw) * OW[t[0]] + bv * OW[t[1]] + bw * OW[t[2]]
+            CW[i] = fade[k] * w + (1 - fade[k]) * CW[i]
+        rep["outfit_weights"][sfx] = {"zone": int(len(sel)), "no_outfit_near": far_}
+    print("OUTFIT_WEIGHTS", rep["outfit_weights"], flush=True)
+    bpy.data.objects.remove(om)
 # at most 8 influences
 order = np.argsort(-CW, axis=1)[:, :8]
 keep = np.zeros_like(CW)
@@ -805,7 +918,8 @@ for i, n in enumerate(bones):
 mod = dr.modifiers.new("Armature", "ARMATURE")
 mod.object = arm
 # underlayer mesh from the rest body, joined into the costume
-if len(body.data.vertices) == len(STOCK):
+# NO_UNDERLAYER=1 leaves it out: a diagnostic, to tell the layer showing through the cloth from a fold of the cloth itself.
+if len(body.data.vertices) == len(STOCK) and os.environ.get("NO_UNDERLAYER") != "1":
     k_loc = 0.002 / body.matrix_world.to_scale()[0]
     ids = np.nonzero(STOCK)[0]
     remap = {int(v): i for i, v in enumerate(ids)}

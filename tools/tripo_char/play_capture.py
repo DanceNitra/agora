@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1] / "comfy_char"))
 from ue import call, APP  # noqa: E402
 from ue_py import run_file  # noqa: E402
+from ue_cap import capture  # noqa: E402
 
 clip, out, view = sys.argv[1], Path(sys.argv[2]), sys.argv[3]
 frames = int(sys.argv[4]) if len(sys.argv) > 4 else 8
@@ -34,7 +35,7 @@ ues.set_level_viewport_camera_info(unreal.Vector({CAM[0]}, {CAM[1]}, {CAM[2]}), 
 unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).editor_invalidate_viewports()
 """
 import os  # noqa: E402
-STATE = SETUP.split("ues = ")[0] + "COSTUME = %r\n" % os.environ.get("COSTUME", "") + """
+STATE = SETUP.split("ues = ")[0] + "CLOTH_ASSET = %r\nTIMES = %r\nCOSTUME = %r\nHIDE_OUTFIT = %r\nOUTFIT_MESH = %r\n" % (os.environ.get("CLOTH_ASSET", ""), os.environ.get("TIMES", ""), os.environ.get("COSTUME", ""), os.environ.get("HIDE_OUTFIT", "") == "1", os.environ.get("OUTFIT_MESH", "")) + """
 # The clip is set on the play copy only. A clip set on the editor actor poses the body while the face mesh stays in
 # the reference pose outside play, which shows as a grey flap around the neck.
 w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
@@ -43,6 +44,8 @@ for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
         for c in a.get_components_by_class(unreal.SkeletalMeshComponent):
             if c.get_name() == "Body":
                 c.play_animation(anim, True)
+                if TIMES:
+                    c.set_play_rate(0.0)  # frozen; the capture loop sets each time, so versions compare frame for frame
                 if COSTUME:
                     # Test only, on the play copy: the costume follows the body's pose as a leader-pose follower and the
                     # MetaHuman default outfit is hidden. Nothing in the level or the Blueprint changes.
@@ -53,7 +56,21 @@ for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
                     sa.attach_to_component(c, "", unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.KEEP_WORLD, False)
                     sc.set_leader_pose_component(c, True)
                     print("COSTUME", sc.get_skeletal_mesh_asset().get_name(), "materials", [m.get_name() for m in sc.get_materials()])
-            if COSTUME and c.get_name() == "SkeletalMesh":
+            if CLOTH_ASSET and c.get_name() == "Body":
+                # Chaos cloth test, play copy only: a cloth component that follows the body's pose replaces the outfit.
+                # The component itself is added to the editor actor beforehand (Python cannot add one in play).
+                cc = a.get_components_by_class(unreal.ChaosClothComponent)[0]
+                cc.attach_to_component(c, "", unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.SNAP_TO_TARGET, unreal.AttachmentRule.KEEP_WORLD, False)
+                cc.set_leader_pose_component(c, True)
+                cc.set_enable_simulation(True)
+                cc.resume_simulation()
+                print("CLOTHSIM enabled", cc.is_simulation_enabled(), "suspended", cc.is_simulation_suspended(), "tick", cc.is_component_tick_enabled(),
+                      "gravity", cc.is_gravity_enabled(), "lod", cc.get_editor_property("forced_lod_model"))
+                print("CLOTH", cc.get_cloth_asset().get_name(), "materials", [m.get_name() for m in cc.get_materials() if m])
+            if OUTFIT_MESH and c.get_name() == "SkeletalMesh":  # another garment on the outfit slot, play copy only
+                c.set_skeletal_mesh_asset(unreal.load_asset(OUTFIT_MESH))
+                c.set_editor_property("override_materials", [])
+            if (COSTUME or HIDE_OUTFIT or CLOTH_ASSET) and c.get_name() == "SkeletalMesh":  # HIDE_OUTFIT: the body skin is masked under clothes
                 c.set_visibility(False, True)
             print("PIE", c.get_name(), "anim mode", c.get_animation_mode(), "playing", c.is_playing(), "pos", round(c.get_position(), 2), "leader", bool(c.get_editor_property("leader_pose_component")) if hasattr(c, "leader_pose_component") else "?")
 """
@@ -87,12 +104,22 @@ unreal.GameplayStatics.get_player_pawn(w, 0).set_actor_location(unreal.Vector(x,
 unreal.GameplayStatics.get_player_controller(w, 0).set_control_rotation(unreal.Rotator(roll=0, pitch=-5, yaw=yaw))
 """ % os.environ["PAWN"])
     time.sleep(1.5)
+TIMES = [float(x) for x in os.environ.get("TIMES", "").split(",") if x]
+if TIMES:
+    frames = len(TIMES)
 try:
     for i in range(frames):
-        r = json.loads(call(APP, "CaptureEditorImage", {}, raw=True))
-        v = r.get("returnValue", r)
-        data = v["image"]["data"] if "image" in v else v["data"]
-        (out / f"{view}_{i:02d}.png").write_bytes(base64.b64decode(data))
+        if TIMES:
+            py("""import unreal
+w = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
+for a in unreal.GameplayStatics.get_all_actors_of_class(w, unreal.Actor):
+    if "MHC_Hero01" in a.get_class().get_name():
+        for c in a.get_components_by_class(unreal.SkeletalMeshComponent):
+            if c.get_name() == "Body":
+                c.set_position(%f, False)
+""" % TIMES[i])
+            time.sleep(0.6)
+        capture(out / f"{view}_{i:02d}.png")  # ue_cap.py: the result format changed in UE 5.9
         time.sleep(gap)
 finally:
     call(APP, "StopPIE", {})
