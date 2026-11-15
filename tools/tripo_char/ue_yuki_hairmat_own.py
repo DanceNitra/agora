@@ -4,15 +4,16 @@ The MetaHuman hair material gave one flat pink: its melanin variation turns stra
 layers came out dark brown (reports/yuki_ue_v13, 2026-11-14). This material takes the variation from the groom itself
 through the Hair Attributes node: every strand a shade between DEEP and LIGHT by its Seed, a share HL_SHARE of the
 clumps (by Clump ID) in the highlight colour HL, and the first quarter of each strand darker towards the root (ROOT).
+ROOT was 0.72: every strand starts at the crown, so the dark roots made a dark spot there (crown_check, 2026-11-15).
 Hair shading model, used with hair strands.
 
-A wrapper may set ARGS = dict(LIGHT=(r,g,b), DEEP=..., HL=..., HL_SHARE=0.22, ROOT=0.72, ROUGH=0.3, SPEC=0.5, SCATTER=1.0,
+A wrapper may set ARGS = dict(LIGHT=(r,g,b), DEEP=..., HL=..., HL_SHARE=0.22, ROOT=0.95, ROUGH=0.3, SPEC=0.5, SCATTER=1.0,
 APPLY=True). Colours are linear. Saves the material and, with APPLY, the level."""
 import unreal
 
 _A = globals().pop("ARGS", {})
 LIGHT, DEEP, HL = _A.get("LIGHT", (0.86, 0.56, 0.74)), _A.get("DEEP", (0.66, 0.36, 0.55)), _A.get("HL", (0.97, 0.80, 0.90))
-HL_SHARE, ROOT, ROUGH, SPEC, SCATTER = _A.get("HL_SHARE", 0.22), _A.get("ROOT", 0.72), _A.get("ROUGH", 0.3), _A.get("SPEC", 0.5), _A.get("SCATTER", 1.0)
+HL_SHARE, ROOT, ROUGH, SPEC, SCATTER = _A.get("HL_SHARE", 0.22), _A.get("ROOT", 0.95), _A.get("ROUGH", 0.3), _A.get("SPEC", 0.5), _A.get("SCATTER", 1.0)
 PKG, NAME = "/Game/AgoraChar/Tripo/Yuki", "M_Yuki_HairOwn"
 mel, lib = unreal.MaterialEditingLibrary, unreal.EditorAssetLibrary
 mat = unreal.load_asset(f"{PKG}/{NAME}") or unreal.AssetToolsHelpers.get_asset_tools().create_asset(NAME, PKG, unreal.Material, unreal.MaterialFactoryNew())

@@ -857,6 +857,33 @@ if hr is not None:
                 _bmc.to_mesh(hr.data)
                 _bmc.free()
                 hr.data.update()
+            # The cut edge followed the Tripo triangles and read as a frilly zigzag with the solidified back behind it
+            # (ears_t6s back views, 2026-11-15). Every open edge of the ears is relaxed along itself: each boundary
+            # vertex moves halfway to the mean of its two boundary neighbours, EAR_EDGE_SMOOTH times.
+            _it = int(os.environ.get("EAR_EDGE_SMOOTH", 20))
+            if _it > 0:
+                _bms = bmesh.new()
+                _bms.from_mesh(hr.data)
+                _bms.verts.ensure_lookup_table()
+                _bnb = {}
+                for _e in _bms.edges:
+                    if _e.is_boundary:
+                        a_, b_ = _e.verts[0].index, _e.verts[1].index
+                        _bnb.setdefault(a_, []).append(b_)
+                        _bnb.setdefault(b_, []).append(a_)
+                _idx = np.array([k for k, v_ in _bnb.items() if len(v_) == 2])
+                _nb = np.array([_bnb[k] for k in _idx]) if len(_idx) else np.zeros((0, 2), int)
+                _P = np.array([v.co[:] for v in _bms.verts])
+                _P0 = _P.copy()
+                for _ in range(_it):
+                    _P[_idx] = 0.5 * _P[_idx] + 0.25 * (_P[_nb[:, 0]] + _P[_nb[:, 1]])
+                for k in _idx:
+                    _bms.verts[k].co = Vector(_P[k])
+                _bms.to_mesh(hr.data)
+                _bms.free()
+                hr.data.update()
+                rep["ear_map"]["edge_smooth"] = {"boundary_verts": int(len(_idx)), "iterations": _it,
+                                                 "max_move_mm": round(float(np.linalg.norm(_P - _P0, axis=1).max()) * 1000, 2) if len(_idx) else 0}
             print("EAR_MAP", rep["ear_map"], flush=True)
         # Dive: where an ear comes within EAR_BLEND of our hair's outer surface, its vertices bend in toward the head
         # centre (EAR_DIVE x the shortfall), so the cut bottom edge ends about 2 cm deep in the strands instead of
@@ -900,6 +927,49 @@ if hr is not None:
                 _pl.material_index = 0
                 _nb += 1
         hr.data.materials.pop(index=1)
+        # SCALP_CAP (metres, 0 = off): a pink cap over the crown under the strands. The wig's strands part at the crown
+        # and the gap showed the scalp in shadow as a dark spot from behind and above (crown_check, 2026-11-15). The cap
+        # is the MetaHuman head's own surface within SCALP_CAP of its top point, not more than 3 cm toward the face,
+        # lifted 1.5 mm along the normals, in the ears' pink (ear_uv), and goes to the head bone with the ears.
+        CAP_R = float(os.environ.get("SCALP_CAP", 0.0))
+        _hpc = os.environ.get("HEAD_FBX", "")
+        if CAP_R > 0 and _hpc:
+            _b4c = set(bpy.data.objects)
+            bpy.ops.import_scene.fbx(filepath=str(Path(_hpc).resolve()))
+            _hoc = [o for o in bpy.data.objects if o not in _b4c]
+            _hmc = max((o for o in _hoc if o.type == "MESH"), key=lambda o: len(o.data.vertices))
+            bpy.context.view_layer.update()
+            _HCv = np.array([(_hmc.matrix_world @ v.co)[:] for v in _hmc.data.vertices])
+            _HCn = np.array([(_hmc.matrix_world.to_3x3() @ v.normal).normalized()[:] for v in _hmc.data.vertices])
+            _top = _HCv[np.argmax(_HCv[:, 2])]
+            _inC = (np.linalg.norm(_HCv - _top, axis=1) < CAP_R) & (_HCv[:, 1] > _top[1] - 0.03)
+            _fc_ = [tuple(q.vertices) for q in _hmc.data.polygons if all(_inC[i] for i in q.vertices)]
+            _used = sorted({i for f in _fc_ for i in f})
+            _remap = {i: k for k, i in enumerate(_used)}
+            _bmcap = bmesh.new()
+            _bmcap.from_mesh(hr.data)
+            _uvc = _bmcap.loops.layers.uv.active
+            _nv0 = len(_bmcap.verts)
+            _nvs = [_bmcap.verts.new(Vector((_HCv[i] + 0.0015 * _HCn[i]).tolist())) for i in _used]
+            _bmcap.verts.ensure_lookup_table()
+            _nf = 0
+            for f in _fc_:
+                try:
+                    nf_ = _bmcap.faces.new([_nvs[_remap[i]] for i in f])
+                except ValueError:
+                    continue
+                nf_.material_index = 0
+                nf_.smooth = True
+                for l_ in nf_.loops:
+                    l_[_uvc].uv = ear_uv
+                _nf += 1
+            _bmcap.to_mesh(hr.data)
+            _bmcap.free()
+            hr.data.update()
+            for o in _hoc:
+                bpy.data.objects.remove(o, do_unlink=True)
+            rep["scalp_cap"] = {"radius_m": CAP_R, "faces": _nf, "top_m": _top.round(4).tolist()}
+            print("SCALP_CAP", rep["scalp_cap"], flush=True)
         Hc = co(hr.data)
         rep["ear_hull_cut"] = {"faces_out": int(_out.sum()), "faces_kept": len(hr.data.polygons), "back_faces": _nb}
     # what lies on the MetaHuman's face is the Tripo face's skin (and its eyes, lips, brows): removed
