@@ -811,6 +811,14 @@ if hr is not None:
                 L_[:, 0] *= sx
                 L_[:, 1] *= sy
                 newP = tH + L_ @ BH                       # tip on tip, then the ear in the wig ear's frame
+                # centred in the wig ear's depth: tip on tip left the Tripo sheet at the back of the wig ear, and its
+                # back stood about 1 cm behind the fur in the side views (ears_t6r, Unreal, 2026-11-15)
+                _vn = _vis(newP)
+                _pn = newP[_vn] if _vn.any() else newP
+                _dout = float(((vH - tH) @ BH[2]).mean() - ((_pn - tH) @ BH[2]).mean())
+                if os.environ.get("EAR_MAP_CENTRE", "1") != "1":
+                    _dout = 0.0
+                newP = newP + _dout * BH[2]
                 _kdh = _KDm(len(PH))
                 for _j, _q in enumerate(PH):
                     _kdh.insert(Vector(_q), _j)
@@ -818,13 +826,37 @@ if hr is not None:
                 nv_ = newP[_vis(newP)] if _vis(newP).any() else newP
                 dd_ = np.array([_kdh.find(Vector(q_))[2] for q_ in nv_])
                 _V[_mT] = newP
-                rep["ear_map"][_nm] = {"scale_side": round(float(sx), 3), "scale_up": round(float(sy), 3),
+                rep["ear_map"][_nm] = {"scale_side": round(float(sx), 3), "scale_up": round(float(sy), 3), "out_shift_mm": round(_dout * 1000, 1),
                                        "wig_tip_m": tH.round(4).tolist(), "tip_after_m": newP[np.argmax(newP[:, 2])].round(4).tolist(),
                                        "turn_deg": round(float(np.degrees(np.arccos(np.clip(BT[1] @ BH[1], -1, 1)))), 1),
                                        "visible_to_wig_mm_mean": round(float(dd_.mean()) * 1000, 1),
                                        "visible_to_wig_mm_p95": round(float(np.percentile(dd_, 95)) * 1000, 1)}
             hr.data.vertices.foreach_set("co", _V.ravel())
             hr.data.update()
+            # Outside our hair, nothing of the Tripo ear may stand away from the wig ear: turned onto the wig ear, the
+            # part that used to reach down into the hair (the prism of the ear's outline) hung out behind the head as
+            # flaps (t6p side and back views, 2026-11-15). A face goes when its centre is outside the hair hull AND
+            # farther than EAR_MAP_FAR from the wig ear (its hull vertices). Cutting below the wig ear's lowest point
+            # removed nothing (t6q): the wig ear's cards reach deep into the hair.
+            FAR_ = float(os.environ.get("EAR_MAP_FAR", 0.012))
+            _fcm = np.array([hr.data.polygons[i].center[:] for i in range(len(hr.data.polygons))])
+            _kdw = _KDm(len(_HV))
+            for _j, _q in enumerate(_HV):
+                _kdw.insert(Vector(_q), _j)
+            _kdw.balance()
+            _dw = np.array([_kdw.find(Vector(q_))[2] for q_ in _fcm])
+            _drop = _vis(_fcm) & (_dw > FAR_)
+            for _nm, _sdf in (("left", _fcm[:, 0] > x0_mh), ("right", _fcm[:, 0] <= x0_mh)):
+                rep["ear_map"].setdefault(_nm, {})["faces_cut_far_from_wig_ear"] = int((_drop & _sdf).sum())
+            if _drop.any():
+                _bmc = bmesh.new()
+                _bmc.from_mesh(hr.data)
+                _bmc.faces.ensure_lookup_table()
+                bmesh.ops.delete(_bmc, geom=[_bmc.faces[i] for i in np.nonzero(_drop)[0]], context="FACES")
+                bmesh.ops.delete(_bmc, geom=[v for v in _bmc.verts if not v.link_faces], context="VERTS")
+                _bmc.to_mesh(hr.data)
+                _bmc.free()
+                hr.data.update()
             print("EAR_MAP", rep["ear_map"], flush=True)
         # Dive: where an ear comes within EAR_BLEND of our hair's outer surface, its vertices bend in toward the head
         # centre (EAR_DIVE x the shortfall), so the cut bottom edge ends about 2 cm deep in the strands instead of
