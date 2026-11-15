@@ -45,7 +45,7 @@ for path in sys.argv[4:]:
                 print(f"  {path.split('/')[-1]} t={fi / fps:.0f}s samples={len(rows)} {time.time() - t0:.0f}s", flush=True)
         fi += 1
     A = np.array(rows, float)
-    n = int(WIN / STEP_S)
+    n = int(round(WIN * fps / every))  # samples per window at the real sample rate (fps / every), not 10 Hz
     nu = len(UPPER)
     good = (A[:, 1] == 1) & (np.abs(A[:, 2]) < 25) & (np.abs(A[:, 3]) < 25) & (A[:, 4] >= MIN_IOD) & (A[:, 5] == 0)
     best = []
