@@ -1,0 +1,417 @@
+{
+ "date": "2026-11-15 18:37",
+ "train": [
+  "sinead_100_60",
+  "brel_nmqp"
+ ],
+ "min_runs": 2,
+ "gains": {
+  "browInnerUp": 2.034,
+  "browOuterUpLeft": 0.792,
+  "browOuterUpRight": 0.638,
+  "eyeSquintLeft": 0.63,
+  "eyeSquintRight": 0.717,
+  "mouthPucker": 0.54,
+  "mouthSmileLeft": 1.83,
+  "mouthSmileRight": 1.906,
+  "mouthUpperUpLeft": 0.518,
+  "mouthUpperUpRight": 0.559,
+  "mouthLowerDownLeft": 1.98,
+  "mouthLowerDownRight": 1.635
+ },
+ "evidence": {
+  "browInnerUp": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.37,
+     "corr": 0.699
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.653,
+     "corr": 0.806
+    }
+   ],
+   "gain": 2.034,
+   "used": true
+  },
+  "browOuterUpLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.23,
+     "corr": 0.554
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.296,
+     "corr": 0.834
+    }
+   ],
+   "gain": 0.792,
+   "used": true
+  },
+  "browOuterUpRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.991,
+     "corr": 0.348
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.235,
+     "corr": 0.852
+    }
+   ],
+   "gain": 0.638,
+   "used": true
+  },
+  "browDownLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.465,
+     "corr": 0.709
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.415,
+     "corr": 0.832
+    }
+   ],
+   "gain": 1.233,
+   "used": false
+  },
+  "browDownRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.68,
+     "corr": 0.6
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.432,
+     "corr": 0.84
+    }
+   ],
+   "gain": 1.013,
+   "used": false
+  },
+  "eyeBlinkLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.89,
+     "corr": 0.924
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.144,
+     "corr": 0.783
+    }
+   ],
+   "gain": 0.991,
+   "used": false
+  },
+  "eyeBlinkRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.874,
+     "corr": 0.786
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.967,
+     "corr": 0.855
+    }
+   ],
+   "gain": 1.088,
+   "used": false
+  },
+  "eyeSquintLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.346,
+     "corr": 0.712
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.872,
+     "corr": 0.581
+    }
+   ],
+   "gain": 0.63,
+   "used": true
+  },
+  "eyeSquintRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.335,
+     "corr": 0.667
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.458,
+     "corr": 0.368
+    }
+   ],
+   "gain": 0.717,
+   "used": true
+  },
+  "jawOpen": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.121,
+     "corr": 0.836
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.516,
+     "corr": 0.677
+    }
+   ],
+   "gain": 1.315,
+   "used": false
+  },
+  "mouthFunnel": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 4.22,
+     "corr": 0.631
+    }
+   ],
+   "gain": 0.33,
+   "used": false
+  },
+  "mouthPucker": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 2.083,
+     "corr": 0.421
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 1.647,
+     "corr": 0.55
+    }
+   ],
+   "gain": 0.54,
+   "used": true
+  },
+  "mouthSmileLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.441,
+     "corr": 0.864
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.677,
+     "corr": 0.795
+    }
+   ],
+   "gain": 1.83,
+   "used": true
+  },
+  "mouthSmileRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.449,
+     "corr": 0.852
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.613,
+     "corr": 0.788
+    }
+   ],
+   "gain": 1.906,
+   "used": true
+  },
+  "mouthStretchLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.02,
+     "corr": 0.493
+    }
+   ],
+   "gain": 3.0,
+   "used": false
+  },
+  "mouthStretchRight": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 0.083,
+     "corr": 0.475
+    }
+   ],
+   "gain": 3.0,
+   "used": false
+  },
+  "mouthDimpleLeft": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 4.86,
+     "corr": 0.483
+    }
+   ],
+   "gain": 0.33,
+   "used": false
+  },
+  "mouthDimpleRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.307,
+     "corr": 0.429
+    }
+   ],
+   "gain": 0.765,
+   "used": false
+  },
+  "mouthUpperUpLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.182,
+     "corr": 0.891
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 3.155,
+     "corr": 0.641
+    }
+   ],
+   "gain": 0.518,
+   "used": true
+  },
+  "mouthUpperUpRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.044,
+     "corr": 0.9
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 3.061,
+     "corr": 0.667
+    }
+   ],
+   "gain": 0.559,
+   "used": true
+  },
+  "mouthLowerDownLeft": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.445,
+     "corr": 0.855
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.573,
+     "corr": 0.424
+    }
+   ],
+   "gain": 1.98,
+   "used": true
+  },
+  "mouthLowerDownRight": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.587,
+     "corr": 0.842
+    },
+    {
+     "run": "brel_nmqp",
+     "amp": 0.637,
+     "corr": 0.461
+    }
+   ],
+   "gain": 1.635,
+   "used": true
+  },
+  "mouthPressLeft": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 0.579,
+     "corr": 0.537
+    }
+   ],
+   "gain": 1.727,
+   "used": false
+  },
+  "mouthPressRight": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 0.233,
+     "corr": 0.581
+    }
+   ],
+   "gain": 3.0,
+   "used": false
+  },
+  "mouthRollLower": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 2.048,
+     "corr": 0.467
+    }
+   ],
+   "gain": 0.488,
+   "used": false
+  },
+  "mouthRollUpper": {
+   "runs": [
+    {
+     "run": "brel_nmqp",
+     "amp": 0.921,
+     "corr": 0.445
+    }
+   ],
+   "gain": 1.086,
+   "used": false
+  },
+  "mouthShrugLower": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 0.374,
+     "corr": 0.669
+    }
+   ],
+   "gain": 2.674,
+   "used": false
+  },
+  "mouthShrugUpper": {
+   "runs": [
+    {
+     "run": "sinead_100_60",
+     "amp": 1.201,
+     "corr": 0.523
+    }
+   ],
+   "gain": 0.833,
+   "used": false
+  }
+ }
+}

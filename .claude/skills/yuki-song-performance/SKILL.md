@@ -30,6 +30,27 @@ From `tools/tripo_char`, with the Unreal editor closed:
   `compare.txt` (correlation and amplitude per blendshape, upper face and mouth means).
 - Time on this machine: solve about 1 minute per 15 s of video, render about 17 minutes per minute of video.
 
+## Audit and fit: every run teaches the next one
+
+Owner, 2026-11-15: "audituj kazdy vysledok a zapisuj co je nove a co sa lepsie spravit aby FITOL lepsie emociu, ak
+chyba vo workflow nastroj ... tak ho dokompiruj".
+
+- The `audit` step (`perf_audit.py`) runs last by default. It measures all 52 blendshapes on the singer and on Yuki,
+  checks shapes that single channels hide (oblique sad brow, brow knit, sad mouth, lip press, asymmetry, gaze), adds a
+  null control, and appends to `tools/tripo_char/ACTING_LEARNING_LOG.md` what is new in this run and what recurs.
+- A deviation that recurs across singers is Yuki's or the pipeline's. `yuki_expr_fit.py` learns gains for it from the
+  audits; the `fit` step applies them to the solved face and renders a `_fit` variant:
+
+```bash
+.venv_mp/Scripts/python.exe yuki_song_pipeline.py --tag <name> --steps fit,render,compare,audit --fit-train <run1>,<run2> --label "<singer, song, year>"
+```
+
+- A check that gains cannot fix (DEAD: the shape does not exist on Yuki; WRONG_DIR: it moves the other way) needs a new
+  control or mapping. Build it, then re-run the audit. Look at the frames before calling anything better.
+- Singer list with measured clip windows: `tools/tripo_char/SINGER_SCOUT_20261115.md`. Design of the acting database:
+  `tools/tripo_char/ACTING_DATABASE_DESIGN.md`. Before Unreal starts, `wait_for_gpu.py` waits until the shared GPU is
+  free under the rules in `C:\Users\Danculus\.claude\compute\README.md`.
+
 ## Choosing the video
 
 - The face must be frontal, large and continuous. Shot cuts, a microphone over the mouth, or a wide stage shot make
@@ -53,5 +74,6 @@ From `tools/tripo_char`, with the Unreal editor closed:
 ## Files
 
 `yuki_song_pipeline.py` (orchestrator), `perf_clip_pick.py`, `perf_head_angles.py`, `perf_emotion_match.py`,
-`ue_mha_mono_solve.py`, `ue_yuki_head_additive.py`, `ue_yuki_dance_seq.py`, `render_yuki_seq.ps1`. Background and
+`ue_mha_mono_solve.py`, `ue_yuki_head_additive.py`, `ue_yuki_dance_seq.py`, `render_yuki_seq.ps1`, `perf_audit.py`,
+`yuki_expr_fit.py` (with `ue_yuki_curves_dump.py` and `ue_yuki_curves_apply.py`), `wait_for_gpu.py`. Background and
 history: `tools/tripo_char/AI_SINGER_TO_METAHUMAN_PLAN.md`, `tools/tripo_char/HANDOFF_20261112.md`.

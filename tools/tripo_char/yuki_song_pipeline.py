@@ -1,7 +1,8 @@
 """Song to Yuki: one command from a video of a singing face to Yuki performing it, side by side, measured.
 
     .venv_mp/Scripts/python.exe yuki_song_pipeline.py --tag NAME (--url URL | --video FILE)
-        (--start S --dur D | --auto D) [--steps download,head,unreal,render,compare]
+        (--start S --dur D | --auto D) [--steps download,head,unreal,render,compare,audit]
+    .venv_mp/Scripts/python.exe yuki_song_pipeline.py --tag NAME --steps fit,render,compare,audit --fit-train RUN1,RUN2
 
 Steps (run in this order; --steps runs a subset, for example after a failure):
  1. download  yt-dlp fetches [start, start + dur] at up to 1080p with sound. With --auto D the whole video is first
@@ -13,6 +14,10 @@ Steps (run in this order; --steps runs a subset, for example after a failure):
               config (ue_yuki_dance_seq), then closes the editor.
  4. render    render_yuki_seq.ps1 renders the sequence in a separate -game process.
  5. compare   side by side (performer left, Yuki right, the performer's sound) and perf_emotion_match per channel.
+ 6. audit     perf_audit: per channel and shape checks against the singer, appended to ACTING_LEARNING_LOG.md.
+ fit          (instead of unreal, after a solve exists) dumps the solved face, applies the gains yuki_expr_fit learns
+              from the audits of --fit-train, saves A_P_<tag>_face_fit and a sequence LS_Yuki_Dance_P_<tag>_fit. With
+              fit in the steps, render, compare and audit work on the fitted variant (render_fit/, *_fit files).
 
 Work folder reports/yuki_lipsync/perf/<tag>/ (source.mp4, head.json, render/, <tag>_vs_yuki.mp4, compare.txt).
 Unreal assets /Game/AgoraChar/Tripo/Yuki/MHA/A_P_<tag>_face_nohead and A_P_<tag>_head, sequence
@@ -41,13 +46,20 @@ ap.add_argument("--video")
 ap.add_argument("--start", type=float, default=0.0)
 ap.add_argument("--dur", type=float, default=15.0)
 ap.add_argument("--auto", type=float, default=0.0)
-ap.add_argument("--steps", default="download,head,unreal,render,compare")
+ap.add_argument("--steps", default="download,head,unreal,render,compare,audit")
+ap.add_argument("--variant", default="", help="render, compare and audit a face variant, for example fit")
+ap.add_argument("--fit-train", default="", help="runs whose audits train yuki_expr_fit, comma separated")
+ap.add_argument("--label", default="", help="singer, song and year for the learning log")
 a = ap.parse_args()
 steps = a.steps.split(",")
 W = ROOT / "reports" / "yuki_lipsync" / "perf" / a.tag
 W.mkdir(parents=True, exist_ok=True)
-SRC, HEAD, RDIR = W / "source.mp4", W / "head.json", W / "render"
+if "fit" in steps and not a.variant:
+    a.variant = "fit"
+SFX = f"_{a.variant}" if a.variant else ""
+SRC, HEAD, RDIR = W / "source.mp4", W / "head.json", W / f"render{SFX}"
 NAME = "P_" + a.tag
+NAMEV = NAME + SFX
 
 
 def run(cmd, **kw):
@@ -96,9 +108,12 @@ if "download" in steps:
 if "head" in steps:
     run([sys.executable, ROOT / "perf_head_angles.py", SRC, HEAD])
 
-if "unreal" in steps:
-    N = len(json.load(open(HEAD))["yaw"])
-    LOCK.write_text(f"agora tripo_char: yuki_song_pipeline {a.tag}, Unreal 5.9 editor, MetaHuman Animator solve, "
+LVL = "import unreal\nunreal.get_editor_subsystem(unreal.LevelEditorSubsystem).load_level('/Game/AgoraChar/Tripo/Yuki/L_Yuki_Preview')\n"
+
+
+def with_editor(what, body):
+    """Starts the editor (own PID), waits until it answers, runs body(), closes the editor and drops the lock."""
+    LOCK.write_text(f"agora tripo_char: yuki_song_pipeline {a.tag}, Unreal 5.9 editor, {what}, "
                     f"scope=gpu ttl=60m started {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
     ed = subprocess.Popen([UE_EXE, UPROJECT])
     print("EDITOR PID", ed.pid, flush=True)
@@ -112,21 +127,46 @@ if "unreal" in steps:
                 break
         else:
             raise SystemExit("the editor did not answer")
-        ue(wrap(f"VIDEO=r'{SRC.as_posix()}', NAME='{NAME}'", "ue_mha_mono_solve.py"), "solve")
-        ue(wrap(f"JSON=r'{HEAD.as_posix()}', DST='{MHA}/A_{NAME}_head'", "ue_yuki_head_additive.py"), "head")
-        lvl = "import unreal\nunreal.get_editor_subsystem(unreal.LevelEditorSubsystem).load_level('/Game/AgoraChar/Tripo/Yuki/L_Yuki_Preview')\n"
-        ue(lvl + wrap(f"ANIM='{IDLE}', FACE='{MHA}/A_{NAME}_face_nohead', ADD=['{MHA}/A_{NAME}_head', '{PROP_ADD}'], Z_OFF=29.5, "
-                      f"PRE=45, TAG='{NAME}', RANGE=(0, {N - 1}), FOCAL=150.0, CAM_Z=126.0, OUT=r'{RDIR.as_posix()}'",
-                      "ue_yuki_dance_seq.py"), "sequence")
+        body()
     finally:
         ed.kill()
         LOCK.unlink(missing_ok=True)
         print("EDITOR closed", flush=True)
 
+
+def sequence(face):
+    N = len(json.load(open(HEAD))["yaw"])
+    ue(LVL + wrap(f"ANIM='{IDLE}', FACE='{face}', ADD=['{MHA}/A_{NAME}_head', '{PROP_ADD}'], Z_OFF=29.5, "
+                  f"PRE=45, TAG='{NAMEV}', RANGE=(0, {N - 1}), FOCAL=150.0, CAM_Z=126.0, OUT=r'{RDIR.as_posix()}'",
+                  "ue_yuki_dance_seq.py"), "sequence")
+
+
+if "unreal" in steps:
+    def solve():
+        ue(wrap(f"VIDEO=r'{SRC.as_posix()}', NAME='{NAME}'", "ue_mha_mono_solve.py"), "solve")
+        ue(wrap(f"JSON=r'{HEAD.as_posix()}', DST='{MHA}/A_{NAME}_head'", "ue_yuki_head_additive.py"), "head")
+        sequence(f"{MHA}/A_{NAME}_face_nohead")
+    with_editor("MetaHuman Animator solve", solve)
+
+if "fit" in steps:
+    CUR = W / "curves"
+    CUR.mkdir(exist_ok=True)
+
+    def fit():
+        base = f"{MHA}/A_{NAME}_face_nohead"
+        ue(wrap(f"ANIMS=['{base}'], OUT=r'{CUR.as_posix()}'", "ue_yuki_curves_dump.py"), "dump")
+        run([sys.executable, ROOT / "yuki_expr_fit.py", "--train", a.fit_train, "--dump", CUR / f"A_{NAME}_face_nohead",
+             "--out", CUR / f"face{SFX}"])
+        ue(wrap(f"SRC='{base}', DST='{MHA}/A_{NAME}_face{SFX}', STEM=r'{(CUR / f'face{SFX}').as_posix()}'", "ue_yuki_curves_apply.py"), "apply")
+        sequence(f"{MHA}/A_{NAME}_face{SFX}")
+    if not a.fit_train:
+        raise SystemExit("fit needs --fit-train RUN1,RUN2")
+    with_editor("face fit", fit)
+
 if "render" in steps:
-    LOCK.write_text(f"agora tripo_char: yuki_song_pipeline {a.tag}, render, scope=gpu ttl=60m started {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
+    LOCK.write_text(f"agora tripo_char: yuki_song_pipeline {a.tag}{SFX}, render, scope=gpu ttl=60m started {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
     try:
-        run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ROOT / "render_yuki_seq.ps1", "-tag", NAME, "-out", RDIR])
+        run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ROOT / "render_yuki_seq.ps1", "-tag", NAMEV, "-out", RDIR])
     finally:
         LOCK.unlink(missing_ok=True)
 
@@ -136,13 +176,16 @@ if "compare" in steps:
     w_, h_ = int(pr[0]), int(pr[1])
     s_ = min(w_, h_)
     left = f"[0:v]fps=30,crop={s_}:{s_}:{(w_ - s_) // 2}:{(h_ - s_) // 2},scale=900:900[l]"
-    for crop, out, audio in (("700:700:190:330", W / f"{a.tag}_vs_yuki.mp4", True), ("520:520:315:400", W / "_tight.mp4", False)):
+    for crop, out, audio in (("700:700:190:330", W / f"{a.tag}{SFX}_vs_yuki.mp4", True), ("520:520:315:400", W / f"_tight{SFX}.mp4", False)):
         cmd = [FFMPEG, "-hide_banner", "-loglevel", "error", "-y", "-i", SRC, "-framerate", 30, "-start_number", 45, "-i", RDIR / "%04d.png",
                "-filter_complex", f"{left};[1:v]crop={crop},scale=900:900[r];[l][r]hstack=inputs=2[v]", "-map", "[v]"]
         cmd += (["-map", "0:a", "-c:a", "aac"] if audio else []) + ["-c:v", "libx264", "-crf", 18, "-pix_fmt", "yuv420p", "-shortest", out]
         run(cmd)
-    with open(W / "compare.txt", "w", encoding="utf-8") as f:
-        r = subprocess.run([sys.executable, str(ROOT / "perf_emotion_match.py"), str(W / "_tight.mp4")], capture_output=True, text=True)
+    with open(W / f"compare{SFX}.txt", "w", encoding="utf-8") as f:
+        r = subprocess.run([sys.executable, str(ROOT / "perf_emotion_match.py"), str(W / f"_tight{SFX}.mp4")], capture_output=True, text=True)
         f.write(r.stdout)
     print("\n".join(line for line in r.stdout.splitlines() if "UPPER" in line or "MOUTH" in line or "lag" in line), flush=True)
-    print("DONE", W / f"{a.tag}_vs_yuki.mp4", flush=True)
+    print("DONE", W / f"{a.tag}{SFX}_vs_yuki.mp4", flush=True)
+
+if "audit" in steps:
+    run([sys.executable, ROOT / "perf_audit.py", W, "--label", a.label] + (["--variant", a.variant] if a.variant else []))
