@@ -1,7 +1,11 @@
 """Runs inside Unreal (tools/comfy_char/ue_py.py). Imports Yuki's face patch (yuki_head.py) as a static mesh and conforms
 a new MetaHumanCharacter to it HEAD ONLY, with face landmarks from the full-head portrait. Hair, cat ears and clothing
 are not in the patch, so they cannot swell the head. Touches only /Game/AgoraChar/Tripo/Yuki and saves only the assets
-it names. A wrapper may set NAME and SRC above this file."""
+it names. A wrapper may set NAME and SRC above this file.
+
+BODY_FBX (optional): a body target, the Tripo body prepared by yuki_body_prep. The conform is then HEAD_AND_BODY: the
+head from the face patch as before, the body from the Tripo static mesh (route M of docs/TRIPO_UE_WORKFLOW 5.5), and
+the solved pose is committed as the A-pose. Without it the body stays the preset's, which is what MHC_Yuki_v5 has."""
 import json
 
 import unreal
@@ -48,6 +52,19 @@ if not curves:
 
 verts, idx, *_ = sub.get_mesh_data_for_conforming(mesh)
 print("target", len(verts), "verts", len(idx) // 3, "tris")
+BODY_FBX = globals().get("BODY_FBX", "")
+bmesh_ = None
+if BODY_FBX:
+    BODY_NAME = globals().get("BODY_NAME", "yuki_body_target")
+    BODY_MESH = f"{PKG}/{BODY_NAME}"
+    if not lib.does_asset_exist(BODY_MESH):
+        bt = unreal.AssetImportTask()
+        for k, v in (("filename", BODY_FBX), ("destination_path", PKG), ("destination_name", BODY_NAME), ("automated", True), ("save", False), ("replace_existing", True)):
+            bt.set_editor_property(k, v)
+        unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([bt])
+    bmesh_ = unreal.load_asset(BODY_MESH)
+    bverts, bidx, *_ = sub.get_mesh_data_for_conforming(bmesh_)
+    print("body target", len(bverts), "verts", len(bidx) // 3, "tris")
 
 # 3. Character asset.
 path = f"{PKG}/{NAME}"
@@ -74,9 +91,16 @@ try:
     p.conform_target_mesh.target_parts_type = unreal.TargetPartsType.HEAD_ONLY
     p.conform_target_mesh.head_vertices = verts
     p.conform_target_mesh.head_vertex_indices = idx
-    p.estimate_body_joints_from_mesh = False
+    if bmesh_:
+        p.conform_target_mesh.target_parts_type = unreal.TargetPartsType.HEAD_AND_BODY
+        p.conform_target_mesh.body_vertices = bverts
+        p.conform_target_mesh.body_vertex_indices = bidx
+    p.estimate_body_joints_from_mesh = bool(globals().get("JOINTS", False))
     p.auto_solve = True
     p.body_conform_solve_settings.pipeline_name = PIPE  # empty: "Failed to find pipeline" in the autorigger
+    for k_, v_ in globals().get("SOLVE", {}).items():      # for example {"symmetrical_solve": True}
+        print("solve setting", k_, p.body_conform_solve_settings.get_editor_property(k_), "->", v_)
+        p.body_conform_solve_settings.set_editor_property(k_, v_)
     view = unreal.MinimalViewInfo()
     view.location = unreal.Vector(*cam["location_cm"])
     view.rotation = unreal.Rotator(pitch=cam["rotation_pitch_yaw_roll"][0], yaw=cam["rotation_pitch_yaw_roll"][1],
@@ -89,10 +113,14 @@ try:
     p.image_size = size
     key = unreal.MetaHumanCharacterTargetMeshKey()
     key.head_mesh = mesh
+    if bmesh_:
+        key.body_mesh = bmesh_
     print("conform started")
     if not sub.conform_to_target_meshes(ch, key, p):
         raise RuntimeError("conform_to_target_meshes returned False")
     print("conform returned True")
+    if bmesh_:
+        sub.commit_posed_state_as_a_pose(ch, key)
     lib.save_asset(path, only_if_is_dirty=False)
     lib.save_asset(MESH, only_if_is_dirty=False)
     ok = True

@@ -280,9 +280,62 @@ LINER = float(os.environ.get("LINER", 1.0))
 if LINER > 0:
     bl_lum = base @ np.array([0.2126, 0.7152, 0.0722], np.float32)
     la = np.clip((0.30 - bl_lum) / 0.16, 0, 1) * cv2.dilate((w_eye | w_eye[:, ::-1]).astype(np.uint8), np.ones((41, 41), np.uint8))
-    la = cv2.GaussianBlur(la.astype(np.float32), (0, 0), 1.2) * LINER
+    # LINER_GROW (texels): the baked liner is a thin line; the concept's lash line is a thick black band with a wing.
+    # SHADOW (0..1): a smoky halo of SHADOW_RGB (linear) around the liner, widest where the liner is (lid and wing).
+    GROW = int(os.environ.get("LINER_GROW", 0))
+    core = (la > 0.35).astype(np.uint8)
+    if GROW:
+        # grown, then rounded: blur and re-threshold, so the wing does not keep the blocky outline of the dilation
+        g = cv2.dilate(core, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * GROW + 1, 2 * GROW + 1))).astype(np.float32)
+        la = np.maximum(la, np.clip((cv2.GaussianBlur(g, (0, 0), GROW) - 0.45) / 0.2, 0, 1))
+    la = cv2.GaussianBlur(la.astype(np.float32), (0, 0), 1.5) * LINER
+    SHADOW = float(os.environ.get("SHADOW", 0))
+    if SHADOW > 0:
+        sr = int(os.environ.get("SHADOW_PX", S // 70))
+        halo = cv2.dilate(core, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * sr + 1, 2 * sr + 1))).astype(np.float32)
+        halo = np.clip(cv2.GaussianBlur(halo, (0, 0), sr * 0.45) * 1.15, 0, 1) * SHADOW
+        col = np.array([float(v) for v in os.environ.get("SHADOW_RGB", "0.16,0.03,0.07").split(",")], np.float32)
+        outl = outl * (1 - halo[..., None]) + col * halo[..., None]
+        print("SHADOW texels", int((halo > 0.25).sum()), flush=True)
     outl = outl * (1 - la[..., None]) + np.array([0.012, 0.006, 0.007], np.float32) * la[..., None]
     print("LINER texels", int((la > 0.5).sum()), flush=True)
+# BROW_FADE (0..1): the projected brows came out thick and red-brown in Unreal; the concept's are thin and grey-brown.
+# Inside the brow zone the texture moves that far toward the smooth skin fill and loses half of its chroma.
+BROW_FADE = float(os.environ.get("BROW_FADE", 0))
+if BROW_FADE > 0:
+    bz = np.maximum(zone(BROW_L, 31, True), zone(BROW_R, 31, True)).astype(np.float32)
+    wb = cv2.remap(bz, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    wb = np.maximum(wb, wb[:, ::-1]) * region
+    wb = cv2.GaussianBlur(wb, (0, 0), S / 250) * BROW_FADE
+    sk = cv2.GaussianBlur(fill, (0, 0), S / 100)
+    grey = (outl @ np.array([0.2126, 0.7152, 0.0722], np.float32))[..., None]
+    outl = outl * (1 - wb[..., None]) + (0.5 * sk + 0.5 * (0.5 * outl + 0.5 * grey)) * wb[..., None]
+# BROW_PAINT (0..1): thin, clean brows drawn along the concept's own brow landmarks (the clean side, mirrored), over
+# the faded projection: a tapered line from the head of the brow to its tail. BROW_RGB is linear.
+BROW_PAINT = float(os.environ.get("BROW_PAINT", 0))
+if BROW_PAINT > 0:
+    bm = np.zeros((ch, cw), np.float32)
+    up, lo = (brow_c[:5], brow_c[5:][::-1]) if True else None
+    mid = (C[up] + C[lo]) / 2
+    mid = mid[np.argsort(np.abs(mid[:, 0] - cw / 2))]          # from the head (near the nose) to the tail
+    pts_ = np.stack([np.interp(np.linspace(0, len(mid) - 1, 60), np.arange(len(mid)), mid[:, k]) for k in (0, 1)], 1)
+    iod_px = float(np.linalg.norm(C[468] - C[473])) if len(C) > 473 else cw / 4
+    for j in range(len(pts_) - 1):
+        u = j / (len(pts_) - 2)
+        th = max(2, int(round(iod_px * (0.045 * (1 - u) + 0.012 * u) * float(os.environ.get("BROW_THICK", 1.0)))))
+        cv2.line(bm, tuple(np.round(pts_[j]).astype(int)), tuple(np.round(pts_[j + 1]).astype(int)), 1.0 - 0.35 * u, th, cv2.LINE_AA)
+    bm = cv2.GaussianBlur(bm, (0, 0), iod_px * 0.008)
+    wbp = cv2.remap(bm, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    wbp = np.maximum(wbp, wbp[:, ::-1]) * region * BROW_PAINT
+    bcol = np.array([float(v) for v in os.environ.get("BROW_RGB", "0.10,0.065,0.06").split(",")], np.float32)
+    outl = outl * (1 - wbp[..., None]) + bcol * wbp[..., None]
+    print("BROW PAINT texels", int((wbp > 0.3).sum()), flush=True)
+# LIP_TINT ("r,g,b" gains, linear): the lips toward the concept's rose
+if os.environ.get("LIP_TINT"):
+    wl = cv2.GaussianBlur((w_lip | w_lip[:, ::-1]).astype(np.float32) * region, (0, 0), S / 400)
+    g = np.array([float(v) for v in os.environ["LIP_TINT"].split(",")], np.float32)
+    lipmask = wl * np.clip((sat - 0.10) / 0.10, 0, 1)        # only the painted lips, not the skin around them
+    outl = np.clip(outl * (1 + (g - 1) * lipmask[..., None]), 0, 1)
 tex = (srgb(outl) * 255 + 0.5).astype(np.uint8)
 cv2.imwrite(str(out / "yuki_face_BC.png"), tex[..., ::-1])
 body = cv2.imread(str(based / "base_body_BC.png"), cv2.IMREAD_COLOR)[..., ::-1].astype(np.float32) / 255

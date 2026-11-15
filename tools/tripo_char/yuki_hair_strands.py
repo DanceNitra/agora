@@ -251,19 +251,62 @@ if os.environ.get("MH_HEAD"):
     # Read off the concept: a tip between the brows, both eyes free, one lock over the outer corner of the picture-left
     # eye, and from the outer eye corners outward the locks that frame the face run down freely. A flat cut at the brow
     # line (v11) read as a bowl fringe.
+    SIDE_FROM, EYE_LOCK = float(os.environ.get("SIDE_FROM", 0.058)), int(os.environ.get("EYE_LOCK", 1))
+    FACE_HALF = SIDE_FROM + 0.012        # half-width of the zone in front of the face where the cut applies
+
     def low_of(dx):
         a_ = np.abs(dx)
         low = np.full(dx.shape, brow_z + 0.004)
         low = np.where(a_ < 0.012, brow_z - 0.012, low)
-        low = np.where((dx > -0.060) & (dx < -0.040), brow_z - 0.040, low)
-        side = brow_z - np.clip((a_ - 0.046) / 0.016, 0, 1) * 0.25
-        return np.where(a_ >= 0.046, np.minimum(low, side), low)
+        # SIDE_FROM (m from the middle): where the face-framing locks may start to hang free. At 0.046 (the outer eye
+        # corner) they came down as coarse wedges over both eye corners and hid the liner wings (reports/yuki_ue_v13);
+        # the concept's framing locks run outside the eyes, along the edge of the face. EYE_LOCK=0 leaves out the one
+        # lock over the picture-left eye.
+        if EYE_LOCK:
+            low = np.where((dx > -0.060) & (dx < -0.048), brow_z - 0.040, low)
+        side = brow_z - np.clip((a_ - SIDE_FROM) / 0.010, 0, 1) * 0.25
+        return np.where(a_ >= SIDE_FROM, np.minimum(low, side), low)
 
+    # SWEEP (2026-11-14): cutting the strands that hang in front of the outer half of the face left a blunt horizontal
+    # edge at eye level on both sides (reports/yuki_ue_v13/h2). The concept's side locks are not cut: they sweep outward
+    # and run down along the edge of the face. Points below the brow line, in front of the face and more than SWEEP_IN
+    # from the middle, move outward to the edge of the face (FACE_HALF plus a per-strand offset, so the lock has
+    # thickness) and back onto the skin, more and more over the first 3 cm under the brows. They then lie outside
+    # the zone the cut applies to.
+    swept = np.zeros(len(S), bool)
+    if int(os.environ.get("SWEEP", 1)):
+        from mathutils.bvhtree import BVHTree as _BVH
+        hb0 = _BVH.FromPolygons([Vector(q) for q in M], [tuple(pl.vertices) for pl in mh.data.polygons])
+        SWEEP_IN = float(os.environ.get("SWEEP_IN", 0.030))
+        dx_ = S[:, :, 0] - mc[0]
+        a0 = np.abs(dx_)
+        zone_ = (a0 > SWEEP_IN) & (a0 < FACE_HALF + 0.004) & (S[:, :, 1] < mc[1] - 0.02) & (S[:, :, 2] < brow_z + 0.01) & (S[:, :, 2] > chin_mh - 0.03)
+        t_ = np.clip((brow_z + 0.01 - S[:, :, 2]) / 0.03, 0, 1)
+        t_ = t_ * t_ * (3 - 2 * t_)
+        g_ = np.clip((a0 - SWEEP_IN) / 0.012, 0, 1)
+        tgt = FACE_HALF + 0.004 + rng.uniform(0, 0.014, len(S))[:, None]
+        newx = mc[0] + np.sign(dx_) * (a0 + (tgt - a0) * t_ * g_)
+        moved = zone_ & (np.abs(newx - S[:, :, 0]) > 1e-5)
+        S[:, :, 0] = np.where(zone_, newx, S[:, :, 0])
+        hug = 0
+        off_ = rng.uniform(0.004, 0.012, len(S))
+        for i, k in zip(*np.nonzero(moved)):
+            loc, nrm_, _, dist = hb0.find_nearest(Vector(S[i, k]), 0.08)
+            if loc is not None and dist > off_[i]:
+                w_ = float(t_[i, k] * g_[i, k])
+                S[i, k] = np.array(Vector(S[i, k]).lerp(loc + nrm_ * off_[i], w_)[:], dtype=np.float32)
+                hug += 1
+        # SWEEP_KEEP=1: a swept strand is never cut afterwards. Tried against the short tufts the cut leaves at both
+        # temples (reports/yuki_ue_v13/h3) and it was worse: the uncut strands lie on the cheeks and across one eye
+        # (h4). Off by default.
+        swept = (moved.sum(1) >= 3) & bool(int(os.environ.get("SWEEP_KEEP", 0)))
+        print("SWEEP points moved", int(moved.sum()), "pulled to the skin", hug, "strands swept", int(swept.sum()), flush=True)
     FV = float(os.environ.get("FRINGE_VAR", 0.012))
     cut = low_of(S[:, :, 0] - mc[0]) - rng.uniform(0, FV, len(S))[:, None]
-    infront = (np.abs(S[:, :, 0] - mc[0]) < 0.062) & (S[:, :, 1] < mc[1] - 0.02) & (S[:, :, 2] < cut) & (S[:, :, 2] > chin_mh - 0.03)
+    infront = (np.abs(S[:, :, 0] - mc[0]) < FACE_HALF) & (S[:, :, 1] < mc[1] - 0.02) & (S[:, :, 2] < cut) & (S[:, :, 2] > chin_mh - 0.03)
     first = np.where(infront.any(1), infront.argmax(1), NPTS)
     trimmed = 0
+    first = np.where(swept, NPTS, first)
     for i in np.nonzero(first < NPTS)[0]:
         k_ = max(int(first[i]), 2)
         S[i, k_:] = S[i, k_ - 1]
@@ -295,29 +338,63 @@ if os.environ.get("MH_HEAD"):
             flat[i] = loc + nrm * 0.003
             pushed += 1
     S = flat.reshape(S.shape)
+    # HUG (1 = off): the hair stood off the head as a wide helmet with flat side panels (owner 2026-11-14, "tvar vlasov").
+    # Above the chin a point farther than 1.5 cm from the head keeps only HUG of the rest of its distance, so the
+    # volume beside the skull closes in and the locks fall from the head and not from a shell round it.
+    HUG = float(os.environ.get("HUG", 1.0))
+    if HUG < 1.0:
+        flat2 = S.reshape(-1, 3)
+        idx = np.nonzero(flat2[:, 2] > chin_mh - 0.02)[0]
+        # HUG_KEEP_EARS (metres, 0 = off): points that near the ear cards keep their place. HUG pulled the ear fur in
+        # with the rest, and the wig's ears turned into bare hulls with tufts beside them (owner 2026-11-15: the ears
+        # must stay where our wig had them, fur included).
+        KEEP_E = float(os.environ.get("HUG_KEEP_EARS", 0.0))
+        if KEEP_E > 0 and ear_pts:
+            from mathutils.kdtree import KDTree as _KDE
+            _ep = (np.concatenate(ear_pts) - pc_) * unit + np.array([mc[0], mc[1], mcrown + 0.004])   # same move as S
+            _kde = _KDE(len(_ep))
+            for _j, _q in enumerate(_ep):
+                _kde.insert(Vector(_q), _j)
+            _kde.balance()
+            _near = np.array([_kde.find(Vector(flat2[i]))[2] < KEEP_E for i in idx])
+            print("HUG ear points kept", int(_near.sum()), flush=True)
+            idx = idx[~_near]
+        moved_h = 0
+        for i in idx:
+            loc, nrm, _, dist = hb_.find_nearest(Vector(flat2[i]), 0.25)
+            if loc is not None and dist > 0.015:
+                fade_ = float(np.clip((flat2[i, 2] - (chin_mh - 0.02)) / 0.05, 0, 1))
+                d2 = 0.015 + (dist - 0.015) * (1 - (1 - HUG) * fade_)
+                flat2[i] = np.array(loc) + (flat2[i] - np.array(loc)) * (d2 / dist)
+                moved_h += 1
+        S = flat2.reshape(S.shape)
+        print("HUG points moved", moved_h, flush=True)
     # Last pass over everything, copies included: the push-out sends a point that sat deep inside the head to the nearest
     # surface, and the head mesh has surfaces inside (eye sockets, mouth), so strands came to lie across the eyes and the
     # nose bridge (seen in Unreal, reports/yuki_ue_v11). Whatever is in front of the face below the brows is cut there.
     cut2 = low_of(S[:, :, 0] - mc[0]) - rng.uniform(0, FV, len(S))[:, None]
-    bad = (np.abs(S[:, :, 0] - mc[0]) < 0.062) & (S[:, :, 1] < mc[1] - 0.015) & (S[:, :, 2] < cut2) & (S[:, :, 2] > chin_mh - 0.03)
+    bad = (np.abs(S[:, :, 0] - mc[0]) < FACE_HALF) & (S[:, :, 1] < mc[1] - 0.015) & (S[:, :, 2] < cut2) & (S[:, :, 2] > chin_mh - 0.03)
     f2 = np.where(bad.any(1), bad.argmax(1), NPTS)
+    swept = np.concatenate([swept, np.zeros(len(S) - len(swept), bool)])      # the fringe copies came after the sweep
+    f2 = np.where(swept, NPTS, f2)
     cut_n = 0
     for i in np.nonzero(f2 < NPTS)[0]:
         k_ = int(f2[i])
         S[i, k_:] = S[i, max(k_ - 1, 0)]
         cut_n += 1
     seg_len = np.linalg.norm(np.diff(S, axis=1), axis=2).sum(1)
-    keep_s = seg_len > 0.012                        # a stub shorter than 12 mm is dropped
+    keep_s = seg_len > float(os.environ.get("STUB", 0.012))     # a stub shorter than this is dropped
     S = S[keep_s]
     print("FACE CLEAN cut", cut_n, "dropped stubs", int((~keep_s).sum()), flush=True)
     # Fringe locks. The cut strands in front of the face are gathered into locks about LOCK_W wide: each strand moves
     # towards its lock's middle more and more towards its tip, and strands at the edge of a lock end sooner, so every
     # lock closes to a point like the concept's.
     LOCK_W = float(os.environ.get("LOCK_W", 0.012))
+    FSWEEP = float(os.environ.get("FRINGE_SWEEP", 0.0))
     seg_ = np.linalg.norm(np.diff(S, axis=1), axis=2)
     npts = (seg_ > 1e-7).sum(1) + 1
     end = S[np.arange(len(S)), npts - 1]
-    fr = (np.abs(end[:, 0] - mc[0]) < 0.066) & (end[:, 1] < mc[1] - 0.015) & (end[:, 2] > chin_mh - 0.03) & (end[:, 2] < brow_z + 0.03) & (npts < NPTS)
+    fr = (np.abs(end[:, 0] - mc[0]) < FACE_HALF + 0.004) & (end[:, 1] < mc[1] - 0.015) & (end[:, 2] > chin_mh - 0.03) & (end[:, 2] < brow_z + 0.03) & (npts < NPTS)
     centres = np.arange(-0.072, 0.0721, LOCK_W) + rng.uniform(-0.3, 0.3, len(np.arange(-0.072, 0.0721, LOCK_W))) * LOCK_W + mc[0]
     styled = 0
     for i in np.nonzero(fr)[0]:
@@ -330,9 +407,75 @@ if os.environ.get("MH_HEAD"):
         tt_ = np.linspace(0, 1, n2)
         wt = np.clip((tt_ - 0.3) / 0.7, 0, 1) ** 1.3
         S[i, :n2, 0] -= (S[i, n2 - 1, 0] - xc) * 0.85 * wt
+        # FRINGE_SWEEP (m): each lock leans away from the middle towards its tip, like the concept's fringe, which
+        # sweeps to both sides from a parting; straight-down locks read as a row of teeth.
+        if abs(xc - mc[0]) > 0.008:
+            S[i, :n2, 0] += np.sign(xc - mc[0]) * FSWEEP * tt_ ** 2
         S[i, n2:] = S[i, n2 - 1]
         styled += 1
     print("FRINGE locks", len(centres), "strands styled", styled, flush=True)
+    # TIDY=1: drop what reads as dirt in front of the face (reports/yuki_ue_v13): a strand that lies across (more
+    # sideways than down) and the short cut tufts at the temples at eye level.
+    if int(os.environ.get("TIDY", 0)):
+        seg_ = np.linalg.norm(np.diff(S, axis=1), axis=2)
+        npts = (seg_ > 1e-7).sum(1) + 1
+        end = S[np.arange(len(S)), npts - 1]
+        ln = seg_.sum(1)
+        dxs, dzs = np.abs(end[:, 0] - S[:, 0, 0]), np.abs(end[:, 2] - S[:, 0, 2])
+        front = (np.abs(end[:, 0] - mc[0]) < FACE_HALF + 0.03) & (end[:, 1] < mc[1] - 0.015) & (end[:, 2] > chin_mh - 0.03) & (end[:, 2] < brow_z + 0.05)
+        across = front & (dxs > 1.2 * dzs) & (dxs > 0.012)
+        tuft = front & (np.abs(end[:, 0] - mc[0]) > 0.035) & (end[:, 2] > brow_z - 0.07) & (end[:, 2] < brow_z + 0.012) & (ln < 0.06)
+        S = S[~(across | tuft)]
+        print("TIDY dropped across", int(across.sum()), "temple tufts", int((tuft & ~across).sum()), flush=True)
+    # CONCEPT_LOCK (strand count, 0 = none): the concept's one long fringe lock, from the parting down across the outer
+    # part of the picture-left eye to the cheek. Cut-and-keep gave a coarse wedge there (v12), so it is built on its own:
+    # a guide curve laid on the face 6 to 9 mm above the skin, and strands round it that close to a point at the tip.
+    NLOCK = int(os.environ.get("CONCEPT_LOCK", 0))
+    if NLOCK:
+        from mathutils.bvhtree import BVHTree as _BVH2
+        hb2 = _BVH2.FromPolygons([Vector(q) for q in M], [tuple(pl.vertices) for pl in mh.data.polygons])
+        ctrl = np.array([(-0.008, 0.058), (-0.026, 0.026), (-0.047, -0.022), (-0.058, -0.070), (-0.066, -0.105)])    # x from the middle, z from the brow line
+        uu = np.linspace(0, 1, NPTS)
+        gx_ = np.interp(uu, np.linspace(0, 1, len(ctrl)), ctrl[:, 0])
+        gz_ = np.interp(uu, np.linspace(0, 1, len(ctrl)), ctrl[:, 1])
+        for _ in range(3):                                          # smooth the polyline into a curve
+            gx_[1:-1], gz_[1:-1] = (gx_[:-2] + 2 * gx_[1:-1] + gx_[2:]) / 4, (gz_[:-2] + 2 * gz_[1:-1] + gz_[2:]) / 4
+        guide = []
+        for x_, z_ in zip(gx_, gz_):
+            hit = hb2.ray_cast(Vector((mc[0] + x_, mc[1] - 0.4, brow_z + z_)), Vector((0, 1, 0)))
+            y_ = hit[0].y if hit[0] is not None else mc[1] - 0.08
+            guide.append((mc[0] + x_, y_, brow_z + z_))
+        guide = np.array(guide)
+        guide[:, 1] = np.minimum.accumulate(guide[:, 1][::-1])[::-1] * 0 + guide[:, 1]
+        ys = guide[:, 1].copy()
+        for _ in range(4):
+            ys[1:-1] = (ys[:-2] + 2 * ys[1:-1] + ys[2:]) / 4
+        guide[:, 1] = np.minimum(ys, guide[:, 1]) - 0.007
+        lock = []
+        taper = (1 - uu) ** 0.7
+        for _ in range(NLOCK):
+            ox, oy = rng.normal(0, 0.0035), abs(rng.normal(0, 0.0015))
+            c_ = guide.copy()
+            c_[:, 0] += ox * taper
+            c_[:, 1] -= oy * taper
+            c_[:, 2] += rng.normal(0, 0.002) * taper
+            # every point stays at least 4 mm in front of the skin at its own place: with one shared depth the
+            # strands at the edge of the lock dipped into the cheek and showed as a chain of dark dots (h3 render)
+            for k_ in range(0, NPTS):
+                hit = hb2.ray_cast(Vector((float(c_[k_, 0]), mc[1] - 0.4, float(c_[k_, 2]))), Vector((0, 1, 0)))
+                if hit[0] is not None:
+                    c_[k_, 1] = min(c_[k_, 1], hit[0].y - 0.004)
+            # the clamp leaves kinks where it starts and ends; they showed as two dark bands across the lock (stills p2).
+            # The depth is smoothed along the strand and may only move away from the skin.
+            ysm = c_[:, 1].copy()
+            for _ in range(6):
+                ysm[1:-1] = (ysm[:-2] + 2 * ysm[1:-1] + ysm[2:]) / 4
+            c_[:, 1] = np.minimum(c_[:, 1], ysm)
+            n_end = NPTS - int(rng.integers(0, 6))
+            c_[n_end:] = c_[n_end - 1]
+            lock.append(c_)
+        S = np.concatenate([S, np.array(lock, dtype=np.float32)])
+        print("CONCEPT LOCK strands", NLOCK, "from", guide[0].round(3).tolist(), "to", guide[-1].round(3).tolist(), flush=True)
     rep["fringe"] = {"brow_z_m": round(brow_z, 4), "strands_trimmed": trimmed, "points_pushed_out": pushed, "face_clean_cut": cut_n, "stubs_dropped": int((~keep_s).sum())}
     print("FRINGE", json.dumps(rep["fringe"]), flush=True)
     rep["fit"] = {"mh_skull_w_d_cm": [round(mw * 100, 1), round(md_ * 100, 1)], "proxy_w_d": [round(pw, 4), round(pd, 4)],
@@ -421,6 +564,27 @@ if unit != 1.0:
     rep["ue_bounds_cm"] = [[round(float(x), 1) for x in (S[:, :, 0].min() * 100, -S[:, :, 1].max() * 100, S[:, :, 2].min() * 100)],
                            [round(float(x), 1) for x in (S[:, :, 0].max() * 100, -S[:, :, 1].min() * 100, S[:, :, 2].max() * 100)]]
     bpy.data.objects.remove(ou)
+    # Two more files for a moving character: strands shorter than LEN_SPLIT (fringe, ear fur, short hair on the head)
+    # and the long ones. In Unreal only the long strands are simulated; the short ones stay fixed on the head. Simulated
+    # together, the short strands scattered and covered the eyes (reports/yuki_dance/sim, 2026-11-14).
+    LEN_SPLIT = float(os.environ.get("LEN_SPLIT", 0.30))
+    slen = np.linalg.norm(np.diff(S, axis=1), axis=2).sum(1)
+    for tag_, sel in (("long", slen >= LEN_SPLIT), ("short", slen < LEN_SPLIT)):
+        Us = U[sel]
+        hs = bpy.data.hair_curves.new("yuki_hair_" + tag_)
+        hs.add_curves([NPTS] * len(Us))
+        hs.position_data.foreach_set("vector", Us.astype(np.float32).reshape(-1))
+        rs = hs.attributes.get("radius") or hs.attributes.new("radius", "FLOAT", "POINT")
+        rs.data.foreach_set("value", np.tile(r0 * 100 * taper, len(Us)).astype(np.float32))
+        os_ = bpy.data.objects.new("yuki_hair_" + tag_, hs)
+        bpy.context.scene.collection.objects.link(os_)
+        bpy.ops.object.select_all(action="DESELECT")
+        os_.select_set(True)
+        bpy.context.view_layer.objects.active = os_
+        bpy.ops.wm.alembic_export(filepath=str(out / f"yuki_hair_{tag_}_ue.abc"), selected=True, start=1, end=1, export_hair=True)
+        bpy.data.objects.remove(os_)
+        rep[tag_ + "_strands"] = int(sel.sum())
+    print("SPLIT long", rep["long_strands"], "short", rep["short_strands"], "at", LEN_SPLIT, "m", flush=True)
 if ear_objs:
     em = bpy.data.materials.new("ear")
     em.use_nodes = True
@@ -442,6 +606,9 @@ if ear_objs:
 (out / "strands.json").write_text(json.dumps(rep, indent=1))
 print("ABC", json.dumps(rep), flush=True)
 
+if os.environ.get("NO_RENDER"):
+    print("DONE (no renders)", out, flush=True)
+    raise SystemExit(0)
 scene = bpy.context.scene
 scene.render.engine = "CYCLES"
 prefs = bpy.context.preferences.addons["cycles"].preferences

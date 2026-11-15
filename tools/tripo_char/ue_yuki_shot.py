@@ -38,6 +38,12 @@ else:
     ch, hair = acts["Yuki_Character"], acts.get("Yuki_Hair")
 face = next(c for c in ch.get_components_by_class(unreal.SkeletalMeshComponent) if c.get_name() == "Face")
 head = face.get_socket_location("FACIAL_C_FacialRoot")
+# HIDE_BONES: bones of the Body component to hide (their geometry collapses), for example the calves under boots of a
+# costume that does not have to fit over the feet. A runtime state: it must be set again in every play session.
+for c in ch.get_components_by_class(unreal.SkeletalMeshComponent):
+    if c.get_name() == "Body":
+        for bn in _A.get("HIDE_BONES", ()):
+            c.hide_bone_by_name(bn, unreal.PhysBodyOp.PBO_NONE)
 hg = list(hair.get_components_by_class(unreal.GroomComponent)) if hair else []
 for g in hg:
     g.set_visibility(STATE != "nohair")
@@ -45,6 +51,10 @@ for g in hg:
 for g in ch.get_components_by_class(unreal.GroomComponent):
     if g.get_name() == "Eyebrows":
         g.set_visibility(_A.get("BROWS", True))
+    elif g.get_name() in _A.get("HIDE_GROOMS", ()):      # a test without one groom (for example "Fuzz")
+        g.set_visibility(False)
+    elif g.get_name() in _A.get("SHOW_GROOMS", ()):
+        g.set_visibility(True)
 # Full detail: a freshly placed MetaHuman rendered in a low LOD through the capture (faceted skull, eye shell showing
 # as a white rim, 2026-11-13). The LODSync component drives every mesh, so it is forced too.
 for c in ch.get_components_by_class(unreal.SkeletalMeshComponent):
@@ -54,7 +64,7 @@ for c in ch.get_components_by_class(unreal.ActorComponent):
         c.set_editor_property("forced_lod", 0)
 a = math.radians(YAW)
 loc = unreal.Vector(head.x + DX + DIST * math.sin(a), head.y + DIST * math.cos(a), head.z + DZ)
-rot = unreal.Rotator(roll=0, pitch=0, yaw=-90 - YAW)
+rot = unreal.Rotator(roll=0, pitch=float(_A.get("PITCH", 0.0)), yaw=-90 - YAW)   # PITCH > 0 looks up (low views)
 # The capture actor Yuki_ShotCam lives in the level: Python cannot spawn an actor into the play world, so the play copy
 # of this one is used there. Run one shot outside play first if the level does not have it yet.
 if PIE:
