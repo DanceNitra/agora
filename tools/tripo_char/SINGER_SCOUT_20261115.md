@@ -3,7 +3,7 @@
 Owner, 2026-11-15: "najdi mi ty zoznam ty 10 najlepsich sprav si deepdajv a hladaj prave starsie veci pretoze tam
 ludia prezivali emotivne veci najlepsie".
 
-Method: 48 YouTube uploads of 37 older live performances, each fetched at 360p and measured with
+Method: 56 YouTube uploads from 36 searches for older live performances, each fetched at 360p and measured with
 `perf_clip_pick.py` (face found, |yaw| and |pitch| under 25 degrees, inner eye distance at least 3 % of the width, no
 shot cut). "Run" is the longest continuous usable stretch. Measurements and contact sheets:
 `reports/yuki_lipsync/scout/` (`scout_summary.json`, `sheet_round1.jpg`, `sheet_round2.jpg`). Private tests only;
