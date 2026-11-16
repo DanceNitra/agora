@@ -115,7 +115,7 @@ def with_editor(what, body):
     """Starts the editor (own PID), waits until it answers, runs body(), closes the editor and drops the lock."""
     LOCK.write_text(f"agora tripo_char: yuki_song_pipeline {a.tag}, Unreal 5.9 editor, {what}, "
                     f"scope=gpu ttl=60m started {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
-    ed = subprocess.Popen([UE_EXE, UPROJECT])
+    ed = subprocess.Popen([UE_EXE, UPROJECT, "-AutoDeclinePackageRecovery"])  # a killed editor leaves a restore prompt that blocks the next start
     print("EDITOR PID", ed.pid, flush=True)
     try:
         ready = "import unreal\nprint('READY', unreal.SystemLibrary.get_engine_version())\n"

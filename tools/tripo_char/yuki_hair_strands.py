@@ -369,6 +369,57 @@ if os.environ.get("MH_HEAD"):
                 moved_h += 1
         S = flat2.reshape(S.shape)
         print("HUG points moved", moved_h, flush=True)
+    # SHELL_MM (mm, 0 = off; not SHELL, which is the system shell variable). Owner 2026-11-15: "tu hlavu ale dotiahni aj zo zadu, ved tam vyzera ako zmorfovana".
+    # Measured with yuki_hair_shell_measure on mh15: 17 to 22 mm of hair over most of the back of the skull, but two
+    # ridges of 36 to 48 mm behind the ears (azimuth 60 to 70 degrees either side of the back, elevation -10 to +40
+    # degrees from the skull centre), which read as a bell. Per direction (7 degree bins round the skull centre, back
+    # half only, so the fringe and the face-framing locks stay) the hair's outer surface, the 95th percentile of the
+    # point distances from the scalp, is brought down to SHELL by scaling every point's distance from the scalp in that
+    # direction: the layers keep their order. The factor is smoothed over neighbouring bins, fades out towards
+    # SHELL_LOW degrees (the nape, where long hair hangs free) and leaves points near the ear cards alone.
+    SHELL = float(os.environ.get("SHELL_MM", 0.0)) / 1000.0
+    if SHELL > 0:
+        flat3 = S.reshape(-1, 3)
+        cc = np.array([mc[0], mc[1], mcrown - 0.095])
+        below = flat3[flat3[:, 2] < chin_mh]
+        bsign = 1.0 if (len(below) and below[:, 1].mean() > cc[1]) else -1.0
+        d3 = flat3 - cc
+        r3 = np.linalg.norm(d3, axis=1)
+        el3 = np.degrees(np.arcsin(np.clip(d3[:, 2] / np.maximum(r3, 1e-9), -1, 1)))
+        az3 = np.degrees(np.arctan2(d3[:, 0], bsign * d3[:, 1]))          # 0 = straight back
+        LOWE = float(os.environ.get("SHELL_LOW", -15.0))
+        sel = np.nonzero((el3 > LOWE - 15) & (np.abs(az3) < 110) & (r3 < 0.3))[0]
+        if ear_pts:
+            from mathutils.kdtree import KDTree as _KDS
+            _ep3 = (np.concatenate(ear_pts) - pc_) * unit + np.array([mc[0], mc[1], mcrown + 0.004])
+            _kds = _KDS(len(_ep3))
+            for _j, _q in enumerate(_ep3):
+                _kds.insert(Vector(_q), _j)
+            _kds.balance()
+            sel = sel[np.array([_kds.find(Vector(flat3[i]))[2] >= 0.02 for i in sel], bool)]
+        locs, offs = np.zeros((len(sel), 3)), np.zeros(len(sel))
+        for n_, i in enumerate(sel):
+            loc, _, _, dist = hb_.find_nearest(Vector(flat3[i]), 0.3)
+            if loc is not None:
+                locs[n_], offs[n_] = loc, dist
+        AZB, ELB = np.arange(-110, 111, 7), np.arange(LOWE - 15, 91, 7)
+        ia = np.clip(np.searchsorted(AZB, az3[sel]) - 1, 0, len(AZB) - 2)
+        ie = np.clip(np.searchsorted(ELB, el3[sel]) - 1, 0, len(ELB) - 2)
+        F = np.ones((len(ELB) - 1, len(AZB) - 1))
+        for a_ in range(len(AZB) - 1):
+            for e_ in range(len(ELB) - 1):
+                m_ = (ia == a_) & (ie == e_) & (offs > 0)
+                if m_.sum() >= 50:
+                    t95 = float(np.percentile(offs[m_], 95))
+                    F[e_, a_] = min(1.0, SHELL / max(t95, 1e-6))
+        Fp = np.pad(F, 1, mode="edge")
+        F = np.array([[Fp[e_:e_ + 3, a_:a_ + 3].mean() for a_ in range(F.shape[1])] for e_ in range(F.shape[0])])
+        w_ = np.clip((el3[sel] - (LOWE - 15)) / 15.0, 0, 1)
+        fac = 1 - w_ * (1 - F[ie, ia])
+        ok_ = offs > 0
+        flat3[sel[ok_]] = locs[ok_] + (flat3[sel[ok_]] - locs[ok_]) * fac[ok_, None]
+        S = flat3.reshape(S.shape)
+        print("SHELL points", int(ok_.sum()), "bins pulled in", int((F < 0.98).sum()), "of", F.size, "smallest factor", round(float(F.min()), 2), flush=True)
     # Last pass over everything, copies included: the push-out sends a point that sat deep inside the head to the nearest
     # surface, and the head mesh has surfaces inside (eye sockets, mouth), so strands came to lie across the eyes and the
     # nose bridge (seen in Unreal, reports/yuki_ue_v11). Whatever is in front of the face below the brows is cut there.
@@ -427,14 +478,24 @@ if os.environ.get("MH_HEAD"):
         tuft = front & (np.abs(end[:, 0] - mc[0]) > 0.035) & (end[:, 2] > brow_z - 0.07) & (end[:, 2] < brow_z + 0.012) & (ln < 0.06)
         S = S[~(across | tuft)]
         print("TIDY dropped across", int(across.sum()), "temple tufts", int((tuft & ~across).sum()), flush=True)
-    # CONCEPT_LOCK (strand count, 0 = none): the concept's one long fringe lock, from the parting down across the outer
-    # part of the picture-left eye to the cheek. Cut-and-keep gave a coarse wedge there (v12), so it is built on its own:
-    # a guide curve laid on the face 6 to 9 mm above the skin, and strands round it that close to a point at the tip.
-    NLOCK = int(os.environ.get("CONCEPT_LOCK", 0))
-    if NLOCK:
-        from mathutils.bvhtree import BVHTree as _BVH2
-        hb2 = _BVH2.FromPolygons([Vector(q) for q in M], [tuple(pl.vertices) for pl in mh.data.polygons])
-        ctrl = np.array([(-0.008, 0.058), (-0.026, 0.026), (-0.047, -0.022), (-0.058, -0.070), (-0.066, -0.105)])    # x from the middle, z from the brow line
+    # Single locks from the concept, each built on its own around a guide curve laid on the face a few mm above the
+    # skin, closing to a point at the tip. Cut-and-keep gave coarse wedges there (v12). ctrl: (x from the middle, -x is
+    # the picture's left; z from the brow line), metres.
+    # - CONCEPT_LOCK (strand count): the long lock from the parting down across the outer part of the picture-left brow
+    #   to the cheek. At 300 strands it read as a striped band (fringe_proposals C, 2026-11-15); it needs the strands of
+    #   a solid ribbon.
+    # - CENTER_LOCK (strand count): the concept's middle wave. Owner 2026-11-15: "ona ma vlnku aj v strede a tu
+    #   ignorujes", and it matters most "lebo ide medzi obocie k nosu a prekryva prave tu cast s moznymi vraskami".
+    #   Read off concept_front.png (interocular distance 320 px = 6.3 cm): a lock about 4 cm wide from the parting, 8 mm
+    #   right of the middle, falling over the forehead and bending to the picture's left, its tip about 1.8 cm left of
+    #   the middle and 8 mm under the brow line, at the inner end of the picture-left brow, by the nose bridge.
+    from mathutils.bvhtree import BVHTree as _BVH2
+    hb2 = _BVH2.FromPolygons([Vector(q) for q in M], [tuple(pl.vertices) for pl in mh.data.polygons])
+
+    def make_lock(name, nlock, ctrl, half_w, lift, flat):
+        """Strands round one guide curve. half_w: half the width at the root (m), shrinking to the tip; flat: True puts
+        the strands side by side across the width (a ribbon), False scatters them round the guide (a round lock)."""
+        ctrl = np.array(ctrl)
         uu = np.linspace(0, 1, NPTS)
         gx_ = np.interp(uu, np.linspace(0, 1, len(ctrl)), ctrl[:, 0])
         gz_ = np.interp(uu, np.linspace(0, 1, len(ctrl)), ctrl[:, 1])
@@ -446,19 +507,25 @@ if os.environ.get("MH_HEAD"):
             y_ = hit[0].y if hit[0] is not None else mc[1] - 0.08
             guide.append((mc[0] + x_, y_, brow_z + z_))
         guide = np.array(guide)
-        guide[:, 1] = np.minimum.accumulate(guide[:, 1][::-1])[::-1] * 0 + guide[:, 1]
         ys = guide[:, 1].copy()
         for _ in range(4):
             ys[1:-1] = (ys[:-2] + 2 * ys[1:-1] + ys[2:]) / 4
-        guide[:, 1] = np.minimum(ys, guide[:, 1]) - 0.007
+        guide[:, 1] = np.minimum(ys, guide[:, 1]) - lift
+        # the width follows the direction across the guide, so a bending lock keeps its width along the bend
+        tx, tz = np.gradient(guide[:, 0]), np.gradient(guide[:, 2])
+        tn = np.maximum(np.hypot(tx, tz), 1e-9)
+        nx_, nz_ = tz / tn, -tx / tn
         lock = []
         taper = (1 - uu) ** 0.7
-        for _ in range(NLOCK):
-            ox, oy = rng.normal(0, 0.0035), abs(rng.normal(0, 0.0015))
+        for _ in range(nlock):
+            if flat:
+                ox, oy = rng.uniform(-1, 1) * half_w, abs(rng.normal(0, 0.0012))
+            else:
+                ox, oy = rng.normal(0, half_w), abs(rng.normal(0, 0.0015))
             c_ = guide.copy()
-            c_[:, 0] += ox * taper
+            c_[:, 0] += ox * taper * nx_
+            c_[:, 2] += ox * taper * nz_ + rng.normal(0, 0.0015) * taper
             c_[:, 1] -= oy * taper
-            c_[:, 2] += rng.normal(0, 0.002) * taper
             # every point stays at least 4 mm in front of the skin at its own place: with one shared depth the
             # strands at the edge of the lock dipped into the cheek and showed as a chain of dark dots (h3 render)
             for k_ in range(0, NPTS):
@@ -474,8 +541,17 @@ if os.environ.get("MH_HEAD"):
             n_end = NPTS - int(rng.integers(0, 6))
             c_[n_end:] = c_[n_end - 1]
             lock.append(c_)
-        S = np.concatenate([S, np.array(lock, dtype=np.float32)])
-        print("CONCEPT LOCK strands", NLOCK, "from", guide[0].round(3).tolist(), "to", guide[-1].round(3).tolist(), flush=True)
+        print(name, "strands", nlock, "from", guide[0].round(3).tolist(), "to", guide[-1].round(3).tolist(), flush=True)
+        return np.array(lock, dtype=np.float32)
+
+    NLOCK = int(os.environ.get("CONCEPT_LOCK", 0))
+    if NLOCK:
+        S = np.concatenate([S, make_lock("CONCEPT LOCK", NLOCK, [(-0.008, 0.058), (-0.026, 0.026), (-0.047, -0.022), (-0.058, -0.070), (-0.066, -0.105)],
+                                         float(os.environ.get("CONCEPT_LOCK_W", 0.0035)), 0.007, int(os.environ.get("CONCEPT_LOCK_FLAT", 0)) == 1)])
+    NCENTER = int(os.environ.get("CENTER_LOCK", 0))
+    if NCENTER:
+        S = np.concatenate([S, make_lock("CENTER LOCK", NCENTER, [(0.008, 0.075), (0.005, 0.055), (0.001, 0.036), (-0.003, 0.020), (-0.008, 0.006), (-0.013, -0.003), (-0.018, -0.008)],
+                                         float(os.environ.get("CENTER_LOCK_W", 0.019)), 0.005, True)])
     rep["fringe"] = {"brow_z_m": round(brow_z, 4), "strands_trimmed": trimmed, "points_pushed_out": pushed, "face_clean_cut": cut_n, "stubs_dropped": int((~keep_s).sum())}
     print("FRINGE", json.dumps(rep["fringe"]), flush=True)
     rep["fit"] = {"mh_skull_w_d_cm": [round(mw * 100, 1), round(md_ * 100, 1)], "proxy_w_d": [round(pw, 4), round(pd, 4)],

@@ -4,6 +4,7 @@ MyProject has bRemoteExecution=True (Config/DefaultEngine.ini). Usage:
     python -I tools/comfy_char/ue_py.py path/to/script.py
 The script runs in the editor's interpreter (import unreal works); its print output comes back here.
 """
+import os
 import sys
 import time
 
@@ -21,7 +22,13 @@ def run_file(path, timeout=20.0):
         nodes = session.remote_nodes
         if not nodes:
             raise SystemExit("no Unreal editor answered on the remote execution multicast group")
-        session.open_command_connection(nodes[0]["node_id"])
+        # Several editors can be open at once (2026-11-15: another session's NitraHrad editor beside MyProject). Run only
+        # in the project asked for (UE_PROJECT, default MyProject), never in the first editor that happens to answer.
+        want = os.environ.get("UE_PROJECT", "MyProject")
+        mine = [n for n in nodes if n.get("project_name") == want or f"/{want.lower()}/" in str(n.get("project_root", "")).replace("\\", "/").lower() + "/"]
+        if not mine:
+            raise SystemExit(f"no {want} editor answered; open editors: {[{k: n.get(k) for k in ('project_name', 'project_root')} for n in nodes]}")
+        session.open_command_connection(mine[0]["node_id"])
         code = open(path, encoding="utf-8").read()
         result = session.run_command(code, unattended=True, exec_mode=rex.MODE_EXEC_FILE)
         for entry in result.get("output", []):
