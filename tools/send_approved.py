@@ -330,7 +330,12 @@ def _new_thread_gate(path, cmd, acked):
 
     words = {w.lower().strip("`(),:") for w in title.split() if len(w) > 4}
     try:
-        raw = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "all",
+        # A repository with issues disabled (most forks) has no issue tracker to search, and
+        # `gh issue list` fails there. Its pull requests are the threads a new one could duplicate.
+        meta = subprocess.run(["gh", "api", "repos/" + repo, "--jq", ".has_issues"], capture_output=True,
+                              text=True, encoding="utf-8", errors="replace", timeout=60)
+        kind = "issue" if meta.stdout.strip() != "false" else "pr"
+        raw = subprocess.run(["gh", kind, "list", "--repo", repo, "--state", "all",
                               "--limit", "60", "--json", "number,title,state,url"],
                              capture_output=True, text=True, encoding="utf-8",
                              errors="replace", timeout=60)
