@@ -365,22 +365,35 @@ def _our_login():
     return _LOGIN[0]
 
 
-def live_match(thread, payload, cache=None):
+def live_match(thread, payload, cache=None, also_repos=()):
     """(id, html_url) of the live text by our account whose body is PAYLOAD byte for byte, or None.
 
     Compared by sha256, with no normalisation: measured 2026-09-28, all six texts that went out
     match their draft.sealed.md exactly, so a looser comparison would only add false positives.
-    Two places can hold a text we sent: a comment on THREAD, and the body of an issue or PR our
-    account opened in the same repository. lantern-outcome-questions is the second kind: its meta
-    thread is a closed PR, and it went out as the new issue Lantern-svg/lantern#2. Raises
-    LiveReadFailed when a read fails.
+    Three places can hold a text we sent: a comment on THREAD, the body of an issue or PR our
+    account opened in the same repository, and the body of a PR we opened in ANOTHER repository.
+    lantern-outcome-questions is the second kind: its meta thread is a closed PR, and it went out
+    as the new issue Lantern-svg/lantern#2.
+
+    ALSO_REPOS carries the third kind. A `kind: pr` text names its destination in meta.json under
+    `creates.repo`, which is usually not the repository its thread lives in: the three UDAH texts
+    had their thread on luoxuejian000/edrn-dmrg-verification#2 and went out as pull requests on
+    luoxuejian000/future-agi and luoxuejian000/traceai-udah-scorer-poc. Without those repositories
+    this function looked only where they were not, found nothing, and `_stage` reported "5 owner"
+    for all three although two were already MERGED. Measured 2026-11-20, after the owner approved
+    one of them a second time and the duplicate gate was the only thing that stopped the post.
+    GitHub's issues endpoint lists pull requests too, so the same path serves both.
+
+    Raises LiveReadFailed when a read fails.
     """
     repo, num = _thread_parts(thread)
     want = hashlib.sha256(payload).hexdigest()
     me = _our_login()
     cache = {} if cache is None else cache
-    for path in ("repos/%s/issues/%s/comments" % (repo, num),
-                 "repos/%s/issues?creator=%s&state=all" % (repo, me)):
+    paths = ["repos/%s/issues/%s/comments" % (repo, num)]
+    for r in [repo] + [x for x in also_repos if x and x != repo]:
+        paths.append("repos/%s/issues?creator=%s&state=all" % (r, me))
+    for path in paths:
         if path not in cache:
             cache[path] = _gh_list(path)
         for cid, url, login, body in cache[path]:
@@ -453,7 +466,8 @@ def _stage(slug, cache=None):
             payload = fh.read()
         sha = hashlib.sha256(payload).hexdigest()
         try:
-            hit = live_match(meta["thread"], payload, cache)
+            hit = live_match(meta["thread"], payload, cache,
+                             also_repos=[(meta.get("creates") or {}).get("repo")])
         except LiveReadFailed as ex:
             return "? gh failed", "do not post; re-run status when gh can read %s (%s)" % (
                 meta["thread"], ex)
