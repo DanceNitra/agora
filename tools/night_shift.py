@@ -29,6 +29,7 @@ ENV = os.path.join(ROOT, "server", ".env")
 MODEL = "claude-opus-5-5"
 # USD per million tokens, Claude Opus 5.5 (claude-api skill shared/models.md, 2026-10-18).
 PRICE_IN, PRICE_OUT = 4.0, 20.0
+CACHE_WRITE, CACHE_READ = 1.25, 0.05   # multiples of PRICE_IN for prompt-cache tokens
 # Hard stop. The monthly credit for Max 20x is 200 USD; the night shift may use 30 percent of it.
 CAP_USD = 60.0
 
@@ -64,13 +65,19 @@ def call(client, system, user, max_tokens=16000, label=""):
         messages=[{"role": "user", "content": user}],
     )
     u = resp.usage
-    usd = (u.input_tokens * PRICE_IN + u.output_tokens * PRICE_OUT) / 1e6
+    read = u.cache_read_input_tokens or 0
+    wrote = u.cache_creation_input_tokens or 0
+    # input_tokens counts only the uncached part. A 5-minute cache write costs 1.25x the input
+    # price, a cache read 0.05x on Opus 5.5 (USD 0.20 per million, claude-api skill 2026-11-20).
+    usd = ((u.input_tokens + CACHE_WRITE * wrote + CACHE_READ * read) * PRICE_IN
+           + u.output_tokens * PRICE_OUT) / 1e6
     os.makedirs(OUT, exist_ok=True)
     with io.open(LEDGER, "a", encoding="utf-8") as f:
         f.write(json.dumps({
             "ts": datetime.datetime.now().isoformat(timespec="seconds"),
             "label": label, "model": MODEL,
             "input_tokens": u.input_tokens, "output_tokens": u.output_tokens,
+            "cache_read_tokens": read, "cache_write_tokens": wrote,
             "usd": round(usd, 6), "stop": resp.stop_reason,
         }) + "\n")
     text = "".join(b.text for b in resp.content if b.type == "text")
@@ -144,8 +151,13 @@ def triage_threads(context_path):
         if "status OK" not in head:
             rows.append((name[:-4], "UNSURE", "thread file is not marked OK: " + head))
             continue
-        user = "HANDOFF NOTES (complete):\n%s\n\n=====\nTHREAD (complete):\n%s" % (context, thread)
-        assert context in user and thread in user  # nothing was cut on the way in
+        # The handoff notes are the same for every thread, so they go first under a cache
+        # marker and every thread after the first reads them from the prompt cache.
+        notes = "HANDOFF NOTES (complete):\n%s\n\n=====\n" % context
+        body = "THREAD (complete):\n%s" % thread
+        assert context in notes and thread in body  # nothing was cut on the way in
+        user = [{"type": "text", "text": notes, "cache_control": {"type": "ephemeral"}},
+                {"type": "text", "text": body}]
         text, usd, stop = call(client, THREAD_SYSTEM, user, max_tokens=16000, label="thread " + name[:-4])
         verdict = re.search(r"VERDICT:\s*(\w+)", text)
         if stop != "end_turn" or not verdict:

@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Yuki</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden;
+               font: 12px "Segoe UI", sans-serif; user-select: none; }
+  #stage { position: fixed; inset: 0; }
+  /* The whole window is a drag handle: the frameless window moves when you drag Yuki. */
+  #drag { position: fixed; inset: 0; }
+  #status { position: fixed; left: 8px; right: 8px; bottom: 8px; color: #dff6ff;
+            text-shadow: 0 0 3px #000, 0 0 6px #000; white-space: pre-wrap; line-height: 1.35; }
+  #level { position: fixed; left: 50%; bottom: 2px; height: 4px; width: 0; transform: translateX(-50%);
+           background: #66e6ff; border-radius: 2px; transition: width 60ms linear; }
+</style>
+<script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="drag" class="pywebview-drag-region"></div>
+<div id="status">Loading...</div>
+<div id="level"></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 1);   // black, like the hologram box
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000);
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2, 3, 4); scene.add(key);
+const rim = new THREE.DirectionalLight(0x8cd9ff, 1.4); rim.position.set(-2, 2, -4); scene.add(rim);
+
+let mixer = null, actions = {}, current = null;
+const clock = new THREE.Clock();
+
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize); resize();
+
+new GLTFLoader().load('nova.glb', (gltf) => {
+  const root = gltf.scene;
+  scene.add(root);
+  root.updateMatrixWorld(true);
+  // A skinned mesh is drawn where its bones are, so frame the camera from the bones.
+  const box = new THREE.Box3();
+  root.traverse((o) => { if (o.isBone) box.expandByPoint(o.getWorldPosition(new THREE.Vector3())); });
+  if (box.isEmpty()) box.setFromObject(root);
+  const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+  const h = size.y * 1.12;
+  const dist = h / (2 * Math.tan(THREE.MathUtils.degToRad(15)));
+  camera.position.set(center.x, center.y, center.z + dist);
+  camera.near = dist / 50; camera.far = dist * 50; camera.updateProjectionMatrix();
+  camera.lookAt(center);
+
+  mixer = new THREE.AnimationMixer(root);
+  for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
+  window.yuki.play('idle1');
+  window.yuki.status('Say "Yuki" and talk to me.');
+  if (window.pywebview) window.pywebview.api.ready(Object.keys(actions));
+}, undefined, (err) => { document.getElementById('status').textContent = 'Could not load nova.glb: ' + err; });
+
+window.yuki = {
+  play(name, speed = 1) {
+    const next = actions[name];
+    if (!next) return false;
+    next.timeScale = speed;
+    if (next === current) return true;
+    next.reset().setLoop(THREE.LoopRepeat, Infinity).fadeIn(0.25).play();
+    if (current) current.fadeOut(0.25);
+    current = next;
+    return true;
+  },
+  status(text) { document.getElementById('status').textContent = text; },
+  level(v) { document.getElementById('level').style.width = Math.round(Math.max(0, Math.min(1, v)) * 60) + '%'; },
+  hideStatus(hidden) { document.getElementById('status').style.display = hidden ? 'none' : 'block'; },
+};
+
+renderer.setAnimationLoop(() => {
+  if (mixer) mixer.update(clock.getDelta());
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
