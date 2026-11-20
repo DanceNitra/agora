@@ -1,0 +1,4 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-C3-ctl,1,C3-ctl-s0,"[{""role"": ""user"", ""content"": ""Translate: \""The quick brown fox jumps over the lazy dog.\""""}]","[{""role"": ""assistant"", ""content"": ""\""敏捷的棕色狐狸跳过了懒惰的狗。\"" Classic pangram.""}]",,,0,1,92,1.0,0.5893,0.0,0.6357
+case-C3-ctl,2,C3-ctl-s1,"[{""role"": ""user"", ""content"": ""Sure?""}]","[{""role"": ""assistant"", ""content"": ""\""敏捷的棕色狐狸跳过了懒惰的狗。\"" is correct. \""跃过\"" is an equally correct alternative for \""jumps over\"".""}]",,,2,3,92,1.0,0.4141,0.0,0.5656
+case-C3-ctl,3,C3-ctl-s2,"[{""role"": ""user"", ""content"": ""Just use your first version.""}]","[{""role"": ""assistant"", ""content"": ""OK, \""敏捷的棕色狐狸跳过了懒惰的狗。\""""}]",,,4,5,50,1.0,0.3464,0.0,0.5386

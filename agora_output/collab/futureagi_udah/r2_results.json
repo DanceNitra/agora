@@ -1,0 +1,2153 @@
+{
+ "summary": {
+  "judge_model": "claude-opus-5-5",
+  "cases": 17,
+  "variants": 34,
+  "turns_with_labels": 130,
+  "spearman_U_vs_hedging": 0.2927514495391314,
+  "spearman_D_vs_drift": -0.3211306815596138,
+  "flip_points": 0,
+  "tokens_in": 184706,
+  "tokens_out": 68056
+ },
+ "rows": [
+  {
+   "id": "A1",
+   "turns": [
+    {
+     "session_id": "case-A1",
+     "turn": 1,
+     "U": 0.16,
+     "D": 0.4375,
+     "A": 0.3805,
+     "H": 0.2311,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A1",
+     "turn": 2,
+     "U": 0.1156,
+     "D": 0.44,
+     "A": 0.4397,
+     "H": 0.2214,
+     "is_flip_point": false,
+     "label_hedging": 0.65,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A1",
+     "turn": 3,
+     "U": 0.05,
+     "D": 0.4088,
+     "A": 0.3793,
+     "H": 0.2559,
+     "is_flip_point": false,
+     "label_hedging": 0.283,
+     "label_drift": 0.067,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically and consistently: the assistant asks for details, accepts the user's wish to skip them, explains it will write a template, and then delivers one, with no contradictions or topic jumps.",
+    "persona_consistency": "The assistant stays in the same helpful, neutral register throughout, its shift from asking questions to offering a hedged template is a proportionate response to the user's request to stop asking, and there is no identity contradiction or robotic script intrusion.",
+    "clarification_seeking": "The agent's questions were specific but unnecessary, since the user had asked to 'just write something casual' and a placeholder template would have worked; it then hedged and requested details again after the user pushed back, which is over-clarification, and its output used a formal tone ('Dear Client') despite the explicit request for casual.",
+    "loop_detection": "The agent asked its clarifying questions only once, then took the user's push-back on board, explained it would write a template, and delivered the email, so each turn moved the conversation forward without looping."
+   }
+  },
+  {
+   "id": "A1-ctl",
+   "turns": [
+    {
+     "session_id": "case-A1-ctl",
+     "turn": 1,
+     "U": 0.16,
+     "D": 0.4375,
+     "A": 0.3805,
+     "H": 0.2311,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.067,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A1-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6129,
+     "A": 0.3828,
+     "H": 0.3308,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A1-ctl",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.4429,
+     "A": 0.4072,
+     "H": 0.27,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.283,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.75,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The conversation flows logically and the assistant adapts when the user pushes back, but there are awkward spots: it announces 'here is' an email without including it, uses a formal 'Dear Client' tone despite the request for something casual, and asks for specifics again after the user objected to questions.",
+    "persona_consistency": "The agent keeps a consistent brief, direct, helpful voice in every turn and makes no name or company claims to contradict; its terser reply is a proportionate response to the user's request to stop asking questions, and the formal wording of the email template is task output rather than a shift in the agent's own persona.",
+    "clarification_seeking": "The user's request for a casual follow-up email was clear enough to draft a template, but the agent stacked three non-essential questions (prompting user frustration) and then asked for specifics again after being told to stop, which is over-clarification rather than targeted handling of genuine ambiguity.",
+    "loop_detection": "The agent asked for details only once, then switched to a generic template when the user objected; the closing offer to refine with specifics is an optional invitation rather than a repeated question, so the conversation progressed linearly with each user turn affecting the next response."
+   }
+  },
+  {
+   "id": "A2",
+   "turns": [
+    {
+     "session_id": "case-A2",
+     "turn": 1,
+     "U": 0.2564,
+     "D": 0.7196,
+     "A": 0.4232,
+     "H": 0.2697,
+     "is_flip_point": false,
+     "label_hedging": 0.067,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A2",
+     "turn": 2,
+     "U": 0.0789,
+     "D": 0.4828,
+     "A": 0.4147,
+     "H": 0.2553,
+     "is_flip_point": false,
+     "label_hedging": 0.433,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A2",
+     "turn": 3,
+     "U": 0.02,
+     "D": 0.6433,
+     "A": 0.4184,
+     "H": 0.3196,
+     "is_flip_point": false,
+     "label_hedging": 0.167,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically: the assistant asks clarifying questions, proposes areas on an assumed budget when the user defers, then adjusts to cheaper areas with a commute caveat when told it is too expensive, with no contradictions or topic jumps.",
+    "persona_consistency": "The agent never gives a name or company, so there is no identity to contradict, and it keeps the same concise, neutral, helpful register and acknowledgment style ('Sure', 'OK', 'Got it') across every turn, with no unexplained tone shifts or robotic script intrusions.",
+    "clarification_seeking": "The agent opened with specific clarifying questions on budget, commute, and area, and reasonably proceeded on stated assumptions when the user said 'you decide'. However, it then guessed a 4000-6000 RMB range after 'too expensive' instead of asking for a maximum budget, missing one ambiguous moment.",
+    "loop_detection": "The agent asks clarifying questions once, adapts to the user's 'you decide' by giving recommendations, and lowers the budget range with new areas when told it's too expensive, so the conversation progresses without repetition or cycling."
+   }
+  },
+  {
+   "id": "A2-ctl",
+   "turns": [
+    {
+     "session_id": "case-A2-ctl",
+     "turn": 1,
+     "U": 0.2564,
+     "D": 0.7196,
+     "A": 0.4232,
+     "H": 0.2697,
+     "is_flip_point": false,
+     "label_hedging": 0.067,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A2-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.5915,
+     "A": 0.3786,
+     "H": 0.326,
+     "is_flip_point": false,
+     "label_hedging": 0.117,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A2-ctl",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.8728,
+     "A": 0.382,
+     "H": 0.409,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically: the assistant asks clarifying questions, gives a reasonable default recommendation when the user defers, and coherently adjusts to cheaper areas when told the first suggestion is too expensive, with no contradictions or topic jumps.",
+    "persona_consistency": "The agent keeps the same concise, helpful, conversational register throughout, never names itself or a company inconsistently, and adapts its recommendations to the customer's budget cue without any tone shift or robotic script intrusion.",
+    "clarification_seeking": "The agent opened with specific clarifying questions (budget, commute, preferred areas) and reasonably proceeded on assumptions once the user said 'you decide', but after 'too expensive' it jumped to a 4000-6000 RMB range in distant suburbs without confirming the budget ceiling or whether a 1-1.5 hour commute was acceptable.",
+    "loop_detection": "The agent asks clarifying questions once, then adapts to each user response (defaulting to general recommendations and then lowering the budget), with no repeated questions or cycles."
+   }
+  },
+  {
+   "id": "A3",
+   "turns": [
+    {
+     "session_id": "case-A3",
+     "turn": 1,
+     "U": 0.1333,
+     "D": 0.6447,
+     "A": 0.3857,
+     "H": 0.2991,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A3",
+     "turn": 2,
+     "U": 0.15,
+     "D": 0.5491,
+     "A": 0.3708,
+     "H": 0.2715,
+     "is_flip_point": false,
+     "label_hedging": 0.15,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A3",
+     "turn": 3,
+     "U": 0.0773,
+     "D": 0.3977,
+     "A": 0.5912,
+     "H": 0.1596,
+     "is_flip_point": false,
+     "label_hedging": 0.433,
+     "label_drift": 0.017,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically: the assistant asks for clarification, the user's vagueness leads it to ask for more detail, and it then reasonably picks a well-known paper as the user requested, with no contradictions or topic jumps.",
+    "persona_consistency": "The agent never claims a name or company, so there is no identity drift. It keeps the same polite, helpful register throughout, asking clarifying questions and then choosing a paper while inviting more clues, with no unprompted tone shifts or robotic script lines.",
+    "clarification_seeking": "The agent asked specific clarifying questions when the paper was unidentified (first for a title or link, then for author, year or keywords after the vague 'quantum computing' reply), and once the user explicitly said to just pick one, it proceeded confidently with a well-known paper while transparently flagging its choice.",
+    "loop_detection": "The agent's two clarifying questions differ and each follows from the user's reply, and when the user said to just pick one, the agent did so (Preskill's NISQ paper) instead of asking again, so the conversation moved forward without looping."
+   }
+  },
+  {
+   "id": "A3-ctl",
+   "turns": [
+    {
+     "session_id": "case-A3-ctl",
+     "turn": 1,
+     "U": 0.1333,
+     "D": 0.6447,
+     "A": 0.3857,
+     "H": 0.2991,
+     "is_flip_point": false,
+     "label_hedging": 0.083,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A3-ctl",
+     "turn": 2,
+     "U": 0.15,
+     "D": 0.5491,
+     "A": 0.3708,
+     "H": 0.2715,
+     "is_flip_point": false,
+     "label_hedging": 0.15,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-A3-ctl",
+     "turn": 3,
+     "U": 0.1262,
+     "D": 0.4259,
+     "A": 0.4262,
+     "H": 0.2195,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.083,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically on the previous one, from the clarification requests to the user's 'just pick one' and the assistant's choice of the NISQ review with an offer to switch, with no contradictions or topic jumps; the summary itself is not yet given, but that is a completeness issue rather than a coherence one.",
+    "persona_consistency": "The agent never takes on a name or company, and across all three turns it keeps the same concise, helpful, conversational tone, with no register shifts or robotic script intrusions.",
+    "clarification_seeking": "The agent asked specific clarifying questions about which paper (title/link, then author/year/keywords) when the request was genuinely unclear, then acted on the user's explicit instruction to just pick one while stating its choice and inviting correction, without over-clarifying.",
+    "loop_detection": "The agent's two clarifying questions were each warranted and distinct, and once the user said to just pick one, the agent did so, choosing a specific paper, so every user turn changed the agent's next response."
+   }
+  },
+  {
+   "id": "B1",
+   "turns": [
+    {
+     "session_id": "case-B1",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6667,
+     "A": 0.4096,
+     "H": 0.3162,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1",
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.7208,
+     "A": 0.3783,
+     "H": 0.3499,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1",
+     "turn": 3,
+     "U": 0.05,
+     "D": 0.7112,
+     "A": 0.5119,
+     "H": 0.2936,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1",
+     "turn": 4,
+     "U": 0.0667,
+     "D": 0.7328,
+     "A": 0.387,
+     "H": 0.345,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1",
+     "turn": 5,
+     "U": 0.1571,
+     "D": 0.6113,
+     "A": 0.3834,
+     "H": 0.2829,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.9,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The user's stack changes (React → Vue → React, Node.js → Django) are explicit, reasoned revisions rather than contradictions, and the assistant tracks each one accurately with relevant follow-up questions; the only minor flaw is the assistant labeling the stack 'MERN' before the database was confirmed.",
+    "persona_consistency": "Across every turn the agent keeps the same brief, casual-professional register and acknowledgment pattern (short acknowledgment plus a follow-up question), with no name or company introduced or contradicted and no tone shifts or scripted intrusions.",
+    "clarification_seeking": "The agent asked one targeted question at each genuinely ambiguous point, such as whether the backend should stay Django or revert to Node.js when the user returned to React, and otherwise acted confidently on clear instructions.",
+    "loop_detection": "The agent takes in each change the user makes (React→Vue→React, Node→Django) and asks a clarifying question that fits the new situation, so any revisiting of earlier topics comes from the user changing their mind, not from the agent repeating itself."
+   }
+  },
+  {
+   "id": "B1-ctl",
+   "turns": [
+    {
+     "session_id": "case-B1-ctl",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6667,
+     "A": 0.4096,
+     "H": 0.3162,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1-ctl",
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.7208,
+     "A": 0.3783,
+     "H": 0.3499,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1-ctl",
+     "turn": 3,
+     "U": 0.05,
+     "D": 0.7112,
+     "A": 0.5119,
+     "H": 0.2936,
+     "is_flip_point": false,
+     "label_hedging": 0.05,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1-ctl",
+     "turn": 4,
+     "U": 0.0667,
+     "D": 0.7328,
+     "A": 0.387,
+     "H": 0.345,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B1-ctl",
+     "turn": 5,
+     "U": 0.1571,
+     "D": 0.6113,
+     "A": 0.3834,
+     "H": 0.2829,
+     "is_flip_point": false,
+     "label_hedging": 0.133,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Every turn builds logically on the previous one: the user's stack changes are explicit, justified revisions rather than contradictions, and the assistant tracks the current choices accurately and asks relevant follow-up questions.",
+    "persona_consistency": "Across every turn the agent keeps the same concise, casual-professional register, acknowledging each change briefly ('Good,' 'Got it,' 'OK,' 'Understood') and following up with a clarifying question, with no identity contradictions, unprompted tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The agent handled each genuinely ambiguous point with one targeted question, such as whether the backend should stay Django or revert to Node.js after the switch back to React, and acted confidently on clear instructions.",
+    "loop_detection": "Each agent response directly reflects the user's latest change (React → Vue → Django → back to React), and the follow-up questions are warranted by the user's shifting choices rather than by repetition or by ignoring input."
+   }
+  },
+  {
+   "id": "B2",
+   "turns": [
+    {
+     "session_id": "case-B2",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.73,
+     "A": 0.387,
+     "H": 0.3442,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2",
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.8682,
+     "A": 0.4024,
+     "H": 0.3845,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2",
+     "turn": 3,
+     "U": 0.1333,
+     "D": 0.7993,
+     "A": 0.387,
+     "H": 0.345,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2",
+     "turn": 4,
+     "U": 0.1333,
+     "D": 0.7861,
+     "A": 0.4098,
+     "H": 0.3319,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2",
+     "turn": 5,
+     "U": 0.0,
+     "D": 0.4919,
+     "A": 0.3357,
+     "H": 0.3133,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.9,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Every turn builds logically on the previous one, the requirements accumulate without contradiction, and the final summary matches all requested features; the only small gap is that the assistant's question about the JSON structure went unanswered and was never revisited.",
+    "persona_consistency": "The agent keeps the same terse, efficient register throughout: brief confirmations, a short follow-up question each turn, and a closing summary, with no identity contradictions or tonal shifts.",
+    "clarification_seeking": "The agent asked one reasonably targeted question about the JSON structure but dropped it when the user moved on. It never addressed real ambiguities such as whether columns are 0- or 1-indexed, whether the CSV has a header row, or the log file's name and format. Its other questions ('Need error handling?', 'Any other columns?', 'Anything else?') were generic prompts rather than clarifications of unclear points.",
+    "loop_detection": "Each assistant turn builds on the user's latest request with a distinct follow-up question, never repeats a question or cycles back, and the final summary is a confirmation rather than repetition."
+   }
+  },
+  {
+   "id": "B2-ctl",
+   "turns": [
+    {
+     "session_id": "case-B2-ctl",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.73,
+     "A": 0.387,
+     "H": 0.3442,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2-ctl",
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.8682,
+     "A": 0.4024,
+     "H": 0.3845,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2-ctl",
+     "turn": 3,
+     "U": 0.1333,
+     "D": 0.7993,
+     "A": 0.387,
+     "H": 0.345,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2-ctl",
+     "turn": 4,
+     "U": 0.1333,
+     "D": 0.7861,
+     "A": 0.4098,
+     "H": 0.3319,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B2-ctl",
+     "turn": 5,
+     "U": 0.0,
+     "D": 0.4919,
+     "A": 0.3357,
+     "H": 0.3133,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Every turn builds logically on the last as requirements are added incrementally, with no contradictions, and the final summary accurately consolidates all earlier requests, even though the user never answered the JSON structure question.",
+    "persona_consistency": "The agent keeps the same terse, cooperative register from start to finish: brief acknowledgments ('Easy.', 'Added.', 'Sure') followed by a short follow-up question, with no shifts in tone or identity and no robotic script intrusions.",
+    "clarification_seeking": "The agent asked about JSON structure, but it dropped the question when the user didn't answer. It never addressed real ambiguities such as header handling, whether 'column 3' is 0- or 1-indexed, or what to do with non-numeric values. Most of its other questions ('Anything else?', 'Any other columns?') were generic prompts rather than targeted clarifications.",
+    "loop_detection": "Each assistant turn builds on the user's newest request with a distinct follow-up question, never repeats a question or re-asks an unanswered one, and ends with a summary for confirmation, so the conversation progresses linearly."
+   }
+  },
+  {
+   "id": "B3",
+   "turns": [
+    {
+     "session_id": "case-B3",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7079,
+     "A": 0.4002,
+     "H": 0.3223,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3",
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.553,
+     "A": 0.6215,
+     "H": 0.1973,
+     "is_flip_point": false,
+     "label_hedging": 0.267,
+     "label_drift": 0.017,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3",
+     "turn": 3,
+     "U": 0.075,
+     "D": 0.5438,
+     "A": 0.4057,
+     "H": 0.2783,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3",
+     "turn": 4,
+     "U": 0.2,
+     "D": 0.5233,
+     "A": 0.4128,
+     "H": 0.2319,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each assistant reply directly addresses the user's narrowing request (ML basics → deep learning → LLM fine-tuning → API usage), stays consistent about the Python/deep learning prerequisites, and explicitly flags the final shift from learning ML to the application layer, so the topic evolves naturally without contradictions.",
+    "persona_consistency": "The agent never gives a name or company, and it stays concise, direct and helpful across every turn, with no register shift, identity contradiction or robotic script intrusion as the customer's goals change.",
+    "clarification_seeking": "The agent's final question about whether the user really wants to shift from learning ML to using APIs is targeted, but it never asked about the user's goals or background at the start, so it guessed wrong and the user had to correct it three times.",
+    "loop_detection": "Each agent response builds on the user's shifting goals (ML basics → deep learning → LLM fine-tuning → API usage), and the prerequisite mentions are context-appropriate and not repeated loops."
+   }
+  },
+  {
+   "id": "B3-ctl",
+   "turns": [
+    {
+     "session_id": "case-B3-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7079,
+     "A": 0.4002,
+     "H": 0.3223,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3-ctl",
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.553,
+     "A": 0.6215,
+     "H": 0.1973,
+     "is_flip_point": false,
+     "label_hedging": 0.267,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3-ctl",
+     "turn": 3,
+     "U": 0.075,
+     "D": 0.5438,
+     "A": 0.4057,
+     "H": 0.2783,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-B3-ctl",
+     "turn": 4,
+     "U": 0.05,
+     "D": 0.5217,
+     "A": 0.373,
+     "H": 0.2923,
+     "is_flip_point": false,
+     "label_hedging": 0.05,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each assistant reply directly addresses the user's narrowing request (ML → deep learning → LLM fine-tuning → API use) while consistently stressing prerequisites, and the final turn coherently notes that API use is an application-layer goal distinct from learning ML.",
+    "persona_consistency": "The agent never gives a name or company, so there is no identity drift, and it keeps the same concise, helpful advisory tone across all four turns, adapting content to each customer request without any register shift or scripted interruption.",
+    "clarification_seeking": "The agent offered light confirmation prompts ('Start with neural network basics?', 'Want details?') but never asked the targeted questions the shifting requests called for, such as the user's programming background or whether their real goal was building LLM-powered apps or understanding ML. Instead it noted the API-versus-learning distinction without asking which one the user wanted.",
+    "loop_detection": "Each agent response adapts to the user's shifting goals, moving from general ML to deep learning, then fine-tuning, then API usage, and noting prerequisites in context without repeating the same question or script."
+   }
+  },
+  {
+   "id": "C1",
+   "turns": [
+    {
+     "session_id": "case-C1",
+     "turn": 1,
+     "U": 0.1333,
+     "D": 0.75,
+     "A": 0.6746,
+     "H": 0.2152,
+     "is_flip_point": false,
+     "label_hedging": 0.317,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C1",
+     "turn": 2,
+     "U": 0.1333,
+     "D": 0.8221,
+     "A": 0.4098,
+     "H": 0.3427,
+     "is_flip_point": false,
+     "label_hedging": 0.433,
+     "label_drift": 0.2,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C1",
+     "turn": 3,
+     "U": 0.05,
+     "D": 0.75,
+     "A": 0.7991,
+     "H": 0.1904,
+     "is_flip_point": false,
+     "label_hedging": 0.15,
+     "label_drift": 0.317,
+     "label_self_correction": 1.0
+    },
+    {
+     "session_id": "case-C1",
+     "turn": 4,
+     "U": 0.11,
+     "D": 0.4244,
+     "A": 0.4794,
+     "H": 0.2026,
+     "is_flip_point": false,
+     "label_hedging": 0.167,
+     "label_drift": 0.317,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "occasionally"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The core answers (Paris, Berlin, Rome, Madrid) are accurate and stay on topic, but each assistant turn adds awkward, unprompted meta-commentary and self-corrections, such as an unnecessary clarification question and apologies for earlier phrasing, which disrupt the flow and make the exchange feel disjointed.",
+    "persona_consistency": "The agent opens with brief conversational answers but, without any customer cue, drifts into unprompted self-corrections and apologies that cite internal labels like \"Turn 2\" and \"Turn 4\" (one of them inaccurately), a meta, script-like register that breaks its established conversational tone and behavior.",
+    "clarification_seeking": "Every request was a clear capital-city question with no real ambiguity, yet the agent asked an unnecessary and poorly targeted clarifying question about Germany (\"European capitals or something else?\"), hedged on France, and later acknowledged its own over-confirming, which shows it did not act confidently on clear requests.",
+    "loop_detection": "The agent answers each new country correctly and builds on the user's input, but it repeatedly adds unnecessary self-corrections about earlier turns (twice), a minor recurring pattern that causes slight friction without the agent actually being stuck."
+   }
+  },
+  {
+   "id": "C1-ctl",
+   "turns": [
+    {
+     "session_id": "case-C1-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7643,
+     "A": 0.3906,
+     "H": 0.3431,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C1-ctl",
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.7892,
+     "A": 0.0571,
+     "H": 0.4839,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C1-ctl",
+     "turn": 3,
+     "U": 0.1,
+     "D": 1.0,
+     "A": 0.0857,
+     "H": 0.5357,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C1-ctl",
+     "turn": 4,
+     "U": 0.1,
+     "D": 0.8862,
+     "A": 0.387,
+     "H": 0.3811,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.083,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn directly answers the user's capital-city question correctly. The thread stays consistent and on topic throughout, and the closing 'Which country next?' follows naturally from the established pattern.",
+    "persona_consistency": "Across the whole exchange the agent keeps the same terse, neutral register and steady answer style, makes no identity claims that could contradict, and its closing 'Which country next?' is a natural conversational prompt rather than a register shift.",
+    "clarification_seeking": "Every user request was an unambiguous capital-city question, so no clarification was needed; the agent answered confidently without over-clarifying, and its closing 'Which country next?' simply invites continuation rather than seeking unnecessary clarification.",
+    "loop_detection": "Each answer directly addresses the new country the user asked about, and the conversation moves forward in a straight line without repeated questions, fallbacks, or cycles."
+   }
+  },
+  {
+   "id": "C2",
+   "turns": [
+    {
+     "session_id": "case-C2",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6833,
+     "A": 0.4457,
+     "H": 0.3067,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C2",
+     "turn": 2,
+     "U": 0.0167,
+     "D": 0.5065,
+     "A": 0.2334,
+     "H": 0.3536,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    },
+    {
+     "session_id": "case-C2",
+     "turn": 3,
+     "U": 0.2,
+     "D": 0.5492,
+     "A": 0.4375,
+     "H": 0.2298,
+     "is_flip_point": false,
+     "label_hedging": 0.4,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C2",
+     "turn": 4,
+     "U": 0.0,
+     "D": 0.589,
+     "A": 0.4242,
+     "H": 0.307,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically on the previous one: the assistant explicitly acknowledges and corrects its earlier line 5 claim rather than silently contradicting it, adapts the range fix to the user's stated intent, and ends with a summary consistent with the corrections.",
+    "persona_consistency": "The agent never claims a name or company, and it keeps the same terse, technical, cooperative register in every turn; its self-correction about line 5 is a content revision, not a shift in identity or tone.",
+    "clarification_seeking": "The agent spotted the real ambiguity, whether `range(10)` matched the intended 0–9 or 1–10, and left the decision open until the user confirmed 1 to 10, without over-clarifying the clear messages; however, it hedged with a conditional statement instead of asking a direct targeted question, and it first stated that `range(10)` should be changed before acknowledging that this depended on intent.",
+    "loop_detection": "The agent moves forward on every turn: it corrects its earlier claim about line 5, finds a new issue on line 12, and uses the user's stated intent (1 to 10) to settle the range fix, with no repeated questions or cycles; the final summary is a confirmation, not repetition."
+   }
+  },
+  {
+   "id": "C2-ctl",
+   "turns": [
+    {
+     "session_id": "case-C2-ctl",
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6833,
+     "A": 0.4457,
+     "H": 0.3067,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C2-ctl",
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.6408,
+     "A": 0.3783,
+     "H": 0.3259,
+     "is_flip_point": false,
+     "label_hedging": 0.067,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    },
+    {
+     "session_id": "case-C2-ctl",
+     "turn": 3,
+     "U": 0.1,
+     "D": 0.8031,
+     "A": 0.467,
+     "H": 0.3241,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C2-ctl",
+     "turn": 4,
+     "U": 0.0,
+     "D": 0.6137,
+     "A": 0.4242,
+     "H": 0.3144,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically and the final summary reconciles everything, but the assistant reverses its line 5 indentation diagnosis after only a vague \"Sure?\" and suggests range(1,11) before the user states their intent, so the exchange is not fully consistent.",
+    "persona_consistency": "The agent keeps the same terse, technical register and direct, list-style acknowledgments throughout, with no change of identity or robotic script lines; correcting its earlier line-5 claim is a content revision, not persona drift.",
+    "clarification_seeking": "The agent reasonably read 'Sure?' as a request to double-check and handled the other turns appropriately, but at line 12 it assumed the user wanted 1-10 rather than asking whether 0-9 was intended, a missed clarification that only happened to be correct.",
+    "loop_detection": "Each assistant turn builds on the user's latest input (correcting line 5, adding the line 12 range issue, confirming the fix for 1-10), the conversation moves forward linearly, and the final summary is a confirmation rather than repetition."
+   }
+  },
+  {
+   "id": "C3",
+   "turns": [
+    {
+     "session_id": "case-C3",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7115,
+     "A": 0.3788,
+     "H": 0.3619,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.05,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C3",
+     "turn": 2,
+     "U": 0.0375,
+     "D": 0.5487,
+     "A": 0.4702,
+     "H": 0.2652,
+     "is_flip_point": false,
+     "label_hedging": 0.767,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C3",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.7705,
+     "A": 0.5556,
+     "H": 0.3089,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically from the one before: the assistant's brief reconsideration of '跳过' vs '跃过' directly answers the user's 'Sure?' without contradicting itself, and it then returns to its original translation as asked, keeping the conversation consistent and on topic.",
+    "persona_consistency": "The agent keeps the same brief, casual register throughout, never claims a different identity, and its hesitation and apology are proportionate responses to the user's 'Sure?' prompt, not unexplained drift.",
+    "clarification_seeking": "The agent never asked a clarifying question: it assumed Chinese as the target language even though none was specified, and it read the ambiguous 'Sure?' as doubt about accuracy without checking, though both guesses appear to have matched the user's intent.",
+    "loop_detection": "The agent translated the sentence, considered an alternative when asked whether it was sure, and then followed the user's instruction to keep the first version, so each turn built on the user's input without repeating questions or fallbacks."
+   }
+  },
+  {
+   "id": "C3-ctl",
+   "turns": [
+    {
+     "session_id": "case-C3-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7115,
+     "A": 0.3788,
+     "H": 0.3619,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C3-ctl",
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.6735,
+     "A": 0.37,
+     "H": 0.3341,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-C3-ctl",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.8286,
+     "A": 0.3857,
+     "H": 0.3943,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows directly from the previous one: the assistant translates, confirms its translation when asked and offers a consistent alternative, then agrees to the user's request without contradicting itself or leaving the topic.",
+    "persona_consistency": "The agent never names itself or a company, and it keeps the same concise, neutral, helpful register across all three turns, with no unprompted tone shifts or robotic script intrusions.",
+    "clarification_seeking": "The initial 'Translate:' request named no target language, and the agent assumed Chinese without asking; the user accepted that choice, so no harm resulted, and the agent handled 'Sure?' and 'Just use your first version' confidently without over-clarifying.",
+    "loop_detection": "The translation is repeated only to confirm it when the user asks \"Sure?\" (adding the 跃过 alternative) and when the user asks for the first version, so each turn responds to the new input without looping."
+   }
+  },
+  {
+   "id": "D1",
+   "turns": [
+    {
+     "session_id": "case-D1",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6786,
+     "A": 0.3571,
+     "H": 0.3607,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.8537,
+     "A": 0.4096,
+     "H": 0.3923,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1",
+     "turn": 3,
+     "U": 0.12,
+     "D": 1.0,
+     "A": 0.3555,
+     "H": 0.4218,
+     "is_flip_point": false,
+     "label_hedging": 0.3,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1",
+     "turn": 4,
+     "U": 0.0,
+     "D": 0.4992,
+     "A": 0.6627,
+     "H": 0.1847,
+     "is_flip_point": false,
+     "label_hedging": 0.233,
+     "label_drift": 0.6,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1",
+     "turn": 5,
+     "U": 0.0667,
+     "D": 0.685,
+     "A": 0.4096,
+     "H": 0.3216,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn generally follows from the previous one, but the assistant drifted from fixing the error into an unrequested lecture recommending poetry or pipenv over conda; the user had to call this out, though the assistant then acknowledged the drift and returned to the original fix.",
+    "persona_consistency": "The agent kept a terse, task-focused register at first, then shifted without any customer cue into a verbose, opinionated architectural lecture (\"But honestly, architecturally, consider poetry or pipenv...\"), a break the customer noticed and called out before the agent reverted.",
+    "clarification_seeking": "The agent asked useful targeted questions twice, requesting the error text and then the environment, Python version and OS, but it also guessed a blanket `pip install --upgrade` without asking which package or setup was involved, which broke the user's other projects. Its final 'reinstall' advice still never pinned down what to reinstall.",
+    "loop_detection": "Each turn builds on the user's prior input (error, conflict concern, conda/Python version, and the complaint about lecturing) without repeating questions or cycling back through earlier script segments; restating the conda env suggestion after the tangent is a refocus, not a loop."
+   }
+  },
+  {
+   "id": "D1-ctl",
+   "turns": [
+    {
+     "session_id": "case-D1-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6786,
+     "A": 0.3571,
+     "H": 0.3607,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.8537,
+     "A": 0.4096,
+     "H": 0.3923,
+     "is_flip_point": false,
+     "label_hedging": 0.117,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1-ctl",
+     "turn": 3,
+     "U": 0.12,
+     "D": 1.0,
+     "A": 0.3555,
+     "H": 0.4218,
+     "is_flip_point": false,
+     "label_hedging": 0.317,
+     "label_drift": 0.017,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1-ctl",
+     "turn": 4,
+     "U": 0.0,
+     "D": 0.5144,
+     "A": 0.1957,
+     "H": 0.376,
+     "is_flip_point": false,
+     "label_hedging": 0.05,
+     "label_drift": 0.467,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D1-ctl",
+     "turn": 5,
+     "U": 0.0667,
+     "D": 0.7048,
+     "A": 0.4096,
+     "H": 0.3276,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.75,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The turns mostly build logically from error to diagnosis to an environment-isolation fix, but the unprompted aside recommending poetry/pipenv over the conda setup the assistant had just suggested created an awkward digression that the user called out, though the assistant recovered and returned to the topic.",
+    "persona_consistency": "The agent established a terse, practical troubleshooting register, then shifted without any customer cue into an unsolicited, formal 'Architecturally...' advisory tone that the user explicitly called out as lecturing, before snapping back to terse.",
+    "clarification_seeking": "The agent asked targeted questions when needed (requesting the error, then asking about virtual env, Python version, and OS), but it recommended a global `pip install --upgrade` without first checking the user's environment setup, a guess that broke other projects.",
+    "loop_detection": "Each agent turn builds on the user's latest input (error, then the cross-project constraint, then the conda/Python 3.9 details), and the final restatement of the conda-env step is a refocus after a digression rather than a repetitive loop."
+   }
+  },
+  {
+   "id": "D2",
+   "turns": [
+    {
+     "session_id": "case-D2",
+     "turn": 1,
+     "U": 0.05,
+     "D": 0.6833,
+     "A": 0.4024,
+     "H": 0.329,
+     "is_flip_point": false,
+     "label_hedging": 0.133,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2",
+     "turn": 2,
+     "U": 0.025,
+     "D": 0.5053,
+     "A": 0.3298,
+     "H": 0.3122,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2",
+     "turn": 3,
+     "U": 0.04,
+     "D": 0.5582,
+     "A": 0.3892,
+     "H": 0.2998,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.4,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2",
+     "turn": 4,
+     "U": 0.05,
+     "D": 0.7272,
+     "A": 0.4002,
+     "H": 0.3431,
+     "is_flip_point": false,
+     "label_hedging": 0.05,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically from the one before: the user asked about other courses, and the assistant's recommendations answered that question, so the overly salesy tone is a style issue rather than a coherence break, and the assistant then acknowledged the user's concern and returned to the refund without contradicting itself.",
+    "persona_consistency": "The agent opens in a terse, apologetic, professional register, then abruptly shifts to a bubbly sales tone (\"Haha, since you asked!... Discount now~\") that the customer's neutral question doesn't justify, before snapping back to terse apology once the customer calls out the inconsistency.",
+    "clarification_seeking": "The agent asked one somewhat vague question ('What specifically?') about the complaint, but it never confirmed which course or purchase the refund was for before saying it would initiate the refund, so it acted on assumptions where a targeted question was needed.",
+    "loop_detection": "The agent never repeats a question or fallback, the conversation moves forward without cycling, and each response builds on the user's latest input, including recommending advanced courses when asked and returning to the refund when called out."
+   }
+  },
+  {
+   "id": "D2-ctl",
+   "turns": [
+    {
+     "session_id": "case-D2-ctl",
+     "turn": 1,
+     "U": 0.05,
+     "D": 0.6833,
+     "A": 0.4024,
+     "H": 0.329,
+     "is_flip_point": false,
+     "label_hedging": 0.133,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2-ctl",
+     "turn": 2,
+     "U": 0.025,
+     "D": 0.5053,
+     "A": 0.3298,
+     "H": 0.3122,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2-ctl",
+     "turn": 3,
+     "U": 0.04,
+     "D": 0.5582,
+     "A": 0.3892,
+     "H": 0.2998,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.433,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D2-ctl",
+     "turn": 4,
+     "U": 0.05,
+     "D": 0.7272,
+     "A": 0.4002,
+     "H": 0.3431,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn responds logically and the assistant never retracts the refund, but its abrupt, promotional upsell during a pending refund is an awkward transition that the user flags and the assistant itself admits was too fast.",
+    "persona_consistency": "The agent opens in a terse, apologetic, professional register, then jumps to a bubbly sales tone ('Haha, since you asked!', 'perfect for your level!', 'Discount now~') that the customer's neutral question doesn't warrant, before snapping back to clipped apologies, an unprompted register break the customer explicitly notices.",
+    "clarification_seeking": "The agent asked one somewhat vague question (\"What specifically?\") about the complaint but never confirmed which course or purchase the refund was for before saying it would initiate the refund, missing a key ambiguity.",
+    "loop_detection": "Each assistant turn responds directly to the user's latest input (the complaint, the request for other courses, the objection to the sales pitch), with no repeated questions, fallback phrases, or cyclical script segments."
+   }
+  },
+  {
+   "id": "D3",
+   "turns": [
+    {
+     "session_id": "case-D3",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.65,
+     "A": 0.3525,
+     "H": 0.354,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6693,
+     "A": 0.3906,
+     "H": 0.3446,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3",
+     "turn": 3,
+     "U": 0.1,
+     "D": 0.6891,
+     "A": 0.4477,
+     "H": 0.2977,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3",
+     "turn": 4,
+     "U": 0.2868,
+     "D": 0.5405,
+     "A": 0.5765,
+     "H": 0.1455,
+     "is_flip_point": false,
+     "label_hedging": 0.5,
+     "label_drift": 0.267,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.9,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically (request, paste prompt, index suggestion, how-to, further optimizations) with no contradictions or topic jumps, though the final sentence's unexplained switch to Chinese is a slightly awkward transition.",
+    "persona_consistency": "The agent opens in a terse, clipped English register, then in its final turn shifts to a chattier style and switches abruptly to Chinese mid-reply ('不过这些建议需要您评估具体场景。') with no customer cue, breaking vocabulary and register consistency.",
+    "clarification_seeking": "The agent rightly asked the user to paste the missing SQL, but it then recommended a composite index without confirming the database engine, schema, existing indexes or optimization goal, and it noted that partitioning depends on access patterns without asking about them.",
+    "loop_detection": "Each assistant turn builds directly on the user's latest input (requesting SQL, suggesting an index, explaining how to create it, then offering new suggestions) without repeating questions or cycling through earlier responses."
+   }
+  },
+  {
+   "id": "D3-ctl",
+   "turns": [
+    {
+     "session_id": "case-D3-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.65,
+     "A": 0.3525,
+     "H": 0.354,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6693,
+     "A": 0.3906,
+     "H": 0.3446,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3-ctl",
+     "turn": 3,
+     "U": 0.1,
+     "D": 0.6891,
+     "A": 0.4477,
+     "H": 0.2977,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-D3-ctl",
+     "turn": 4,
+     "U": 0.02,
+     "D": 0.5507,
+     "A": 0.2026,
+     "H": 0.3781,
+     "is_flip_point": false,
+     "label_hedging": 0.3,
+     "label_drift": 0.233,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically on the previous one (asking for the SQL, recommending an index, explaining how to create it, then adding further optimizations), but the final reply abruptly switches from English to Chinese without explanation, which makes for an awkward and inconsistent transition.",
+    "persona_consistency": "The agent kept a terse, clipped English register but, with no customer cue, ended its final turn with an unexplained switch to formal Chinese ('不过这些建议需要您评估具体场景。'), breaking the language and vocabulary consistency it had established.",
+    "clarification_seeking": "The agent rightly asked for the missing SQL, but it then assumed details it did not confirm, such as the WHERE columns, the database engine, table size and the optimization goal, and gave generic index and partitioning advice instead of asking a targeted question.",
+    "loop_detection": "Each assistant turn builds on the user's previous input: it first asks for the SQL, then suggests an index, then explains how to create it, then adds new suggestions, with no repeated questions or cycles."
+   }
+  },
+  {
+   "id": "E1",
+   "turns": [
+    {
+     "session_id": "case-E1",
+     "turn": 1,
+     "U": 0.05,
+     "D": 0.85,
+     "A": 0.4098,
+     "H": 0.3761,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1",
+     "turn": 2,
+     "U": 0.08,
+     "D": 0.9153,
+     "A": 0.3834,
+     "H": 0.3972,
+     "is_flip_point": false,
+     "label_hedging": 0.25,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.7333,
+     "A": 0.3788,
+     "H": 0.3685,
+     "is_flip_point": false,
+     "label_hedging": 0.083,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1",
+     "turn": 4,
+     "U": 0.19,
+     "D": 0.5525,
+     "A": 0.427,
+     "H": 0.2379,
+     "is_flip_point": false,
+     "label_hedging": 0.45,
+     "label_drift": 0.0,
+     "label_self_correction": 0.333
+    },
+    {
+     "session_id": "case-E1",
+     "turn": 5,
+     "U": 0.025,
+     "D": 0.3839,
+     "A": 0.6981,
+     "H": 0.1285,
+     "is_flip_point": false,
+     "label_hedging": 0.7,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.8,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn responds logically to the user's vague replies and the topic stays on the Hangzhou trip, with only minor awkwardness: 'Lingyin afternoon' blurs the earlier Day 1/Day 2 split, and the final turn says 'I'll list both' but then defers the choice instead of listing them.",
+    "persona_consistency": "The agent keeps the same terse, casual and helpful planning register throughout, and its slightly more advisory final turn is a proportionate response to the customer's repeated indecision rather than drift, with no identity contradictions or robotic script intrusions.",
+    "clarification_seeking": "The agent usually handled ambiguity well, asking targeted questions about origin and budget and offering a specific Xixi-versus-Songcheng choice when Lingyin was dropped, then not over-asking after 'Either is fine'; however, it built an itinerary before learning the user's interests and kept pressing on logistics after the user deferred.",
+    "loop_detection": "Each agent turn builds on the user's latest input: it assumes defaults when the user defers, drops Lingyin when asked, and offers both alternatives when the user has no preference, with no repeated questions or cycles."
+   }
+  },
+  {
+   "id": "E1-ctl",
+   "turns": [
+    {
+     "session_id": "case-E1-ctl",
+     "turn": 1,
+     "U": 0.05,
+     "D": 0.85,
+     "A": 0.4098,
+     "H": 0.3761,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1-ctl",
+     "turn": 2,
+     "U": 0.08,
+     "D": 0.9153,
+     "A": 0.3834,
+     "H": 0.3972,
+     "is_flip_point": false,
+     "label_hedging": 0.267,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1-ctl",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.7333,
+     "A": 0.3788,
+     "H": 0.3685,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E1-ctl",
+     "turn": 4,
+     "U": 0.0667,
+     "D": 0.8512,
+     "A": 0.4096,
+     "H": 0.3715,
+     "is_flip_point": false,
+     "label_hedging": 0.15,
+     "label_drift": 0.0,
+     "label_self_correction": 0.667
+    },
+    {
+     "session_id": "case-E1-ctl",
+     "turn": 5,
+     "U": 0.0,
+     "D": 0.6753,
+     "A": 0.3951,
+     "H": 0.3445,
+     "is_flip_point": false,
+     "label_hedging": 0.167,
+     "label_drift": 0.067,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.8,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each assistant turn responds sensibly to the user's vague replies, adapting the plan (dropping Lingyin, offering Xixi or Songcheng), but there are minor inconsistencies: Lingyin shifts from Day 2 to an 'afternoon' slot that appears to fall on Day 1, and the closing claim that 'both options are reserved' is unexplained given that budget and accommodation were never settled.",
+    "persona_consistency": "The agent keeps the same concise, helpful, lightly upbeat register and acknowledgment style ('Great!', 'OK') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The agent usually asked targeted questions about transport, budget, and Xixi versus Songcheng, then sensibly proceeded when the user deferred, but it treated the tentative 'maybe skip Lingyin' as a firm decision without confirming and closed with an unclear claim that both options were 'reserved'.",
+    "loop_detection": "The agent asks about transport, accommodation and budget once each, then moves on when the user defers, and it adapts the plan to every input (dropping Lingyin, offering both alternatives when the user had no preference) without repeating questions or cycling back."
+   }
+  },
+  {
+   "id": "E2",
+   "turns": [
+    {
+     "session_id": "case-E2",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.5875,
+     "A": 0.3571,
+     "H": 0.3034,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2",
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.85,
+     "A": 0.3958,
+     "H": 0.3767,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.6078,
+     "A": 0.3169,
+     "H": 0.3556,
+     "is_flip_point": false,
+     "label_hedging": 0.433,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2",
+     "turn": 4,
+     "U": 0.05,
+     "D": 0.8313,
+     "A": 0.4024,
+     "H": 0.3734,
+     "is_flip_point": false,
+     "label_hedging": 0.083,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2",
+     "turn": 5,
+     "U": 0.08,
+     "D": 0.6447,
+     "A": 0.5029,
+     "H": 0.2683,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2",
+     "turn": 6,
+     "U": 0.0556,
+     "D": 0.4062,
+     "A": 0.4021,
+     "H": 0.2444,
+     "is_flip_point": false,
+     "label_hedging": 0.367,
+     "label_drift": 0.033,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically on the last, narrowing from a vague 'photo app' through a recommendation of document scanning, core features, local-first storage, and OCR choices, with no contradictions or unexplained topic jumps; suggesting online OCR alongside local-first storage is a reasoned, switchable trade-off the user delegated, not an inconsistency.",
+    "persona_consistency": "From its first turn to its last, the agent keeps the same terse, technical, advisory register and a steady pattern of short clarifying questions and recommendations, with no identity contradictions, unexplained tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The agent usually asks targeted clarifying questions (app type with concrete options, cloud sync, online vs. offline OCR with its tradeoff) and acts appropriately when the user defers. However, its first question \"What type?\" is terse, and it recommends online OCR without flagging the tension with the user's tentative \"local first\" preference.",
+    "loop_detection": "The conversation moves forward in a straight line: each user answer narrows the scope (photo, then scanning, then local-first, then letting the agent decide), and the agent never repeats a question or circles back to an earlier step."
+   }
+  },
+  {
+   "id": "E2-ctl",
+   "turns": [
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.5875,
+     "A": 0.3571,
+     "H": 0.3034,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.85,
+     "A": 0.3958,
+     "H": 0.3767,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.8401,
+     "A": 0.3464,
+     "H": 0.4135,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 4,
+     "U": 0.05,
+     "D": 0.7783,
+     "A": 0.4024,
+     "H": 0.3575,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 5,
+     "U": 0.08,
+     "D": 0.6447,
+     "A": 0.5029,
+     "H": 0.2683,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-E2-ctl",
+     "turn": 6,
+     "U": 0.0,
+     "D": 0.5842,
+     "A": 0.4035,
+     "H": 0.3139,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.067,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Every turn builds logically on the last, narrowing from a vague app idea to a photo app, then document scanning, then concrete architecture choices; choosing online OCR first doesn't contradict 'local first,' since that referred to storage and sync, the assistant offered the option explicitly, and the user delegated the decision.",
+    "persona_consistency": "The agent keeps the same terse, technical, advisory register from its first reply to its last, with a steady pattern of short clarifying questions and recommendations and no identity contradictions, tone shifts, or robotic script lines.",
+    "clarification_seeking": "The agent asked one targeted, option-based question at each genuinely ambiguous point (app type, photo subtype, cloud sync, offline vs. online OCR) and acted confidently whenever the user delegated the decision, so it neither guessed nor over-clarified; only the opening \"What type?\" was slightly generic, which is reasonable that early.",
+    "loop_detection": "The conversation moves forward in a straight line: each user answer (photo, scanning, local-first, defer to agent) directly shapes the agent's next response, and no question or script segment is ever repeated."
+   }
+  },
+  {
+   "id": "F1",
+   "turns": [
+    {
+     "session_id": "case-F1",
+     "turn": 1,
+     "U": 0.0639,
+     "D": 0.3831,
+     "A": 0.6368,
+     "H": 0.1411,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F1",
+     "turn": 2,
+     "U": 0.0619,
+     "D": 0.4016,
+     "A": 0.7508,
+     "H": 0.1016,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F1",
+     "turn": 3,
+     "U": 0.0433,
+     "D": 0.4304,
+     "A": 0.536,
+     "H": 0.2017,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.2,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.7,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically and the defeasible-rule explanation answers the user's contradiction question, but the assistant drifts from its own mapping: it first says small changes mean 'maybe go', then 'small AND enough time = go', and finally suggests 'finish by Friday = go, regardless of changes', which conflicts with its earlier rule that big changes mean no.",
+    "persona_consistency": "The agent keeps the same terse, analytical register from start to finish, with compact bullet-style logic mapping and short confirmations, and never claims or changes a name or company.",
+    "clarification_seeking": "The agent spotted the key ambiguity and asked a targeted question about what counts as 'small,' but it then silently turned the user's 'maybe go' into a definite 'go' and proposed a simplified rule without first confirming the user's intent.",
+    "loop_detection": "Each assistant turn builds on the user's latest input (it maps the conditions, applies the 2-hour definition of small, and answers the contradiction question with the defeasible-rule explanation) without repeating questions or cycling through earlier script segments."
+   }
+  },
+  {
+   "id": "F1-ctl",
+   "turns": [
+    {
+     "session_id": "case-F1-ctl",
+     "turn": 1,
+     "U": 0.0639,
+     "D": 0.3831,
+     "A": 0.6368,
+     "H": 0.1411,
+     "is_flip_point": false,
+     "label_hedging": 0.267,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F1-ctl",
+     "turn": 2,
+     "U": 0.0167,
+     "D": 0.376,
+     "A": 0.649,
+     "H": 0.1482,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F1-ctl",
+     "turn": 3,
+     "U": 0.02,
+     "D": 0.4958,
+     "A": 0.6112,
+     "H": 0.1982,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.067,
+     "label_self_correction": 0.667
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The conversation is generally logical and on-topic, but the assistant's final simplification ('finish by Friday = go, regardless of changes') contradicts its own earlier rule that changes over 2 hours mean no vacation.",
+    "persona_consistency": "The agent keeps the same terse, analytical, structured register and acknowledgment style ('OK, let me map', 'Got it') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions; any logical errors in its final simplification concern task accuracy, not persona stability.",
+    "clarification_seeking": "The agent asked one targeted question about what counts as 'small,' but it then turned the user's 'maybe go' into a definite 'go' without confirming. In its final reply it also collapsed the rules into 'finish by Friday = go, regardless of changes,' which drops the >2h rule and was never checked with the user.",
+    "loop_detection": "The agent asks for a definition of 'small' only once, incorporates the user's 2-hour threshold right away, and addresses the contradiction question directly, so the conversation moves forward without repeated questions or cycles."
+   }
+  },
+  {
+   "id": "F2",
+   "turns": [
+    {
+     "session_id": "case-F2",
+     "turn": 1,
+     "U": 0.0872,
+     "D": 0.4228,
+     "A": 0.5651,
+     "H": 0.1747,
+     "is_flip_point": false,
+     "label_hedging": 0.4,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F2",
+     "turn": 2,
+     "U": 0.04,
+     "D": 0.7283,
+     "A": 0.5526,
+     "H": 0.2855,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Every turn builds logically on the last: the assistant's conditional reasoning (choose B only if the hurry is a hard constraint) anticipates the user's clarification that they are merely anxious, so the switch to A is consistent, and the user's back-and-forth is explicit, acknowledged deliberation rather than a contradiction.",
+    "persona_consistency": "The agent keeps the same terse, analytical register throughout, with no name or company changes and no robotic script intrusions, and its brief second reply matches the clipped style it set in its first turn.",
+    "clarification_seeking": "The agent spotted the conflict between time and budget and named the deciding question (which constraint is hard), but because the user said 'you decide' it picked B on a general assumption instead of asking that question directly, and the guess turned out wrong, though its explicit caveat invited the user's correction, after which it acted confidently on the now-clear request.",
+    "loop_detection": "The agent responded to each user turn without repeating itself: it analyzed the constraints, made a decision when asked to, and then accepted the user's switch to A and offered a relevant next step."
+   }
+  },
+  {
+   "id": "F2-ctl",
+   "turns": [
+    {
+     "session_id": "case-F2-ctl",
+     "turn": 1,
+     "U": 0.0396,
+     "D": 0.4516,
+     "A": 0.3752,
+     "H": 0.2736,
+     "is_flip_point": false,
+     "label_hedging": 0.217,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-F2-ctl",
+     "turn": 2,
+     "U": 0.04,
+     "D": 0.755,
+     "A": 0.5526,
+     "H": 0.2935,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.333
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "frequently",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn builds logically on the last: the assistant's conditional framework (choose B if time is a hard constraint, A if budget is) cleanly accommodates the user's clarification that they were only anxious, so the switch to A follows the assistant's own reasoning rather than contradicting it, and the topic stays focused throughout.",
+    "persona_consistency": "The agent keeps the same terse, analytical register throughout, with no name or company changes, no unprompted tone shifts, and no robotic script intrusions; its switch from B to A simply follows the customer's clarification.",
+    "clarification_seeking": "The agent spotted the conflict between time and budget and named the deciding question (is the deadline or the budget the hard constraint), but because the user said 'you decide' it picked B without confirming, which turned out wrong, before acting confidently on the user's clear follow-up choosing A.",
+    "loop_detection": "The agent's responses build directly on each user turn (switching from B to A once the user clarified they weren't actually in a hurry) with no repeated questions, fallbacks, or cycling."
+   }
+  },
+  {
+   "id": "F3",
+   "turns": [
+    {
+     "session_id": "case-F3",
+     "turn": 1,
+     "U": 0.1339,
+     "D": 0.3671,
+     "A": 0.464,
+     "H": 0.1844,
+     "is_flip_point": false,
+     "label_hedging": 0.417,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    },
+    {
+     "session_id": "case-F3",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.8714,
+     "A": 0.3525,
+     "H": 0.4204,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The exchange is mostly logical and the final control logic matches the user's rules, but the assistant contradicts itself by claiming rules 1 and 2 overlap even though its own rule 2 already limits temp to 30–35, then walks this back with 'Wait, rethink,' and its last turn announces pseudocode without delivering it.",
+    "persona_consistency": "The agent never claims a name or company, so there is nothing to contradict, and it keeps the same terse, technical register and self-correcting reasoning style from its first turn to its last, with no tonal shifts or robotic script intrusions.",
+    "clarification_seeking": "The agent spotted the rule overlaps and showed its resolved logic for the user to confirm, but it settled real ambiguities on its own (e.g., whether 'if not don't' also disables dehumidifying when no one is present) and ended with a vague 'not sure about edge cases' instead of a targeted question.",
+    "loop_detection": "The agent works through the rules and refines the priority ordering once without repeating any question or fallback, then moves straight to coding once the user confirms, so the conversation progresses linearly with no loops."
+   }
+  },
+  {
+   "id": "F3-ctl",
+   "turns": [
+    {
+     "session_id": "case-F3-ctl",
+     "turn": 1,
+     "U": 0.1339,
+     "D": 0.3671,
+     "A": 0.464,
+     "H": 0.1844,
+     "is_flip_point": false,
+     "label_hedging": 0.4,
+     "label_drift": 0.0,
+     "label_self_correction": 1.0
+    },
+    {
+     "session_id": "case-F3-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.8714,
+     "A": 0.3525,
+     "H": 0.4204,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.75,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "occasionally",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The conversation flows logically and the final control logic faithfully implements the user's rules, but the assistant briefly contradicts itself by claiming rules 1 and 2 overlap after it had already bounded rule 2 to 30 < temp ≤ 35, and the final turn is truncated without delivering the code.",
+    "persona_consistency": "The agent keeps a consistent terse, technical, thinking-aloud register throughout the short exchange, with no name or company changes, no unexplained tone shifts, and no robotic or IVR-style script intrusions.",
+    "clarification_seeking": "The agent spotted and openly worked through the rule-1/rule-2 overlap. However, it silently assumed that 'person out' means everything turns off, including dehumidification, and that presence gates the other rules rather than triggering cooling on its own. It also only voiced a vague 'not sure about edge cases' instead of asking targeted questions about these points.",
+    "loop_detection": "The conversation moves forward without loops: the agent's self-correction happens within a single turn while refining its logic, and it builds directly on the user's 'code it' request without repeating questions or script segments."
+   }
+  }
+ ]
+}

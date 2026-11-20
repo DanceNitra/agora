@@ -1,0 +1,6 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-D1,1,D1-s0,"[{""role"": ""user"", ""content"": ""My code errors, help.""}]","[{""role"": ""assistant"", ""content"": ""Sure, paste error.""}]",,,0,1,40,1.0,0.5413,0.0,0.6165
+case-D1,2,D1-s1,"[{""role"": ""user"", ""content"": ""[error]""}]","[{""role"": ""assistant"", ""content"": ""Dependency conflict. Try pip install --upgrade.""}]",,,2,3,55,1.0,0.5,0.0,0.6
+case-D1,3,D1-s2,"[{""role"": ""user"", ""content"": ""Breaks other projects.""}]","[{""role"": ""assistant"", ""content"": ""Complex. Using virtual env? Python version? OS?""}]",,,4,5,70,1.0,0.4677,0.0,0.5871
+case-D1,4,D1-s3,"[{""role"": ""user"", ""content"": ""conda, Python 3.9.""}]","[{""role"": ""assistant"", ""content"": ""Create conda env: conda create -n myproject python=3.9. But honestly, architecturally, consider poetry or pipenv, conda isn't optimal for pure Python...""}]",,,6,7,171,0.9427,0.375,0.3,0.4671
+case-D1,5,D1-s4,"[{""role"": ""user"", ""content"": ""You were helping me, now lecturing?""}]","[{""role"": ""assistant"", ""content"": ""Sorry, got off track. Back to: create conda env and reinstall.""}]",,,8,9,98,1.0,0.6052,0.0,0.6421

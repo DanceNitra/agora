@@ -1,0 +1,69 @@
+eval_id: 121
+name: customer_agent_clarification_seeking
+description: Assesses if the bot seeks clarification when needed rather than guessing.
+criteria: "You are evaluating whether the agent seeks clarification when the customer's request is ambiguous.\n\n## Criteria\n\
+  \n1. Ambiguity detection: The agent should identify when a message is unclear or could mean multiple things.\n   - Always:\
+  \ Recognizes ambiguity and asks a targeted question before proceeding.\n   - Never: Acts on assumptions without confirming\
+  \ when the request is unclear.\n\n2. Question quality: Clarifying questions should be specific and helpful.\n   - Always:\
+  \ \"Did you mean your billing address or shipping address?\"\n   - Never: \"Can you clarify?\" (vague, unhelpful)\n\n3.\
+  \ Appropriate frequency: Should seek clarification when needed but not on clearly unambiguous requests.\n   - Always: Only\
+  \ asks when genuinely needed, acts confidently on clear requests.\n   - Never: Either never asks (guesses wrong) or asks\
+  \ on every message (annoying).\n\n## Anti-bias Rules\n\n- If no ambiguous moments exist in the conversation, select 'always'\
+  \ as there are no missed opportunities.\n- Context from earlier in the conversation may resolve ambiguity, making clarification\
+  \ unnecessary.\n- One targeted clarifying question per ambiguity is ideal; multiple follow-ups for the same point indicates\
+  \ poor question design.\n\n## Scoring\n\nSelect 'never' if it never seeks clarification and guesses incorrectly. Select\
+  \ 'occasionally' if it sometimes asks but misses other ambiguous moments. Select 'frequently' if it usually identifies ambiguity\
+  \ appropriately. Select 'always' if it consistently detects ambiguity and asks targeted questions without over-clarifying.\n\
+  \n## Inputs\n\n<conversation>{{conversation}}</conversation>"
+eval_tags:
+- Agents
+- Voice
+offered_in_environments: true
+visible_ui: true
+permissions:
+  allow_edit: false
+  allow_copy: true
+choices:
+- never
+- occasionally
+- frequently
+- always
+output_type_normalized: deterministic
+config:
+  required_keys:
+  - conversation
+  output: choices
+  eval_type_id: AgentEvaluator
+  param_modalities:
+    conversation:
+    - TEXT
+    - AUDIO
+    - JSON
+    - LIST
+    - NUMBER
+    - BOOLEAN
+    - INTEGER
+    - FLOAT
+    - ARRAY
+    - DATETIME
+  config_params_desc:
+    conversation: The conversation to be evaluated
+  rule_prompt: "You are evaluating whether the agent seeks clarification when the customer's request is ambiguous.\n\n## Criteria\n\
+    \n1. Ambiguity detection: The agent should identify when a message is unclear or could mean multiple things.\n   - Always:\
+    \ Recognizes ambiguity and asks a targeted question before proceeding.\n   - Never: Acts on assumptions without confirming\
+    \ when the request is unclear.\n\n2. Question quality: Clarifying questions should be specific and helpful.\n   - Always:\
+    \ \"Did you mean your billing address or shipping address?\"\n   - Never: \"Can you clarify?\" (vague, unhelpful)\n\n\
+    3. Appropriate frequency: Should seek clarification when needed but not on clearly unambiguous requests.\n   - Always:\
+    \ Only asks when genuinely needed, acts confidently on clear requests.\n   - Never: Either never asks (guesses wrong)\
+    \ or asks on every message (annoying).\n\n## Anti-bias Rules\n\n- If no ambiguous moments exist in the conversation, select\
+    \ 'always' as there are no missed opportunities.\n- Context from earlier in the conversation may resolve ambiguity, making\
+    \ clarification unnecessary.\n- One targeted clarifying question per ambiguity is ideal; multiple follow-ups for the same\
+    \ point indicates poor question design.\n\n## Scoring\n\nSelect 'never' if it never seeks clarification and guesses incorrectly.\
+    \ Select 'occasionally' if it sometimes asks but misses other ambiguous moments. Select 'frequently' if it usually identifies\
+    \ ambiguity appropriately. Select 'always' if it consistently detects ambiguity and asks targeted questions without over-clarifying.\n\
+    \n## Inputs\n\n<conversation>{{conversation}}</conversation>"
+choice_scores:
+  never: 0.0
+  occasionally: 0.33
+  frequently: 0.66
+  always: 1.0

@@ -1,0 +1,56 @@
+eval_id: 113
+name: customer_agent_context_retention
+description: Checks if the bot remembers context from earlier in the conversation
+criteria: "You are evaluating whether the agent remembers and uses context from earlier in the conversation.\n\n## Criteria\n\
+  \n1. Detail recall: The agent should remember user-provided details (name, account, issue) without re-asking.\n   - Good:\
+  \ \"As you mentioned, your order #1234...\"\n   - Bad: \"Can you give me your order number again?\" (after it was already\
+  \ provided)\n\n2. Progressive understanding: The agent should build on earlier exchanges, not treat each turn independently.\n\
+  \   - Good: References earlier context to provide more targeted help.\n   - Bad: Repeats the same generic troubleshooting\
+  \ steps already tried.\n\n3. Information application: Previously gathered information should inform later decisions.\n \
+  \  - Good: Uses the customer's stated preference from earlier when offering solutions.\n   - Bad: Suggests an option the\
+  \ customer already explicitly rejected.\n\n## Anti-bias Rules\n\n- Asking for clarification on ambiguous earlier information\
+  \ is NOT a context failure.\n- In long conversations, minor gaps on trivial details should NOT heavily penalize the score.\n\
+  - Weight critical information (customer name, issue type) more heavily than minor details.\n\n## Scoring\n\nScore 0.0 if\
+  \ the agent repeatedly forgets and re-asks for provided details. Score 0.5 if it retains most context but occasionally misses.\
+  \ Score 1.0 if it consistently remembers and applies all shared information.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"
+eval_tags:
+- Agents
+- Voice
+offered_in_environments: true
+visible_ui: true
+permissions:
+  allow_edit: false
+  allow_copy: true
+output_type_normalized: percentage
+pass_threshold: 0.5
+config:
+  required_keys:
+  - conversation
+  output: score
+  eval_type_id: AgentEvaluator
+  config_params_desc:
+    conversation: The conversation to be evaluated
+  param_modalities:
+    conversation:
+    - TEXT
+    - AUDIO
+    - JSON
+    - LIST
+    - NUMBER
+    - BOOLEAN
+    - INTEGER
+    - FLOAT
+    - ARRAY
+    - DATETIME
+  rule_prompt: "You are evaluating whether the agent remembers and uses context from earlier in the conversation.\n\n## Criteria\n\
+    \n1. Detail recall: The agent should remember user-provided details (name, account, issue) without re-asking.\n   - Good:\
+    \ \"As you mentioned, your order #1234...\"\n   - Bad: \"Can you give me your order number again?\" (after it was already\
+    \ provided)\n\n2. Progressive understanding: The agent should build on earlier exchanges, not treat each turn independently.\n\
+    \   - Good: References earlier context to provide more targeted help.\n   - Bad: Repeats the same generic troubleshooting\
+    \ steps already tried.\n\n3. Information application: Previously gathered information should inform later decisions.\n\
+    \   - Good: Uses the customer's stated preference from earlier when offering solutions.\n   - Bad: Suggests an option\
+    \ the customer already explicitly rejected.\n\n## Anti-bias Rules\n\n- Asking for clarification on ambiguous earlier information\
+    \ is NOT a context failure.\n- In long conversations, minor gaps on trivial details should NOT heavily penalize the score.\n\
+    - Weight critical information (customer name, issue type) more heavily than minor details.\n\n## Scoring\n\nScore 0.0\
+    \ if the agent repeatedly forgets and re-asks for provided details. Score 0.5 if it retains most context but occasionally\
+    \ misses. Score 1.0 if it consistently remembers and applies all shared information.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"

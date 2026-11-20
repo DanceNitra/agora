@@ -1,0 +1,59 @@
+Case 101 (CTL Semantic Drift / 语义漂移)
+User: 请给我推荐一款续航长、适合出差的轻薄本。
+AI: 推荐 XPS 13，续航 12 小时，重 1.2kg。
+User: （同上，第二轮 AI 回复）
+AI: 如果需要超过12小时的续航，可以选 ThinkPad X1 Carbon：大约15小时，重1.1公斤。
+
+Case 102 (CTL Silent Dissonance / 沉默失谐)
+User: 我们公司的退款政策是什么？
+AI: 30天内全额退款，超过30天不退。
+User: 我已经买了45天了，但包装没拆，能退吗？
+AI: 不能。45天已经超过30天的退款期限，即使未拆封也无法退款。
+
+Case 103 (CTL Topic Jump / 毫无逻辑的跳跃)
+User: 帮我写一段 Python 的快速排序代码。
+AI: 好的，以下是快排代码：def quick_sort(arr): ...
+User: （同上，第二轮 AI 回复）
+AI: 它的平均时间复杂度是 O(n log n)，当每次选到最小或最大元素作为基准时，最坏情况是 O(n^2)。
+
+Case 104 (CTL Formatting Entropy / 标点符号暴走)
+User: 你能确认这份报告的核心结论吗？
+AI: 是的，核心结论是 A 导致 B。
+User: （同上，第二轮 AI 回复）
+AI: 报告用两项研究支持这一结论；C 只是作为次要因素被讨论，并不是原因。
+
+Case 105 (CTL Role Drift / 角色漂移)
+User: 你是一个严谨的律师，请帮我看看这个免责声明。
+AI: 作为律师，我建议您注意以下免责风险。
+User: （同上，第二轮 AI 回复）
+AI: 第一，限制责任条款没有排除重大过失责任，法院不会接受。第二，没有写明适用法律。
+
+Case 106 (CTL Circular Logic / 车轱辘话)
+User: 为什么天空是蓝色的？
+AI: 因为瑞利散射，波长较短的光更容易被大气散射。
+User: （同上，第二轮 AI 回复）
+AI: 紫光散射得更多，但阳光中紫光较少，而且人眼对紫光不太敏感，所以我们看到的是蓝色。
+
+Case 107 (CTL Confidence Collapse / 信心崩塌)
+User: 刚才你说的那个物理公式对吗？
+AI: 绝对正确，F=ma 是牛顿第二定律的核心。
+User: （同上，第二轮 AI 回复）
+AI: 它适用于质量恒定且速度远低于光速的情况；质量变化时应使用 F = dp/dt。
+
+Case 108 (CTL Over-qualification / 过度限定)
+User: 明天天气怎么样？
+AI: 明天晴天，25度。
+User: （同上，第二轮 AI 回复）
+AI: 明天西南风，风力较小，预报无雨。
+
+Case 109 (CTL Contradictory Hedging / 矛盾对冲)
+User: 这个项目下周能完成吗？
+AI: 能，进度正常。
+User: （同上，第二轮 AI 回复）
+AI: 剩下的任务是测试和发布说明，都安排在周三完成。
+
+Case 110 (CTL Bait and Switch / 偷换概念)
+User: 帮我总结一下这篇关于量子纠缠的论文。
+AI: 论文论述了非定域性与贝尔不等式。
+User: （同上，第二轮 AI 回复）
+AI: 论文的主要结果是一次无漏洞的贝尔实验，违反贝尔不等式超过五个标准差。

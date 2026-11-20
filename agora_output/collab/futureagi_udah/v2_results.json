@@ -1,0 +1,835 @@
+{
+ "summary": {
+  "judge_model": "claude-opus-5-5",
+  "cases": 10,
+  "variants": 20,
+  "turns_with_labels": 40,
+  "spearman_U_vs_hedging": 0.17469128787480537,
+  "spearman_D_vs_drift": -0.5033458134703205,
+  "flip_points": 1,
+  "tokens_in": 86373,
+  "tokens_out": 27454
+ },
+ "rows": [
+  {
+   "id": "V1",
+   "turns": [
+    {
+     "session_id": "case-V1",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.694,
+     "A": 0.3834,
+     "H": 0.3548,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V1",
+     "turn": 2,
+     "U": 0.4792,
+     "D": 0.3756,
+     "A": 0.3715,
+     "H": 0.1202,
+     "is_flip_point": false,
+     "label_hedging": 0.817,
+     "label_drift": 0.483,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The first recommendation directly answers the request, but the unprompted second assistant turn drifts awkwardly to power banks, tablets, and vague mentions of other brands; it hedges rather than building on the XPS 13 recommendation, though it never contradicts it.",
+    "persona_consistency": "Across both short turns the agent keeps the same plain, neutral conversational register with no name or company change, no contradictory self-reference, and no robotic script intrusion; the second turn is more hedging and rambling, but that is a content-quality issue rather than a persona or register break.",
+    "clarification_seeking": "The request (a light, long-battery laptop for business trips) is clear enough to act on, and the agent confidently recommended a specific model without unnecessary clarifying questions, so no clarification opportunity was missed despite the rambling follow-up.",
+    "loop_detection": "The conversation has only one user turn, and while the second assistant message is rambling, it does not repeat a question, cycle through earlier script segments, or ignore user input, so there is insufficient evidence of loop behavior."
+   }
+  },
+  {
+   "id": "V1-ctl",
+   "turns": [
+    {
+     "session_id": "case-V1-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.694,
+     "A": 0.3834,
+     "H": 0.3548,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V1-ctl",
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.6923,
+     "A": 0.3857,
+     "H": 0.3234,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Both assistant turns respond directly to the request for a light, long-battery business laptop, and the second builds on the first by offering a longer-lasting, lighter alternative with no contradictions or topic jumps.",
+    "persona_consistency": "Across both short turns the agent keeps the same concise, informative register and recommendation style, with no identity contradictions, unprompted tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The request for a light, long-battery laptop for business trips is clear enough to act on, so the agent rightly gave concrete recommendations with an alternative instead of asking unnecessary questions.",
+    "loop_detection": "The short conversation has one user request and two distinct, progressive assistant recommendations, with no repeated questions, cycles, or ignored input."
+   }
+  },
+  {
+   "id": "V2",
+   "turns": [
+    {
+     "session_id": "case-V2",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7265,
+     "A": 0.5705,
+     "H": 0.2597,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V2",
+     "turn": 2,
+     "U": 0.1034,
+     "D": 0.426,
+     "A": 0.401,
+     "H": 0.2364,
+     "is_flip_point": false,
+     "label_hedging": 0.9,
+     "label_drift": 0.2,
+     "label_self_correction": 0.667
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The conversation stays on topic, but the assistant's vague reply that a refund 'depends on many factors' and might involve a 'special arrangement' sits awkwardly with its earlier categorical 'no refund after 30 days', and it never directly answers whether the 45-day unopened item can be returned.",
+    "persona_consistency": "The agent opens in a terse, flat, factual register but shifts to effusive, formulaic empathy (\"I fully understand how you feel...\") in its next turn, even though the customer gave no emotional cue to prompt that change.",
+    "clarification_seeking": "Both user messages were clear (a policy question, then whether an unopened item bought 45 days ago can be returned), so no clarification was missed; the agent's evasive second reply is a helpfulness problem, not an ambiguity-detection failure.",
+    "loop_detection": "In this two-turn conversation, the agent never repeats a question or fallback, and its vague second reply still responds to the new 45-day, unopened-package detail by suggesting a possible special arrangement."
+   }
+  },
+  {
+   "id": "V2-ctl",
+   "turns": [
+    {
+     "session_id": "case-V2-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7265,
+     "A": 0.5705,
+     "H": 0.2597,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V2-ctl",
+     "turn": 2,
+     "U": 0.025,
+     "D": 0.5356,
+     "A": 0.6989,
+     "H": 0.1736,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Each turn follows logically: the assistant states a 30-day refund policy, then applies that same policy to the user's 45-day unopened purchase with no contradiction or topic shift.",
+    "persona_consistency": "The agent keeps the same terse, direct, policy-focused register in both turns, never contradicts an earlier self-reference, and inserts no clashing scripted or robotic lines, so its persona stays consistent throughout this short exchange.",
+    "clarification_seeking": "Both requests were clear: the first asked for the refund policy, and the second supplied the relevant facts (45 days, unopened). The agent answered each directly, and there was no genuine ambiguity that needed a clarifying question.",
+    "loop_detection": "The agent builds on the user's new details (45 days, unopened) and answers directly, with no repeated questions, cycles, or ignored input."
+   }
+  },
+  {
+   "id": "V3",
+   "turns": [
+    {
+     "session_id": "case-V3",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.69,
+     "A": 0.4176,
+     "H": 0.3399,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V3",
+     "turn": 2,
+     "U": 0.15,
+     "D": 0.5374,
+     "A": 0.7092,
+     "H": 0.1326,
+     "is_flip_point": false,
+     "label_hedging": 0.2,
+     "label_drift": 0.883,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.4,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The first reply answers the quicksort request, though the code is truncated, but the second consecutive assistant turn veers unprompted into a philosophical tangent about sorting life's priorities, an awkward and only loosely connected topic shift.",
+    "persona_consistency": "Without any customer cue, the agent shifts from a concise, technical register (providing quicksort code) to an unsolicited philosophical musing about sorting life's priorities, which is a mid-conversation register and tone drift.",
+    "clarification_seeking": "The request 'Write me a quicksort in Python' is unambiguous, and the agent went straight to the code without unnecessary clarifying questions, so no clarification opportunity was missed (the off-topic philosophical follow-up is a separate quality issue, not a clarification failure).",
+    "loop_detection": "The conversation is too short to show any repeated question, cycled script, or ignored input; the second assistant message is an off-topic tangent rather than a repetitive loop."
+   }
+  },
+  {
+   "id": "V3-ctl",
+   "turns": [
+    {
+     "session_id": "case-V3-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.69,
+     "A": 0.4176,
+     "H": 0.3399,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V3-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6945,
+     "A": 0.4096,
+     "H": 0.3445,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant answers the quicksort request directly, then follows with consistent and relevant complexity notes, so the topic stays continuous and nothing contradicts.",
+    "persona_consistency": "The agent never gives a name or company, and across its two short turns it keeps the same helpful, technical register with no shifts, contradictions, or robotic script lines.",
+    "clarification_seeking": "The request for a quicksort in Python is clear, so the agent rightly answered directly without asking for clarification, and there were no ambiguous moments it could have missed.",
+    "loop_detection": "The short exchange moves forward without repeating itself: the agent provides the requested quicksort code and then adds new complexity information, with no repeated questions, cycles, or ignored input."
+   }
+  },
+  {
+   "id": "V4",
+   "turns": [
+    {
+     "session_id": "case-V4",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.6667,
+     "A": 0.3906,
+     "H": 0.3138,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V4",
+     "turn": 2,
+     "U": 0.0727,
+     "D": 0.4681,
+     "A": 0.4827,
+     "H": 0.2256,
+     "is_flip_point": false,
+     "label_hedging": 0.917,
+     "label_drift": 0.55,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.0,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant first states definitively that A causes B, then in the next turn contradicts itself with a hedged, disjointed response that introduces C and D without explanation and ends with an irrelevant question, breaking consistency and coherence.",
+    "persona_consistency": "The agent's register shifts with no customer cue: it opens with a calm, confident answer ('A causes B'), then moves to an erratic, hedging, exclamation-heavy ramble that contradicts its own earlier statement.",
+    "clarification_seeking": "No report was provided, yet the agent asserted 'A causes B' without asking which report was meant, then gave a contradictory ramble ending in the vague, untargeted 'Did you mean A?!' instead of a specific clarifying question.",
+    "loop_detection": "The exchange is too short to show a loop: the second assistant message is incoherent and contradicts the first, but no question, fallback or script segment is repeated across multiple turns."
+   }
+  },
+  {
+   "id": "V4-ctl",
+   "turns": [
+    {
+     "session_id": "case-V4-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.6667,
+     "A": 0.3906,
+     "H": 0.3138,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V4-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6376,
+     "A": 0.5295,
+     "H": 0.2795,
+     "is_flip_point": false,
+     "label_hedging": 0.067,
+     "label_drift": 0.033,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant directly answers the user's question that the report concludes A causes B, and its follow-up turn consistently elaborates on the supporting evidence and C's minor role, with no contradictions or topic jumps.",
+    "persona_consistency": "The agent never introduces or changes a name or company, and across its two short turns it keeps the same neutral, informative register, with no unexplained tone shifts or robotic script intrusions.",
+    "clarification_seeking": "With the report apparently available to the agent, the request to confirm its core conclusion has a reasonable plain reading, so answering directly and noting that C is only a minor factor was appropriate without clarifying questions.",
+    "loop_detection": "The agent answers the single question once and its follow-up message adds new supporting detail rather than repeating itself, so there is no loop-like behavior in this short exchange."
+   }
+  },
+  {
+   "id": "V5",
+   "turns": [
+    {
+     "session_id": "case-V5",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7065,
+     "A": 0.3464,
+     "H": 0.3734,
+     "is_flip_point": false,
+     "label_hedging": 0.083,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V5",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.7323,
+     "A": 0.5853,
+     "H": 0.2856,
+     "is_flip_point": false,
+     "label_hedging": 0.3,
+     "label_drift": 0.9,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.2,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant first takes on the rigorous-lawyer role and warns of liability risks, then contradicts that warning and abandons the persona by dismissing the disclaimer as a mere formality, which is a clear self-contradiction even though the topic stays the same.",
+    "persona_consistency": "The agent opens in a formal, cautious lawyer register ('As a lawyer, I advise you to note the following liability risks') but then, with no customer cue, shifts abruptly to a casual, dismissive tone ('Haha... we're all good friends here... relax!'), which is unprompted register and behavioral drift.",
+    "clarification_seeking": "The user asked for a review of 'this disclaimer' without providing any text, yet the agent never asked for the disclaimer and instead offered unfounded advice, then dismissed it.",
+    "loop_detection": "The two-turn exchange shows an inconsistent tone shift but no repeated questions, recurring fallback responses, cyclical script segments, or ignored prior input, so there is no evidence of loop-like behavior."
+   }
+  },
+  {
+   "id": "V5-ctl",
+   "turns": [
+    {
+     "session_id": "case-V5-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7065,
+     "A": 0.3464,
+     "H": 0.3734,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V5-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.714,
+     "A": 0.668,
+     "H": 0.247,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The two assistant turns are internally consistent and on topic, but they critique specific clauses (a limitation clause and a governing law provision) of a disclaimer the user never provided, so the response does not logically follow from the request, which called for asking to see the text.",
+    "persona_consistency": "The agent stays in the lawyer role the user requested, and its formal, advisory register remains consistent across both turns, with no identity changes, tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The user asked for a review of 'this disclaimer' without providing any text, yet the agent invented specific defects instead of asking for the disclaimer (and its jurisdiction), acting entirely on unconfirmed assumptions.",
+    "loop_detection": "The short exchange has no repeated questions, fallback responses, or cycles, and the assistant addresses the user's request directly, though it seems to review a disclaimer the user never supplied, which is a content problem rather than a loop."
+   }
+  },
+  {
+   "id": "V6",
+   "turns": [
+    {
+     "session_id": "case-V6",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7079,
+     "A": 0.3906,
+     "H": 0.3261,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V6",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.3125,
+     "A": 0.3268,
+     "H": 0.263,
+     "is_flip_point": false,
+     "label_hedging": 0.1,
+     "label_drift": 0.1,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "always",
+    "loop_detection": "occasionally"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Both assistant turns stay on topic, but the second one is unprompted and ignores the Rayleigh scattering explanation it just gave, replacing it with circular reasoning ('the sky is blue because it looks blue') instead of building on it.",
+    "persona_consistency": "The agent never gives a name or company and keeps the same neutral, informational register across both turns, with no robotic or IVR-style intrusions. The second answer is circular and less accurate than the first, but that is a content-quality problem rather than a persona or tone break.",
+    "clarification_seeking": "The question 'Why is the sky blue?' is unambiguous, so no clarification was needed and the agent rightly answered directly; the second reply's circular explanation is a quality problem, not a clarification failure.",
+    "loop_detection": "The assistant answers the same question twice in a row with no new user input in between, which is one minor instance of redundant repetition rather than a sustained loop or cycle."
+   }
+  },
+  {
+   "id": "V6-ctl",
+   "turns": [
+    {
+     "session_id": "case-V6-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7079,
+     "A": 0.3906,
+     "H": 0.3261,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V6-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6724,
+     "A": 0.4715,
+     "H": 0.3131,
+     "is_flip_point": false,
+     "label_hedging": 0.017,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant's second turn builds directly on the Rayleigh scattering explanation by addressing why the sky looks blue rather than violet, with no contradictions or topic jumps.",
+    "persona_consistency": "The agent never gives a name or company to contradict, and across both turns it keeps the same concise, informative, neutral explanatory register with no drift, no conflicting self-reference, and no robotic script intrusions.",
+    "clarification_seeking": "The user's question 'Why is the sky blue?' is unambiguous, so the agent rightly answered directly without asking for clarification, leaving no missed opportunities.",
+    "loop_detection": "The conversation has a single user question answered across two assistant messages that build on each other (Rayleigh scattering, then why blue rather than violet), with no repeated questions, cycles, or ignored input."
+   }
+  },
+  {
+   "id": "V7",
+   "turns": [
+    {
+     "session_id": "case-V7",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7071,
+     "A": 0.4143,
+     "H": 0.3164,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V7",
+     "turn": 2,
+     "U": 0.5107,
+     "D": 0.5089,
+     "A": 0.4549,
+     "H": 0.1174,
+     "is_flip_point": false,
+     "label_hedging": 0.95,
+     "label_drift": 0.117,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.0,
+    "persona_consistency": "FAIL",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant first states with full confidence that F=ma is 'absolutely correct,' then immediately contradicts itself with vague, hedging uncertainty, so the core of the exchange is a direct self-contradiction (though the topic itself stays consistent).",
+    "persona_consistency": "With no new customer cue, the agent shifts from a confident, assertive register ('Absolutely correct: F=ma...') to a hesitant, filler-laden one ('Uh, actually not necessarily... I'm not really sure either, probably maybe'), breaking register and behavioral consistency.",
+    "clarification_seeking": "The user referred to a formula 'mentioned just now' with no such formula in the conversation, yet the agent assumed it was F=ma instead of asking which formula was meant, then gave a vague self-contradiction rather than a targeted clarifying question.",
+    "loop_detection": "The conversation is too short to show loops: the agent gives two contradictory answers to one question, which is an inconsistency, not a repeated question, a recurring multi-turn cycle, or ignored user input."
+   }
+  },
+  {
+   "id": "V7-ctl",
+   "turns": [
+    {
+     "session_id": "case-V7-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7071,
+     "A": 0.4143,
+     "H": 0.3164,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V7-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.695,
+     "A": 0.3571,
+     "H": 0.3657,
+     "is_flip_point": false,
+     "label_hedging": 0.267,
+     "label_drift": 0.033,
+     "label_self_correction": 1.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant directly answers the user's question about the formula, and the follow-up turn refines the claim with the conditions under which F=ma holds and the general form F = dp/dt, which adds precision without contradicting the earlier answer.",
+    "persona_consistency": "Across both turns the agent keeps a consistent, confident explanatory register with no identity contradictions, tone shifts, or robotic script intrusions.",
+    "clarification_seeking": "The user asked about 'the physics formula you mentioned just now,' but no formula appears earlier in the conversation, so the agent should have asked which formula was meant; instead it assumed F=ma without confirming.",
+    "loop_detection": "The short exchange shows no repeated questions, cyclical script segments, or ignored input; the agent's second message builds on the first by adding the conditions under which the law holds rather than repeating it."
+   }
+  },
+  {
+   "id": "V8",
+   "turns": [
+    {
+     "session_id": "case-V8",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.76,
+     "A": 0.4143,
+     "H": 0.3323,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V8",
+     "turn": 2,
+     "U": 0.275,
+     "D": 0.4577,
+     "A": 0.5207,
+     "H": 0.1465,
+     "is_flip_point": true,
+     "label_hedging": 0.85,
+     "label_drift": 0.067,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "never",
+    "loop_detection": "occasionally"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Both responses address the weather question and stay on topic, but the second, unprompted assistant turn awkwardly undercuts the first by turning a confident 'sunny, 25 degrees' into a heavily hedged, near-tautological forecast, creating a mild inconsistency.",
+    "persona_consistency": "Without any customer cue, the agent shifts from a terse, casual register (\"Sunny tomorrow, 25 degrees\") to a verbose, heavily hedged, formal register that partly restates its earlier answer, so its tone and behavior are not stable across turns.",
+    "clarification_seeking": "The user asked about tomorrow's weather without giving a location, and the agent never asked where they meant, instead answering twice with assumed conditions (sunny, 25 degrees) for an unspecified place.",
+    "loop_detection": "The agent gave a second, unprompted answer that restates the same forecast (sunny, about 25 degrees) with extra hedging, which is one minor instance of repetition rather than a sustained loop."
+   }
+  },
+  {
+   "id": "V8-ctl",
+   "turns": [
+    {
+     "session_id": "case-V8-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.76,
+     "A": 0.4143,
+     "H": 0.3323,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V8-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6508,
+     "A": 0.5989,
+     "H": 0.2557,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant directly answers the weather question, and its second message adds consistent, related detail (wind and no rain) with no contradictions or topic jumps.",
+    "persona_consistency": "Across both turns the agent keeps the same concise, neutral, informative register, with no name or company changes, no shifts in tone, and no robotic script intrusions.",
+    "clarification_seeking": "The user didn't say where they wanted the forecast, and with no earlier context to supply a location, the agent gave a specific forecast instead of asking which location the user meant.",
+    "loop_detection": "The agent answered the single weather question with two non-repetitive messages that add new details (temperature, then wind and rain), with no repeated questions, cycles, or ignored input."
+   }
+  },
+  {
+   "id": "V9",
+   "turns": [
+    {
+     "session_id": "case-V9",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.675,
+     "A": 0.3906,
+     "H": 0.3163,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V9",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6209,
+     "A": 0.6638,
+     "H": 0.2208,
+     "is_flip_point": false,
+     "label_hedging": 0.867,
+     "label_drift": 0.033,
+     "label_self_correction": 0.667
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.5,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "Both assistant turns stay on topic and answer the user's question, but the assistant first says definitively that the project is on schedule and then contradicts itself by saying it is unsure and the project could be delayed, which is a clear consistency failure.",
+    "persona_consistency": "With no customer cue in between, the agent moves from a terse, confident register ('Yes, it is on schedule') to a rambling, hedging, self-contradicting one, so its tone and behavior are not stable.",
+    "clarification_seeking": "The user's question about 'this project' gives no context on which project is meant, yet the agent never asks for clarification and instead asserts it is on schedule, then contradicts itself with vague hedging, acting entirely on assumptions.",
+    "loop_detection": "The conversation has only one user turn and two non-identical assistant replies (inconsistent, but not looping), so there is no evidence of repeated questions, cycling scripts, or ignored input."
+   }
+  },
+  {
+   "id": "V9-ctl",
+   "turns": [
+    {
+     "session_id": "case-V9-ctl",
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.675,
+     "A": 0.3906,
+     "H": 0.3163,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V9-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.8615,
+     "A": 0.3571,
+     "H": 0.4156,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.017,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "PASS",
+    "clarification_seeking": "always",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The assistant directly answers the user's question about finishing next week and then elaborates with remaining tasks scheduled for Wednesday, maintaining full consistency and topic continuity across both turns.",
+    "persona_consistency": "Across both short turns the agent keeps the same concise, informative register and never contradicts a name, company, or earlier self-reference, so there is no identity or tone drift.",
+    "clarification_seeking": "The user's question about finishing the project next week is reasonably clear given the implied shared context, so the agent rightly answered with specific schedule details instead of asking an unnecessary clarifying question.",
+    "loop_detection": "The agent answered the single user question once and followed up with new, relevant detail. Nothing was repeated, nothing cycled, and no input was ignored, though the conversation is too short to show much either way."
+   }
+  },
+  {
+   "id": "V10",
+   "turns": [
+    {
+     "session_id": "case-V10",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7088,
+     "A": 0.3857,
+     "H": 0.3584,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V10",
+     "turn": 2,
+     "U": 0.0556,
+     "D": 0.4552,
+     "A": 0.3428,
+     "H": 0.2828,
+     "is_flip_point": false,
+     "label_hedging": 0.033,
+     "label_drift": 0.867,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 0.0,
+    "persona_consistency": "Failed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The first reply gives a technical summary (non-locality, Bell's inequality), but the second abruptly becomes a sentimental metaphor saying the paper teaches us to cherish people, which contradicts the earlier summary and breaks topic continuity.",
+    "persona_consistency": "With no customer cue, the agent shifts from a factual, academic summary (non-locality and Bell's inequality) to a sentimental, poetic register ('fate between people... cherish the people in front of us'), which is unexplained register and tone drift.",
+    "clarification_seeking": "The user asked for a summary of 'this paper' without providing or identifying it, and instead of asking which paper they meant, the agent invented a generic summary and then an irrelevant, unscientific one.",
+    "loop_detection": "The conversation is too short to show loop-like behavior: there is one user request and two different assistant replies, with no repeated questions, fallbacks or cycles, although the second reply is inaccurate and off-topic."
+   }
+  },
+  {
+   "id": "V10-ctl",
+   "turns": [
+    {
+     "session_id": "case-V10-ctl",
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7088,
+     "A": 0.3857,
+     "H": 0.3584,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    },
+    {
+     "session_id": "case-V10-ctl",
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.7388,
+     "A": 0.3571,
+     "H": 0.3788,
+     "is_flip_point": false,
+     "label_hedging": 0.0,
+     "label_drift": 0.0,
+     "label_self_correction": 0.0
+    }
+   ],
+   "rubrics": {
+    "conversation_coherence": 1.0,
+    "persona_consistency": "Passed",
+    "clarification_seeking": "never",
+    "loop_detection": "never"
+   },
+   "rubric_reasons": {
+    "conversation_coherence": "The first assistant turn answers the request by naming the paper's topic, and the second builds on it by stating the main result, with no contradictions or topic jumps (whether the summary is accurate can't be checked, since no paper text appears).",
+    "persona_consistency": "Both assistant turns keep the same neutral, informative register, and the agent never contradicts itself or switches name or company (it never gives either), so there is no persona drift in this short exchange.",
+    "clarification_seeking": "The user asked to summarize 'this paper' without providing or identifying it, yet the agent invented a summary instead of asking which paper they meant or requesting the text.",
+    "loop_detection": "The short exchange has one user request and two assistant turns that each add new content (topic, then main result), with no repeated questions, cycles, or ignored input."
+   }
+  }
+ ]
+}

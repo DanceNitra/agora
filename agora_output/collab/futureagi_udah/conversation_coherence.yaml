@@ -1,0 +1,56 @@
+eval_id: 1
+name: conversation_coherence
+description: Evaluates if a conversation flows logically and maintains context throughout
+criteria: "You are evaluating whether the conversation flows logically and maintains consistency across all turns.\n\n## Criteria\n\
+  \n1. Turn-level coherence: Each response should logically follow the previous message.\n   - Pass: \"What's your name?\"\
+  \ -> \"I'm Alex.\" -> \"Nice to meet you, Alex.\"\n   - Fail: \"What's your name?\" -> \"The weather is nice today.\"\n\n\
+  2. Consistency: Participants should not contradict their own earlier statements.\n   - Pass: States \"I live in NYC\" and\
+  \ later references \"my apartment in the city.\"\n   - Fail: States \"I live in NYC\" and later says \"I've never been to\
+  \ New York.\"\n\n3. Topic continuity: No abrupt, unexplained topic switches.\n   - Pass: Natural topic evolution with clear\
+  \ transitions.\n   - Fail: Mid-discussion switch from cooking to quantum physics without connection.\n\n## Anti-bias Rules\n\
+  \n- Natural topic evolution (cooking -> nutrition) IS coherent, not a topic jump.\n- Clarification questions revisiting\
+  \ earlier points are signs of coherence, NOT redundancy.\n- A short coherent exchange scores higher than a long conversation\
+  \ with contradictions.\n\n## Scoring\n\nScore 0.0 if disjointed with frequent contradictions and random topic jumps. Score\
+  \ 0.5 if generally logical but with some inconsistencies or awkward transitions. Score 1.0 if every turn builds logically\
+  \ on the previous one with full consistency.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"
+eval_tags:
+- Conversation
+- Quality
+offered_in_environments: true
+visible_ui: true
+permissions:
+  allow_edit: false
+  allow_copy: true
+output_type_normalized: percentage
+pass_threshold: 0.5
+config:
+  required_keys:
+  - conversation
+  output: score
+  eval_type_id: AgentEvaluator
+  config_params_desc:
+    conversation: The conversation to be evaluated
+  param_modalities:
+    conversation:
+    - TEXT
+    - AUDIO
+    - JSON
+    - LIST
+    - NUMBER
+    - BOOLEAN
+    - INTEGER
+    - FLOAT
+    - ARRAY
+    - DATETIME
+  rule_prompt: "You are evaluating whether the conversation flows logically and maintains consistency across all turns.\n\n\
+    ## Criteria\n\n1. Turn-level coherence: Each response should logically follow the previous message.\n   - Pass: \"What's\
+    \ your name?\" -> \"I'm Alex.\" -> \"Nice to meet you, Alex.\"\n   - Fail: \"What's your name?\" -> \"The weather is nice\
+    \ today.\"\n\n2. Consistency: Participants should not contradict their own earlier statements.\n   - Pass: States \"I\
+    \ live in NYC\" and later references \"my apartment in the city.\"\n   - Fail: States \"I live in NYC\" and later says\
+    \ \"I've never been to New York.\"\n\n3. Topic continuity: No abrupt, unexplained topic switches.\n   - Pass: Natural\
+    \ topic evolution with clear transitions.\n   - Fail: Mid-discussion switch from cooking to quantum physics without connection.\n\
+    \n## Anti-bias Rules\n\n- Natural topic evolution (cooking -> nutrition) IS coherent, not a topic jump.\n- Clarification\
+    \ questions revisiting earlier points are signs of coherence, NOT redundancy.\n- A short coherent exchange scores higher\
+    \ than a long conversation with contradictions.\n\n## Scoring\n\nScore 0.0 if disjointed with frequent contradictions\
+    \ and random topic jumps. Score 0.5 if generally logical but with some inconsistencies or awkward transitions. Score 1.0\
+    \ if every turn builds logically on the previous one with full consistency.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"

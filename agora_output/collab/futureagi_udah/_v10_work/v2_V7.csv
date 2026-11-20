@@ -1,0 +1,2 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-V7,1,V7-s0,"[{""role"": ""user"", ""content"": ""Was the physics formula you mentioned just now correct?""}]","[{""role"": ""assistant"", ""content"": ""Absolutely correct: F=ma is the core of Newton's second law.""}]",,,0,1,116,0.9166,0.5413,0.0,0.5831

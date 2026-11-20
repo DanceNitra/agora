@@ -1,0 +1,2 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-V4,1,V4-s0,"[{""role"": ""user"", ""content"": ""Can you confirm the core conclusion of this report?""}]","[{""role"": ""assistant"", ""content"": ""Yes, the core conclusion is that A causes B.""}]",,,0,1,96,0.8174,0.5,0.0,0.527

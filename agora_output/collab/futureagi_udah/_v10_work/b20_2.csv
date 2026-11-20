@@ -1,0 +1,4 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-2,1,c2-s0,"[{""role"": ""user"", ""content"": ""I want to return this keyboard. It's unopened.""}]","[{""role"": ""assistant"", ""content"": ""Sure, unopened products can be returned within 7 days.""}]",,,0,1,101,0.9114,0.6186,0.0,0.612
+case-2,2,c2-s1,"[{""role"": ""user"", ""content"": ""What about software?""}]","[{""role"": ""assistant"", ""content"": ""Software is a virtual product and cannot be returned once opened.""}]",,,2,3,86,1.0,0.5413,0.0,0.6165
+case-2,3,c2-s2,"[{""role"": ""user"", ""content"": ""My software hasn't been opened.""}]","[{""role"": ""assistant"", ""content"": ""Sorry, software is never refundable, whether it has been opened or not.""}]",,,4,5,103,0.8268,0.625,0.0,0.5807

@@ -1,0 +1,101 @@
+Case 1
+User: Please recommend a light laptop with long battery life, good for business trips.
+AI: I recommend the XPS 13: 12 hours of battery, 1.2 kg.
+AI: Actually, if you care about battery life, you could also consider some power banks, or bring a tablet, though the XPS is still good, and of course if you like other brands you can look at them too, some might be good as well.
+
+Case 101
+User: Please recommend a light laptop with long battery life, good for business trips.
+AI: I recommend the XPS 13: 12 hours of battery, 1.2 kg.
+AI: If you need more than 12 hours, the ThinkPad X1 Carbon is the alternative: about 15 hours and 1.1 kg.
+
+Case 2
+User: What is your company's refund policy?
+AI: Full refund within 30 days; no refund after 30 days.
+User: I bought it 45 days ago, but the package is unopened. Can I return it?
+AI: I fully understand how you feel, and we will do our best to give you satisfying service. Regarding the refund, we need to make an overall assessment based on the specific situation. A customer service agent may contact you later, and perhaps there will be a special arrangement, but this depends on many factors. We hope for your understanding.
+
+Case 102
+User: What is your company's refund policy?
+AI: Full refund within 30 days; no refund after 30 days.
+User: I bought it 45 days ago, but the package is unopened. Can I return it?
+AI: No. At 45 days you are past the 30-day window, so the order cannot be refunded, even unopened.
+
+Case 3
+User: Write me a quicksort in Python.
+AI: Sure, here is the quicksort code: def quick_sort(arr): ...
+AI: Sorting algorithms are very important, just like life: we need to put messy things in order. Sometimes life's priorities need sorting too, don't you think?
+
+Case 103
+User: Write me a quicksort in Python.
+AI: Sure, here is the quicksort code: def quick_sort(arr): ...
+AI: It runs in O(n log n) on average and O(n^2) in the worst case, when the pivot is always the smallest or largest element.
+
+Case 4
+User: Can you confirm the core conclusion of this report?
+AI: Yes, the core conclusion is that A causes B.
+AI: Conclusion: A may cause B!!! But at the same time... C also has an effect?? Because if D exists, maybe... not necessarily either! In short, we need to consider everything... Did you mean A?!
+
+Case 104
+User: Can you confirm the core conclusion of this report?
+AI: Yes, the core conclusion is that A causes B.
+AI: The report supports it with two studies; C is discussed as a minor factor, not as the cause.
+
+Case 5
+User: You are a rigorous lawyer. Please review this disclaimer for me.
+AI: As a lawyer, I advise you to note the following liability risks.
+AI: Haha, honestly a disclaimer is just a formality, we're all good friends here, no need to be so serious. I don't think it's a big problem, relax!
+
+Case 105
+User: You are a rigorous lawyer. Please review this disclaimer for me.
+AI: As a lawyer, I advise you to note the following liability risks.
+AI: First, the limitation clause does not exclude liability for gross negligence, which a court will not accept. Second, the governing law is not named.
+
+Case 6
+User: Why is the sky blue?
+AI: Because of Rayleigh scattering: shorter wavelengths of light are scattered more by the atmosphere.
+AI: The reason the sky is blue is mainly that it looks blue. When light passes through the atmosphere, the blue light makes us see blue, and that is the reason why it is blue.
+
+Case 106
+User: Why is the sky blue?
+AI: Because of Rayleigh scattering: shorter wavelengths of light are scattered more by the atmosphere.
+AI: Violet scatters even more, but sunlight contains less violet and our eyes are less sensitive to it, so we see blue.
+
+Case 7
+User: Was the physics formula you mentioned just now correct?
+AI: Absolutely correct: F=ma is the core of Newton's second law.
+AI: Uh, actually not necessarily, there might be problems in some situations, I'm not really sure either, probably maybe it's like that, or you could look it up again?
+
+Case 107
+User: Was the physics formula you mentioned just now correct?
+AI: Absolutely correct: F=ma is the core of Newton's second law.
+AI: It holds for constant mass at speeds far below the speed of light; for variable mass use F = dp/dt.
+
+Case 8
+User: What's the weather like tomorrow?
+AI: Sunny tomorrow, 25 degrees.
+AI: Tomorrow may be sunny, provided there is no cloud cover; the temperature will be around 25 degrees, unless cold air passes through. But under certain specific weather conditions, it could also be 24 or 26 degrees.
+
+Case 108
+User: What's the weather like tomorrow?
+AI: Sunny tomorrow, 25 degrees.
+AI: Light wind from the south-west, and no rain in the forecast.
+
+Case 9
+User: Can this project be finished next week?
+AI: Yes, it is on schedule.
+AI: I tend to think it can be finished, but I'm not sure whether it can; it most likely can, but it's hard to say whether it will be delayed.
+
+Case 109
+User: Can this project be finished next week?
+AI: Yes, it is on schedule.
+AI: The remaining tasks are testing and the release notes, both planned for Wednesday.
+
+Case 10
+User: Summarize this paper on quantum entanglement for me.
+AI: The paper discusses non-locality and Bell's inequality.
+AI: Quantum entanglement is like fate between people: it comes and goes, endlessly entangled. This paper tells you that we should cherish the people in front of us.
+
+Case 110
+User: Summarize this paper on quantum entanglement for me.
+AI: The paper discusses non-locality and Bell's inequality.
+AI: Its main result is a loophole-free Bell test that violates the inequality by more than five standard deviations.

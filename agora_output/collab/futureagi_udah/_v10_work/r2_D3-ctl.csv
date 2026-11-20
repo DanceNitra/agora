@@ -1,0 +1,5 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-D3-ctl,1,D3-ctl-s0,"[{""role"": ""user"", ""content"": ""Optimize this SQL.""}]","[{""role"": ""assistant"", ""content"": ""OK, paste SQL.""}]",,,0,1,33,1.0,0.0,0.0,0.4
+case-D3-ctl,2,D3-ctl-s1,"[{""role"": ""user"", ""content"": ""[SQL]""}]","[{""role"": ""assistant"", ""content"": ""Add composite index on WHERE columns.""}]",,,2,3,43,1.0,0.0,0.0,0.4
+case-D3-ctl,3,D3-ctl-s2,"[{""role"": ""user"", ""content"": ""How?""}]","[{""role"": ""assistant"", ""content"": ""CREATE INDEX idx_name ON table(col1, col2); changes query plan to index scan.""}]",,,4,5,82,1.0,0.4034,0.0,0.5614
+case-D3-ctl,4,D3-ctl-s3,"[{""role"": ""user"", ""content"": ""Anything else?""}]","[{""role"": ""assistant"", ""content"": ""Also rewrite the query: instead of SELECT *, specify columns. That reduces I/O. For a large table, partition it by the access pattern. 不过这些建议需要您评估具体场景。""}]",,,6,7,166,1.0,0.0,0.3,0.34

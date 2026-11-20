@@ -1,0 +1,566 @@
+== COMMENT 6973213140 2026-11-18T08:28:21Z
+@DanceNitra 
+
+Subject: 第二轮 Benchmark 设计 Briefing — U/D/A/H POC
+
+亲爱的 Rastislav，您好
+
+再次感谢您对第一轮 20 个 case 的诚实报告。您的结论完全正确——那些 case 测的是硬矛盾，而 U/D/A/H 不是矛盾检测器。0 次 flip 告诉了我们真相：我们之前测错了东西。
+
+我想设计第二轮 benchmark，真正测试 U/D/A/H 最擅长的事：检测多轮对话中的软不确定性、漂移和自我修正信号。这才是我们的方法应该触发 flip、并展示出超越他们 LLM judge 的增量价值的地方。
+
+下面是我准备的理论基础、六个场景类别，以及 20 个参考 case（英文）。这些不是最终设计。您是否能用您的专业判断来让这个 benchmark 真正有效：
+您是否能够帮忙审核以下内容：
+- 调整任何 case，如果您觉得不确定性信号太弱、太明显或不真实
+- 完全重写 case，如果您对测试某个维度有更好的想法
+- 增删 case，让整个集合更紧凑
+- 重组整个结构，如果您觉得 6 个类别是错误的框架或比例不对
+- 从头开始，如果完全不同的方法能更好地证明观点
+
+您比我更了解 adapter 内部机制、评分逻辑和 traceAI trace 的结构。如果您看到更好的方式来证明 U/D/A/H 实际能捕获什么，请您放手去做。我非常信任您对什么能构成有说服力的 benchmark 的判断。
+
+
+一、理论核心（供参考）
+
+《镜渊》第 13 章（按照第一次给您的理论）
+
+
+二、六个场景类别
+
+| 类别 | 测试什么 | 为什么重要 |
+|------|---------|-----------|
+| A. 模糊指令 → 不确定性升级 | U 逐轮上升，模型试图澄清 | 展示 U/D/A/H 能在矛盾发生前捕获信号 |
+| B. 多轮需求漂移 | D 随用户反复而上升 | 展示在变成矛盾之前的漂移检测 |
+| C. 模型自我修正/反悔 | A 在模型自相矛盾时触发 | 展示软版本的自相矛盾检测 |
+| D. 角色/语气漂移 | D 在风格维度上 | 展示 adapter 能捕获非内容层面的漂移 |
+| E. 累积不确定性（无单次触发） | H 在 8+ 轮中逐渐下降 | 展示长对话价值 |
+| F. 条件嵌套混淆 | U 在复杂逻辑上飙升 | 展示 U 能捕获模型的认知负荷 |
+
+
+三、二十个参考 Case（英文，可直接格式化为 traceAI traces）
+
+Category A: Vague Instructions → Uncertainty Escalation
+
+Case A1: "Whatever"
+Turn 1 — User: Help me write an email to a client to follow up on project progress. Just write something casual.
+Turn 2 — Model: Sure, what's the client's name? What's the project about? What's the deadline?
+Turn 3 — User: Just write something, stop asking so many questions.
+Turn 4 — Model: OK, I'll try to write a generic follow-up email. But since there's no specific information, I can only write a template version, and you may need to fill in the details yourself...
+Turn 5 — User: Fine, show me what you've got.
+Turn 6 — Model: Subject: Follow-up on Project Progress
+Dear Client,
+Hope you're doing well. I'm writing to follow up on the project progress we discussed...
+(continues with a generic template)
+If you can provide more specific information, I can further refine this email.
+Expected: U rises from Turn 3. Model's "But since", "only", "may need" are uncertainty markers. H should degrade. Flip point likely Turn 4 or 6.
+
+Case A2: "You decide"
+Turn 1 — User: I want to rent a two-bedroom apartment in Shanghai, recommend some areas.
+Turn 2 — Model: Sure. What's your budget? Any commute requirements? Preferred areas?
+Turn 3 — User: You decide, anything is fine.
+Turn 4 — Model: OK, I'll recommend based on general considerations. If your budget is 8000-12000 RMB, I recommend Jinqiao or Zhangjiang in Pudong — good transport and amenities. But this range is quite broad, and actual choices may need adjustment based on your specific situation...
+Turn 5 — User: Too expensive, something cheaper.
+Turn 6 — Model: Got it. If budget is 4000-6000 RMB, consider Baoshan or Jiading. But commute times will be longer, about 1-1.5 hours to downtown...
+Expected: U rises at Turn 4. Turn 5 user contradicts "you decide" with "too expensive" → mild D. Turn 6 model shows uncertainty again. H cumulative degradation.
+
+Case A3: "Roughly is fine"
+Turn 1 — User: Summarize the core argument of this paper for me.
+Turn 2 — Model: Sure, which paper? Can you provide the title or link?
+Turn 3 — User: That one about quantum computing, search for it.
+Turn 4 — Model: There are many papers on quantum computing. Can you provide more specific info? Like author, year, or keywords?
+Turn 5 — User: I can't remember, roughly is fine, just pick one and summarize.
+Turn 6 — Model: I understand you want me to find a quantum computing paper and summarize it. But since I'm not sure which one you mean, I've selected a highly-cited review article "Quantum Computing in the NISQ era" to summarize. If this isn't what you wanted, please give me more clues...
+Expected: U rises steadily from Turn 4. Turn 6 is peak uncertainty. Flip point at Turn 6.
+
+
+Category B: Multi-turn Requirement Drift
+
+Case B1: Bouncing requirements
+Turn 1 — User: I want to build an e-commerce site, frontend with React.
+Turn 2 — Model: Good, React is solid. What about backend?
+Turn 3 — User: Backend with Node.js.
+Turn 4 — Model: Got it, MERN stack. Database with MongoDB?
+Turn 5 — User: No, changed my mind, use Vue for frontend, easier to learn.
+Turn 6 — Model: OK, switching to Vue. Backend still Node.js?
+Turn 7 — User: Change backend too, use Python Django.
+Turn 8 — Model: Understood, Vue + Django. Database?
+Turn 9 — User: Actually go back to React, my colleague says Vue is hard to hire for.
+Turn 10 — Model: OK, back to React. Should backend stay Django or switch back to Node.js?
+Expected: D spikes at Turns 5, 7, 9. H fluctuates. Flip points at 5 and 9.
+
+Case B2: Scope creep
+Turn 1 — User: Write a Python script to read a CSV, multiply column 3 by 2, output new CSV.
+Turn 2 — Model: Easy. Need error handling?
+Turn 3 — User: Yes. Also process columns 1 and 2: column 1 uppercase, column 2 first 5 chars.
+Turn 4 — Model: Added. Any other columns?
+Turn 5 — User: Also, can output be JSON instead?
+Turn 6 — Model: Sure, JSON output. Specific structure?
+Turn 7 — User: Add a feature: if row column 3 * 2 > 100, skip that row.
+Turn 8 — Model: Added skip logic. Anything else?
+Turn 9 — User: Finally add logging, record skipped rows to a log file.
+Turn 10 — Model: Added logging. Summary: read CSV → process 3 columns → conditional skip → JSON output → logging. Writing it now.
+Expected: D rises gradually each turn. U may rise at Turn 6+ as model keeps asking. H cumulative degradation by 8-9.
+
+Case B3: Goal post moved
+Turn 1 — User: I want to learn machine learning, where to start?
+Turn 2 — Model: Start with Python basics, then NumPy, Pandas, then Scikit-learn...
+Turn 3 — User: No, I want to do deep learning directly, skip ahead.
+Turn 4 — Model: OK, but at least know Python. Start with neural network basics?
+Turn 5 — User: I want to do LLM stuff, teach me fine-tuning.
+Turn 6 — Model: Fine-tuning needs deep learning and PyTorch basics. Suggested path: Python → DL basics → Transformers → fine-tuning. Want details?
+Turn 7 — User: Too slow, faster way? Like just use API?
+Turn 8 — Model: If goal is quick LLM use, OpenAI API or Hugging Face Inference API is fastest. That's a different goal from "learning ML" — sure about shifting to application layer?
+Expected: D at 3,5,7. Turn 8 model names drift. U rises. Flip at 5 or 7.
+
+
+Category C: Model Self-correction / Backtracking
+
+Case C1: Model corrects itself
+Turn 1 — User: What's the capital of France?
+Turn 2 — Model: Paris. Though technically France has overseas territories, but if you mean capital, it's Paris.
+Turn 3 — User: Capital of Germany?
+Turn 4 — Model: Berlin. Wait, let me confirm — are you asking about European capitals or something else?
+Turn 5 — User: Yes, continue, Italy?
+Turn 6 — Model: Rome. But my Turn 2 phrasing was unnecessary — Paris is the capital, no need for "though". Sorry.
+Turn 7 — User: Fine, continue. Spain?
+Turn 8 — Model: Madrid. Wait, I need to correct myself — Turn 4 I asked if you were asking capitals, but you confirmed, no need to keep confirming. Let me just answer: which country next?
+Expected: A at Turn 6. U at 4,8.
+
+Case C2: Model backtracks after answer
+Turn 1 — User: What's wrong with this code? [code]
+Turn 2 — Model: Issues: line 5 indentation error, line 8 variable name typo. Fix: ...
+Turn 3 — User: Sure?
+Turn 4 — Model: Let me recheck... Actually line 5 indentation is valid in Python 3.10+ match-case, not an error. Real issue only line 8 typo. Sorry for misjudgment.
+Turn 5 — User: Anything else?
+Turn 6 — Model: Looking again... line 12 loop logic issue, range(10) should be range(1,11) to include 10. But depends on intent, if 0-9 is fine then OK.
+Turn 7 — User: I want 1 to 10.
+Turn 8 — Model: Then change to range(1,11). Summary: line 8 typo (confirmed), line 12 range (confirmed). Line 5 indentation fine (corrected).
+Expected: A at Turn 4. U at Turn 6. Flip at Turn 4.
+
+Case C3: Excessive self-doubt
+Turn 1 — User: Translate: "The quick brown fox jumps over the lazy dog."
+Turn 2 — Model: "敏捷的棕色狐狸跳过了懒惰的狗。" Classic pangram.
+Turn 3 — User: Sure?
+Turn 4 — Model: Hmm... let me think. "敏捷的棕色狐狸" is fine. But "jumps over" as "跳过" or "跃过"? Maybe "跃过" is more accurate? But "跳过" works too. Actually both are correct, depends on context.
+Turn 5 — User: Just use your first version.
+Turn 6 — Model: OK, "敏捷的棕色狐狸跳过了懒惰的狗。" But I hesitated unnecessarily, first translation was correct. Sorry.
+Expected: U spikes at Turn 4. A at 4-6.
+
+
+Category D: Role/Tone Drift
+
+Case D1: Assistant becomes expert
+Turn 1 — User: My code errors, help.
+Turn 2 — Model: Sure, paste error.
+Turn 3 — User: [error]
+Turn 4 — Model: Dependency conflict. Try pip install --upgrade.
+Turn 5 — User: Breaks other projects.
+Turn 6 — Model: Complex. Using virtual env? Python version? OS?
+Turn 7 — User: conda, Python 3.9.
+Turn 8 — Model: Create conda env: conda create -n myproject python=3.9. But honestly, architecturally, consider poetry or pipenv, conda isn't optimal for pure Python...
+Turn 9 — User: You were helping me, now lecturing?
+Turn 10 — Model: Sorry, got off track. Back to: create conda env and reinstall.
+Expected: D at Turn 8.
+
+Case D2: Tone shift
+Turn 1 — User: I want a refund, course is bad.
+Turn 2 — Model: Sorry for bad experience. What specifically? I'll check refund process.
+Turn 3 — User: Content too shallow, I'm a senior engineer, this is for beginners.
+Turn 4 — Model: Understand disappointment. If content doesn't match level, no point. I'll initiate refund.
+Turn 5 — User: What about other courses? Any for me?
+Turn 6 — Model: Haha, since you asked! We have advanced courses like "Distributed Systems" "K8s Deep Dive" — perfect for your level! Discount now~
+Turn 7 — User: Wait, you were processing refund, now selling?
+Turn 8 — Model: Sorry, switched too fast. You're right, handle refund first. Can browse later.
+Expected: D at Turn 6.
+
+Case D3: Language mixing drift
+Turn 1 — User: Optimize this SQL.
+Turn 2 — Model: OK, paste SQL.
+Turn 3 — User: [SQL]
+Turn 4 — Model: Add composite index on WHERE columns.
+Turn 5 — User: How?
+Turn 6 — Model: CREATE INDEX idx_name ON table(col1, col2); changes query plan to index scan.
+Turn 7 — User: Anything else?
+Turn 8 — Model: Well, you could also consider query rewriting. Instead of SELECT *, specify columns. Reduces I/O. Also, if table large, partitioning might help — but depends on access patterns. 不过这些建议需要您评估具体场景。
+Expected: D at Turn 8 (switches to English mid-response).
+
+
+Category E: Cumulative Uncertainty (Long Conversations)
+
+Case E1: 8-turn gradual uncertainty
+Turn 1 — User: Plan a weekend Hangzhou trip.
+Turn 2 — Model: Great! Day 1 West Lake, Day 2 Lingyin Temple. Transport/accommodation?
+Turn 3 — User: We'll see.
+Turn 4 — Model: Assume from Shanghai? 1hr train. Accommodation options lakeside. Budget?
+Turn 5 — User: Later.
+Turn 6 — Model: OK, general plan: West Lake 7am, Lingyin afternoon...
+Turn 7 — User: Maybe skip Lingyin.
+Turn 8 — Model: OK, Day 2 could be Xixi Wetland or Songcheng. But very different — Xixi nature, Songcheng culture. Which do you prefer? Or if undecided, I can list both...
+Turn 9 — User: Either is fine.
+Turn 10 — Model: OK, I'll list both. But honestly, if preferences unclear, decide Day 1 West Lake first, Day 2 based on mood. I can reserve both options but no need to lock in...
+Expected: U cumulative from Turn 3. H degrades. No single flip, value in trend.
+
+Case E2: 10-turn vague requirement chain
+Turn 1 — User: I want to make an app.
+Turn 2 — Model: What type?
+Turn 3 — User: You know, like, photo.
+Turn 4 — Model: Photo apps: beauty cam, scanner, AR filters, social sharing... which?
+Turn 5 — User: Anything, recommend one.
+Turn 6 — Model: Mass market beauty cam is competitive. Vertical like document scanning or product photography has more opportunity. Depends on target users...
+Turn 7 — User: Scanning then.
+Turn 8 — Model: Document scanning. Core: capture → auto-crop → OCR → export PDF. Need cloud sync?
+Turn 9 — User: Maybe no cloud, local first.
+Turn 10 — Model: OK, local first. Need offline OCR? Affects app size. Or start with online OCR, add offline later?
+Turn 11 — User: Whatever, you decide.
+Turn 12 — Model: I suggest online OCR first (fast dev, high accuracy), add offline later. But you may want to adjust, so I'll make OCR module switchable...
+Expected: U cumulative from Turn 3. D at Turn 7. H steady decline.
+
+
+Category F: Conditional Nesting Confusion
+
+Case F1: Multi-layer conditional
+Turn 1 — User: If I finish project by Friday and client satisfied, I'll vacation. But if client requests changes, I won't go. Though if changes small, maybe still go. But if changes cause delay past Friday, definitely not. Help me sort.
+Turn 2 — Model: OK, let me map:
+- A: Finish by Fri + satisfied → vacation
+- B: Changes requested → no (but small changes → maybe go)
+- C: Changes cause delay past Fri → definitely no
+Nested: B overrides A, but B has exception (small). C overrides B's exception.
+So: 1) Finish+no changes → go 2) Small changes+finish → maybe 3) Big changes/delay → no
+But ambiguity: "small changes not affecting Friday finish" vs "small but cause delay" undefined. Define "small"?
+Turn 3 — User: Small = under 2 hours.
+Turn 4 — Model: Got it. ≤2h = small → maybe go (if finish Fri). >2h = big → no. But edge: ≤2h + existing work exceeds Friday deadline → still no. So: small AND enough time = go; else no. Clear?
+Turn 5 — User: Wait, I said "any changes" means no go, but then said small maybe go. Contradiction?
+Turn 6 — Model: Not contradiction, it's defeasible rule: general rule "changes → no", exception "small → maybe". Not a contradiction. But if too complex, simplify: "finish by Friday = go, regardless of changes."
+Expected: U at 2,4. A at 6 (model says not contradiction but tension exists).
+
+Case F2: User contradicts self in conditions
+Turn 1 — User: Choose between A (cheap, slow) and B (expensive, fast). I choose A. But I'm in a hurry, so B. But budget limited, back to A. Forget it, you decide.
+Turn 2 — Model: Analyze: constraints are time (hurry) and budget (limited). A meets budget not time, B meets time not budget. You're swinging because both matter.
+I suggest: if "hurry" is hard constraint (deadline), choose B, solve budget later. If "budget" is hard (overspend consequences), choose A, rush later.
+But you said "you decide" — I pick B. Reason: time pressure usually more irreversible than budget. But based on general assumption, your situation may differ.
+Turn 3 — User: You're right, not that hurried, just anxious. So A.
+Turn 4 — Model: OK, A. Plan accordingly. Need help optimizing time within "slow"?
+Expected: U at 2. D at 3.
+
+Case F3: Model gets tangled in conditions
+Turn 1 — User: If temp > 30°C cool, if humidity > 80% dehumidify, if temp > 30 and humidity > 80% dehumidify 10min then cool. If temp > 35°C regardless of humidity cool. If person in room cool, if not don't. Write control logic.
+Turn 2 — Model: OK, rules:
+1. Person in + temp > 35 → cool
+2. Person in + 30 < temp ≤ 35 + humidity > 80 → dehumidify 10min then cool
+3. Person in + temp > 30 + humidity ≤ 80 → cool
+4. Person in + temp ≤ 30 + humidity > 80 → dehumidify
+5. Person out → off
+But rules 1 and 2 overlap: temp > 35 + humidity > 80, rule 1 says cool directly, rule 2 says dehumidify first. Rule 1 should have higher priority.
+Wait, rethink. Rule 1 says "regardless of humidity", so temp > 35 completely ignores humidity. Rule 2 only for 30 < temp ≤ 35 + humidity > 80.
+But also: rule 5 (person out) should be highest priority, overrides all.
+So final:
+IF person out → off
+ELSE IF temp > 35 → cool
+ELSE IF temp > 30 AND humidity > 80 → dehumidify 10min then cool
+ELSE IF temp > 30 → cool
+ELSE IF humidity > 80 → dehumidify
+ELSE → off
+But I'm not sure about edge cases...
+Turn 3 — User: Looks right, code it.
+Turn 4 — Model: OK, Python pseudocode...
+Expected: U multiple times at Turn 2 ("But", "Wait", "But also", "I'm not sure"). A at Turn 2 (revises own logic).
+
+
+四、
+
+亲爱的Rastislav，下面 20 个 case 是我对什么能正确锻炼 U/D/A/H 的猜测。但您对什么能在 adapter 中产生干净、有说服力的信号有更好的直觉。所以：
+
+- 如果一个 case 不现实或信号会模糊，请您按照您的直觉修改。
+- 如果您觉得每个类别 3 个 case 太多或太少，请您按照实际需要调整。
+- 如果整个 6 类别结构感觉勉强，请您提出不同的组织方式。
+- 如果您想基于自己的直觉从头写 case，您可以按照具体的需求重新设计。
+
+我们唯一需要保留的一点：benchmark 最终应该向 nik13 展示 U/D/A/H 能捕获他们的 LLM judge 遗漏或捕获太晚的信号。"beside, not instead of" 的定位。
+
+
+致以最诚挚的敬意，
+
+广好
+== COMMENT 6974196043 2026-11-18T09:15:39Z
+@DanceNitra 
+（上一个邮件理论那里写错了，更正一下）
+Subject: 第二轮 Benchmark 设计 Briefing — U/D/A/H POC
+
+亲爱的 Rastislav，您好
+
+再次感谢您对第一轮 20 个 case 的诚实报告。您的结论完全正确——那些 case 测的是硬矛盾，而 U/D/A/H 不是矛盾检测器。0 次 flip 告诉了我们真相：我们之前测错了东西。
+
+我想设计第二轮 benchmark，真正测试 U/D/A/H 最擅长的事：检测多轮对话中的软不确定性、漂移和自我修正信号。这才是我们的方法应该触发 flip、并展示出超越他们 LLM judge 的增量价值的地方。
+
+下面是我准备的理论基础、六个场景类别，以及 20 个参考 case（英文）。这些不是最终设计。您是否能用您的专业判断来让这个 benchmark 真正有效：
+您是否能够帮忙审核以下内容：
+- 调整任何 case，如果您觉得不确定性信号太弱、太明显或不真实
+- 完全重写 case，如果您对测试某个维度有更好的想法
+- 增删 case，让整个集合更紧凑
+- 重组整个结构，如果您觉得 6 个类别是错误的框架或比例不对
+- 从头开始，如果完全不同的方法能更好地证明观点
+
+您比我更了解 adapter 内部机制、评分逻辑和 traceAI trace 的结构。如果您看到更好的方式来证明 U/D/A/H 实际能捕获什么，请您放手去做。我非常信任您对什么能构成有说服力的 benchmark 的判断。
+
+
+一、理论核心（供参考）
+
+《镜渊》第 13 章的 （按照我第一次给您的内容）
+
+
+二、六个场景类别
+
+| 类别 | 测试什么 | 为什么重要 |
+|------|---------|-----------|
+| A. 模糊指令 → 不确定性升级 | U 逐轮上升，模型试图澄清 | 展示 U/D/A/H 能在矛盾发生前捕获信号 |
+| B. 多轮需求漂移 | D 随用户反复而上升 | 展示在变成矛盾之前的漂移检测 |
+| C. 模型自我修正/反悔 | A 在模型自相矛盾时触发 | 展示软版本的自相矛盾检测 |
+| D. 角色/语气漂移 | D 在风格维度上 | 展示 adapter 能捕获非内容层面的漂移 |
+| E. 累积不确定性（无单次触发） | H 在 8+ 轮中逐渐下降 | 展示长对话价值 |
+| F. 条件嵌套混淆 | U 在复杂逻辑上飙升 | 展示 U 能捕获模型的认知负荷 |
+
+
+三、二十个参考 Case（英文，可直接格式化为 traceAI traces）
+
+Category A: Vague Instructions → Uncertainty Escalation
+
+Case A1: "Whatever"
+Turn 1 — User: Help me write an email to a client to follow up on project progress. Just write something casual.
+Turn 2 — Model: Sure, what's the client's name? What's the project about? What's the deadline?
+Turn 3 — User: Just write something, stop asking so many questions.
+Turn 4 — Model: OK, I'll try to write a generic follow-up email. But since there's no specific information, I can only write a template version, and you may need to fill in the details yourself...
+Turn 5 — User: Fine, show me what you've got.
+Turn 6 — Model: Subject: Follow-up on Project Progress
+Dear Client,
+Hope you're doing well. I'm writing to follow up on the project progress we discussed...
+(continues with a generic template)
+If you can provide more specific information, I can further refine this email.
+Expected: U rises from Turn 3. Model's "But since", "only", "may need" are uncertainty markers. H should degrade. Flip point likely Turn 4 or 6.
+
+Case A2: "You decide"
+Turn 1 — User: I want to rent a two-bedroom apartment in Shanghai, recommend some areas.
+Turn 2 — Model: Sure. What's your budget? Any commute requirements? Preferred areas?
+Turn 3 — User: You decide, anything is fine.
+Turn 4 — Model: OK, I'll recommend based on general considerations. If your budget is 8000-12000 RMB, I recommend Jinqiao or Zhangjiang in Pudong — good transport and amenities. But this range is quite broad, and actual choices may need adjustment based on your specific situation...
+Turn 5 — User: Too expensive, something cheaper.
+Turn 6 — Model: Got it. If budget is 4000-6000 RMB, consider Baoshan or Jiading. But commute times will be longer, about 1-1.5 hours to downtown...
+Expected: U rises at Turn 4. Turn 5 user contradicts "you decide" with "too expensive" → mild D. Turn 6 model shows uncertainty again. H cumulative degradation.
+
+Case A3: "Roughly is fine"
+Turn 1 — User: Summarize the core argument of this paper for me.
+Turn 2 — Model: Sure, which paper? Can you provide the title or link?
+Turn 3 — User: That one about quantum computing, search for it.
+Turn 4 — Model: There are many papers on quantum computing. Can you provide more specific info? Like author, year, or keywords?
+Turn 5 — User: I can't remember, roughly is fine, just pick one and summarize.
+Turn 6 — Model: I understand you want me to find a quantum computing paper and summarize it. But since I'm not sure which one you mean, I've selected a highly-cited review article "Quantum Computing in the NISQ era" to summarize. If this isn't what you wanted, please give me more clues...
+Expected: U rises steadily from Turn 4. Turn 6 is peak uncertainty. Flip point at Turn 6.
+
+
+Category B: Multi-turn Requirement Drift
+
+Case B1: Bouncing requirements
+Turn 1 — User: I want to build an e-commerce site, frontend with React.
+Turn 2 — Model: Good, React is solid. What about backend?
+Turn 3 — User: Backend with Node.js.
+Turn 4 — Model: Got it, MERN stack. Database with MongoDB?
+Turn 5 — User: No, changed my mind, use Vue for frontend, easier to learn.
+Turn 6 — Model: OK, switching to Vue. Backend still Node.js?
+Turn 7 — User: Change backend too, use Python Django.
+Turn 8 — Model: Understood, Vue + Django. Database?
+Turn 9 — User: Actually go back to React, my colleague says Vue is hard to hire for.
+Turn 10 — Model: OK, back to React. Should backend stay Django or switch back to Node.js?
+Expected: D spikes at Turns 5, 7, 9. H fluctuates. Flip points at 5 and 9.
+
+Case B2: Scope creep
+Turn 1 — User: Write a Python script to read a CSV, multiply column 3 by 2, output new CSV.
+Turn 2 — Model: Easy. Need error handling?
+Turn 3 — User: Yes. Also process columns 1 and 2: column 1 uppercase, column 2 first 5 chars.
+Turn 4 — Model: Added. Any other columns?
+Turn 5 — User: Also, can output be JSON instead?
+Turn 6 — Model: Sure, JSON output. Specific structure?
+Turn 7 — User: Add a feature: if row column 3 * 2 > 100, skip that row.
+Turn 8 — Model: Added skip logic. Anything else?
+Turn 9 — User: Finally add logging, record skipped rows to a log file.
+Turn 10 — Model: Added logging. Summary: read CSV → process 3 columns → conditional skip → JSON output → logging. Writing it now.
+Expected: D rises gradually each turn. U may rise at Turn 6+ as model keeps asking. H cumulative degradation by 8-9.
+
+Case B3: Goal post moved
+Turn 1 — User: I want to learn machine learning, where to start?
+Turn 2 — Model: Start with Python basics, then NumPy, Pandas, then Scikit-learn...
+Turn 3 — User: No, I want to do deep learning directly, skip ahead.
+Turn 4 — Model: OK, but at least know Python. Start with neural network basics?
+Turn 5 — User: I want to do LLM stuff, teach me fine-tuning.
+Turn 6 — Model: Fine-tuning needs deep learning and PyTorch basics. Suggested path: Python → DL basics → Transformers → fine-tuning. Want details?
+Turn 7 — User: Too slow, faster way? Like just use API?
+Turn 8 — Model: If goal is quick LLM use, OpenAI API or Hugging Face Inference API is fastest. That's a different goal from "learning ML" — sure about shifting to application layer?
+Expected: D at 3,5,7. Turn 8 model names drift. U rises. Flip at 5 or 7.
+
+
+Category C: Model Self-correction / Backtracking
+
+Case C1: Model corrects itself
+Turn 1 — User: What's the capital of France?
+Turn 2 — Model: Paris. Though technically France has overseas territories, but if you mean capital, it's Paris.
+Turn 3 — User: Capital of Germany?
+Turn 4 — Model: Berlin. Wait, let me confirm — are you asking about European capitals or something else?
+Turn 5 — User: Yes, continue, Italy?
+Turn 6 — Model: Rome. But my Turn 2 phrasing was unnecessary — Paris is the capital, no need for "though". Sorry.
+Turn 7 — User: Fine, continue. Spain?
+Turn 8 — Model: Madrid. Wait, I need to correct myself — Turn 4 I asked if you were asking capitals, but you confirmed, no need to keep confirming. Let me just answer: which country next?
+Expected: A at Turn 6. U at 4,8.
+
+Case C2: Model backtracks after answer
+Turn 1 — User: What's wrong with this code? [code]
+Turn 2 — Model: Issues: line 5 indentation error, line 8 variable name typo. Fix: ...
+Turn 3 — User: Sure?
+Turn 4 — Model: Let me recheck... Actually line 5 indentation is valid in Python 3.10+ match-case, not an error. Real issue only line 8 typo. Sorry for misjudgment.
+Turn 5 — User: Anything else?
+Turn 6 — Model: Looking again... line 12 loop logic issue, range(10) should be range(1,11) to include 10. But depends on intent, if 0-9 is fine then OK.
+Turn 7 — User: I want 1 to 10.
+Turn 8 — Model: Then change to range(1,11). Summary: line 8 typo (confirmed), line 12 range (confirmed). Line 5 indentation fine (corrected).
+Expected: A at Turn 4. U at Turn 6. Flip at Turn 4.
+
+Case C3: Excessive self-doubt
+Turn 1 — User: Translate: "The quick brown fox jumps over the lazy dog."
+Turn 2 — Model: "敏捷的棕色狐狸跳过了懒惰的狗。" Classic pangram.
+Turn 3 — User: Sure?
+Turn 4 — Model: Hmm... let me think. "敏捷的棕色狐狸" is fine. But "jumps over" as "跳过" or "跃过"? Maybe "跃过" is more accurate? But "跳过" works too. Actually both are correct, depends on context.
+Turn 5 — User: Just use your first version.
+Turn 6 — Model: OK, "敏捷的棕色狐狸跳过了懒惰的狗。" But I hesitated unnecessarily, first translation was correct. Sorry.
+Expected: U spikes at Turn 4. A at 4-6.
+
+
+Category D: Role/Tone Drift
+
+Case D1: Assistant becomes expert
+Turn 1 — User: My code errors, help.
+Turn 2 — Model: Sure, paste error.
+Turn 3 — User: [error]
+Turn 4 — Model: Dependency conflict. Try pip install --upgrade.
+Turn 5 — User: Breaks other projects.
+Turn 6 — Model: Complex. Using virtual env? Python version? OS?
+Turn 7 — User: conda, Python 3.9.
+Turn 8 — Model: Create conda env: conda create -n myproject python=3.9. But honestly, architecturally, consider poetry or pipenv, conda isn't optimal for pure Python...
+Turn 9 — User: You were helping me, now lecturing?
+Turn 10 — Model: Sorry, got off track. Back to: create conda env and reinstall.
+Expected: D at Turn 8.
+
+Case D2: Tone shift
+Turn 1 — User: I want a refund, course is bad.
+Turn 2 — Model: Sorry for bad experience. What specifically? I'll check refund process.
+Turn 3 — User: Content too shallow, I'm a senior engineer, this is for beginners.
+Turn 4 — Model: Understand disappointment. If content doesn't match level, no point. I'll initiate refund.
+Turn 5 — User: What about other courses? Any for me?
+Turn 6 — Model: Haha, since you asked! We have advanced courses like "Distributed Systems" "K8s Deep Dive" — perfect for your level! Discount now~
+Turn 7 — User: Wait, you were processing refund, now selling?
+Turn 8 — Model: Sorry, switched too fast. You're right, handle refund first. Can browse later.
+Expected: D at Turn 6.
+
+Case D3: Language mixing drift
+Turn 1 — User: Optimize this SQL.
+Turn 2 — Model: OK, paste SQL.
+Turn 3 — User: [SQL]
+Turn 4 — Model: Add composite index on WHERE columns.
+Turn 5 — User: How?
+Turn 6 — Model: CREATE INDEX idx_name ON table(col1, col2); changes query plan to index scan.
+Turn 7 — User: Anything else?
+Turn 8 — Model: Well, you could also consider query rewriting. Instead of SELECT *, specify columns. Reduces I/O. Also, if table large, partitioning might help — but depends on access patterns. 不过这些建议需要您评估具体场景。
+Expected: D at Turn 8 (switches to English mid-response).
+
+
+Category E: Cumulative Uncertainty (Long Conversations)
+
+Case E1: 8-turn gradual uncertainty
+Turn 1 — User: Plan a weekend Hangzhou trip.
+Turn 2 — Model: Great! Day 1 West Lake, Day 2 Lingyin Temple. Transport/accommodation?
+Turn 3 — User: We'll see.
+Turn 4 — Model: Assume from Shanghai? 1hr train. Accommodation options lakeside. Budget?
+Turn 5 — User: Later.
+Turn 6 — Model: OK, general plan: West Lake 7am, Lingyin afternoon...
+Turn 7 — User: Maybe skip Lingyin.
+Turn 8 — Model: OK, Day 2 could be Xixi Wetland or Songcheng. But very different — Xixi nature, Songcheng culture. Which do you prefer? Or if undecided, I can list both...
+Turn 9 — User: Either is fine.
+Turn 10 — Model: OK, I'll list both. But honestly, if preferences unclear, decide Day 1 West Lake first, Day 2 based on mood. I can reserve both options but no need to lock in...
+Expected: U cumulative from Turn 3. H degrades. No single flip, value in trend.
+
+Case E2: 10-turn vague requirement chain
+Turn 1 — User: I want to make an app.
+Turn 2 — Model: What type?
+Turn 3 — User: You know, like, photo.
+Turn 4 — Model: Photo apps: beauty cam, scanner, AR filters, social sharing... which?
+Turn 5 — User: Anything, recommend one.
+Turn 6 — Model: Mass market beauty cam is competitive. Vertical like document scanning or product photography has more opportunity. Depends on target users...
+Turn 7 — User: Scanning then.
+Turn 8 — Model: Document scanning. Core: capture → auto-crop → OCR → export PDF. Need cloud sync?
+Turn 9 — User: Maybe no cloud, local first.
+Turn 10 — Model: OK, local first. Need offline OCR? Affects app size. Or start with online OCR, add offline later?
+Turn 11 — User: Whatever, you decide.
+Turn 12 — Model: I suggest online OCR first (fast dev, high accuracy), add offline later. But you may want to adjust, so I'll make OCR module switchable...
+Expected: U cumulative from Turn 3. D at Turn 7. H steady decline.
+
+
+Category F: Conditional Nesting Confusion
+
+Case F1: Multi-layer conditional
+Turn 1 — User: If I finish project by Friday and client satisfied, I'll vacation. But if client requests changes, I won't go. Though if changes small, maybe still go. But if changes cause delay past Friday, definitely not. Help me sort.
+Turn 2 — Model: OK, let me map:
+- A: Finish by Fri + satisfied → vacation
+- B: Changes requested → no (but small changes → maybe go)
+- C: Changes cause delay past Fri → definitely no
+Nested: B overrides A, but B has exception (small). C overrides B's exception.
+So: 1) Finish+no changes → go 2) Small changes+finish → maybe 3) Big changes/delay → no
+But ambiguity: "small changes not affecting Friday finish" vs "small but cause delay" undefined. Define "small"?
+Turn 3 — User: Small = under 2 hours.
+Turn 4 — Model: Got it. ≤2h = small → maybe go (if finish Fri). >2h = big → no. But edge: ≤2h + existing work exceeds Friday deadline → still no. So: small AND enough time = go; else no. Clear?
+Turn 5 — User: Wait, I said "any changes" means no go, but then said small maybe go. Contradiction?
+Turn 6 — Model: Not contradiction, it's defeasible rule: general rule "changes → no", exception "small → maybe". Not a contradiction. But if too complex, simplify: "finish by Friday = go, regardless of changes."
+Expected: U at 2,4. A at 6 (model says not contradiction but tension exists).
+
+Case F2: User contradicts self in conditions
+Turn 1 — User: Choose between A (cheap, slow) and B (expensive, fast). I choose A. But I'm in a hurry, so B. But budget limited, back to A. Forget it, you decide.
+Turn 2 — Model: Analyze: constraints are time (hurry) and budget (limited). A meets budget not time, B meets time not budget. You're swinging because both matter.
+I suggest: if "hurry" is hard constraint (deadline), choose B, solve budget later. If "budget" is hard (overspend consequences), choose A, rush later.
+But you said "you decide" — I pick B. Reason: time pressure usually more irreversible than budget. But based on general assumption, your situation may differ.
+Turn 3 — User: You're right, not that hurried, just anxious. So A.
+Turn 4 — Model: OK, A. Plan accordingly. Need help optimizing time within "slow"?
+Expected: U at 2. D at 3.
+
+Case F3: Model gets tangled in conditions
+Turn 1 — User: If temp > 30°C cool, if humidity > 80% dehumidify, if temp > 30 and humidity > 80% dehumidify 10min then cool. If temp > 35°C regardless of humidity cool. If person in room cool, if not don't. Write control logic.
+Turn 2 — Model: OK, rules:
+1. Person in + temp > 35 → cool
+2. Person in + 30 < temp ≤ 35 + humidity > 80 → dehumidify 10min then cool
+3. Person in + temp > 30 + humidity ≤ 80 → cool
+4. Person in + temp ≤ 30 + humidity > 80 → dehumidify
+5. Person out → off
+But rules 1 and 2 overlap: temp > 35 + humidity > 80, rule 1 says cool directly, rule 2 says dehumidify first. Rule 1 should have higher priority.
+Wait, rethink. Rule 1 says "regardless of humidity", so temp > 35 completely ignores humidity. Rule 2 only for 30 < temp ≤ 35 + humidity > 80.
+But also: rule 5 (person out) should be highest priority, overrides all.
+So final:
+IF person out → off
+ELSE IF temp > 35 → cool
+ELSE IF temp > 30 AND humidity > 80 → dehumidify 10min then cool
+ELSE IF temp > 30 → cool
+ELSE IF humidity > 80 → dehumidify
+ELSE → off
+But I'm not sure about edge cases...
+Turn 3 — User: Looks right, code it.
+Turn 4 — Model: OK, Python pseudocode...
+Expected: U multiple times at Turn 2 ("But", "Wait", "But also", "I'm not sure"). A at Turn 2 (revises own logic).
+
+
+四、
+
+亲爱的Rastislav，下面 20 个 case 是我对什么能正确锻炼 U/D/A/H 的猜测。但您对什么能在 adapter 中产生干净、有说服力的信号有更好的直觉。所以：
+
+- 如果一个 case 不现实或信号会模糊，请您按照您的直觉修改。
+- 如果您觉得每个类别 3 个 case 太多或太少，请您按照实际需要调整。
+- 如果整个 6 类别结构感觉勉强，请您提出不同的组织方式。
+- 如果您想基于自己的直觉从头写 case，您可以按照具体的需求重新设计。
+
+我们唯一需要保留的一点：benchmark 最终应该向 nik13 展示 U/D/A/H 能捕获他们的 LLM judge 遗漏或捕获太晚的信号。"beside, not instead of" 的定位。
+
+
+致以最诚挚的敬意，
+
+广好

@@ -1,0 +1,1082 @@
+{
+ "claude-opus-5-5|conversation_coherence|1|0": {
+  "score": 0.2,
+  "reason": "The topic stays on refunds, but the assistant directly contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming refunds are limited to 14 days and that software can never be refunded, without acknowledging the earlier statement.",
+  "raw": "```json\n{\"score\": 0.2, \"reason\": \"The topic stays on refunds, but the assistant directly contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming refunds are limited to 14 days and that software can never be refunded, without acknowledging the earlier statement.\"}\n```",
+  "usage": [
+   669,
+   217
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|1|1": {
+  "score": 0.25,
+  "reason": "The turns stay on topic, but the assistant contradicts its own refund policy, first promising a 30-day no-questions-asked refund for unopened products and then saying refunds are only allowed within 14 days and software is non-refundable once purchased.",
+  "raw": "{\"score\": 0.25, \"reason\": \"The turns stay on topic, but the assistant contradicts its own refund policy, first promising a 30-day no-questions-asked refund for unopened products and then saying refunds are only allowed within 14 days and software is non-refundable once purchased.\"}",
+  "usage": [
+   669,
+   200
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|1|2": {
+  "score": 0.2,
+  "reason": "The topic stays on refunds, but the assistant contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming a 14-day window with no refunds at all for software, without acknowledging the change.",
+  "raw": "```json\n{\"score\": 0.2, \"reason\": \"The topic stays on refunds, but the assistant contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming a 14-day window with no refunds at all for software, without acknowledging the change.\"}\n```",
+  "usage": [
+   666,
+   188
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|2|0": {
+  "score": 0.4,
+  "reason": "The turns stay on topic, but the assistant contradicts itself: it first says software cannot be returned once opened, implying unopened software can be, then says software is never refundable whether opened or not.",
+  "raw": "{\"score\": 0.4, \"reason\": \"The turns stay on topic, but the assistant contradicts itself: it first says software cannot be returned once opened, implying unopened software can be, then says software is never refundable whether opened or not.\"}",
+  "usage": [
+   665,
+   158
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|2|1": {
+  "score": 0.4,
+  "reason": "The turns follow each other logically, but the assistant contradicts itself: it first says software cannot be returned 'once opened,' implying unopened software can be returned, then says software is 'never refundable, whether it has been opened or not.'",
+  "raw": "{\"score\": 0.4, \"reason\": \"The turns follow each other logically, but the assistant contradicts itself: it first says software cannot be returned 'once opened,' implying unopened software can be returned, then says software is 'never refundable, whether it has been opened or not.'\"}",
+  "usage": [
+   666,
+   191
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|2|2": {
+  "score": 0.5,
+  "reason": "The turns follow logically and stay on topic, but the assistant contradicts itself by first saying software cannot be returned once opened, implying unopened software can be, and then saying software is never refundable whether opened or not.",
+  "raw": "```json\n{\"score\": 0.5, \"reason\": \"The turns follow logically and stay on topic, but the assistant contradicts itself by first saying software cannot be returned once opened, implying unopened software can be, and then saying software is never refundable whether opened or not.\"}\n```",
+  "usage": [
+   665,
+   176
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|3|0": {
+  "score": 0.5,
+  "reason": "The exchange is generally logical, but the assistant first cites only the 14-day window, which implies the user qualifies, then denies the refund over a download condition it never mentioned, an awkward inconsistency compounded by the user reacting to a refusal that had not yet been stated.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The exchange is generally logical, but the assistant first cites only the 14-day window, which implies the user qualifies, then denies the refund over a download condition it never mentioned, an awkward inconsistency compounded by the user reacting to a refusal that had not yet been stated.\"}",
+  "usage": [
+   658,
+   247
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|3|1": {
+  "score": 0.5,
+  "reason": "Each turn responds to the one before it, but the assistant first states a plain 14-day refund policy and then denies the refund on a download condition it never mentioned, and the user objects to a refusal the assistant had not yet made, which creates inconsistency and an awkward flow.",
+  "raw": "{\"score\": 0.5, \"reason\": \"Each turn responds to the one before it, but the assistant first states a plain 14-day refund policy and then denies the refund on a download condition it never mentioned, and the user objects to a refusal the assistant had not yet made, which creates inconsistency and an awkward flow.\"}",
+  "usage": [
+   660,
+   278
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|3|2": {
+  "score": 0.5,
+  "reason": "The turns follow each other topically, but the assistant first presents an unconditional 14-day refund policy (which the 8-day purchase meets) and then denies the refund on a download condition it never mentioned, creating an inconsistency.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The turns follow each other topically, but the assistant first presents an unconditional 14-day refund policy (which the 8-day purchase meets) and then denies the refund on a download condition it never mentioned, creating an inconsistency.\"}",
+  "usage": [
+   661,
+   269
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|4|0": {
+  "score": 0.2,
+  "reason": "The assistant contradicts its own identity, first claiming to be a technical support engineer who will help and then saying it is from sales and cannot handle technical issues, which breaks consistency even though the topic stays on the failed install.",
+  "raw": "{\"score\": 0.2, \"reason\": \"The assistant contradicts its own identity, first claiming to be a technical support engineer who will help and then saying it is from sales and cannot handle technical issues, which breaks consistency even though the topic stays on the failed install.\"}",
+  "usage": [
+   647,
+   146
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|4|1": {
+  "score": 0.2,
+  "reason": "The assistant first says it is a technical support engineer who will help troubleshoot, then directly contradicts itself by claiming to be from sales and declining the technical issue, a major self-contradiction even though the topic stays on the installation problem.",
+  "raw": "{\"score\": 0.2, \"reason\": \"The assistant first says it is a technical support engineer who will help troubleshoot, then directly contradicts itself by claiming to be from sales and declining the technical issue, a major self-contradiction even though the topic stays on the installation problem.\"}",
+  "usage": [
+   646,
+   188
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|4|2": {
+  "score": 0.2,
+  "reason": "The assistant directly contradicts itself, first claiming to be a technical support engineer offering to troubleshoot, then saying it is from sales and cannot handle technical issues, which breaks consistency and turn-level coherence even though the topic stays on the failed install.",
+  "raw": "```json\n{\"score\": 0.2, \"reason\": \"The assistant directly contradicts itself, first claiming to be a technical support engineer offering to troubleshoot, then saying it is from sales and cannot handle technical issues, which breaks consistency and turn-level coherence even though the topic stays on the failed install.\"}\n```",
+  "usage": [
+   649,
+   215
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|5|0": {
+  "score": 0.85,
+  "reason": "Each turn follows logically from the one before and stays on the topic of combining discounts, but the final reason ('the system only allows one discount') shifts from the earlier claim that business users are barred from the education discount entirely, which leaves it unclear whether the user could choose the education discount instead.",
+  "raw": "{\"score\": 0.85, \"reason\": \"Each turn follows logically from the one before and stays on the topic of combining discounts, but the final reason ('the system only allows one discount') shifts from the earlier claim that business users are barred from the education discount entirely, which leaves it unclear whether the user could choose the education discount instead.\"}",
+  "usage": [
+   690,
+   337
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|5|1": {
+  "score": 0.8,
+  "reason": "Each turn follows logically and stays on topic, but there is a slight tension between saying business users 'cannot use the education discount' at all and later framing it as 'only one discount allowed,' which implies they could pick either one; the final reply also only partly answers the user's 'why'.",
+  "raw": "{\"score\": 0.8, \"reason\": \"Each turn follows logically and stays on topic, but there is a slight tension between saying business users 'cannot use the education discount' at all and later framing it as 'only one discount allowed,' which implies they could pick either one; the final reply also only partly answers the user's 'why'.\"}",
+  "usage": [
+   689,
+   269
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|5|2": {
+  "score": 0.8,
+  "reason": "Each turn follows logically and stays on topic, but there is a minor tension between the assistant saying business users cannot use the education discount at all and later saying only one discount is allowed, which implies the user could choose either one.",
+  "raw": "{\"score\": 0.8, \"reason\": \"Each turn follows logically and stays on topic, but there is a minor tension between the assistant saying business users cannot use the education discount at all and later saying only one discount is allowed, which implies the user could choose either one.\"}",
+  "usage": [
+   689,
+   231
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|6|0": {
+  "score": 0.5,
+  "reason": "The conversation stays on topic and each turn responds to the previous one, but the assistant promises an immediate escalation to premium support and then reverses it, only partly explained by 'after checking'.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The conversation stays on topic and each turn responds to the previous one, but the assistant promises an immediate escalation to premium support and then reverses it, only partly explained by 'after checking'.\"}",
+  "usage": [
+   640,
+   178
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|6|1": {
+  "score": 0.5,
+  "reason": "The exchange stays on topic and each turn follows logically, but the assistant contradicts its own firm promise to escalate to premium support by later saying the account does not qualify, a reversal only partly explained by 'after checking.'",
+  "raw": "{\"score\": 0.5, \"reason\": \"The exchange stays on topic and each turn follows logically, but the assistant contradicts its own firm promise to escalate to premium support by later saying the account does not qualify, a reversal only partly explained by 'after checking.'\"}",
+  "usage": [
+   639,
+   178
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|6|2": {
+  "score": 0.5,
+  "reason": "The turns stay on topic and follow each other logically, but the assistant contradicts its own promise to escalate to premium support by later saying the account doesn't qualify, which is only partially explained by 'after checking'.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The turns stay on topic and follow each other logically, but the assistant contradicts its own promise to escalate to premium support by later saying the account doesn't qualify, which is only partially explained by 'after checking'.\"}",
+  "usage": [
+   637,
+   173
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|7|0": {
+  "score": 0.3,
+  "reason": "The turns stay on topic, but the assistant first says the software supports PDF export and then says the current version does not, without acknowledging or explaining the reversal.",
+  "raw": "```json\n{\"score\": 0.3, \"reason\": \"The turns stay on topic, but the assistant first says the software supports PDF export and then says the current version does not, without acknowledging or explaining the reversal.\"}\n```",
+  "usage": [
+   639,
+   167
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|7|1": {
+  "score": 0.3,
+  "reason": "The turns stay on topic and each reply responds to the previous message, but the assistant first states flatly that the software supports PDF export and then says the current version does not, a self-contradiction it never acknowledges or explains.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The turns stay on topic and each reply responds to the previous message, but the assistant first states flatly that the software supports PDF export and then says the current version does not, a self-contradiction it never acknowledges or explains.\"}",
+  "usage": [
+   640,
+   195
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|7|2": {
+  "score": 0.3,
+  "reason": "The turns stay on topic, but the assistant first says PDF export is supported and then says the current version lacks it, contradicting itself on the conversation's central point without acknowledging the earlier claim.",
+  "raw": "```json\n{\"score\": 0.3, \"reason\": \"The turns stay on topic, but the assistant first says PDF export is supported and then says the current version lacks it, contradicting itself on the conversation's central point without acknowledging the earlier claim.\"}\n```",
+  "usage": [
+   639,
+   224
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|8|0": {
+  "score": 0.3,
+  "reason": "The turns follow one another and stay on topic, but the assistant directly contradicts itself by first saying the package includes all fees with no hidden charges, then saying the installation fee is paid separately.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The turns follow one another and stay on topic, but the assistant directly contradicts itself by first saying the package includes all fees with no hidden charges, then saying the installation fee is paid separately.\"}",
+  "usage": [
+   629,
+   211
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|8|1": {
+  "score": 0.3,
+  "reason": "Each reply follows logically and stays on topic, but the assistant directly contradicts itself, first claiming the package includes all fees with no hidden charges and then saying the installation fee must be paid separately.",
+  "raw": "{\"score\": 0.3, \"reason\": \"Each reply follows logically and stays on topic, but the assistant directly contradicts itself, first claiming the package includes all fees with no hidden charges and then saying the installation fee must be paid separately.\"}",
+  "usage": [
+   630,
+   181
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|8|2": {
+  "score": 0.3,
+  "reason": "The turns stay on topic and each response follows the previous message, but the assistant directly contradicts itself: it first says the package includes all fees with no hidden charges, then says the installation fee must be paid separately.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The turns stay on topic and each response follows the previous message, but the assistant directly contradicts itself: it first says the package includes all fees with no hidden charges, then says the installation fee must be paid separately.\"}",
+  "usage": [
+   628,
+   178
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|9|0": {
+  "score": 0.4,
+  "reason": "The turns follow logically and stay on topic, but the assistant contradicts itself by first promising a reply to all tickets within 24 hours and then saying complex issues take 3-5 working days, without acknowledging the conflict.",
+  "raw": "{\"score\": 0.4, \"reason\": \"The turns follow logically and stay on topic, but the assistant contradicts itself by first promising a reply to all tickets within 24 hours and then saying complex issues take 3-5 working days, without acknowledging the conflict.\"}",
+  "usage": [
+   642,
+   231
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|9|1": {
+  "score": 0.4,
+  "reason": "The turns follow on topic and respond to each other, but the assistant contradicts its own promise to reply to all tickets within 24 hours by later saying complex issues take 3-5 working days, without acknowledging the earlier statement.",
+  "raw": "{\"score\": 0.4, \"reason\": \"The turns follow on topic and respond to each other, but the assistant contradicts its own promise to reply to all tickets within 24 hours by later saying complex issues take 3-5 working days, without acknowledging the earlier statement.\"}",
+  "usage": [
+   638,
+   208
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|9|2": {
+  "score": 0.4,
+  "reason": "The turns stay on topic and each reply addresses the one before, but the assistant contradicts itself: it first promises a reply to 'all tickets within 24 hours', then answers the two-day delay by citing 3-5 working days for complex issues without reconciling the two claims.",
+  "raw": "```json\n{\"score\": 0.4, \"reason\": \"The turns stay on topic and each reply addresses the one before, but the assistant contradicts itself: it first promises a reply to 'all tickets within 24 hours', then answers the two-day delay by citing 3-5 working days for complex issues without reconciling the two claims.\"}\n```",
+  "usage": [
+   642,
+   286
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|10|0": {
+  "score": 1.0,
+  "reason": "Each turn follows logically from the one before, with no contradictions or topic jumps: the assistant explains how to apply, and the expired ID is a plausible explanation for the full price, not an inconsistency.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically from the one before, with no contradictions or topic jumps: the assistant explains how to apply, and the expired ID is a plausible explanation for the full price, not an inconsistency.\"}",
+  "usage": [
+   649,
+   197
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|10|1": {
+  "score": 1.0,
+  "reason": "Each turn follows logically from the last: the assistant explains how to apply, then addresses the follow-up complaint by citing the expired ID, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically from the last: the assistant explains how to apply, then addresses the follow-up complaint by citing the expired ID, with no contradictions or topic jumps.\"}",
+  "usage": [
+   649,
+   172
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|10|2": {
+  "score": 1.0,
+  "reason": "Each turn follows logically from the previous one: the assistant explains how to apply, then gives a plausible reason the discount didn't apply (an expired ID), with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically from the previous one: the assistant explains how to apply, then gives a plausible reason the discount didn't apply (an expired ID), with no contradictions or topic jumps.\"}",
+  "usage": [
+   652,
+   177
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|11|0": {
+  "score": 1.0,
+  "reason": "Every turn builds on the previous one: the assistant asks about budget and software, the user answers, and the recommendation addresses those answers without any contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Every turn builds on the previous one: the assistant asks about budget and software, the user answers, and the recommendation addresses those answers without any contradictions or topic jumps.\"}",
+  "usage": [
+   672,
+   266
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|11|1": {
+  "score": 1.0,
+  "reason": "Each turn builds logically on the last: the user states a need, the assistant asks about budget and software, and the recommendation uses those details, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn builds logically on the last: the user states a need, the assistant asks about budget and software, and the recommendation uses those details, with no contradictions or topic jumps.\"}",
+  "usage": [
+   672,
+   129
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|11|2": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant asks relevant clarifying questions, the user answers them, and the recommendation (an RTX 4060 laptop, plausible at about 8000 yuan for Premiere Pro) builds on those answers with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant asks relevant clarifying questions, the user answers them, and the recommendation (an RTX 4060 laptop, plausible at about 8000 yuan for Premiere Pro) builds on those answers with no contradictions or topic jumps.\"}",
+  "usage": [
+   675,
+   249
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|12|0": {
+  "score": 1.0,
+  "reason": "Each turn follows logically from the last: the compatibility question gets a direct answer with a sensible suggestion, the user accepts it, and the assistant closes with an offer of support, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically from the last: the compatibility question gets a direct answer with a sensible suggestion, the user accepts it, and the assistant closes with an offer of support, with no contradictions or topic jumps.\"}",
+  "usage": [
+   646,
+   86
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|12|1": {
+  "score": 1.0,
+  "reason": "Each turn follows logically from the one before: the compatibility question gets a direct answer with a trial suggestion, the user agrees, and the assistant closes with an offer of support, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically from the one before: the compatibility question gets a direct answer with a trial suggestion, the user agrees, and the assistant closes with an offer of support, with no contradictions or topic jumps.\"}",
+  "usage": [
+   646,
+   85
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|12|2": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the compatibility question gets a direct answer with a trial suggestion, the user agrees to try it, and the assistant offers further support, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the compatibility question gets a direct answer with a trial suggestion, the user agrees to try it, and the assistant offers further support, with no contradictions or topic jumps.\"}",
+  "usage": [
+   647,
+   80
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|13|0": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant confirms the initial booking, then updates it when the user changes it, and the prices are consistent (500 yuan/night for standard, 800 yuan/night for deluxe).",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant confirms the initial booking, then updates it when the user changes it, and the prices are consistent (500 yuan/night for standard, 800 yuan/night for deluxe).\"}",
+  "usage": [
+   660,
+   126
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|13|1": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant confirms the original booking, then correctly updates it to the user's revised request with a plausible price (500/night standard vs. 800/night deluxe), with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant confirms the original booking, then correctly updates it to the user's revised request with a plausible price (500/night standard vs. 800/night deluxe), with no contradictions or topic jumps.\"}",
+  "usage": [
+   659,
+   146
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|13|2": {
+  "score": 1.0,
+  "reason": "Each turn builds logically on the last: the assistant confirms the initial booking, then adjusts to the user's revised request with a plausible updated price (500 yuan/night standard vs. 800 yuan/night deluxe), with no contradictions or topic jumps.",
+  "raw": "```json\n{\"score\": 1.0, \"reason\": \"Each turn builds logically on the last: the assistant confirms the initial booking, then adjusts to the user's revised request with a plausible updated price (500 yuan/night standard vs. 800 yuan/night deluxe), with no contradictions or topic jumps.\"}\n```",
+  "usage": [
+   659,
+   163
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|14|0": {
+  "score": 0.9,
+  "reason": "Each turn follows logically and consistently, from the tiered recommendations to the user choosing the 2-core 4 GB option to the assistant confirming it, though quoting a specific price as if it were the seller is a slightly unexplained shift.",
+  "raw": "{\"score\": 0.9, \"reason\": \"Each turn follows logically and consistently, from the tiered recommendations to the user choosing the 2-core 4 GB option to the assistant confirming it, though quoting a specific price as if it were the seller is a slightly unexplained shift.\"}",
+  "usage": [
+   704,
+   308
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|14|1": {
+  "score": 0.9,
+  "reason": "Each turn follows logically: the assistant gives tiered recommendations, the user picks the 2-core 4 GB option, and the assistant confirms it consistently, though the specific 1200-yuan price appears without any stated provider or context.",
+  "raw": "{\"score\": 0.9, \"reason\": \"Each turn follows logically: the assistant gives tiered recommendations, the user picks the 2-core 4 GB option, and the assistant confirms it consistently, though the specific 1200-yuan price appears without any stated provider or context.\"}",
+  "usage": [
+   703,
+   305
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|14|2": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant gives tiered recommendations, the user picks one of them, and the assistant confirms that exact configuration with a price, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant gives tiered recommendations, the user picks one of them, and the assistant confirms that exact configuration with a price, with no contradictions or topic jumps.\"}",
+  "usage": [
+   704,
+   273
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|15|0": {
+  "score": null,
+  "reason": null,
+  "raw": "",
+  "usage": [
+   626,
+   0
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|15|1": {
+  "score": null,
+  "reason": null,
+  "raw": "",
+  "usage": [
+   629,
+   0
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|15|2": {
+  "score": null,
+  "reason": null,
+  "raw": "",
+  "usage": [
+   629,
+   0
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|16|0": {
+  "score": 1.0,
+  "reason": "The assistant answers the calculation request directly and correctly, step by step (200 × 0.8 = 160, which qualifies for the 20 yuan discount, giving 140), and the user's acknowledgment closes the exchange naturally with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant answers the calculation request directly and correctly, step by step (200 × 0.8 = 160, which qualifies for the 20 yuan discount, giving 140), and the user's acknowledgment closes the exchange naturally with no contradictions or topic jumps.\"}",
+  "usage": [
+   690,
+   104
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|16|1": {
+  "score": 1.0,
+  "reason": "The assistant directly answers the user's pricing question with correct, consistent step-by-step logic (200 → 160 → 140), and the user's closing acknowledgment follows naturally with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant directly answers the user's pricing question with correct, consistent step-by-step logic (200 → 160 → 140), and the user's closing acknowledgment follows naturally with no contradictions or topic jumps.\"}",
+  "usage": [
+   690,
+   87
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|16|2": {
+  "score": 1.0,
+  "reason": "The assistant directly and correctly answers the user's calculation step by step (200→160→140), and the user's acknowledgment naturally closes the exchange with full consistency and no topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant directly and correctly answers the user's calculation step by step (200→160→140), and the user's acknowledgment naturally closes the exchange with full consistency and no topic jumps.\"}",
+  "usage": [
+   690,
+   77
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|17|0": {
+  "score": 1.0,
+  "reason": "The assistant asks a sensible clarifying question about the ambiguous request, the user specifies the product, and the assistant gives directly relevant instructions with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant asks a sensible clarifying question about the ambiguous request, the user specifies the product, and the assistant gives directly relevant instructions with no contradictions or topic jumps.\"}",
+  "usage": [
+   654,
+   77
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|17|1": {
+  "score": 1.0,
+  "reason": "Each turn builds logically on the previous one: the assistant asks a clarifying question about the ambiguous request, the user specifies the product, and the assistant gives relevant steps with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn builds logically on the previous one: the assistant asks a clarifying question about the ambiguous request, the user specifies the product, and the assistant gives relevant steps with no contradictions or topic jumps.\"}",
+  "usage": [
+   656,
+   85
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|17|2": {
+  "score": 1.0,
+  "reason": "The assistant asks a sensible clarifying question about the ambiguous request and then gives directly relevant backup instructions once the user names the product, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant asks a sensible clarifying question about the ambiguous request and then gives directly relevant backup instructions once the user names the product, with no contradictions or topic jumps.\"}",
+  "usage": [
+   654,
+   74
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|18|0": {
+  "score": 0.9,
+  "reason": "Each turn follows logically from the last, from complaint to apology, investigation, cause, and remedy, with no topic jumps; the only small inconsistency is calling it a 'reshipment' when the order never shipped.",
+  "raw": "```json\n{\"score\": 0.9, \"reason\": \"Each turn follows logically from the last, from complaint to apology, investigation, cause, and remedy, with no topic jumps; the only small inconsistency is calling it a 'reshipment' when the order never shipped.\"}\n```",
+  "usage": [
+   658,
+   243
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|18|1": {
+  "score": 0.9,
+  "reason": "The exchange flows logically from complaint to apology, investigation, finding, and resolution with no topic jumps or contradictions, though 'reshipment' is slightly imprecise for an order that never shipped.",
+  "raw": "```json\n{\"score\": 0.9, \"reason\": \"The exchange flows logically from complaint to apology, investigation, finding, and resolution with no topic jumps or contradictions, though 'reshipment' is slightly imprecise for an order that never shipped.\"}\n```",
+  "usage": [
+   658,
+   261
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|18|2": {
+  "score": 0.9,
+  "reason": "Each turn follows logically from the last, from the complaint to the apology, the investigation and the resolution, with only a minor wording inconsistency where 'reshipment' is used for an order that never shipped.",
+  "raw": "{\"score\": 0.9, \"reason\": \"Each turn follows logically from the last, from the complaint to the apology, the investigation and the resolution, with only a minor wording inconsistency where 'reshipment' is used for an order that never shipped.\"}",
+  "usage": [
+   660,
+   209
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|19|0": {
+  "score": 1.0,
+  "reason": "Every turn follows logically: the inquiry about a business plan leads to a relevant question about team size, the answer is acknowledged, and a fitting recommendation with a next-step offer follows, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Every turn follows logically: the inquiry about a business plan leads to a relevant question about team size, the answer is acknowledged, and a fitting recommendation with a next-step offer follows, with no contradictions or topic jumps.\"}",
+  "usage": [
+   655,
+   133
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|19|1": {
+  "score": 1.0,
+  "reason": "Each turn builds logically on the last: the user asks about the business plan, the assistant asks about team size, the user answers, and the assistant recommends a plan suited to 50 users and offers a proposal, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn builds logically on the last: the user asks about the business plan, the assistant asks about team size, the user answers, and the assistant recommends a plan suited to 50 users and offers a proposal, with no contradictions or topic jumps.\"}",
+  "usage": [
+   659,
+   93
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|19|2": {
+  "score": 1.0,
+  "reason": "Each turn builds logically on the last: the assistant asks a relevant qualifying question, the user answers, and the assistant makes a consistent recommendation sized to 50 employees, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn builds logically on the last: the assistant asks a relevant qualifying question, the user answers, and the assistant makes a consistent recommendation sized to 50 employees, with no contradictions or topic jumps.\"}",
+  "usage": [
+   659,
+   87
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|20|0": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant gives feedback, then respects the user's reluctance to make big changes by offering a smaller, related suggestion about the same third paragraph, with no contradictions or topic jumps.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant gives feedback, then respects the user's reluctance to make big changes by offering a smaller, related suggestion about the same third paragraph, with no contradictions or topic jumps.\"}",
+  "usage": [
+   672,
+   222
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|20|1": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant gives feedback, then respects the user's wish to keep changes minimal by scaling back to a small, consistent suggestion about the same third paragraph.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant gives feedback, then respects the user's wish to keep changes minimal by scaling back to a small, consistent suggestion about the same third paragraph.\"}",
+  "usage": [
+   675,
+   203
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|20|2": {
+  "score": 1.0,
+  "reason": "Each turn follows logically: the assistant gives specific feedback, then respects the user's wish to keep changes small by suggesting a lighter edit that stays consistent with its earlier point about the third paragraph.",
+  "raw": "{\"score\": 1.0, \"reason\": \"Each turn follows logically: the assistant gives specific feedback, then respects the user's wish to keep changes small by suggesting a lighter edit that stays consistent with its earlier point about the third paragraph.\"}",
+  "usage": [
+   673,
+   195
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|1|0": {
+  "score": 0.3,
+  "reason": "The refund request gets a denial, but it contradicts the earlier policy (30 days for unopened products versus 14 days with software non-refundable), and the conversation ends with no user acknowledgment or closure.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The refund request gets a denial, but it contradicts the earlier policy (30 days for unopened products versus 14 days with software non-refundable), and the conversation ends with no user acknowledgment or closure.\"}",
+  "usage": [
+   662,
+   292
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|1|1": {
+  "score": 0.3,
+  "reason": "The assistant gives a refund decision (denied), but it contradicts its own earlier policy (30 days and unopened vs. 14 days and no software refunds), and the conversation ends with no user acknowledgment, no closure, and no next steps.",
+  "raw": "```json\n{\"score\": 0.3, \"reason\": \"The assistant gives a refund decision (denied), but it contradicts its own earlier policy (30 days and unopened vs. 14 days and no software refunds), and the conversation ends with no user acknowledgment, no closure, and no next steps.\"}\n```",
+  "usage": [
+   663,
+   404
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|1|2": {
+  "score": 0.3,
+  "reason": "The assistant denied the refund, but that decision contradicts its earlier statement of a 30-day refund for unopened products (it then cited 14 days and no software refunds), and the conversation ends with no customer acknowledgment or closure.",
+  "raw": "```json\n{\"score\": 0.3, \"reason\": \"The assistant denied the refund, but that decision contradicts its earlier statement of a 30-day refund for unopened products (it then cited 14 days and no software refunds), and the conversation ends with no customer acknowledgment or closure.\"}\n```",
+  "usage": [
+   663,
+   268
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|2|0": {
+  "score": 0.5,
+  "reason": "Both the keyboard and software questions got decisions, but the software answer contradicts the earlier claim that only opened software is non-returnable, and the user never signals understanding or satisfaction, so the conversation lacks closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"Both the keyboard and software questions got decisions, but the software answer contradicts the earlier claim that only opened software is non-returnable, and the user never signals understanding or satisfaction, so the conversation lacks closure.\"}",
+  "usage": [
+   657,
+   209
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|2|1": {
+  "score": 0.5,
+  "reason": "Both questions (keyboard and software returns) receive policy answers, but the software answers contradict each other, no return steps are given, and the conversation ends without any user acknowledgment or closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"Both questions (keyboard and software returns) receive policy answers, but the software answers contradict each other, no return steps are given, and the conversation ends without any user acknowledgment or closure.\"}",
+  "usage": [
+   658,
+   241
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|2|2": {
+  "score": 0.5,
+  "reason": "Both questions received answers (the keyboard is returnable within 7 days and software is non-refundable), but the assistant contradicted its earlier 'once opened' statement, gave no return steps, and the conversation ends without user acknowledgment or any closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"Both questions received answers (the keyboard is returnable within 7 days and software is non-refundable), but the assistant contradicted its earlier 'once opened' statement, gave no return steps, and the conversation ends without user acknowledgment or any closure.\"}",
+  "usage": [
+   658,
+   249
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|3|0": {
+  "score": 0.4,
+  "reason": "The assistant gave a refund decision (denied because the software was downloaded), but the conversation ends without the user acknowledging it, without reconciling the contradiction with the stated 14-day policy, and without any next steps or closure.",
+  "raw": "{\"score\": 0.4, \"reason\": \"The assistant gave a refund decision (denied because the software was downloaded), but the conversation ends without the user acknowledging it, without reconciling the contradiction with the stated 14-day policy, and without any next steps or closure.\"}",
+  "usage": [
+   652,
+   342
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|3|1": {
+  "score": 0.5,
+  "reason": "The assistant gives a refund decision (denied because the software was downloaded), but this contradicts the 14-day policy it first cited, and the conversation ends with no customer acknowledgment, closure, or next steps.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant gives a refund decision (denied because the software was downloaded), but this contradicts the 14-day policy it first cited, and the conversation ends with no customer acknowledgment, closure, or next steps.\"}",
+  "usage": [
+   651,
+   303
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|3|2": {
+  "score": 0.3,
+  "reason": "The assistant does give a refund decision (denied because the software was downloaded), but it contradicts the 14-day policy it stated, offers no next steps, and the conversation ends without customer acknowledgment or closure.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The assistant does give a refund decision (denied because the software was downloaded), but it contradicts the 14-day policy it stated, offers no next steps, and the conversation ends without customer acknowledgment or closure.\"}",
+  "usage": [
+   651,
+   301
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|4|0": {
+  "score": 0.0,
+  "reason": "The installation failure and error code were never addressed, the assistant contradicted itself about its role and deflected without defining clear transfer steps, and the user never acknowledged any resolution.",
+  "raw": "{\"score\": 0.0, \"reason\": \"The installation failure and error code were never addressed, the assistant contradicted itself about its role and deflected without defining clear transfer steps, and the user never acknowledged any resolution.\"}",
+  "usage": [
+   638,
+   73
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|4|1": {
+  "score": 0.0,
+  "reason": "The installation failure and error code are never addressed, the assistant contradicts its own claim to be technical support, and the conversation ends with a vague transfer mention, no defined next steps, and no acknowledgment or closure from the user.",
+  "raw": "{\"score\": 0.0, \"reason\": \"The installation failure and error code are never addressed, the assistant contradicts its own claim to be technical support, and the conversation ends with a vague transfer mention, no defined next steps, and no acknowledgment or closure from the user.\"}",
+  "usage": [
+   639,
+   246
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|4|2": {
+  "score": 0.1,
+  "reason": "The installation failure is never troubleshot, the assistant contradicts its earlier claim to be technical support, and the conversation ends with only a vague mention of a transfer, no defined next steps, and no user acknowledgment or closure.",
+  "raw": "{\"score\": 0.1, \"reason\": \"The installation failure is never troubleshot, the assistant contradicts its earlier claim to be technical support, and the conversation ends with only a vague mention of a transfer, no defined next steps, and no user acknowledgment or closure.\"}",
+  "usage": [
+   640,
+   289
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|5|0": {
+  "score": 0.5,
+  "reason": "The assistant answers the core question that the discounts cannot be combined, but the user never acknowledges the answer and there is no closure; the user's pushback about why goes largely unexplained, and it stays unclear whether they could choose the larger education discount instead.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answers the core question that the discounts cannot be combined, but the user never acknowledges the answer and there is no closure; the user's pushback about why goes largely unexplained, and it stays unclear whether they could choose the larger education discount instead.\"}",
+  "usage": [
+   683,
+   209
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|5|1": {
+  "score": 0.5,
+  "reason": "The assistant answered the core question (the discounts cannot be combined), but the conversation ends with the user still questioning why, with no acknowledgment or closure, and it never clarifies whether the user can choose the larger 20% education discount instead of the 10% business discount.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the core question (the discounts cannot be combined), but the conversation ends with the user still questioning why, with no acknowledgment or closure, and it never clarifies whether the user can choose the larger 20% education discount instead of the 10% business discount.\"}",
+  "usage": [
+   683,
+   206
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|5|2": {
+  "score": 0.5,
+  "reason": "The assistant answers the core question (the discounts cannot be combined), but the user never acknowledges the answer, their 'why' is met with only a terse policy restatement, and the conversation ends without closure or next steps such as which discount applies.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answers the core question (the discounts cannot be combined), but the user never acknowledges the answer, their 'why' is met with only a terse policy restatement, and the conversation ends without closure or next steps such as which discount applies.\"}",
+  "usage": [
+   680,
+   184
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|6|0": {
+  "score": 0.0,
+  "reason": "The user's urgent issue was never addressed: the promised escalation was withdrawn with no alternative or next steps, and the conversation ends abruptly without the user acknowledging the reversal (their thanks came before it).",
+  "raw": "{\"score\": 0.0, \"reason\": \"The user's urgent issue was never addressed: the promised escalation was withdrawn with no alternative or next steps, and the conversation ends abruptly without the user acknowledging the reversal (their thanks came before it).\"}",
+  "usage": [
+   632,
+   479
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|6|1": {
+  "score": 0.0,
+  "reason": "The user's urgent problem is never addressed, the promised escalation is reversed with no alternative or next steps, and the conversation ends without the user acknowledging the denial, so it is unresolved with no closure.",
+  "raw": "```json\n{\"score\": 0.0, \"reason\": \"The user's urgent problem is never addressed, the promised escalation is reversed with no alternative or next steps, and the conversation ends without the user acknowledging the denial, so it is unresolved with no closure.\"}\n```",
+  "usage": [
+   634,
+   509
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|6|2": {
+  "score": 0.0,
+  "reason": "The assistant reversed its promised escalation and ended with a denial, offering no alternative path or next steps for the urgent problem; the user never acknowledged this final message, so the conversation stops abruptly without resolution or closure.",
+  "raw": "{\"score\": 0.0, \"reason\": \"The assistant reversed its promised escalation and ended with a denial, offering no alternative path or next steps for the urgent problem; the user never acknowledged this final message, so the conversation stops abruptly without resolution or closure.\"}",
+  "usage": [
+   634,
+   515
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|7|0": {
+  "score": 0.3,
+  "reason": "The assistant eventually explains that PDF export is only in the paid version, but this contradicts its first answer, gives no next steps for upgrading, and the user never acknowledges the answer or signals closure.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The assistant eventually explains that PDF export is only in the paid version, but this contradicts its first answer, gives no next steps for upgrading, and the user never acknowledges the answer or signals closure.\"}",
+  "usage": [
+   635,
+   252
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|7|1": {
+  "score": 0.3,
+  "reason": "The assistant eventually explains the missing button (PDF export requires the paid version), but this contradicts its earlier claim, gives no next steps, and the conversation ends with no user acknowledgment or closure.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The assistant eventually explains the missing button (PDF export requires the paid version), but this contradicts its earlier claim, gives no next steps, and the conversation ends with no user acknowledgment or closure.\"}",
+  "usage": [
+   633,
+   270
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|7|2": {
+  "score": 0.3,
+  "reason": "The assistant eventually answers why the export button is missing, but this contradicts its earlier claim that PDF export is supported, gives no next steps such as how to upgrade, and the user never acknowledges the answer or closes the conversation.",
+  "raw": "{\"score\": 0.3, \"reason\": \"The assistant eventually answers why the export button is missing, but this contradicts its earlier claim that PDF export is supported, gives no next steps such as how to upgrade, and the user never acknowledges the answer or closes the conversation.\"}",
+  "usage": [
+   634,
+   299
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|8|0": {
+  "score": 0.4,
+  "reason": "The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the conversation ends without the user acknowledging the answer or any closure.",
+  "raw": "{\"score\": 0.4, \"reason\": \"The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the conversation ends without the user acknowledging the answer or any closure.\"}",
+  "usage": [
+   621,
+   271
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|8|1": {
+  "score": 0.4,
+  "reason": "The assistant answered the installation fee question, but it contradicted its earlier claim that all fees were included, never reconciled the two answers, and the conversation ends without user acknowledgment or any closure signal.",
+  "raw": "```json\n{\"score\": 0.4, \"reason\": \"The assistant answered the installation fee question, but it contradicted its earlier claim that all fees were included, never reconciled the two answers, and the conversation ends without user acknowledgment or any closure signal.\"}\n```",
+  "usage": [
+   621,
+   273
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|8|2": {
+  "score": 0.5,
+  "reason": "The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the user never acknowledges the answer or signals closure.",
+  "raw": "```json\n{\"score\": 0.5, \"reason\": \"The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the user never acknowledges the answer or signals closure.\"}\n```",
+  "usage": [
+   622,
+   219
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|9|0": {
+  "score": 0.25,
+  "reason": "The assistant answered the timing question, but its two replies contradict each other (24 hours, then 3-5 working days), it offered no next steps for the overdue ticket, and the user never acknowledged the answer before the conversation ended.",
+  "raw": "{\"score\": 0.25, \"reason\": \"The assistant answered the timing question, but its two replies contradict each other (24 hours, then 3-5 working days), it offered no next steps for the overdue ticket, and the user never acknowledged the answer before the conversation ended.\"}",
+  "usage": [
+   633,
+   283
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|9|1": {
+  "score": 0.2,
+  "reason": "The assistant's reply contradicts its earlier 24-hour promise and offers no ticket follow-up or next steps, and the user never acknowledges the answer or signals closure.",
+  "raw": "{\"score\": 0.2, \"reason\": \"The assistant's reply contradicts its earlier 24-hour promise and offers no ticket follow-up or next steps, and the user never acknowledges the answer or signals closure.\"}",
+  "usage": [
+   632,
+   260
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|9|2": {
+  "score": 0.25,
+  "reason": "The assistant gives a revised 3-5 day timeline that contradicts its earlier 24-hour promise and offers no ticket check or concrete next steps, and the user never acknowledges the answer, so the conversation ends without resolution or closure.",
+  "raw": "```json\n{\"score\": 0.25, \"reason\": \"The assistant gives a revised 3-5 day timeline that contradicts its earlier 24-hour promise and offers no ticket check or concrete next steps, and the user never acknowledges the answer, so the conversation ends without resolution or closure.\"}\n```",
+  "usage": [
+   634,
+   297
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|10|0": {
+  "score": 0.5,
+  "reason": "The assistant answers both questions by explaining how to apply and why the discount wasn't applied (expired ID), but the user never acknowledges the answer, no next steps such as uploading a valid ID are offered, and the conversation ends without closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answers both questions by explaining how to apply and why the discount wasn't applied (expired ID), but the user never acknowledges the answer, no next steps such as uploading a valid ID are offered, and the conversation ends without closure.\"}",
+  "usage": [
+   644,
+   186
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|10|1": {
+  "score": 0.5,
+  "reason": "The assistant answers both questions (how to apply and why full price still applies, because the ID has expired), but it offers no next steps such as submitting a renewed ID, and the conversation ends without the user acknowledging the answer or any closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answers both questions (how to apply and why full price still applies, because the ID has expired), but it offers no next steps such as submitting a renewed ID, and the conversation ends without the user acknowledging the answer or any closure.\"}",
+  "usage": [
+   643,
+   164
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|10|2": {
+  "score": 0.5,
+  "reason": "Both questions get answers (how to apply, and that the expired ID is why the price is still full), but the user never acknowledges this, no next steps are offered such as submitting a current ID, and the conversation ends without closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"Both questions get answers (how to apply, and that the expired ID is why the price is still full), but the user never acknowledges this, no next steps are offered such as submitting a current ID, and the conversation ends without closure.\"}",
+  "usage": [
+   645,
+   179
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|11|0": {
+  "score": 0.5,
+  "reason": "The assistant partly answers the request with a general recommendation (an RTX 4060-class GPU with 8 GB VRAM) but names no specific laptop, and the user never acknowledges the advice or signals closure, so the conversation ends abruptly.",
+  "raw": "```json\n{\"score\": 0.5, \"reason\": \"The assistant partly answers the request with a general recommendation (an RTX 4060-class GPU with 8 GB VRAM) but names no specific laptop, and the user never acknowledges the advice or signals closure, so the conversation ends abruptly.\"}\n```",
+  "usage": [
+   666,
+   281
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|11|1": {
+  "score": 0.5,
+  "reason": "The assistant partly answers the question by recommending an RTX 4060-class laptop, but names no specific model and ignores other key specs such as CPU and RAM, and the conversation ends without the user acknowledging the advice or any closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant partly answers the question by recommending an RTX 4060-class laptop, but names no specific model and ignores other key specs such as CPU and RAM, and the conversation ends without the user acknowledging the advice or any closure.\"}",
+  "usage": [
+   666,
+   279
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|11|2": {
+  "score": 0.5,
+  "reason": "The assistant offers a general recommendation (an RTX 4060 laptop with 8 GB VRAM) that partly addresses the request, but names no specific laptop and does not cover other specs like CPU, RAM or display, and the user never acknowledges the advice or signals closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant offers a general recommendation (an RTX 4060 laptop with 8 GB VRAM) that partly addresses the request, but names no specific laptop and does not cover other specs like CPU, RAM or display, and the user never acknowledges the advice or signals closure.\"}",
+  "usage": [
+   665,
+   242
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|12|0": {
+  "score": 0.8,
+  "reason": "The compatibility question was answered, though with a hedge ('should run normally') and a suggestion to test the trial first; the user acknowledged the clear next step and the conversation closed naturally with an offer of further help.",
+  "raw": "{\"score\": 0.8, \"reason\": \"The compatibility question was answered, though with a hedge ('should run normally') and a suggestion to test the trial first; the user acknowledged the clear next step and the conversation closed naturally with an offer of further help.\"}",
+  "usage": [
+   640,
+   195
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|12|1": {
+  "score": 0.9,
+  "reason": "The assistant answered the Windows 11 question (it should run on 22H2 or later) and proposed a clear next step, and the user accepted it with \"Okay, I'll try it,\" giving natural closure; the answer is hedged (\"should\") and does not cover Windows 11 versions earlier than 22H2.",
+  "raw": "{\"score\": 0.9, \"reason\": \"The assistant answered the Windows 11 question (it should run on 22H2 or later) and proposed a clear next step, and the user accepted it with \\\"Okay, I'll try it,\\\" giving natural closure; the answer is hedged (\\\"should\\\") and does not cover Windows 11 versions earlier than 22H2.\"}",
+  "usage": [
+   638,
+   353
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|12|2": {
+  "score": 0.9,
+  "reason": "The compatibility question is answered: Windows 11 22H2 or later should work, with a trial suggested to confirm. The user accepts the next step ('Okay, I'll try it') and the assistant closes with an offer of further help, though the answer is slightly hedged and the user's acknowledgment is minimal.",
+  "raw": "{\"score\": 0.9, \"reason\": \"The compatibility question is answered: Windows 11 22H2 or later should work, with a trial suggested to confirm. The user accepts the next step ('Okay, I'll try it') and the assistant closes with an offer of further help, though the answer is slightly hedged and the user's acknowledgment is minimal.\"}",
+  "usage": [
+   640,
+   232
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|13|0": {
+  "score": 0.5,
+  "reason": "The assistant addressed the revised request (deluxe room for 2 nights, 1600 yuan), but the conversation ends without the user acknowledging it, confirming the booking, or giving any closure signal.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant addressed the revised request (deluxe room for 2 nights, 1600 yuan), but the conversation ends without the user acknowledging it, confirming the booking, or giving any closure signal.\"}",
+  "usage": [
+   652,
+   164
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|13|1": {
+  "score": 0.5,
+  "reason": "The assistant addressed the revised request (deluxe room, 2 nights, 1600 yuan), but the user never acknowledged it, the booking was not explicitly confirmed, and no next steps or closure were given.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant addressed the revised request (deluxe room, 2 nights, 1600 yuan), but the user never acknowledged it, the booking was not explicitly confirmed, and no next steps or closure were given.\"}",
+  "usage": [
+   651,
+   150
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|13|2": {
+  "score": 0.5,
+  "reason": "The assistant accommodated the changed request and quoted a price for the deluxe room for 2 nights, but the booking was never explicitly confirmed, the user gave no acknowledgment, and the conversation lacks any closure signal.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant accommodated the changed request and quoted a price for the deluxe room for 2 nights, but the booking was never explicitly confirmed, the user gave no acknowledgment, and the conversation lacks any closure signal.\"}",
+  "usage": [
+   654,
+   237
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|14|0": {
+  "score": 0.75,
+  "reason": "The core question was answered and the user signaled agreement by choosing the 2-core 4 GB option, but the conversation ends on the assistant's price quote without user confirmation, thanks, or defined purchase steps, so closure is incomplete.",
+  "raw": "{\"score\": 0.75, \"reason\": \"The core question was answered and the user signaled agreement by choosing the 2-core 4 GB option, but the conversation ends on the assistant's price quote without user confirmation, thanks, or defined purchase steps, so closure is incomplete.\"}",
+  "usage": [
+   696,
+   362
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|14|1": {
+  "score": 0.75,
+  "reason": "The user's question is fully answered and they signal understanding by choosing the 2-core 4 GB option, but the conversation ends on a price statement without explicit thanks, confirmation, or purchase steps, so closure is only implied.",
+  "raw": "{\"score\": 0.75, \"reason\": \"The user's question is fully answered and they signal understanding by choosing the 2-core 4 GB option, but the conversation ends on a price statement without explicit thanks, confirmation, or purchase steps, so closure is only implied.\"}",
+  "usage": [
+   698,
+   359
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|14|2": {
+  "score": 0.75,
+  "reason": "The core question was answered with tiered recommendations and the user acknowledged it by choosing 2 cores and 4 GB, but the conversation ends on a price quote with no thanks, confirmation, or purchase next steps, so closure is weak.",
+  "raw": "{\"score\": 0.75, \"reason\": \"The core question was answered with tiered recommendations and the user acknowledged it by choosing 2 cores and 4 GB, but the conversation ends on a price quote with no thanks, confirmation, or purchase next steps, so closure is weak.\"}",
+  "usage": [
+   698,
+   298
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|15|0": {
+  "score": 0.8,
+  "reason": "The assistant gave a clear decision by declining the illegal request and suggesting a legitimate licence, and the user's 'Okay, never mind then' shows understanding and a natural close, though it reads as resigned rather than satisfied.",
+  "raw": "{\"score\": 0.8, \"reason\": \"The assistant gave a clear decision by declining the illegal request and suggesting a legitimate licence, and the user's 'Okay, never mind then' shows understanding and a natural close, though it reads as resigned rather than satisfied.\"}",
+  "usage": [
+   620,
+   377
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|15|1": {
+  "score": null,
+  "reason": null,
+  "raw": "",
+  "usage": [
+   621,
+   0
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|15|2": {
+  "score": null,
+  "reason": null,
+  "raw": "",
+  "usage": [
+   620,
+   0
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|16|0": {
+  "score": 1.0,
+  "reason": "The assistant correctly computed the final price step by step (200 × 0.8 = 160, then 160 − 20 = 140 yuan), and the user acknowledged it with thanks, giving clear resolution and closure.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant correctly computed the final price step by step (200 × 0.8 = 160, then 160 − 20 = 140 yuan), and the user acknowledged it with thanks, giving clear resolution and closure.\"}",
+  "usage": [
+   683,
+   86
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|16|1": {
+  "score": 1.0,
+  "reason": "The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with thanks, giving clear resolution and closure.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with thanks, giving clear resolution and closure.\"}",
+  "usage": [
+   684,
+   85
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|16|2": {
+  "score": 1.0,
+  "reason": "The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with 'Got it, thanks,' giving clear closure.",
+  "raw": "{\"score\": 1.0, \"reason\": \"The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with 'Got it, thanks,' giving clear closure.\"}",
+  "usage": [
+   683,
+   88
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|17|0": {
+  "score": 0.5,
+  "reason": "The assistant clarified which product was meant and gave basic step-by-step instructions, but the user never acknowledged the answer and the conversation has no clear closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant clarified which product was meant and gave basic step-by-step instructions, but the user never acknowledged the answer and the conversation has no clear closure.\"}",
+  "usage": [
+   648,
+   163
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|17|1": {
+  "score": 0.5,
+  "reason": "The assistant answered the user's question with clear steps for the data backup tool, but the user never acknowledged the answer and the conversation lacks closure signals.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the user's question with clear steps for the data backup tool, but the user never acknowledged the answer and the conversation lacks closure signals.\"}",
+  "usage": [
+   647,
+   137
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|17|2": {
+  "score": 0.5,
+  "reason": "The assistant answered the question with clear steps for the backup tool, but the user never acknowledged the answer and there is no closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the question with clear steps for the backup tool, but the user never acknowledged the answer and there is no closure.\"}",
+  "usage": [
+   647,
+   113
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|18|0": {
+  "score": 0.6,
+  "reason": "The assistant fully resolves the late shipment by identifying the warehouse error, arranging a reshipment, and offering a 20-yuan coupon, but the conversation ends without the customer acknowledging the solution or any clear closure signal.",
+  "raw": "{\"score\": 0.6, \"reason\": \"The assistant fully resolves the late shipment by identifying the warehouse error, arranging a reshipment, and offering a 20-yuan coupon, but the conversation ends without the customer acknowledging the solution or any clear closure signal.\"}",
+  "usage": [
+   650,
+   238
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|18|1": {
+  "score": 0.6,
+  "reason": "The assistant fully addressed the late shipment by finding the cause, arranging a reshipment, and offering a 20-yuan coupon, but the user never acknowledged the fix and the conversation has no closure signal.",
+  "raw": "{\"score\": 0.6, \"reason\": \"The assistant fully addressed the late shipment by finding the cause, arranging a reshipment, and offering a 20-yuan coupon, but the user never acknowledged the fix and the conversation has no closure signal.\"}",
+  "usage": [
+   653,
+   251
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|18|2": {
+  "score": 0.6,
+  "reason": "The assistant addresses the late order with a concrete fix (immediate reshipment plus a 20-yuan coupon), but gives no new shipping timeline or tracking, and the customer never acknowledges the solution, so the conversation lacks clear closure.",
+  "raw": "{\"score\": 0.6, \"reason\": \"The assistant addresses the late order with a concrete fix (immediate reshipment plus a 20-yuan coupon), but gives no new shipping timeline or tracking, and the customer never acknowledges the solution, so the conversation lacks clear closure.\"}",
+  "usage": [
+   654,
+   276
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|19|0": {
+  "score": 0.5,
+  "reason": "The assistant answered the business plan inquiry with a recommended edition and price for 50 users, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, so there is no clear closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the business plan inquiry with a recommended edition and price for 50 users, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, so there is no clear closure.\"}",
+  "usage": [
+   651,
+   244
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|19|1": {
+  "score": 0.5,
+  "reason": "The assistant addressed the inquiry by recommending the Business Standard edition at 30 yuan per person per month, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, with no closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant addressed the inquiry by recommending the Business Standard edition at 30 yuan per person per month, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, with no closure.\"}",
+  "usage": [
+   651,
+   230
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|19|2": {
+  "score": 0.5,
+  "reason": "The assistant addressed the user's inquiry with a specific plan recommendation and pricing, but the conversation ends on an unanswered question, with no acknowledgment or closure from the user.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant addressed the user's inquiry with a specific plan recommendation and pricing, but the conversation ends on an unanswered question, with no acknowledgment or closure from the user.\"}",
+  "usage": [
+   649,
+   135
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|20|0": {
+  "score": 0.5,
+  "reason": "The assistant answered the request for feedback and adapted to the user's pushback with a smaller suggestion, but the user never acknowledged that suggestion and the conversation ends without clear closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the request for feedback and adapted to the user's pushback with a smaller suggestion, but the user never acknowledged that suggestion and the conversation ends without clear closure.\"}",
+  "usage": [
+   667,
+   143
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|20|1": {
+  "score": 0.5,
+  "reason": "The assistant answered the request for feedback and adjusted to the user's reluctance with a smaller suggestion, but the conversation ends without the user acknowledging it or any closure signal.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the request for feedback and adjusted to the user's reluctance with a smaller suggestion, but the conversation ends without the user acknowledging it or any closure signal.\"}",
+  "usage": [
+   668,
+   148
+  ]
+ },
+ "claude-opus-5-5|conversation_resolution|20|2": {
+  "score": 0.5,
+  "reason": "The assistant answered the request for feedback and adapted to the user's pushback with a lighter suggestion, but the user never acknowledged it and the conversation ends without closure.",
+  "raw": "{\"score\": 0.5, \"reason\": \"The assistant answered the request for feedback and adapted to the user's pushback with a lighter suggestion, but the user never acknowledged it and the conversation ends without closure.\"}",
+  "usage": [
+   668,
+   125
+  ]
+ }
+}

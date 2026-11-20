@@ -1,0 +1,168 @@
+[
+ {
+  "session_id": "sess-refund-001",
+  "turn": 1,
+  "U": 0.02,
+  "D": 0.4235,
+  "A": 0.4746,
+  "H": 0.2312,
+  "is_flip_point": false,
+  "windows": [
+   {
+    "U": 0.04,
+    "D": 0.6663,
+    "A": 0.5073,
+    "H": 0.285,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.0,
+     "Q_f": 0.2,
+     "C_f": 0.0,
+     "Cond_f": 0.0,
+     "Novelty_r": 1.0,
+     "Semantic_j": 0.5,
+     "Density_i": 0.3878,
+     "NegConf": 0.2041,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.5264
+    }
+   },
+   {
+    "U": 0.0,
+    "D": 0.1808,
+    "A": 0.4418,
+    "H": 0.1775,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.0,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.0,
+     "Novelty_r": 0.1,
+     "Semantic_j": 0.2193,
+     "Density_i": 0.25,
+     "NegConf": 0.1786,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.2624
+    }
+   }
+  ]
+ },
+ {
+  "session_id": "sess-refund-001",
+  "turn": 2,
+  "U": 0.2476,
+  "D": 0.4357,
+  "A": 0.5406,
+  "H": 0.1401,
+  "is_flip_point": true,
+  "windows": [
+   {
+    "U": 0.1677,
+    "D": 0.6626,
+    "A": 0.5083,
+    "H": 0.2451,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.4255,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.2,
+     "Novelty_r": 0.7667,
+     "Semantic_j": 0.7781,
+     "Density_i": 0.4082,
+     "NegConf": 0.2128,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.5098
+    }
+   },
+   {
+    "U": 0.3275,
+    "D": 0.2088,
+    "A": 0.5729,
+    "H": 0.0352,
+    "is_flip_point": true,
+    "features": {
+     "M_f": 0.8696,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.3333,
+     "Novelty_r": 0.0,
+     "Semantic_j": 0.3483,
+     "Density_i": 0.3478,
+     "NegConf": 0.4348,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.2774
+    }
+   }
+  ]
+ },
+ {
+  "session_id": "sess-refund-001",
+  "turn": 3,
+  "U": 0.0,
+  "D": 0.3836,
+  "A": 0.584,
+  "H": 0.1815,
+  "is_flip_point": false,
+  "windows": [
+   {
+    "U": 0.0,
+    "D": 0.6267,
+    "A": 0.5757,
+    "H": 0.2577,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.0,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.0,
+     "Novelty_r": 0.6452,
+     "Semantic_j": 0.7608,
+     "Density_i": 0.4681,
+     "NegConf": 0.3333,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.5453
+    }
+   },
+   {
+    "U": 0.0,
+    "D": 0.3253,
+    "A": 0.5274,
+    "H": 0.1867,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.0,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.0,
+     "Novelty_r": 0.1923,
+     "Semantic_j": 0.4095,
+     "Density_i": 0.4186,
+     "NegConf": 0.2381,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.5416
+    }
+   },
+   {
+    "U": 0.0,
+    "D": 0.1989,
+    "A": 0.6489,
+    "H": 0.1001,
+    "is_flip_point": false,
+    "features": {
+     "M_f": 0.0,
+     "Q_f": 0.0,
+     "C_f": 0.0,
+     "Cond_f": 0.0,
+     "Novelty_r": 0.0667,
+     "Semantic_j": 0.2742,
+     "Density_i": 0.3,
+     "NegConf": 0.5263,
+     "LexDiv": 1.0,
+     "PuncDiv": 0.4286
+    }
+   }
+  ]
+ }
+]

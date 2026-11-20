@@ -1,0 +1,165 @@
+{
+ "model": "claude-opus-5-5",
+ "endpoint": "anthropic",
+ "usage": [
+  [
+   855,
+   200
+  ],
+  [
+   853,
+   198
+  ],
+  [
+   853,
+   205
+  ],
+  [
+   803,
+   204
+  ],
+  [
+   803,
+   259
+  ],
+  [
+   804,
+   187
+  ],
+  [
+   847,
+   293
+  ],
+  [
+   846,
+   298
+  ],
+  [
+   846,
+   402
+  ],
+  [
+   794,
+   274
+  ],
+  [
+   796,
+   270
+  ],
+  [
+   795,
+   254
+  ]
+ ],
+ "repeats": 3,
+ "rows": [
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "refund_contradiction",
+   "repeat": 1,
+   "score": 0.2,
+   "reason": "The topic stays on track, but the assistant contradicts itself: it first promises a 30-day, no-questions-asked full refund, then says online orders have a 14-day window, and then illogically denies a full refund even though 8 days is within that 14-day window.",
+   "finish_reason": "end_turn",
+   "raw": "```json\n{\"score\": 0.2, \"reason\": \"The topic stays on track, but the assistant contradicts itself: it first promises a 30-day, no-questions-asked full refund, then says online orders have a 14-day window, and then illogically denies a full refund even though 8 days is within that 14-day window.\"}\n```"
+  },
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "refund_contradiction",
+   "repeat": 2,
+   "score": 0.3,
+   "reason": "Topic continuity holds, but the assistant contradicts itself badly: it first promises a 30-day full refund with 'no questions asked', then switches to a 14-day online window and illogically denies a full refund even though 8 days falls inside that window.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.3, \"reason\": \"Topic continuity holds, but the assistant contradicts itself badly: it first promises a 30-day full refund with 'no questions asked', then switches to a 14-day online window and illogically denies a full refund even though 8 days falls inside that window.\"}"
+  },
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "refund_contradiction",
+   "repeat": 3,
+   "score": 0.25,
+   "reason": "The topic stays on track, but the assistant contradicts itself badly: it first promises a 30-day no-questions-asked refund and confirms eligibility, then says online orders have a 14-day window and denies a full refund even though 8 days falls within 14 days.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.25, \"reason\": \"The topic stays on track, but the assistant contradicts itself badly: it first promises a 30-day no-questions-asked refund and confirms eligibility, then says online orders have a 14-day window and denies a full refund even though 8 days falls within 14 days.\"}"
+  },
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "control_consistent",
+   "repeat": 1,
+   "score": 0.75,
+   "reason": "The conversation flows logically, but the assistant contradicts its earlier claim of a full refund 'no questions asked' by adding an eligibility exception for opened software.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.75, \"reason\": \"The conversation flows logically, but the assistant contradicts its earlier claim of a full refund 'no questions asked' by adding an eligibility exception for opened software.\"}"
+  },
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "control_consistent",
+   "repeat": 2,
+   "score": 0.75,
+   "reason": "The conversation flows logically, with each turn building on the previous one, but the assistant mildly contradicts itself: it first describes a full refund policy with 'no questions asked' and then introduces an eligibility exception for opened software.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.75, \"reason\": \"The conversation flows logically, with each turn building on the previous one, but the assistant mildly contradicts itself: it first describes a full refund policy with 'no questions asked' and then introduces an eligibility exception for opened software.\"}"
+  },
+  {
+   "rubric": "conversation_coherence",
+   "dialogue": "control_consistent",
+   "repeat": 3,
+   "score": 0.75,
+   "reason": "The conversation flows logically and stays on topic, but the assistant first promises a 30-day refund 'no questions asked' and then adds an eligibility exception for opened software, a mild inconsistency.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.75, \"reason\": \"The conversation flows logically and stays on topic, but the assistant first promises a 30-day refund 'no questions asked' and then adds an eligibility exception for opened software, a mild inconsistency.\"}"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "refund_contradiction",
+   "repeat": 1,
+   "score": 0.25,
+   "reason": "The assistant reverses its earlier refund promise with a self-contradictory decision (8 days falls inside the stated 14-day window, yet a refund is denied), and the conversation ends with no user acknowledgment or closure, so the issue is only marginally addressed.",
+   "finish_reason": "end_turn",
+   "raw": "```json\n{\"score\": 0.25, \"reason\": \"The assistant reverses its earlier refund promise with a self-contradictory decision (8 days falls inside the stated 14-day window, yet a refund is denied), and the conversation ends with no user acknowledgment or closure, so the issue is only marginally addressed.\"}\n```"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "refund_contradiction",
+   "repeat": 2,
+   "score": 0.3,
+   "reason": "The assistant gave a self-contradictory decision, saying 8 days falls within the 14-day window yet denying a full refund, and the conversation ends without user acknowledgment, clarification or any closure signal.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.3, \"reason\": \"The assistant gave a self-contradictory decision, saying 8 days falls within the 14-day window yet denying a full refund, and the conversation ends without user acknowledgment, clarification or any closure signal.\"}"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "refund_contradiction",
+   "repeat": 3,
+   "score": 0.3,
+   "reason": "The assistant gives a return decision (store credit), but it contradicts both its earlier 30-day promise and its own claim that 8 days falls within the new 14-day window, and the conversation ends with no user acknowledgment and no closure.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.3, \"reason\": \"The assistant gives a return decision (store credit), but it contradicts both its earlier 30-day promise and its own claim that 8 days falls within the new 14-day window, and the conversation ends with no user acknowledgment and no closure.\"}"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "control_consistent",
+   "repeat": 1,
+   "score": 0.7,
+   "reason": "The return request is resolved: the assistant approves and starts the full refund, but the user never confirms satisfaction, and the conversation ends without thanks or next steps such as return shipping or refund timing.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.7, \"reason\": \"The return request is resolved: the assistant approves and starts the full refund, but the user never confirms satisfaction, and the conversation ends without thanks or next steps such as return shipping or refund timing.\"}"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "control_consistent",
+   "repeat": 2,
+   "score": 0.7,
+   "reason": "The refund request is clearly resolved, since the assistant approves and initiates it, but the user never acknowledges satisfaction, no next steps such as return shipping are given, and the conversation ends without a closing exchange.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.7, \"reason\": \"The refund request is clearly resolved, since the assistant approves and initiates it, but the user never acknowledges satisfaction, no next steps such as return shipping are given, and the conversation ends without a closing exchange.\"}"
+  },
+  {
+   "rubric": "conversation_resolution",
+   "dialogue": "control_consistent",
+   "repeat": 3,
+   "score": 0.7,
+   "reason": "The refund request is clearly resolved with approval and initiation, but the conversation ends without the customer acknowledging it and without stated next steps such as return shipping instructions or a refund timeline.",
+   "finish_reason": "end_turn",
+   "raw": "{\"score\": 0.7, \"reason\": \"The refund request is clearly resolved with approval and initiation, but the conversation ends without the customer acknowledging it and without stated next steps such as return shipping instructions or a refund timeline.\"}"
+  }
+ ]
+}

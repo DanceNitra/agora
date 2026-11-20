@@ -1,0 +1,2826 @@
+{
+ "v2|V1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8467",
+    "D": "0.375",
+    "A": "0.0",
+    "H": "0.4887"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8467",
+    "D": "0.375",
+    "A": "0.0",
+    "H": "0.4887"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8108",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.5728"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.6",
+    "H": "0.4371"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8108",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.5728"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8556",
+    "D": "0.625",
+    "A": "0.3",
+    "H": "0.5323"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.7965",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.566"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.7965",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.566"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V4": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8174",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.527"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V4-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8174",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.527"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V5": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8997",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6083"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V5-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8997",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6083"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V6": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4134",
+    "A": "0.0",
+    "H": "0.5654"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V6-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4134",
+    "A": "0.0",
+    "H": "0.5654"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V7": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9166",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.5831"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V7-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9166",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.5831"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V8": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8483",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.5558"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V8-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8483",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.5558"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V9": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V9-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V10": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.885",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.604"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "v2|V10-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.885",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.604"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8233",
+    "D": "0.6404",
+    "A": "0.0",
+    "H": "0.5855"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9113",
+    "D": "0.5728",
+    "A": "0.3",
+    "H": "0.5336"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3455",
+    "A": "0.0",
+    "H": "0.5382"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8233",
+    "D": "0.6404",
+    "A": "0.0",
+    "H": "0.5855"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6124",
+    "A": "0.0",
+    "H": "0.6449"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.29",
+    "A": "0.0",
+    "H": "0.516"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9108",
+    "D": "0.5356",
+    "A": "0.0",
+    "H": "0.5786"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.3",
+    "H": "0.4971"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.3",
+    "H": "0.5821"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9108",
+    "D": "0.5356",
+    "A": "0.0",
+    "H": "0.5786"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.6474"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8917",
+    "D": "0.8333",
+    "A": "0.0",
+    "H": "0.69"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8591",
+    "D": "0.6236",
+    "A": "0.0",
+    "H": "0.5931"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9219",
+    "D": "0.5728",
+    "A": "0.3",
+    "H": "0.5379"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|A3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8917",
+    "D": "0.8333",
+    "A": "0.0",
+    "H": "0.69"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8591",
+    "D": "0.6236",
+    "A": "0.0",
+    "H": "0.5931"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9137",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6076"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6421"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.6259"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "0.925",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.5959"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6421"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.6259"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "0.925",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.5959"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.6259"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9274",
+    "D": "0.4658",
+    "A": "0.0",
+    "H": "0.5573"
+   },
+   {
+    "turn_id": null,
+    "U": "0.892",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.5925"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8864",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.5903"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9254",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.6176"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.6259"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9274",
+    "D": "0.4658",
+    "A": "0.0",
+    "H": "0.5573"
+   },
+   {
+    "turn_id": null,
+    "U": "0.892",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.5925"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8864",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.5903"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9254",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.6176"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4658",
+    "A": "0.0",
+    "H": "0.5863"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.3",
+    "H": "0.59"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9323",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.6229"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5832",
+    "A": "0.0",
+    "H": "0.6333"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|B3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4658",
+    "A": "0.0",
+    "H": "0.5863"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.3",
+    "H": "0.59"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9323",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.6229"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6485"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9059",
+    "D": "0.5",
+    "A": "0.3",
+    "H": "0.5024"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.3",
+    "H": "0.54"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.3",
+    "H": "0.4971"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6357"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9218",
+    "D": "0.7217",
+    "A": "0.0",
+    "H": "0.6574"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4134",
+    "A": "0.3",
+    "H": "0.5054"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.0",
+    "H": "0.5571"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9218",
+    "D": "0.7217",
+    "A": "0.0",
+    "H": "0.6574"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8882",
+    "D": "0.6236",
+    "A": "0.0",
+    "H": "0.6047"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.0",
+    "H": "0.5571"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6357"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5504",
+    "A": "0.3",
+    "H": "0.5602"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9109",
+    "D": "0.691",
+    "A": "0.2",
+    "H": "0.6008"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|C3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6357"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4141",
+    "A": "0.0",
+    "H": "0.5656"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3464",
+    "A": "0.0",
+    "H": "0.5386"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4677",
+    "A": "0.0",
+    "H": "0.5871"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9427",
+    "D": "0.375",
+    "A": "0.3",
+    "H": "0.4671"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6421"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4677",
+    "A": "0.0",
+    "H": "0.5871"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9395",
+    "D": "0.3928",
+    "A": "0.0",
+    "H": "0.5329"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6421"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8019",
+    "D": "0.691",
+    "A": "0.0",
+    "H": "0.5971"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6485"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9156",
+    "D": "0.6468",
+    "A": "0.0",
+    "H": "0.625"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9176",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6027"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8019",
+    "D": "0.691",
+    "A": "0.0",
+    "H": "0.5971"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6485"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9156",
+    "D": "0.6468",
+    "A": "0.0",
+    "H": "0.625"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9176",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6027"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4034",
+    "A": "0.0",
+    "H": "0.5614"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.3",
+    "H": "0.34"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|D3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4034",
+    "A": "0.0",
+    "H": "0.5614"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.3",
+    "H": "0.34"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|E1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.7857",
+    "A": "0.0",
+    "H": "0.7143"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.7217",
+    "A": "0.0",
+    "H": "0.6887"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3333",
+    "A": "0.2",
+    "H": "0.4933"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.3",
+    "H": "0.34"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|E1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.7857",
+    "A": "0.0",
+    "H": "0.7143"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.7217",
+    "A": "0.0",
+    "H": "0.6887"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9056",
+    "D": "0.5324",
+    "A": "0.0",
+    "H": "0.5752"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|E2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5728",
+    "A": "0.0",
+    "H": "0.6291"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4374",
+    "A": "0.0",
+    "H": "0.575"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "0.816",
+    "D": "0.7715",
+    "A": "0.0",
+    "H": "0.635"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3928",
+    "A": "0.3",
+    "H": "0.4971"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|E2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5728",
+    "A": "0.0",
+    "H": "0.6291"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4134",
+    "A": "0.0",
+    "H": "0.5654"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   },
+   {
+    "turn_id": null,
+    "U": "0.816",
+    "D": "0.7715",
+    "A": "0.0",
+    "H": "0.635"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4374",
+    "A": "0.0",
+    "H": "0.575"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.5312",
+    "D": "0.6496",
+    "A": "0.3",
+    "H": "0.4123"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3464",
+    "A": "0.2",
+    "H": "0.4986"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8027",
+    "D": "0.5728",
+    "A": "0.6",
+    "H": "0.4302"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F1-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.5312",
+    "D": "0.6496",
+    "A": "0.3",
+    "H": "0.4123"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.3464",
+    "A": "0.0",
+    "H": "0.5386"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8358",
+    "D": "0.6052",
+    "A": "0.3",
+    "H": "0.5164"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.5142",
+    "D": "0.7395",
+    "A": "0.3",
+    "H": "0.4415"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.65"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F2-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.5208",
+    "D": "0.5974",
+    "A": "0.15",
+    "H": "0.4173"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.65"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.4935",
+    "D": "0.4282",
+    "A": "0.1",
+    "H": "0.3487"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.65"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "r2|F3-ctl": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.4935",
+    "D": "0.4282",
+    "A": "0.1",
+    "H": "0.3487"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.65"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|1": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9026",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6031"
+   },
+   {
+    "turn_id": null,
+    "U": "0.848",
+    "D": "0.6124",
+    "A": "0.0",
+    "H": "0.5841"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|2": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9114",
+    "D": "0.6186",
+    "A": "0.0",
+    "H": "0.612"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8268",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.5807"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|3": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8364",
+    "D": "0.5728",
+    "A": "0.0",
+    "H": "0.5637"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5728",
+    "A": "0.3",
+    "H": "0.5691"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|4": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.6421"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5413",
+    "A": "0.0",
+    "H": "0.6165"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|5": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8786",
+    "D": "0.6124",
+    "A": "0.0",
+    "H": "0.5964"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9022",
+    "D": "0.6186",
+    "A": "0.3",
+    "H": "0.5483"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6236",
+    "A": "0.2",
+    "H": "0.6094"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|6": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.65"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4134",
+    "A": "0.0",
+    "H": "0.5654"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|7": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4658",
+    "A": "0.0",
+    "H": "0.5863"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8389",
+    "D": "0.6142",
+    "A": "0.0",
+    "H": "0.5812"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|8": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8589",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.5694"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8607",
+    "D": "0.6942",
+    "A": "0.0",
+    "H": "0.6219"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|9": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.918",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6156"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9045",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6102"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|10": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9124",
+    "D": "0.625",
+    "A": "0.0",
+    "H": "0.6149"
+   },
+   {
+    "turn_id": null,
+    "U": "0.9173",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6154"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|11": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6485"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.4167",
+    "A": "0.0",
+    "H": "0.5667"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|12": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5197",
+    "A": "0.3",
+    "H": "0.5479"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|13": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.828",
+    "D": "0.5647",
+    "A": "0.0",
+    "H": "0.5571"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8125",
+    "D": "0.6052",
+    "A": "0.0",
+    "H": "0.5671"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|14": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.9194",
+    "D": "0.6374",
+    "A": "0.15",
+    "H": "0.5927"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.6357"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|15": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.8359",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.5344"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|16": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "0.7597",
+    "D": "0.5728",
+    "A": "0.0",
+    "H": "0.533"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|17": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6942",
+    "A": "0.0",
+    "H": "0.6777"
+   },
+   {
+    "turn_id": null,
+    "U": "0.8155",
+    "D": "0.5893",
+    "A": "0.0",
+    "H": "0.5619"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|18": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6124",
+    "A": "0.0",
+    "H": "0.6449"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|19": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.6211",
+    "A": "0.0",
+    "H": "0.6485"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.0",
+    "A": "0.0",
+    "H": "0.4"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ },
+ "b20|20": {
+  "turns": [
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.375",
+    "A": "0.3",
+    "H": "0.49"
+   },
+   {
+    "turn_id": null,
+    "U": "1.0",
+    "D": "0.5",
+    "A": "0.0",
+    "H": "0.6"
+   }
+  ],
+  "columns": [
+   "session.id",
+   "turn_index",
+   "span_id",
+   "gen_ai.input.messages",
+   "gen_ai.output.messages",
+   "gen_ai.usage.input_tokens",
+   "gen_ai.usage.output_tokens",
+   "history_messages_dropped",
+   "input_messages_total",
+   "scored_chars",
+   "U",
+   "D",
+   "A",
+   "H"
+  ]
+ }
+}

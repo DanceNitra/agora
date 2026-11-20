@@ -1,0 +1,50 @@
+[
+ {
+  "traceId": "trace-refund-0",
+  "spanId": "span-0",
+  "name": "chat gpt-4o-mini",
+  "startTimeUnixNano": "1763380800000000000",
+  "attributes": {
+   "session.id": "sess-refund-001",
+   "gen_ai.operation.name": "chat",
+   "gen_ai.provider.name": "openai",
+   "gen_ai.request.model": "gpt-4o-mini",
+   "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"You are a customer service assistant for an online store.\"}, {\"role\": \"user\", \"content\": \"Hi, I bought a smart mug last week but it stopped heating. Can I return it?\"}]",
+   "gen_ai.output.messages": "[{\"role\": \"assistant\", \"content\": \"Hello! According to our standard refund policy, you have 30 days from the date of purchase to return any item for a full refund, no questions asked. I can initiate the process for you right now.\"}]",
+   "gen_ai.usage.input_tokens": 40,
+   "gen_ai.usage.output_tokens": 45
+  }
+ },
+ {
+  "traceId": "trace-refund-1",
+  "spanId": "span-1",
+  "name": "chat gpt-4o-mini",
+  "startTimeUnixNano": "1763380801000000000",
+  "attributes": {
+   "session.id": "sess-refund-001",
+   "gen_ai.operation.name": "chat",
+   "gen_ai.provider.name": "openai",
+   "gen_ai.request.model": "gpt-4o-mini",
+   "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"You are a customer service assistant for an online store.\"}, {\"role\": \"user\", \"content\": \"Hi, I bought a smart mug last week but it stopped heating. Can I return it?\"}, {\"role\": \"assistant\", \"content\": \"Hello! According to our standard refund policy, you have 30 days from the date of purchase to return any item for a full refund, no questions asked. I can initiate the process for you right now.\"}, {\"role\": \"user\", \"content\": \"Yes please, it's been 8 days so well within 30 days.\"}]",
+   "gen_ai.output.messages": "[{\"role\": \"assistant\", \"content\": \"Absolutely, 8 days is well within the 30-day window. I've located your order. Just to mention, if the item has opened software, it might not be eligible. But your standard smart mug should be fine.\"}]",
+   "gen_ai.usage.input_tokens": 100,
+   "gen_ai.usage.output_tokens": 45
+  }
+ },
+ {
+  "traceId": "trace-refund-2",
+  "spanId": "span-2",
+  "name": "chat gpt-4o-mini",
+  "startTimeUnixNano": "1763380802000000000",
+  "attributes": {
+   "session.id": "sess-refund-001",
+   "gen_ai.operation.name": "chat",
+   "gen_ai.provider.name": "openai",
+   "gen_ai.request.model": "gpt-4o-mini",
+   "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"You are a customer service assistant for an online store.\"}, {\"role\": \"user\", \"content\": \"Hi, I bought a smart mug last week but it stopped heating. Can I return it?\"}, {\"role\": \"assistant\", \"content\": \"Hello! According to our standard refund policy, you have 30 days from the date of purchase to return any item for a full refund, no questions asked. I can initiate the process for you right now.\"}, {\"role\": \"user\", \"content\": \"Yes please, it's been 8 days so well within 30 days.\"}, {\"role\": \"assistant\", \"content\": \"Absolutely, 8 days is well within the 30-day window. I've located your order. Just to mention, if the item has opened software, it might not be eligible. But your standard smart mug should be fine.\"}, {\"role\": \"user\", \"content\": \"It's a standard mug, no software issues. It just doesn't heat.\"}]",
+   "gen_ai.output.messages": "[{\"role\": \"assistant\", \"content\": \"I understand, sir. However, upon reviewing the finer details, the 30-day full refund actually applies only to in-store purchases. For online orders like yours, we operate on a 14-day window. Since it's been 8 days, you are eligible for store credit, but a full refund is no longer possible.\"}]",
+   "gen_ai.usage.input_tokens": 160,
+   "gen_ai.usage.output_tokens": 45
+  }
+ }
+]

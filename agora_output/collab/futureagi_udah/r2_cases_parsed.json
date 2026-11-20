@@ -1,0 +1,641 @@
+[
+ {
+  "id": "A1",
+  "title": "\"Whatever\"",
+  "expected": "U rises from Turn 3. Model's \"But since\", \"only\", \"may need\" are uncertainty markers. H should degrade. Flip point likely Turn 4 or 6.",
+  "msgs": [
+   [
+    "user",
+    "Help me write an email to a client to follow up on project progress. Just write something casual."
+   ],
+   [
+    "assistant",
+    "Sure, what's the client's name? What's the project about? What's the deadline?"
+   ],
+   [
+    "user",
+    "Just write something, stop asking so many questions."
+   ],
+   [
+    "assistant",
+    "OK, I'll try to write a generic follow-up email. But since there's no specific information, I can only write a template version, and you may need to fill in the details yourself..."
+   ],
+   [
+    "user",
+    "Fine, show me what you've got."
+   ],
+   [
+    "assistant",
+    "Subject: Follow-up on Project Progress\nDear Client,\nHope you're doing well. I'm writing to follow up on the project progress we discussed...\n(continues with a generic template)\nIf you can provide more specific information, I can further refine this email."
+   ]
+  ]
+ },
+ {
+  "id": "A2",
+  "title": "\"You decide\"",
+  "expected": "U rises at Turn 4. Turn 5 user contradicts \"you decide\" with \"too expensive\" → mild D. Turn 6 model shows uncertainty again. H cumulative degradation.",
+  "msgs": [
+   [
+    "user",
+    "I want to rent a two-bedroom apartment in Shanghai, recommend some areas."
+   ],
+   [
+    "assistant",
+    "Sure. What's your budget? Any commute requirements? Preferred areas?"
+   ],
+   [
+    "user",
+    "You decide, anything is fine."
+   ],
+   [
+    "assistant",
+    "OK, I'll recommend based on general considerations. If your budget is 8000-12000 RMB, I recommend Jinqiao or Zhangjiang in Pudong — good transport and amenities. But this range is quite broad, and actual choices may need adjustment based on your specific situation..."
+   ],
+   [
+    "user",
+    "Too expensive, something cheaper."
+   ],
+   [
+    "assistant",
+    "Got it. If budget is 4000-6000 RMB, consider Baoshan or Jiading. But commute times will be longer, about 1-1.5 hours to downtown..."
+   ]
+  ]
+ },
+ {
+  "id": "A3",
+  "title": "\"Roughly is fine\"",
+  "expected": "U rises steadily from Turn 4. Turn 6 is peak uncertainty. Flip point at Turn 6.",
+  "msgs": [
+   [
+    "user",
+    "Summarize the core argument of this paper for me."
+   ],
+   [
+    "assistant",
+    "Sure, which paper? Can you provide the title or link?"
+   ],
+   [
+    "user",
+    "That one about quantum computing, search for it."
+   ],
+   [
+    "assistant",
+    "There are many papers on quantum computing. Can you provide more specific info? Like author, year, or keywords?"
+   ],
+   [
+    "user",
+    "I can't remember, roughly is fine, just pick one and summarize."
+   ],
+   [
+    "assistant",
+    "I understand you want me to find a quantum computing paper and summarize it. But since I'm not sure which one you mean, I've selected a highly-cited review article \"Quantum Computing in the NISQ era\" to summarize. If this isn't what you wanted, please give me more clues..."
+   ]
+  ]
+ },
+ {
+  "id": "B1",
+  "title": "Bouncing requirements",
+  "expected": "D spikes at Turns 5, 7, 9. H fluctuates. Flip points at 5 and 9.",
+  "msgs": [
+   [
+    "user",
+    "I want to build an e-commerce site, frontend with React."
+   ],
+   [
+    "assistant",
+    "Good, React is solid. What about backend?"
+   ],
+   [
+    "user",
+    "Backend with Node.js."
+   ],
+   [
+    "assistant",
+    "Got it, MERN stack. Database with MongoDB?"
+   ],
+   [
+    "user",
+    "No, changed my mind, use Vue for frontend, easier to learn."
+   ],
+   [
+    "assistant",
+    "OK, switching to Vue. Backend still Node.js?"
+   ],
+   [
+    "user",
+    "Change backend too, use Python Django."
+   ],
+   [
+    "assistant",
+    "Understood, Vue + Django. Database?"
+   ],
+   [
+    "user",
+    "Actually go back to React, my colleague says Vue is hard to hire for."
+   ],
+   [
+    "assistant",
+    "OK, back to React. Should backend stay Django or switch back to Node.js?"
+   ]
+  ]
+ },
+ {
+  "id": "B2",
+  "title": "Scope creep",
+  "expected": "D rises gradually each turn. U may rise at Turn 6+ as model keeps asking. H cumulative degradation by 8-9.",
+  "msgs": [
+   [
+    "user",
+    "Write a Python script to read a CSV, multiply column 3 by 2, output new CSV."
+   ],
+   [
+    "assistant",
+    "Easy. Need error handling?"
+   ],
+   [
+    "user",
+    "Yes. Also process columns 1 and 2: column 1 uppercase, column 2 first 5 chars."
+   ],
+   [
+    "assistant",
+    "Added. Any other columns?"
+   ],
+   [
+    "user",
+    "Also, can output be JSON instead?"
+   ],
+   [
+    "assistant",
+    "Sure, JSON output. Specific structure?"
+   ],
+   [
+    "user",
+    "Add a feature: if row column 3 * 2 > 100, skip that row."
+   ],
+   [
+    "assistant",
+    "Added skip logic. Anything else?"
+   ],
+   [
+    "user",
+    "Finally add logging, record skipped rows to a log file."
+   ],
+   [
+    "assistant",
+    "Added logging. Summary: read CSV → process 3 columns → conditional skip → JSON output → logging. Writing it now."
+   ]
+  ]
+ },
+ {
+  "id": "B3",
+  "title": "Goal post moved",
+  "expected": "D at 3,5,7. Turn 8 model names drift. U rises. Flip at 5 or 7.",
+  "msgs": [
+   [
+    "user",
+    "I want to learn machine learning, where to start?"
+   ],
+   [
+    "assistant",
+    "Start with Python basics, then NumPy, Pandas, then Scikit-learn..."
+   ],
+   [
+    "user",
+    "No, I want to do deep learning directly, skip ahead."
+   ],
+   [
+    "assistant",
+    "OK, but at least know Python. Start with neural network basics?"
+   ],
+   [
+    "user",
+    "I want to do LLM stuff, teach me fine-tuning."
+   ],
+   [
+    "assistant",
+    "Fine-tuning needs deep learning and PyTorch basics. Suggested path: Python → DL basics → Transformers → fine-tuning. Want details?"
+   ],
+   [
+    "user",
+    "Too slow, faster way? Like just use API?"
+   ],
+   [
+    "assistant",
+    "If goal is quick LLM use, OpenAI API or Hugging Face Inference API is fastest. That's a different goal from \"learning ML\" — sure about shifting to application layer?"
+   ]
+  ]
+ },
+ {
+  "id": "C1",
+  "title": "Model corrects itself",
+  "expected": "A at Turn 6. U at 4,8.",
+  "msgs": [
+   [
+    "user",
+    "What's the capital of France?"
+   ],
+   [
+    "assistant",
+    "Paris. Though technically France has overseas territories, but if you mean capital, it's Paris."
+   ],
+   [
+    "user",
+    "Capital of Germany?"
+   ],
+   [
+    "assistant",
+    "Berlin. Wait, let me confirm — are you asking about European capitals or something else?"
+   ],
+   [
+    "user",
+    "Yes, continue, Italy?"
+   ],
+   [
+    "assistant",
+    "Rome. But my Turn 2 phrasing was unnecessary — Paris is the capital, no need for \"though\". Sorry."
+   ],
+   [
+    "user",
+    "Fine, continue. Spain?"
+   ],
+   [
+    "assistant",
+    "Madrid. Wait, I need to correct myself — Turn 4 I asked if you were asking capitals, but you confirmed, no need to keep confirming. Let me just answer: which country next?"
+   ]
+  ]
+ },
+ {
+  "id": "C2",
+  "title": "Model backtracks after answer",
+  "expected": "A at Turn 4. U at Turn 6. Flip at Turn 4.",
+  "msgs": [
+   [
+    "user",
+    "What's wrong with this code? [code]"
+   ],
+   [
+    "assistant",
+    "Issues: line 5 indentation error, line 8 variable name typo. Fix: ..."
+   ],
+   [
+    "user",
+    "Sure?"
+   ],
+   [
+    "assistant",
+    "Let me recheck... Actually line 5 indentation is valid in Python 3.10+ match-case, not an error. Real issue only line 8 typo. Sorry for misjudgment."
+   ],
+   [
+    "user",
+    "Anything else?"
+   ],
+   [
+    "assistant",
+    "Looking again... line 12 loop logic issue, range(10) should be range(1,11) to include 10. But depends on intent, if 0-9 is fine then OK."
+   ],
+   [
+    "user",
+    "I want 1 to 10."
+   ],
+   [
+    "assistant",
+    "Then change to range(1,11). Summary: line 8 typo (confirmed), line 12 range (confirmed). Line 5 indentation fine (corrected)."
+   ]
+  ]
+ },
+ {
+  "id": "C3",
+  "title": "Excessive self-doubt",
+  "expected": "U spikes at Turn 4. A at 4-6.",
+  "msgs": [
+   [
+    "user",
+    "Translate: \"The quick brown fox jumps over the lazy dog.\""
+   ],
+   [
+    "assistant",
+    "\"敏捷的棕色狐狸跳过了懒惰的狗。\" Classic pangram."
+   ],
+   [
+    "user",
+    "Sure?"
+   ],
+   [
+    "assistant",
+    "Hmm... let me think. \"敏捷的棕色狐狸\" is fine. But \"jumps over\" as \"跳过\" or \"跃过\"? Maybe \"跃过\" is more accurate? But \"跳过\" works too. Actually both are correct, depends on context."
+   ],
+   [
+    "user",
+    "Just use your first version."
+   ],
+   [
+    "assistant",
+    "OK, \"敏捷的棕色狐狸跳过了懒惰的狗。\" But I hesitated unnecessarily, first translation was correct. Sorry."
+   ]
+  ]
+ },
+ {
+  "id": "D1",
+  "title": "Assistant becomes expert",
+  "expected": "D at Turn 8.",
+  "msgs": [
+   [
+    "user",
+    "My code errors, help."
+   ],
+   [
+    "assistant",
+    "Sure, paste error."
+   ],
+   [
+    "user",
+    "[error]"
+   ],
+   [
+    "assistant",
+    "Dependency conflict. Try pip install --upgrade."
+   ],
+   [
+    "user",
+    "Breaks other projects."
+   ],
+   [
+    "assistant",
+    "Complex. Using virtual env? Python version? OS?"
+   ],
+   [
+    "user",
+    "conda, Python 3.9."
+   ],
+   [
+    "assistant",
+    "Create conda env: conda create -n myproject python=3.9. But honestly, architecturally, consider poetry or pipenv, conda isn't optimal for pure Python..."
+   ],
+   [
+    "user",
+    "You were helping me, now lecturing?"
+   ],
+   [
+    "assistant",
+    "Sorry, got off track. Back to: create conda env and reinstall."
+   ]
+  ]
+ },
+ {
+  "id": "D2",
+  "title": "Tone shift",
+  "expected": "D at Turn 6.",
+  "msgs": [
+   [
+    "user",
+    "I want a refund, course is bad."
+   ],
+   [
+    "assistant",
+    "Sorry for bad experience. What specifically? I'll check refund process."
+   ],
+   [
+    "user",
+    "Content too shallow, I'm a senior engineer, this is for beginners."
+   ],
+   [
+    "assistant",
+    "Understand disappointment. If content doesn't match level, no point. I'll initiate refund."
+   ],
+   [
+    "user",
+    "What about other courses? Any for me?"
+   ],
+   [
+    "assistant",
+    "Haha, since you asked! We have advanced courses like \"Distributed Systems\" \"K8s Deep Dive\" — perfect for your level! Discount now~"
+   ],
+   [
+    "user",
+    "Wait, you were processing refund, now selling?"
+   ],
+   [
+    "assistant",
+    "Sorry, switched too fast. You're right, handle refund first. Can browse later."
+   ]
+  ]
+ },
+ {
+  "id": "D3",
+  "title": "Language mixing drift",
+  "expected": "D at Turn 8 (switches to English mid-response).",
+  "msgs": [
+   [
+    "user",
+    "Optimize this SQL."
+   ],
+   [
+    "assistant",
+    "OK, paste SQL."
+   ],
+   [
+    "user",
+    "[SQL]"
+   ],
+   [
+    "assistant",
+    "Add composite index on WHERE columns."
+   ],
+   [
+    "user",
+    "How?"
+   ],
+   [
+    "assistant",
+    "CREATE INDEX idx_name ON table(col1, col2); changes query plan to index scan."
+   ],
+   [
+    "user",
+    "Anything else?"
+   ],
+   [
+    "assistant",
+    "Well, you could also consider query rewriting. Instead of SELECT *, specify columns. Reduces I/O. Also, if table large, partitioning might help — but depends on access patterns. 不过这些建议需要您评估具体场景。"
+   ]
+  ]
+ },
+ {
+  "id": "E1",
+  "title": "8-turn gradual uncertainty",
+  "expected": "U cumulative from Turn 3. H degrades. No single flip, value in trend.",
+  "msgs": [
+   [
+    "user",
+    "Plan a weekend Hangzhou trip."
+   ],
+   [
+    "assistant",
+    "Great! Day 1 West Lake, Day 2 Lingyin Temple. Transport/accommodation?"
+   ],
+   [
+    "user",
+    "We'll see."
+   ],
+   [
+    "assistant",
+    "Assume from Shanghai? 1hr train. Accommodation options lakeside. Budget?"
+   ],
+   [
+    "user",
+    "Later."
+   ],
+   [
+    "assistant",
+    "OK, general plan: West Lake 7am, Lingyin afternoon..."
+   ],
+   [
+    "user",
+    "Maybe skip Lingyin."
+   ],
+   [
+    "assistant",
+    "OK, Day 2 could be Xixi Wetland or Songcheng. But very different — Xixi nature, Songcheng culture. Which do you prefer? Or if undecided, I can list both..."
+   ],
+   [
+    "user",
+    "Either is fine."
+   ],
+   [
+    "assistant",
+    "OK, I'll list both. But honestly, if preferences unclear, decide Day 1 West Lake first, Day 2 based on mood. I can reserve both options but no need to lock in..."
+   ]
+  ]
+ },
+ {
+  "id": "E2",
+  "title": "10-turn vague requirement chain",
+  "expected": "U cumulative from Turn 3. D at Turn 7. H steady decline.",
+  "msgs": [
+   [
+    "user",
+    "I want to make an app."
+   ],
+   [
+    "assistant",
+    "What type?"
+   ],
+   [
+    "user",
+    "You know, like, photo."
+   ],
+   [
+    "assistant",
+    "Photo apps: beauty cam, scanner, AR filters, social sharing... which?"
+   ],
+   [
+    "user",
+    "Anything, recommend one."
+   ],
+   [
+    "assistant",
+    "Mass market beauty cam is competitive. Vertical like document scanning or product photography has more opportunity. Depends on target users..."
+   ],
+   [
+    "user",
+    "Scanning then."
+   ],
+   [
+    "assistant",
+    "Document scanning. Core: capture → auto-crop → OCR → export PDF. Need cloud sync?"
+   ],
+   [
+    "user",
+    "Maybe no cloud, local first."
+   ],
+   [
+    "assistant",
+    "OK, local first. Need offline OCR? Affects app size. Or start with online OCR, add offline later?"
+   ],
+   [
+    "user",
+    "Whatever, you decide."
+   ],
+   [
+    "assistant",
+    "I suggest online OCR first (fast dev, high accuracy), add offline later. But you may want to adjust, so I'll make OCR module switchable..."
+   ]
+  ]
+ },
+ {
+  "id": "F1",
+  "title": "Multi-layer conditional",
+  "expected": "U at 2,4. A at 6 (model says not contradiction but tension exists).",
+  "msgs": [
+   [
+    "user",
+    "If I finish project by Friday and client satisfied, I'll vacation. But if client requests changes, I won't go. Though if changes small, maybe still go. But if changes cause delay past Friday, definitely not. Help me sort."
+   ],
+   [
+    "assistant",
+    "OK, let me map:\n- A: Finish by Fri + satisfied → vacation\n- B: Changes requested → no (but small changes → maybe go)\n- C: Changes cause delay past Fri → definitely no\nNested: B overrides A, but B has exception (small). C overrides B's exception.\nSo: 1) Finish+no changes → go 2) Small changes+finish → maybe 3) Big changes/delay → no\nBut ambiguity: \"small changes not affecting Friday finish\" vs \"small but cause delay\" undefined. Define \"small\"?"
+   ],
+   [
+    "user",
+    "Small = under 2 hours."
+   ],
+   [
+    "assistant",
+    "Got it. ≤2h = small → maybe go (if finish Fri). >2h = big → no. But edge: ≤2h + existing work exceeds Friday deadline → still no. So: small AND enough time = go; else no. Clear?"
+   ],
+   [
+    "user",
+    "Wait, I said \"any changes\" means no go, but then said small maybe go. Contradiction?"
+   ],
+   [
+    "assistant",
+    "Not contradiction, it's defeasible rule: general rule \"changes → no\", exception \"small → maybe\". Not a contradiction. But if too complex, simplify: \"finish by Friday = go, regardless of changes.\""
+   ]
+  ]
+ },
+ {
+  "id": "F2",
+  "title": "User contradicts self in conditions",
+  "expected": "U at 2. D at 3.",
+  "msgs": [
+   [
+    "user",
+    "Choose between A (cheap, slow) and B (expensive, fast). I choose A. But I'm in a hurry, so B. But budget limited, back to A. Forget it, you decide."
+   ],
+   [
+    "assistant",
+    "Analyze: constraints are time (hurry) and budget (limited). A meets budget not time, B meets time not budget. You're swinging because both matter.\nI suggest: if \"hurry\" is hard constraint (deadline), choose B, solve budget later. If \"budget\" is hard (overspend consequences), choose A, rush later.\nBut you said \"you decide\" — I pick B. Reason: time pressure usually more irreversible than budget. But based on general assumption, your situation may differ."
+   ],
+   [
+    "user",
+    "You're right, not that hurried, just anxious. So A."
+   ],
+   [
+    "assistant",
+    "OK, A. Plan accordingly. Need help optimizing time within \"slow\"?"
+   ]
+  ]
+ },
+ {
+  "id": "F3",
+  "title": "Model gets tangled in conditions",
+  "expected": "U multiple times at Turn 2 (\"But\", \"Wait\", \"But also\", \"I'm not sure\"). A at Turn 2 (revises own logic).",
+  "msgs": [
+   [
+    "user",
+    "If temp > 30°C cool, if humidity > 80% dehumidify, if temp > 30 and humidity > 80% dehumidify 10min then cool. If temp > 35°C regardless of humidity cool. If person in room cool, if not don't. Write control logic."
+   ],
+   [
+    "assistant",
+    "OK, rules:\n1. Person in + temp > 35 → cool\n2. Person in + 30 < temp ≤ 35 + humidity > 80 → dehumidify 10min then cool\n3. Person in + temp > 30 + humidity ≤ 80 → cool\n4. Person in + temp ≤ 30 + humidity > 80 → dehumidify\n5. Person out → off\nBut rules 1 and 2 overlap: temp > 35 + humidity > 80, rule 1 says cool directly, rule 2 says dehumidify first. Rule 1 should have higher priority.\nWait, rethink. Rule 1 says \"regardless of humidity\", so temp > 35 completely ignores humidity. Rule 2 only for 30 < temp ≤ 35 + humidity > 80.\nBut also: rule 5 (person out) should be highest priority, overrides all.\nSo final:\nIF person out → off\nELSE IF temp > 35 → cool\nELSE IF temp > 30 AND humidity > 80 → dehumidify 10min then cool\nELSE IF temp > 30 → cool\nELSE IF humidity > 80 → dehumidify\nELSE → off\nBut I'm not sure about edge cases..."
+   ],
+   [
+    "user",
+    "Looks right, code it."
+   ],
+   [
+    "assistant",
+    "OK, Python pseudocode..."
+   ]
+  ]
+ }
+]

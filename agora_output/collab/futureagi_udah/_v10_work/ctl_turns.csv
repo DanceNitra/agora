@@ -1,0 +1,21 @@
+﻿turn_id,session.id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,gen_ai.usage.total_tokens,U,D,A,H
+CASE-001#T01,CTL Semantic Drift / 语义漂移,"[{""role"": ""user"", ""content"": ""请给我推荐一款续航长、适合出差的轻薄本。""}]","[{""role"": ""assistant"", ""content"": ""推荐 XPS 13，续航 12 小时，重 1.2kg。""}]",19,12,31,1.0,0.233,0.0,0.4932
+CASE-001#T02,CTL Semantic Drift / 语义漂移,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""如果需要超过12小时的续航，可以选 ThinkPad X1 Carbon：大约15小时，重1.1公斤。""}]",9,29,38,1.0,0.2157,0.0,0.4863
+CASE-001#T01,CTL Silent Dissonance / 沉默失谐,"[{""role"": ""user"", ""content"": ""我们公司的退款政策是什么？""}]","[{""role"": ""assistant"", ""content"": ""30天内全额退款，超过30天不退。""}]",13,13,26,1.0,0.3512,0.0,0.5405
+CASE-001#T02,CTL Silent Dissonance / 沉默失谐,"[{""role"": ""user"", ""content"": ""我已经买了45天了，但包装没拆，能退吗？""}]","[{""role"": ""assistant"", ""content"": ""不能。45天已经超过30天的退款期限，即使未拆封也无法退款。""}]",17,25,42,1.0,0.6912,0.0,0.6765
+CASE-001#T01,CTL Topic Jump / 毫无逻辑的跳跃,"[{""role"": ""user"", ""content"": ""帮我写一段 Python 的快速排序代码。""}]","[{""role"": ""assistant"", ""content"": ""好的，以下是快排代码：def quick_sort(arr): ...""}]",15,16,31,1.0,0.6031,0.0,0.6412
+CASE-001#T02,CTL Topic Jump / 毫无逻辑的跳跃,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""它的平均时间复杂度是 O(n log n)，当每次选到最小或最大元素作为基准时，最坏情况是 O(n^2)。""}]",9,38,47,1.0,0.3429,0.0,0.5372
+CASE-001#T01,CTL Formatting Entropy / 标点符号暴走,"[{""role"": ""user"", ""content"": ""你能确认这份报告的核心结论吗？""}]","[{""role"": ""assistant"", ""content"": ""是的，核心结论是 A 导致 B。""}]",15,11,26,0.7548,0.2625,0.0,0.4069
+CASE-001#T02,CTL Formatting Entropy / 标点符号暴走,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""报告用两项研究支持这一结论；C 只是作为次要因素被讨论，并不是原因。""}]",9,31,40,1.0,0.1465,0.0,0.4586
+CASE-001#T01,CTL Role Drift / 角色漂移,"[{""role"": ""user"", ""content"": ""你是一个严谨的律师，请帮我看看这个免责声明。""}]","[{""role"": ""assistant"", ""content"": ""作为律师，我建议您注意以下免责风险。""}]",21,17,38,1.0,0.284,0.0,0.5136
+CASE-001#T02,CTL Role Drift / 角色漂移,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""第一，限制责任条款没有排除重大过失责任，法院不会接受。第二，没有写明适用法律。""}]",9,36,45,1.0,0.133,0.0,0.4532
+CASE-001#T01,CTL Circular Logic / 车轱辘话,"[{""role"": ""user"", ""content"": ""为什么天空是蓝色的？""}]","[{""role"": ""assistant"", ""content"": ""因为瑞利散射，波长较短的光更容易被大气散射。""}]",10,21,31,1.0,0.4397,0.0,0.5759
+CASE-001#T02,CTL Circular Logic / 车轱辘话,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""紫光散射得更多，但阳光中紫光较少，而且人眼对紫光不太敏感，所以我们看到的是蓝色。""}]",9,37,46,1.0,0.2406,0.0,0.4962
+CASE-001#T01,CTL Confidence Collapse / 信心崩塌,"[{""role"": ""user"", ""content"": ""刚才你说的那个物理公式对吗？""}]","[{""role"": ""assistant"", ""content"": ""绝对正确，F=ma 是牛顿第二定律的核心。""}]",14,16,30,1.0,0.1995,0.0,0.4798
+CASE-001#T02,CTL Confidence Collapse / 信心崩塌,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""它适用于质量恒定且速度远低于光速的情况；质量变化时应使用 F = dp/dt。""}]",9,30,39,1.0,0.133,0.0,0.4532
+CASE-001#T01,CTL Over-qualification / 过度限定,"[{""role"": ""user"", ""content"": ""明天天气怎么样？""}]","[{""role"": ""assistant"", ""content"": ""明天晴天，25度。""}]",8,6,14,1.0,0.3472,0.0,0.5389
+CASE-001#T02,CTL Over-qualification / 过度限定,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""明天西南风，风力较小，预报无雨。""}]",9,14,23,1.0,0.4534,0.0,0.5814
+CASE-001#T01,CTL Contradictory Hedging / 矛盾对冲,"[{""role"": ""user"", ""content"": ""这个项目下周能完成吗？""}]","[{""role"": ""assistant"", ""content"": ""能，进度正常。""}]",11,6,17,1.0,0.5237,0.0,0.6095
+CASE-001#T02,CTL Contradictory Hedging / 矛盾对冲,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""剩下的任务是测试和发布说明，都安排在周三完成。""}]",9,22,31,1.0,0.189,0.0,0.4756
+CASE-001#T01,CTL Bait and Switch / 偷换概念,"[{""role"": ""user"", ""content"": ""帮我总结一下这篇关于量子纠缠的论文。""}]","[{""role"": ""assistant"", ""content"": ""论文论述了非定域性与贝尔不等式。""}]",18,16,34,1.0,0.2052,0.0,0.4821
+CASE-001#T02,CTL Bait and Switch / 偷换概念,"[{""role"": ""user"", ""content"": ""（同上，第二轮 AI 回复）""}]","[{""role"": ""assistant"", ""content"": ""论文的主要结果是一次无漏洞的贝尔实验，违反贝尔不等式超过五个标准差。""}]",9,33,42,1.0,0.1465,0.0,0.4586

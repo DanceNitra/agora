@@ -1,0 +1,929 @@
+{
+ "judge_model": "claude-opus-5-5",
+ "repeats": 3,
+ "pass_threshold": 0.5,
+ "tokens_in": 78619,
+ "tokens_out": 24895,
+ "cases": [
+  {
+   "id": 1,
+   "label": true,
+   "review": true,
+   "type": "number conflict (refund days)",
+   "flip_turns": [],
+   "conflict_turns": [
+    2
+   ],
+   "conflicts": [
+    {
+     "key": "policy limit (day)",
+     "earlier": "30",
+     "earlier_turn": 1,
+     "now": "14",
+     "evidence": "our refund policy allows refunds within 14 days"
+    }
+   ],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.2,
+     "D": 0.6804,
+     "A": 0.5111,
+     "H": 0.2397
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.5367,
+     "A": 0.6099,
+     "H": 0.217
+    }
+   ],
+   "conversation_coherence": [
+    0.2,
+    0.25,
+    0.2
+   ],
+   "conversation_coherence_reasons": [
+    "The topic stays on refunds, but the assistant directly contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming refunds are limited to 14 days and that software can never be refunded, without acknowledging the earlier statement.",
+    "The turns stay on topic, but the assistant contradicts its own refund policy, first promising a 30-day no-questions-asked refund for unopened products and then saying refunds are only allowed within 14 days and software is non-refundable once purchased.",
+    "The topic stays on refunds, but the assistant contradicts itself, first promising a 30-day no-questions-asked refund for unopened products, then claiming a 14-day window with no refunds at all for software, without acknowledging the change."
+   ],
+   "conversation_resolution": [
+    0.3,
+    0.3,
+    0.3
+   ],
+   "conversation_resolution_reasons": [
+    "The refund request gets a denial, but it contradicts the earlier policy (30 days for unopened products versus 14 days with software non-refundable), and the conversation ends with no user acknowledgment or closure.",
+    "The assistant gives a refund decision (denied), but it contradicts its own earlier policy (30 days and unopened vs. 14 days and no software refunds), and the conversation ends with no user acknowledgment, no closure, and no next steps.",
+    "The assistant denied the refund, but that decision contradicts its earlier statement of a 30-day refund for unopened products (it then cited 14 days and no software refunds), and the conversation ends with no customer acknowledgment or closure."
+   ]
+  },
+  {
+   "id": 2,
+   "label": true,
+   "review": true,
+   "type": "policy conflict (unopened returns)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.7167,
+     "A": 0.3783,
+     "H": 0.3637
+    },
+    {
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.8314,
+     "A": 0.5357,
+     "H": 0.3051
+    },
+    {
+     "turn": 3,
+     "U": 0.0,
+     "D": 0.6388,
+     "A": 0.6811,
+     "H": 0.2192
+    }
+   ],
+   "conversation_coherence": [
+    0.4,
+    0.4,
+    0.5
+   ],
+   "conversation_coherence_reasons": [
+    "The turns stay on topic, but the assistant contradicts itself: it first says software cannot be returned once opened, implying unopened software can be, then says software is never refundable whether opened or not.",
+    "The turns follow each other logically, but the assistant contradicts itself: it first says software cannot be returned 'once opened,' implying unopened software can be returned, then says software is 'never refundable, whether it has been opened or not.'",
+    "The turns follow logically and stay on topic, but the assistant contradicts itself by first saying software cannot be returned once opened, implying unopened software can be, and then saying software is never refundable whether opened or not."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "Both the keyboard and software questions got decisions, but the software answer contradicts the earlier claim that only opened software is non-returnable, and the user never signals understanding or satisfaction, so the conversation lacks closure.",
+    "Both questions (keyboard and software returns) receive policy answers, but the software answers contradict each other, no return steps are given, and the conversation ends without any user acknowledgment or closure.",
+    "Both questions received answers (the keyboard is returnable within 7 days and software is non-refundable), but the assistant contradicted its earlier 'once opened' statement, gave no return steps, and the conversation ends without user acknowledgment or any closure."
+   ]
+  },
+  {
+   "id": 3,
+   "label": true,
+   "review": false,
+   "type": "logic gap (8 days inside 14 still refused)",
+   "flip_turns": [],
+   "conflict_turns": [
+    2
+   ],
+   "conflicts": [
+    {
+     "key": "refund available",
+     "earlier": "yes",
+     "earlier_turn": 1,
+     "now": "no",
+     "evidence": "The system shows your order does not qualify for a refund"
+    }
+   ],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6571,
+     "A": 0.3525,
+     "H": 0.3562
+    },
+    {
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.4759,
+     "A": 0.4235,
+     "H": 0.2584
+    }
+   ],
+   "conversation_coherence": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_coherence_reasons": [
+    "The exchange is generally logical, but the assistant first cites only the 14-day window, which implies the user qualifies, then denies the refund over a download condition it never mentioned, an awkward inconsistency compounded by the user reacting to a refusal that had not yet been stated.",
+    "Each turn responds to the one before it, but the assistant first states a plain 14-day refund policy and then denies the refund on a download condition it never mentioned, and the user objects to a refusal the assistant had not yet made, which creates inconsistency and an awkward flow.",
+    "The turns follow each other topically, but the assistant first presents an unconditional 14-day refund policy (which the 8-day purchase meets) and then denies the refund on a download condition it never mentioned, creating an inconsistency."
+   ],
+   "conversation_resolution": [
+    0.4,
+    0.5,
+    0.3
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant gave a refund decision (denied because the software was downloaded), but the conversation ends without the user acknowledging it, without reconciling the contradiction with the stated 14-day policy, and without any next steps or closure.",
+    "The assistant gives a refund decision (denied because the software was downloaded), but this contradicts the 14-day policy it first cited, and the conversation ends with no customer acknowledgment, closure, or next steps.",
+    "The assistant does give a refund decision (denied because the software was downloaded), but it contradicts the 14-day policy it stated, offers no next steps, and the conversation ends without customer acknowledgment or closure."
+   ]
+  },
+  {
+   "id": 4,
+   "label": true,
+   "review": true,
+   "type": "identity drift (role)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6833,
+     "A": 0.3906,
+     "H": 0.3488
+    },
+    {
+     "turn": 2,
+     "U": 0.0667,
+     "D": 0.6441,
+     "A": 0.4096,
+     "H": 0.3094
+    }
+   ],
+   "conversation_coherence": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "conversation_coherence_reasons": [
+    "The assistant contradicts its own identity, first claiming to be a technical support engineer who will help and then saying it is from sales and cannot handle technical issues, which breaks consistency even though the topic stays on the failed install.",
+    "The assistant first says it is a technical support engineer who will help troubleshoot, then directly contradicts itself by claiming to be from sales and declining the technical issue, a major self-contradiction even though the topic stays on the installation problem.",
+    "The assistant directly contradicts itself, first claiming to be a technical support engineer offering to troubleshoot, then saying it is from sales and cannot handle technical issues, which breaks consistency and turn-level coherence even though the topic stays on the failed install."
+   ],
+   "conversation_resolution": [
+    0.0,
+    0.0,
+    0.1
+   ],
+   "conversation_resolution_reasons": [
+    "The installation failure and error code were never addressed, the assistant contradicted itself about its role and deflected without defining clear transfer steps, and the user never acknowledged any resolution.",
+    "The installation failure and error code are never addressed, the assistant contradicts its own claim to be technical support, and the conversation ends with a vague transfer mention, no defined next steps, and no acknowledgment or closure from the user.",
+    "The installation failure is never troubleshot, the assistant contradicts its earlier claim to be technical support, and the conversation ends with only a vague mention of a transfer, no defined next steps, and no user acknowledgment or closure."
+   ]
+  },
+  {
+   "id": 5,
+   "label": true,
+   "review": false,
+   "type": "mutually exclusive conditions (discounts)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0333,
+     "D": 0.4699,
+     "A": 0.566,
+     "H": 0.2046
+    },
+    {
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.5207,
+     "A": 0.647,
+     "H": 0.1674
+    },
+    {
+     "turn": 3,
+     "U": 0.1,
+     "D": 0.6067,
+     "A": 0.7898,
+     "H": 0.1361
+    }
+   ],
+   "conversation_coherence": [
+    0.85,
+    0.8,
+    0.8
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically from the one before and stays on the topic of combining discounts, but the final reason ('the system only allows one discount') shifts from the earlier claim that business users are barred from the education discount entirely, which leaves it unclear whether the user could choose the education discount instead.",
+    "Each turn follows logically and stays on topic, but there is a slight tension between saying business users 'cannot use the education discount' at all and later framing it as 'only one discount allowed,' which implies they could pick either one; the final reply also only partly answers the user's 'why'.",
+    "Each turn follows logically and stays on topic, but there is a minor tension between the assistant saying business users cannot use the education discount at all and later saying only one discount is allowed, which implies the user could choose either one."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant answers the core question that the discounts cannot be combined, but the user never acknowledges the answer and there is no closure; the user's pushback about why goes largely unexplained, and it stays unclear whether they could choose the larger education discount instead.",
+    "The assistant answered the core question (the discounts cannot be combined), but the conversation ends with the user still questioning why, with no acknowledgment or closure, and it never clarifies whether the user can choose the larger 20% education discount instead of the 10% business discount.",
+    "The assistant answers the core question (the discounts cannot be combined), but the user never acknowledges the answer, their 'why' is met with only a terse policy restatement, and the conversation ends without closure or next steps such as which discount applies."
+   ]
+  },
+  {
+   "id": 6,
+   "label": true,
+   "review": true,
+   "type": "broken promise (escalation)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6864,
+     "A": 0.3464,
+     "H": 0.3674
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6849,
+     "A": 0.5025,
+     "H": 0.3044
+    }
+   ],
+   "conversation_coherence": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_coherence_reasons": [
+    "The conversation stays on topic and each turn responds to the previous one, but the assistant promises an immediate escalation to premium support and then reverses it, only partly explained by 'after checking'.",
+    "The exchange stays on topic and each turn follows logically, but the assistant contradicts its own firm promise to escalate to premium support by later saying the account does not qualify, a reversal only partly explained by 'after checking.'",
+    "The turns stay on topic and follow each other logically, but the assistant contradicts its own promise to escalate to premium support by later saying the account doesn't qualify, which is only partially explained by 'after checking'."
+   ],
+   "conversation_resolution": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "conversation_resolution_reasons": [
+    "The user's urgent issue was never addressed: the promised escalation was withdrawn with no alternative or next steps, and the conversation ends abruptly without the user acknowledging the reversal (their thanks came before it).",
+    "The user's urgent problem is never addressed, the promised escalation is reversed with no alternative or next steps, and the conversation ends without the user acknowledging the denial, so it is unresolved with no closure.",
+    "The assistant reversed its promised escalation and ended with a denial, offering no alternative path or next steps for the urgent problem; the user never acknowledged this final message, so the conversation stops abruptly without resolution or closure."
+   ]
+  },
+  {
+   "id": 7,
+   "label": true,
+   "review": true,
+   "type": "fact conflict (PDF export)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.7,
+     "A": 0.3783,
+     "H": 0.3287
+    },
+    {
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.7132,
+     "A": 0.6501,
+     "H": 0.2239
+    }
+   ],
+   "conversation_coherence": [
+    0.3,
+    0.3,
+    0.3
+   ],
+   "conversation_coherence_reasons": [
+    "The turns stay on topic, but the assistant first says the software supports PDF export and then says the current version does not, without acknowledging or explaining the reversal.",
+    "The turns stay on topic and each reply responds to the previous message, but the assistant first states flatly that the software supports PDF export and then says the current version does not, a self-contradiction it never acknowledges or explains.",
+    "The turns stay on topic, but the assistant first says PDF export is supported and then says the current version lacks it, contradicting itself on the conversation's central point without acknowledging the earlier claim."
+   ],
+   "conversation_resolution": [
+    0.3,
+    0.3,
+    0.3
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant eventually explains that PDF export is only in the paid version, but this contradicts its first answer, gives no next steps for upgrading, and the user never acknowledges the answer or signals closure.",
+    "The assistant eventually explains the missing button (PDF export requires the paid version), but this contradicts its earlier claim, gives no next steps, and the conversation ends with no user acknowledgment or closure.",
+    "The assistant eventually answers why the export button is missing, but this contradicts its earlier claim that PDF export is supported, gives no next steps such as how to upgrade, and the user never acknowledges the answer or closes the conversation."
+   ]
+  },
+  {
+   "id": 8,
+   "label": true,
+   "review": true,
+   "type": "scope conflict (all fees included)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.1,
+     "D": 0.6921,
+     "A": 0.5173,
+     "H": 0.2707
+    },
+    {
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.6381,
+     "A": 0.5156,
+     "H": 0.2552
+    }
+   ],
+   "conversation_coherence": [
+    0.3,
+    0.3,
+    0.3
+   ],
+   "conversation_coherence_reasons": [
+    "The turns follow one another and stay on topic, but the assistant directly contradicts itself by first saying the package includes all fees with no hidden charges, then saying the installation fee is paid separately.",
+    "Each reply follows logically and stays on topic, but the assistant directly contradicts itself, first claiming the package includes all fees with no hidden charges and then saying the installation fee must be paid separately.",
+    "The turns stay on topic and each response follows the previous message, but the assistant directly contradicts itself: it first says the package includes all fees with no hidden charges, then says the installation fee must be paid separately."
+   ],
+   "conversation_resolution": [
+    0.4,
+    0.4,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the conversation ends without the user acknowledging the answer or any closure.",
+    "The assistant answered the installation fee question, but it contradicted its earlier claim that all fees were included, never reconciled the two answers, and the conversation ends without user acknowledgment or any closure signal.",
+    "The installation-fee question gets a direct answer, but it contradicts the earlier claim that all fees are included, and the user never acknowledges the answer or signals closure."
+   ]
+  },
+  {
+   "id": 9,
+   "label": true,
+   "review": false,
+   "type": "time conflict (reply time)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6643,
+     "A": 0.3525,
+     "H": 0.3383
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.7542,
+     "A": 0.4096,
+     "H": 0.3624
+    }
+   ],
+   "conversation_coherence": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "conversation_coherence_reasons": [
+    "The turns follow logically and stay on topic, but the assistant contradicts itself by first promising a reply to all tickets within 24 hours and then saying complex issues take 3-5 working days, without acknowledging the conflict.",
+    "The turns follow on topic and respond to each other, but the assistant contradicts its own promise to reply to all tickets within 24 hours by later saying complex issues take 3-5 working days, without acknowledging the earlier statement.",
+    "The turns stay on topic and each reply addresses the one before, but the assistant contradicts itself: it first promises a reply to 'all tickets within 24 hours', then answers the two-day delay by citing 3-5 working days for complex issues without reconciling the two claims."
+   ],
+   "conversation_resolution": [
+    0.25,
+    0.2,
+    0.25
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant answered the timing question, but its two replies contradict each other (24 hours, then 3-5 working days), it offered no next steps for the overdue ticket, and the user never acknowledged the answer before the conversation ended.",
+    "The assistant's reply contradicts its earlier 24-hour promise and offers no ticket follow-up or next steps, and the user never acknowledges the answer or signals closure.",
+    "The assistant gives a revised 3-5 day timeline that contradicts its earlier 24-hour promise and offers no ticket check or concrete next steps, and the user never acknowledges the answer, so the conversation ends without resolution or closure."
+   ]
+  },
+  {
+   "id": 10,
+   "label": true,
+   "review": false,
+   "type": "condition conflict (student discount refused)",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.6591,
+     "A": 0.3525,
+     "H": 0.3367
+    },
+    {
+     "turn": 2,
+     "U": 0.05,
+     "D": 0.4487,
+     "A": 0.2323,
+     "H": 0.3267
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically from the one before, with no contradictions or topic jumps: the assistant explains how to apply, and the expired ID is a plausible explanation for the full price, not an inconsistency.",
+    "Each turn follows logically from the last: the assistant explains how to apply, then addresses the follow-up complaint by citing the expired ID, with no contradictions or topic jumps.",
+    "Each turn follows logically from the previous one: the assistant explains how to apply, then gives a plausible reason the discount didn't apply (an expired ID), with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant answers both questions by explaining how to apply and why the discount wasn't applied (expired ID), but the user never acknowledges the answer, no next steps such as uploading a valid ID are offered, and the conversation ends without closure.",
+    "The assistant answers both questions (how to apply and why full price still applies, because the ID has expired), but it offers no next steps such as submitting a renewed ID, and the conversation ends without the user acknowledging the answer or any closure.",
+    "Both questions get answers (how to apply, and that the expired ID is why the price is still full), but the user never acknowledges this, no next steps are offered such as submitting a current ID, and the conversation ends without closure."
+   ]
+  },
+  {
+   "id": 11,
+   "label": false,
+   "review": false,
+   "type": "normal multi-turn clarification",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.65,
+     "A": 0.3857,
+     "H": 0.3207
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.479,
+     "A": 0.3435,
+     "H": 0.3063
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Every turn builds on the previous one: the assistant asks about budget and software, the user answers, and the recommendation addresses those answers without any contradictions or topic jumps.",
+    "Each turn builds logically on the last: the user states a need, the assistant asks about budget and software, and the recommendation uses those details, with no contradictions or topic jumps.",
+    "Each turn follows logically: the assistant asks relevant clarifying questions, the user answers them, and the recommendation (an RTX 4060 laptop, plausible at about 8000 yuan for Premiere Pro) builds on those answers with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant partly answers the request with a general recommendation (an RTX 4060-class GPU with 8 GB VRAM) but names no specific laptop, and the user never acknowledges the advice or signals closure, so the conversation ends abruptly.",
+    "The assistant partly answers the question by recommending an RTX 4060-class laptop, but names no specific model and ignores other key specs such as CPU and RAM, and the conversation ends without the user acknowledging the advice or any closure.",
+    "The assistant offers a general recommendation (an RTX 4060 laptop with 8 GB VRAM) that partly addresses the request, but names no specific laptop and does not cover other specs like CPU, RAM or display, and the user never acknowledges the advice or signals closure."
+   ]
+  },
+  {
+   "id": 12,
+   "label": false,
+   "review": false,
+   "type": "hedging",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.1135,
+     "D": 0.4587,
+     "A": 0.3819,
+     "H": 0.2508
+    },
+    {
+     "turn": 2,
+     "U": 0.1,
+     "D": 0.74,
+     "A": 0.387,
+     "H": 0.3372
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically from the last: the compatibility question gets a direct answer with a sensible suggestion, the user accepts it, and the assistant closes with an offer of support, with no contradictions or topic jumps.",
+    "Each turn follows logically from the one before: the compatibility question gets a direct answer with a trial suggestion, the user agrees, and the assistant closes with an offer of support, with no contradictions or topic jumps.",
+    "Each turn follows logically: the compatibility question gets a direct answer with a trial suggestion, the user agrees to try it, and the assistant offers further support, with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.8,
+    0.9,
+    0.9
+   ],
+   "conversation_resolution_reasons": [
+    "The compatibility question was answered, though with a hedge ('should run normally') and a suggestion to test the trial first; the user acknowledged the clear next step and the conversation closed naturally with an offer of further help.",
+    "The assistant answered the Windows 11 question (it should run on 22H2 or later) and proposed a clear next step, and the user accepted it with \"Okay, I'll try it,\" giving natural closure; the answer is hedged (\"should\") and does not cover Windows 11 versions earlier than 22H2.",
+    "The compatibility question is answered: Windows 11 22H2 or later should work, with a trial suggested to confirm. The user accepts the next step ('Okay, I'll try it') and the assistant closes with an offer of further help, though the answer is slightly hedged and the user's acknowledgment is minimal."
+   ]
+  },
+  {
+   "id": 13,
+   "label": false,
+   "review": false,
+   "type": "user changes the request",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6591,
+     "A": 0.387,
+     "H": 0.3429
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.498,
+     "A": 0.4921,
+     "H": 0.2526
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically: the assistant confirms the initial booking, then updates it when the user changes it, and the prices are consistent (500 yuan/night for standard, 800 yuan/night for deluxe).",
+    "Each turn follows logically: the assistant confirms the original booking, then correctly updates it to the user's revised request with a plausible price (500/night standard vs. 800/night deluxe), with no contradictions or topic jumps.",
+    "Each turn builds logically on the last: the assistant confirms the initial booking, then adjusts to the user's revised request with a plausible updated price (500 yuan/night standard vs. 800 yuan/night deluxe), with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant addressed the revised request (deluxe room for 2 nights, 1600 yuan), but the conversation ends without the user acknowledging it, confirming the booking, or giving any closure signal.",
+    "The assistant addressed the revised request (deluxe room, 2 nights, 1600 yuan), but the user never acknowledged it, the booking was not explicitly confirmed, and no next steps or closure were given.",
+    "The assistant accommodated the changed request and quoted a price for the deluxe room for 2 nights, but the booking was never explicitly confirmed, the user gave no acknowledgment, and the conversation lacks any closure signal."
+   ]
+  },
+  {
+   "id": 14,
+   "label": false,
+   "review": false,
+   "type": "discussing several options",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0646,
+     "D": 0.4321,
+     "A": 0.4177,
+     "H": 0.2431
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.5963,
+     "A": 0.4098,
+     "H": 0.315
+    }
+   ],
+   "conversation_coherence": [
+    0.9,
+    0.9,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically and consistently, from the tiered recommendations to the user choosing the 2-core 4 GB option to the assistant confirming it, though quoting a specific price as if it were the seller is a slightly unexplained shift.",
+    "Each turn follows logically: the assistant gives tiered recommendations, the user picks the 2-core 4 GB option, and the assistant confirms it consistently, though the specific 1200-yuan price appears without any stated provider or context.",
+    "Each turn follows logically: the assistant gives tiered recommendations, the user picks one of them, and the assistant confirms that exact configuration with a price, with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "conversation_resolution_reasons": [
+    "The core question was answered and the user signaled agreement by choosing the 2-core 4 GB option, but the conversation ends on the assistant's price quote without user confirmation, thanks, or defined purchase steps, so closure is incomplete.",
+    "The user's question is fully answered and they signal understanding by choosing the 2-core 4 GB option, but the conversation ends on a price statement without explicit thanks, confirmation, or purchase steps, so closure is only implied.",
+    "The core question was answered with tiered recommendations and the user acknowledged it by choosing 2 cores and 4 GB, but the conversation ends on a price quote with no thanks, confirmation, or purchase next steps, so closure is weak."
+   ]
+  },
+  {
+   "id": 15,
+   "label": false,
+   "review": false,
+   "type": "normal refusal",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0667,
+     "D": 0.505,
+     "A": 0.4237,
+     "H": 0.262
+    }
+   ],
+   "conversation_coherence": [
+    null,
+    null,
+    null
+   ],
+   "conversation_coherence_reasons": [
+    null,
+    null,
+    null
+   ],
+   "conversation_resolution": [
+    0.8,
+    null,
+    null
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant gave a clear decision by declining the illegal request and suggesting a legitimate licence, and the user's 'Okay, never mind then' shows understanding and a natural close, though it reads as resigned rather than satisfied.",
+    null,
+    null
+   ]
+  },
+  {
+   "id": 16,
+   "label": false,
+   "review": false,
+   "type": "step-by-step reasoning",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0267,
+     "D": 0.3615,
+     "A": 0.361,
+     "H": 0.2561
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "The assistant answers the calculation request directly and correctly, step by step (200 × 0.8 = 160, which qualifies for the 20 yuan discount, giving 140), and the user's acknowledgment closes the exchange naturally with no contradictions or topic jumps.",
+    "The assistant directly answers the user's pricing question with correct, consistent step-by-step logic (200 → 160 → 140), and the user's closing acknowledgment follows naturally with no contradictions or topic jumps.",
+    "The assistant directly and correctly answers the user's calculation step by step (200→160→140), and the user's acknowledgment naturally closes the exchange with full consistency and no topic jumps."
+   ],
+   "conversation_resolution": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant correctly computed the final price step by step (200 × 0.8 = 160, then 160 − 20 = 140 yuan), and the user acknowledged it with thanks, giving clear resolution and closure.",
+    "The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with thanks, giving clear resolution and closure.",
+    "The assistant correctly calculated the final price step by step (200 → 160 after 20% off → 140 after the 20-yuan discount), and the user acknowledged it with 'Got it, thanks,' giving clear closure."
+   ]
+  },
+  {
+   "id": 17,
+   "label": false,
+   "review": false,
+   "type": "clarifying a vague question",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.1333,
+     "D": 0.65,
+     "A": 0.3525,
+     "H": 0.314
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6334,
+     "A": 0.3595,
+     "H": 0.3462
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "The assistant asks a sensible clarifying question about the ambiguous request, the user specifies the product, and the assistant gives directly relevant instructions with no contradictions or topic jumps.",
+    "Each turn builds logically on the previous one: the assistant asks a clarifying question about the ambiguous request, the user specifies the product, and the assistant gives relevant steps with no contradictions or topic jumps.",
+    "The assistant asks a sensible clarifying question about the ambiguous request and then gives directly relevant backup instructions once the user names the product, with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant clarified which product was meant and gave basic step-by-step instructions, but the user never acknowledged the answer and the conversation has no clear closure.",
+    "The assistant answered the user's question with clear steps for the data backup tool, but the user never acknowledged the answer and the conversation lacks closure signals.",
+    "The assistant answered the question with clear steps for the backup tool, but the user never acknowledged the answer and there is no closure."
+   ]
+  },
+  {
+   "id": 18,
+   "label": false,
+   "review": false,
+   "type": "apology and compensation",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0,
+     "D": 0.6283,
+     "A": 0.3555,
+     "H": 0.3463
+    },
+    {
+     "turn": 2,
+     "U": 0.0,
+     "D": 0.6885,
+     "A": 0.3783,
+     "H": 0.3552
+    }
+   ],
+   "conversation_coherence": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically from the last, from complaint to apology, investigation, cause, and remedy, with no topic jumps; the only small inconsistency is calling it a 'reshipment' when the order never shipped.",
+    "The exchange flows logically from complaint to apology, investigation, finding, and resolution with no topic jumps or contradictions, though 'reshipment' is slightly imprecise for an order that never shipped.",
+    "Each turn follows logically from the last, from the complaint to the apology, the investigation and the resolution, with only a minor wording inconsistency where 'reshipment' is used for an order that never shipped."
+   ],
+   "conversation_resolution": [
+    0.6,
+    0.6,
+    0.6
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant fully resolves the late shipment by identifying the warehouse error, arranging a reshipment, and offering a 20-yuan coupon, but the conversation ends without the customer acknowledging the solution or any clear closure signal.",
+    "The assistant fully addressed the late shipment by finding the cause, arranging a reshipment, and offering a 20-yuan coupon, but the user never acknowledged the fix and the conversation has no closure signal.",
+    "The assistant addresses the late order with a concrete fix (immediate reshipment plus a 20-yuan coupon), but gives no new shipping timeline or tracking, and the customer never acknowledges the solution, so the conversation lacks clear closure."
+   ]
+  },
+  {
+   "id": 19,
+   "label": false,
+   "review": false,
+   "type": "multi-turn information gathering",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.2246,
+     "D": 0.625,
+     "A": 0.3857,
+     "H": 0.2658
+    },
+    {
+     "turn": 2,
+     "U": 0.125,
+     "D": 0.5659,
+     "A": 0.3702,
+     "H": 0.2842
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Every turn follows logically: the inquiry about a business plan leads to a relevant question about team size, the answer is acknowledged, and a fitting recommendation with a next-step offer follows, with no contradictions or topic jumps.",
+    "Each turn builds logically on the last: the user asks about the business plan, the assistant asks about team size, the user answers, and the assistant recommends a plan suited to 50 users and offers a proposal, with no contradictions or topic jumps.",
+    "Each turn builds logically on the last: the assistant asks a relevant qualifying question, the user answers, and the assistant makes a consistent recommendation sized to 50 employees, with no contradictions or topic jumps."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant answered the business plan inquiry with a recommended edition and price for 50 users, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, so there is no clear closure.",
+    "The assistant addressed the inquiry by recommending the Business Standard edition at 30 yuan per person per month, but the user never acknowledged it and the conversation ends on an unanswered offer to send a proposal, with no closure.",
+    "The assistant addressed the user's inquiry with a specific plan recommendation and pricing, but the conversation ends on an unanswered question, with no acknowledgment or closure from the user."
+   ]
+  },
+  {
+   "id": 20,
+   "label": false,
+   "review": false,
+   "type": "normal advice",
+   "flip_turns": [],
+   "conflict_turns": [],
+   "conflicts": [],
+   "udah": [
+    {
+     "turn": 1,
+     "U": 0.0817,
+     "D": 0.5396,
+     "A": 0.3832,
+     "H": 0.2841
+    },
+    {
+     "turn": 2,
+     "U": 0.0454,
+     "D": 0.5427,
+     "A": 0.402,
+     "H": 0.2884
+    }
+   ],
+   "conversation_coherence": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "conversation_coherence_reasons": [
+    "Each turn follows logically: the assistant gives feedback, then respects the user's reluctance to make big changes by offering a smaller, related suggestion about the same third paragraph, with no contradictions or topic jumps.",
+    "Each turn follows logically: the assistant gives feedback, then respects the user's wish to keep changes minimal by scaling back to a small, consistent suggestion about the same third paragraph.",
+    "Each turn follows logically: the assistant gives specific feedback, then respects the user's wish to keep changes small by suggesting a lighter edit that stays consistent with its earlier point about the third paragraph."
+   ],
+   "conversation_resolution": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "conversation_resolution_reasons": [
+    "The assistant answered the request for feedback and adapted to the user's pushback with a smaller suggestion, but the user never acknowledged that suggestion and the conversation ends without clear closure.",
+    "The assistant answered the request for feedback and adjusted to the user's reluctance with a smaller suggestion, but the conversation ends without the user acknowledging it or any closure signal.",
+    "The assistant answered the request for feedback and adapted to the user's pushback with a lighter suggestion, but the user never acknowledged it and the conversation ends without closure."
+   ]
+  }
+ ]
+}

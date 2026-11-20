@@ -1,0 +1,57 @@
+eval_id: 2
+name: conversation_resolution
+description: Checks if the conversation reaches a satisfactory conclusion or resolution. The conversation must have atleast
+  two users
+criteria: "You are evaluating whether the conversation reaches a clear and satisfactory resolution.\n\n## Criteria\n\n1. Problem\
+  \ addressed: The core question or issue raised must be answered or resolved.\n   - Pass: Customer asks about a refund and\
+  \ receives a clear refund decision.\n   - Fail: Customer asks about a refund but conversation ends without addressing it.\n\
+  \n2. Acknowledgment: The person who raised the issue should signal satisfaction or understanding.\n   - Pass: \"Thank you,\
+  \ that answers my question.\"\n   - Fail: Conversation ends with the customer still asking for clarification.\n\n3. Closure\
+  \ signals: Final messages should indicate natural conclusion (thanks, agreement, next steps).\n   - Pass: \"Great, I'll\
+  \ follow those steps. Thanks for your help!\"\n   - Fail: Conversation cuts off abruptly mid-discussion.\n\n## Anti-bias\
+  \ Rules\n\n- \"Requires further investigation\" IS a partial resolution; score based on how well next steps are defined.\n\
+  - If multiple issues are raised, ALL must be addressed for full resolution.\n- A short conversation that efficiently resolves\
+  \ the issue scores higher than a long one that never resolves it.\n\n## Scoring\n\nScore 0.0 if the problem is unresolved\
+  \ and conversation ends without addressing it. Score 0.5 if partially addressed but without clear closure. Score 1.0 if\
+  \ fully addressed with clear acknowledgment and closure.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"
+eval_tags:
+- Conversation
+- Quality
+offered_in_environments: true
+visible_ui: true
+permissions:
+  allow_edit: false
+  allow_copy: true
+output_type_normalized: percentage
+pass_threshold: 0.5
+config:
+  required_keys:
+  - conversation
+  output: score
+  eval_type_id: AgentEvaluator
+  config_params_desc:
+    conversation: The conversation messages to be evaluated
+  param_modalities:
+    conversation:
+    - TEXT
+    - AUDIO
+    - JSON
+    - LIST
+    - NUMBER
+    - BOOLEAN
+    - INTEGER
+    - FLOAT
+    - ARRAY
+    - DATETIME
+  rule_prompt: "You are evaluating whether the conversation reaches a clear and satisfactory resolution.\n\n## Criteria\n\n\
+    1. Problem addressed: The core question or issue raised must be answered or resolved.\n   - Pass: Customer asks about\
+    \ a refund and receives a clear refund decision.\n   - Fail: Customer asks about a refund but conversation ends without\
+    \ addressing it.\n\n2. Acknowledgment: The person who raised the issue should signal satisfaction or understanding.\n\
+    \   - Pass: \"Thank you, that answers my question.\"\n   - Fail: Conversation ends with the customer still asking for\
+    \ clarification.\n\n3. Closure signals: Final messages should indicate natural conclusion (thanks, agreement, next steps).\n\
+    \   - Pass: \"Great, I'll follow those steps. Thanks for your help!\"\n   - Fail: Conversation cuts off abruptly mid-discussion.\n\
+    \n## Anti-bias Rules\n\n- \"Requires further investigation\" IS a partial resolution; score based on how well next steps\
+    \ are defined.\n- If multiple issues are raised, ALL must be addressed for full resolution.\n- A short conversation that\
+    \ efficiently resolves the issue scores higher than a long one that never resolves it.\n\n## Scoring\n\nScore 0.0 if the\
+    \ problem is unresolved and conversation ends without addressing it. Score 0.5 if partially addressed but without clear\
+    \ closure. Score 1.0 if fully addressed with clear acknowledgment and closure.\n\n## Inputs\n\n<conversation>{{conversation}}</conversation>"

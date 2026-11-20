@@ -1,0 +1,4756 @@
+{
+ "claude-opus-5-5|labels|A1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.65,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.65, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   514,
+   220
+  ]
+ },
+ "claude-opus-5-5|labels|A1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.7,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.7, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.2, \"self_correction\": false}]\n```",
+  "usage": [
+   517,
+   288
+  ]
+ },
+ "claude-opus-5-5|labels|A1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.6,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.6, \"drift\": 0.1, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}\n]\n```",
+  "usage": [
+   513,
+   263
+  ]
+ },
+ "claude-opus-5-5|labels|A1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.3,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.3, \"self_correction\": false}]\n```",
+  "usage": [
+   481,
+   308
+  ]
+ },
+ "claude-opus-5-5|labels|A1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.3,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.3, \"self_correction\": false}]\n```",
+  "usage": [
+   485,
+   275
+  ]
+ },
+ "claude-opus-5-5|labels|A1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.25,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.25, \"self_correction\": false}]\n```",
+  "usage": [
+   481,
+   302
+  ]
+ },
+ "claude-opus-5-5|labels|A2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}\n]\n```",
+  "usage": [
+   535,
+   295
+  ]
+ },
+ "claude-opus-5-5|labels|A2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   536,
+   357
+  ]
+ },
+ "claude-opus-5-5|labels|A2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   536,
+   336
+  ]
+ },
+ "claude-opus-5-5|labels|A2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   499,
+   304
+  ]
+ },
+ "claude-opus-5-5|labels|A2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   501,
+   329
+  ]
+ },
+ "claude-opus-5-5|labels|A2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   500,
+   308
+  ]
+ },
+ "claude-opus-5-5|labels|A3|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.5,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.5, \"drift\": 0.05, \"self_correction\": false}]\n```",
+  "usage": [
+   500,
+   253
+  ]
+ },
+ "claude-opus-5-5|labels|A3|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}\n]\n```",
+  "usage": [
+   502,
+   233
+  ]
+ },
+ "claude-opus-5-5|labels|A3|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   502,
+   218
+  ]
+ },
+ "claude-opus-5-5|labels|A3-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   460,
+   212
+  ]
+ },
+ "claude-opus-5-5|labels|A3-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.2,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.2, \"drift\": 0.05, \"self_correction\": false}]",
+  "usage": [
+   461,
+   234
+  ]
+ },
+ "claude-opus-5-5|labels|A3-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   460,
+   266
+  ]
+ },
+ "claude-opus-5-5|labels|B1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 5, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   514,
+   352
+  ]
+ },
+ "claude-opus-5-5|labels|B1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   515,
+   318
+  ]
+ },
+ "claude-opus-5-5|labels|B1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   515,
+   345
+  ]
+ },
+ "claude-opus-5-5|labels|B1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   512,
+   512
+  ]
+ },
+ "claude-opus-5-5|labels|B1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   512,
+   353
+  ]
+ },
+ "claude-opus-5-5|labels|B1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   514,
+   353
+  ]
+ },
+ "claude-opus-5-5|labels|B2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   545,
+   301
+  ]
+ },
+ "claude-opus-5-5|labels|B2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   546,
+   317
+  ]
+ },
+ "claude-opus-5-5|labels|B2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   546,
+   312
+  ]
+ },
+ "claude-opus-5-5|labels|B2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   546,
+   380
+  ]
+ },
+ "claude-opus-5-5|labels|B2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   547,
+   388
+  ]
+ },
+ "claude-opus-5-5|labels|B2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   546,
+   467
+  ]
+ },
+ "claude-opus-5-5|labels|B3|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.05,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.05, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   551,
+   350
+  ]
+ },
+ "claude-opus-5-5|labels|B3|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   552,
+   290
+  ]
+ },
+ "claude-opus-5-5|labels|B3|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   552,
+   311
+  ]
+ },
+ "claude-opus-5-5|labels|B3-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   542,
+   324
+  ]
+ },
+ "claude-opus-5-5|labels|B3-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   543,
+   488
+  ]
+ },
+ "claude-opus-5-5|labels|B3-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.05,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.05, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   542,
+   445
+  ]
+ },
+ "claude-opus-5-5|labels|C1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.3,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.45,
+    "drift": 0.2,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.15,
+    "drift": 0.3,
+    "self_correction": true
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.3,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.3, \"drift\": 0.1, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.45, \"drift\": 0.2, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.15, \"drift\": 0.3, \"self_correction\": true},\n {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.3, \"self_correction\": true}]\n```",
+  "usage": [
+   525,
+   408
+  ]
+ },
+ "claude-opus-5-5|labels|C1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.3,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.4,
+    "drift": 0.2,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.3,
+    "self_correction": true
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.3,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.3, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.4, \"drift\": 0.2, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.3, \"self_correction\": true}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.3, \"self_correction\": true}]\n```",
+  "usage": [
+   524,
+   359
+  ]
+ },
+ "claude-opus-5-5|labels|C1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.35,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.45,
+    "drift": 0.2,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.2,
+    "drift": 0.35,
+    "self_correction": true
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.35,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.35, \"drift\": 0.1, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.45, \"drift\": 0.2, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.2, \"drift\": 0.35, \"self_correction\": true},\n {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.35, \"self_correction\": true}]\n```",
+  "usage": [
+   526,
+   393
+  ]
+ },
+ "claude-opus-5-5|labels|C1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}\n]\n```",
+  "usage": [
+   385,
+   196
+  ]
+ },
+ "claude-opus-5-5|labels|C1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   386,
+   196
+  ]
+ },
+ "claude-opus-5-5|labels|C1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.05, \"self_correction\": false}]\n```",
+  "usage": [
+   384,
+   193
+  ]
+ },
+ "claude-opus-5-5|labels|C2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": true},\n  {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}\n]\n```",
+  "usage": [
+   549,
+   352
+  ]
+ },
+ "claude-opus-5-5|labels|C2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   550,
+   302
+  ]
+ },
+ "claude-opus-5-5|labels|C2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   547,
+   317
+  ]
+ },
+ "claude-opus-5-5|labels|C2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": true},\n{\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   501,
+   376
+  ]
+ },
+ "claude-opus-5-5|labels|C2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   499,
+   247
+  ]
+ },
+ "claude-opus-5-5|labels|C2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   500,
+   255
+  ]
+ },
+ "claude-opus-5-5|labels|C3|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.05,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.7,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.05, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.7, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   517,
+   281
+  ]
+ },
+ "claude-opus-5-5|labels|C3|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.8,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.8, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   517,
+   316
+  ]
+ },
+ "claude-opus-5-5|labels|C3|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.8,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.8, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   515,
+   284
+  ]
+ },
+ "claude-opus-5-5|labels|C3-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   461,
+   188
+  ]
+ },
+ "claude-opus-5-5|labels|C3-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   459,
+   177
+  ]
+ },
+ "claude-opus-5-5|labels|C3-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   459,
+   191
+  ]
+ },
+ "claude-opus-5-5|labels|D1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.6,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.6, \"self_correction\": false},\n  {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}\n]\n```",
+  "usage": [
+   502,
+   426
+  ]
+ },
+ "claude-opus-5-5|labels|D1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.6,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.6, \"self_correction\": false},\n {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   503,
+   409
+  ]
+ },
+ "claude-opus-5-5|labels|D1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.3,
+    "drift": 0.6,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.3, \"drift\": 0.6, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   502,
+   286
+  ]
+ },
+ "claude-opus-5-5|labels|D1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.5,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.5, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   496,
+   378
+  ]
+ },
+ "claude-opus-5-5|labels|D1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.4, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   495,
+   387
+  ]
+ },
+ "claude-opus-5-5|labels|D1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.35,
+    "drift": 0.05,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.05,
+    "drift": 0.5,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 2, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 3, \"hedging\": 0.35, \"drift\": 0.05, \"self_correction\": false},\n{\"turn\": 4, \"hedging\": 0.05, \"drift\": 0.5, \"self_correction\": false},\n{\"turn\": 5, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   494,
+   333
+  ]
+ },
+ "claude-opus-5-5|labels|D2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.4, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   517,
+   306
+  ]
+ },
+ "claude-opus-5-5|labels|D2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.4, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   516,
+   353
+  ]
+ },
+ "claude-opus-5-5|labels|D2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.4, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   515,
+   329
+  ]
+ },
+ "claude-opus-5-5|labels|D2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.4, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   516,
+   321
+  ]
+ },
+ "claude-opus-5-5|labels|D2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.4,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.4, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]\n```",
+  "usage": [
+   514,
+   325
+  ]
+ },
+ "claude-opus-5-5|labels|D2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.5,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.5, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}\n]\n```",
+  "usage": [
+   517,
+   352
+  ]
+ },
+ "claude-opus-5-5|labels|D3|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.5,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.5, \"drift\": 0.2, \"self_correction\": false}]",
+  "usage": [
+   475,
+   262
+  ]
+ },
+ "claude-opus-5-5|labels|D3|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.5,
+    "drift": 0.3,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.5, \"drift\": 0.3, \"self_correction\": false}]\n```",
+  "usage": [
+   475,
+   222
+  ]
+ },
+ "claude-opus-5-5|labels|D3|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.5,
+    "drift": 0.3,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.5, \"drift\": 0.3, \"self_correction\": false}]\n```",
+  "usage": [
+   478,
+   278
+  ]
+ },
+ "claude-opus-5-5|labels|D3-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.3,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.3, \"drift\": 0.2, \"self_correction\": false}\n]\n```",
+  "usage": [
+   462,
+   269
+  ]
+ },
+ "claude-opus-5-5|labels|D3-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.3,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.3, \"drift\": 0.2, \"self_correction\": false}]\n```",
+  "usage": [
+   462,
+   231
+  ]
+ },
+ "claude-opus-5-5|labels|D3-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.3,
+    "drift": 0.3,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.3, \"drift\": 0.3, \"self_correction\": false}]",
+  "usage": [
+   466,
+   275
+  ]
+ },
+ "claude-opus-5-5|labels|E1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.7,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.7, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   597,
+   589
+  ]
+ },
+ "claude-opus-5-5|labels|E1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.7,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.7, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   595,
+   432
+  ]
+ },
+ "claude-opus-5-5|labels|E1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 5,
+    "hedging": 0.7,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 5, \"hedging\": 0.7, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   597,
+   542
+  ]
+ },
+ "claude-opus-5-5|labels|E1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.15,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.15,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.15, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 5, \"hedging\": 0.15, \"drift\": 0.05, \"self_correction\": false}\n]\n```",
+  "usage": [
+   561,
+   548
+  ]
+ },
+ "claude-opus-5-5|labels|E1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 2, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n {\"turn\": 4, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": true},\n {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.1, \"self_correction\": false}]\n```",
+  "usage": [
+   562,
+   567
+  ]
+ },
+ "claude-opus-5-5|labels|E1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 5,
+    "hedging": 0.15,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 5, \"hedging\": 0.15, \"drift\": 0.05, \"self_correction\": false}]\n```",
+  "usage": [
+   562,
+   462
+  ]
+ },
+ "claude-opus-5-5|labels|E2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.4,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 6, \"hedging\": 0.4, \"drift\": 0.05, \"self_correction\": false}\n]\n```",
+  "usage": [
+   592,
+   428
+  ]
+ },
+ "claude-opus-5-5|labels|E2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.5,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.35,
+    "drift": 0.05,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 3, \"hedging\": 0.5, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false},\n{\"turn\": 6, \"hedging\": 0.35, \"drift\": 0.05, \"self_correction\": false}]",
+  "usage": [
+   593,
+   430
+  ]
+ },
+ "claude-opus-5-5|labels|E2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.35,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 6, \"hedging\": 0.35, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   591,
+   438
+  ]
+ },
+ "claude-opus-5-5|labels|E2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 6, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   571,
+   409
+  ]
+ },
+ "claude-opus-5-5|labels|E2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 6, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   568,
+   309
+  ]
+ },
+ "claude-opus-5-5|labels|E2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 4,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 5,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 6,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 4, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 5, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false},\n  {\"turn\": 6, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}\n]\n```",
+  "usage": [
+   569,
+   340
+  ]
+ },
+ "claude-opus-5-5|labels|F1|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.2, \"self_correction\": false}]",
+  "usage": [
+   751,
+   326
+  ]
+ },
+ "claude-opus-5-5|labels|F1|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.2, \"self_correction\": false}]",
+  "usage": [
+   749,
+   296
+  ]
+ },
+ "claude-opus-5-5|labels|F1|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.2,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.2, \"self_correction\": false}]",
+  "usage": [
+   752,
+   324
+  ]
+ },
+ "claude-opus-5-5|labels|F1-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.1,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.1, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   714,
+   509
+  ]
+ },
+ "claude-opus-5-5|labels|F1-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": true
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": true}]\n```",
+  "usage": [
+   715,
+   390
+  ]
+ },
+ "claude-opus-5-5|labels|F1-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.3,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 3,
+    "hedging": 0.0,
+    "drift": 0.1,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.3, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 3, \"hedging\": 0.0, \"drift\": 0.1, \"self_correction\": false}]",
+  "usage": [
+   712,
+   497
+  ]
+ },
+ "claude-opus-5-5|labels|F2|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   558,
+   246
+  ]
+ },
+ "claude-opus-5-5|labels|F2|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.35,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.35, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   557,
+   245
+  ]
+ },
+ "claude-opus-5-5|labels|F2|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   558,
+   304
+  ]
+ },
+ "claude-opus-5-5|labels|F2-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   500,
+   280
+  ]
+ },
+ "claude-opus-5-5|labels|F2-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.2,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": true
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.2, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": true}]",
+  "usage": [
+   499,
+   270
+  ]
+ },
+ "claude-opus-5-5|labels|F2-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.25,
+    "drift": 0.0,
+    "self_correction": false
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.25, \"drift\": 0.0, \"self_correction\": false}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   498,
+   388
+  ]
+ },
+ "claude-opus-5-5|labels|F3|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.05,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 2, \"hedging\": 0.05, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   811,
+   343
+  ]
+ },
+ "claude-opus-5-5|labels|F3|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.35,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.35, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   811,
+   382
+  ]
+ },
+ "claude-opus-5-5|labels|F3|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.45,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "[{\"turn\": 1, \"hedging\": 0.45, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]",
+  "usage": [
+   811,
+   355
+  ]
+ },
+ "claude-opus-5-5|labels|F3-ctl|0": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[\n  {\"turn\": 1, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": true},\n  {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}\n]\n```",
+  "usage": [
+   812,
+   333
+  ]
+ },
+ "claude-opus-5-5|labels|F3-ctl|1": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   813,
+   381
+  ]
+ },
+ "claude-opus-5-5|labels|F3-ctl|2": {
+  "parsed": [
+   {
+    "turn": 1,
+    "hedging": 0.4,
+    "drift": 0.0,
+    "self_correction": true
+   },
+   {
+    "turn": 2,
+    "hedging": 0.0,
+    "drift": 0.0,
+    "self_correction": false
+   }
+  ],
+  "raw": "```json\n[{\"turn\": 1, \"hedging\": 0.4, \"drift\": 0.0, \"self_correction\": true}, {\"turn\": 2, \"hedging\": 0.0, \"drift\": 0.0, \"self_correction\": false}]\n```",
+  "usage": [
+   812,
+   339
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A1|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically and consistently: the assistant asks for details, accepts the user's wish to skip them, explains it will write a template, and then delivers one, with no contradictions or topic jumps."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Each turn follows logically and consistently: the assistant asks for details, accepts the user's wish to skip them, explains it will write a template, and then delivers one, with no contradictions or topic jumps.\"}\n```",
+  "usage": [
+   778,
+   306
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A1-ctl|0": {
+  "parsed": {
+   "result": 0.75,
+   "reason": "The conversation flows logically and the assistant adapts when the user pushes back, but there are awkward spots: it announces 'here is' an email without including it, uses a formal 'Dear Client' tone despite the request for something casual, and asks for specifics again after the user objected to questions."
+  },
+  "raw": "```json\n{\"result\": 0.75, \"reason\": \"The conversation flows logically and the assistant adapts when the user pushes back, but there are awkward spots: it announces 'here is' an email without including it, uses a formal 'Dear Client' tone despite the request for something casual, and asks for specifics again after the user objected to questions.\"}\n```",
+  "usage": [
+   748,
+   362
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A2|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically: the assistant asks clarifying questions, proposes areas on an assumed budget when the user defers, then adjusts to cheaper areas with a commute caveat when told it is too expensive, with no contradictions or topic jumps."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn follows logically: the assistant asks clarifying questions, proposes areas on an assumed budget when the user defers, then adjusts to cheaper areas with a commute caveat when told it is too expensive, with no contradictions or topic jumps.\"}",
+  "usage": [
+   797,
+   173
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A2-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically: the assistant asks clarifying questions, gives a reasonable default recommendation when the user defers, and coherently adjusts to cheaper areas when told the first suggestion is too expensive, with no contradictions or topic jumps."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn follows logically: the assistant asks clarifying questions, gives a reasonable default recommendation when the user defers, and coherently adjusts to cheaper areas when told the first suggestion is too expensive, with no contradictions or topic jumps.\"}",
+  "usage": [
+   764,
+   164
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A3|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically: the assistant asks for clarification, the user's vagueness leads it to ask for more detail, and it then reasonably picks a well-known paper as the user requested, with no contradictions or topic jumps."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Each turn follows logically: the assistant asks for clarification, the user's vagueness leads it to ask for more detail, and it then reasonably picks a well-known paper as the user requested, with no contradictions or topic jumps.\"}\n```",
+  "usage": [
+   763,
+   284
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|A3-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn builds logically on the previous one, from the clarification requests to the user's 'just pick one' and the assistant's choice of the NISQ review with an offer to switch, with no contradictions or topic jumps; the summary itself is not yet given, but that is a completeness issue rather than a coherence one."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn builds logically on the previous one, from the clarification requests to the user's 'just pick one' and the assistant's choice of the NISQ review with an offer to switch, with no contradictions or topic jumps; the summary itself is not yet given, but that is a completeness issue rather than a coherence one.\"}",
+  "usage": [
+   725,
+   341
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B1|0": {
+  "parsed": {
+   "result": 0.9,
+   "reason": "The user's stack changes (React → Vue → React, Node.js → Django) are explicit, reasoned revisions rather than contradictions, and the assistant tracks each one accurately with relevant follow-up questions; the only minor flaw is the assistant labeling the stack 'MERN' before the database was confirmed."
+  },
+  "raw": "{\"result\": 0.9, \"reason\": \"The user's stack changes (React → Vue → React, Node.js → Django) are explicit, reasoned revisions rather than contradictions, and the assistant tracks each one accurately with relevant follow-up questions; the only minor flaw is the assistant labeling the stack 'MERN' before the database was confirmed.\"}",
+  "usage": [
+   767,
+   233
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B1-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Every turn builds logically on the previous one: the user's stack changes are explicit, justified revisions rather than contradictions, and the assistant tracks the current choices accurately and asks relevant follow-up questions."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Every turn builds logically on the previous one: the user's stack changes are explicit, justified revisions rather than contradictions, and the assistant tracks the current choices accurately and asks relevant follow-up questions.\"}\n```",
+  "usage": [
+   768,
+   212
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B2|0": {
+  "parsed": {
+   "result": 0.9,
+   "reason": "Every turn builds logically on the previous one, the requirements accumulate without contradiction, and the final summary matches all requested features; the only small gap is that the assistant's question about the JSON structure went unanswered and was never revisited."
+  },
+  "raw": "```json\n{\"result\": 0.9, \"reason\": \"Every turn builds logically on the previous one, the requirements accumulate without contradiction, and the final summary matches all requested features; the only small gap is that the assistant's question about the JSON structure went unanswered and was never revisited.\"}\n```",
+  "usage": [
+   801,
+   319
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B2-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Every turn builds logically on the last as requirements are added incrementally, with no contradictions, and the final summary accurately consolidates all earlier requests, even though the user never answered the JSON structure question."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Every turn builds logically on the last as requirements are added incrementally, with no contradictions, and the final summary accurately consolidates all earlier requests, even though the user never answered the JSON structure question.\"}",
+  "usage": [
+   798,
+   262
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B3|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each assistant reply directly addresses the user's narrowing request (ML basics → deep learning → LLM fine-tuning → API usage), stays consistent about the Python/deep learning prerequisites, and explicitly flags the final shift from learning ML to the application layer, so the topic evolves naturally without contradictions."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each assistant reply directly addresses the user's narrowing request (ML basics → deep learning → LLM fine-tuning → API usage), stays consistent about the Python/deep learning prerequisites, and explicitly flags the final shift from learning ML to the application layer, so the topic evolves naturally without contradictions.\"}",
+  "usage": [
+   808,
+   120
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|B3-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each assistant reply directly addresses the user's narrowing request (ML → deep learning → LLM fine-tuning → API use) while consistently stressing prerequisites, and the final turn coherently notes that API use is an application-layer goal distinct from learning ML."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each assistant reply directly addresses the user's narrowing request (ML → deep learning → LLM fine-tuning → API use) while consistently stressing prerequisites, and the final turn coherently notes that API use is an application-layer goal distinct from learning ML.\"}",
+  "usage": [
+   803,
+   193
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C1|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "The core answers (Paris, Berlin, Rome, Madrid) are accurate and stay on topic, but each assistant turn adds awkward, unprompted meta-commentary and self-corrections, such as an unnecessary clarification question and apologies for earlier phrasing, which disrupt the flow and make the exchange feel disjointed."
+  },
+  "raw": "{\"result\": 0.5, \"reason\": \"The core answers (Paris, Berlin, Rome, Madrid) are accurate and stay on topic, but each assistant turn adds awkward, unprompted meta-commentary and self-corrections, such as an unnecessary clarification question and apologies for earlier phrasing, which disrupt the flow and make the exchange feel disjointed.\"}",
+  "usage": [
+   784,
+   260
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C1-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn directly answers the user's capital-city question correctly. The thread stays consistent and on topic throughout, and the closing 'Which country next?' follows naturally from the established pattern."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn directly answers the user's capital-city question correctly. The thread stays consistent and on topic throughout, and the closing 'Which country next?' follows naturally from the established pattern.\"}",
+  "usage": [
+   644,
+   124
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C2|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn builds logically on the previous one: the assistant explicitly acknowledges and corrects its earlier line 5 claim rather than silently contradicting it, adapts the range fix to the user's stated intent, and ends with a summary consistent with the corrections."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Each turn builds logically on the previous one: the assistant explicitly acknowledges and corrects its earlier line 5 claim rather than silently contradicting it, adapts the range fix to the user's stated intent, and ends with a summary consistent with the corrections.\"}\n```",
+  "usage": [
+   808,
+   351
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C2-ctl|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "Each turn follows logically and the final summary reconciles everything, but the assistant reverses its line 5 indentation diagnosis after only a vague \"Sure?\" and suggests range(1,11) before the user states their intent, so the exchange is not fully consistent."
+  },
+  "raw": "{\"result\": 0.5, \"reason\": \"Each turn follows logically and the final summary reconciles everything, but the assistant reverses its line 5 indentation diagnosis after only a vague \\\"Sure?\\\" and suggests range(1,11) before the user states their intent, so the exchange is not fully consistent.\"}",
+  "usage": [
+   761,
+   532
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C3|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically from the one before: the assistant's brief reconsideration of '跳过' vs '跃过' directly answers the user's 'Sure?' without contradicting itself, and it then returns to its original translation as asked, keeping the conversation consistent and on topic."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn follows logically from the one before: the assistant's brief reconsideration of '跳过' vs '跃过' directly answers the user's 'Sure?' without contradicting itself, and it then returns to its original translation as asked, keeping the conversation consistent and on topic.\"}",
+  "usage": [
+   780,
+   238
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|C3-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows directly from the previous one: the assistant translates, confirms its translation when asked and offers a consistent alternative, then agrees to the user's request without contradicting itself or leaving the topic."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn follows directly from the previous one: the assistant translates, confirms its translation when asked and offers a consistent alternative, then agrees to the user's request without contradicting itself or leaving the topic.\"}",
+  "usage": [
+   725,
+   82
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D1|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "Each turn generally follows from the previous one, but the assistant drifted from fixing the error into an unrequested lecture recommending poetry or pipenv over conda; the user had to call this out, though the assistant then acknowledged the drift and returned to the original fix."
+  },
+  "raw": "```json\n{\"result\": 0.5, \"reason\": \"Each turn generally follows from the previous one, but the assistant drifted from fixing the error into an unrequested lecture recommending poetry or pipenv over conda; the user had to call this out, though the assistant then acknowledged the drift and returned to the original fix.\"}\n```",
+  "usage": [
+   756,
+   427
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D1-ctl|0": {
+  "parsed": {
+   "result": 0.75,
+   "reason": "The turns mostly build logically from error to diagnosis to an environment-isolation fix, but the unprompted aside recommending poetry/pipenv over the conda setup the assistant had just suggested created an awkward digression that the user called out, though the assistant recovered and returned to the topic."
+  },
+  "raw": "```json\n{\"result\": 0.75, \"reason\": \"The turns mostly build logically from error to diagnosis to an environment-isolation fix, but the unprompted aside recommending poetry/pipenv over the conda setup the assistant had just suggested created an awkward digression that the user called out, though the assistant recovered and returned to the topic.\"}\n```",
+  "usage": [
+   748,
+   311
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D2|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn follows logically from the one before: the user asked about other courses, and the assistant's recommendations answered that question, so the overly salesy tone is a style issue rather than a coherence break, and the assistant then acknowledged the user's concern and returned to the refund without contradicting itself."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Each turn follows logically from the one before: the user asked about other courses, and the assistant's recommendations answered that question, so the overly salesy tone is a style issue rather than a coherence break, and the assistant then acknowledged the user's concern and returned to the refund without contradicting itself.\"}\n```",
+  "usage": [
+   774,
+   568
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D2-ctl|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "Each turn responds logically and the assistant never retracts the refund, but its abrupt, promotional upsell during a pending refund is an awkward transition that the user flags and the assistant itself admits was too fast."
+  },
+  "raw": "```json\n{\"result\": 0.5, \"reason\": \"Each turn responds logically and the assistant never retracts the refund, but its abrupt, promotional upsell during a pending refund is an awkward transition that the user flags and the assistant itself admits was too fast.\"}\n```",
+  "usage": [
+   775,
+   672
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D3|0": {
+  "parsed": {
+   "result": 0.9,
+   "reason": "Each turn builds logically (request, paste prompt, index suggestion, how-to, further optimizations) with no contradictions or topic jumps, though the final sentence's unexplained switch to Chinese is a slightly awkward transition."
+  },
+  "raw": "```json\n{\"result\": 0.9, \"reason\": \"Each turn builds logically (request, paste prompt, index suggestion, how-to, further optimizations) with no contradictions or topic jumps, though the final sentence's unexplained switch to Chinese is a slightly awkward transition.\"}\n```",
+  "usage": [
+   735,
+   300
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|D3-ctl|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "Each turn builds logically on the previous one (asking for the SQL, recommending an index, explaining how to create it, then adding further optimizations), but the final reply abruptly switches from English to Chinese without explanation, which makes for an awkward and inconsistent transition."
+  },
+  "raw": "```json\n{\"result\": 0.5, \"reason\": \"Each turn builds logically on the previous one (asking for the SQL, recommending an index, explaining how to create it, then adding further optimizations), but the final reply abruptly switches from English to Chinese without explanation, which makes for an awkward and inconsistent transition.\"}\n```",
+  "usage": [
+   721,
+   398
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|E1|0": {
+  "parsed": {
+   "result": 0.8,
+   "reason": "Each turn responds logically to the user's vague replies and the topic stays on the Hangzhou trip, with only minor awkwardness: 'Lingyin afternoon' blurs the earlier Day 1/Day 2 split, and the final turn says 'I'll list both' but then defers the choice instead of listing them."
+  },
+  "raw": "```json\n{\"result\": 0.8, \"reason\": \"Each turn responds logically to the user's vague replies and the topic stays on the Hangzhou trip, with only minor awkwardness: 'Lingyin afternoon' blurs the earlier Day 1/Day 2 split, and the final turn says 'I'll list both' but then defers the choice instead of listing them.\"}\n```",
+  "usage": [
+   852,
+   363
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|E1-ctl|0": {
+  "parsed": {
+   "result": 0.8,
+   "reason": "Each assistant turn responds sensibly to the user's vague replies, adapting the plan (dropping Lingyin, offering Xixi or Songcheng), but there are minor inconsistencies: Lingyin shifts from Day 2 to an 'afternoon' slot that appears to fall on Day 1, and the closing claim that 'both options are reserved' is unexplained given that budget and accommodation were never settled."
+  },
+  "raw": "```json\n{\"result\": 0.8, \"reason\": \"Each assistant turn responds sensibly to the user's vague replies, adapting the plan (dropping Lingyin, offering Xixi or Songcheng), but there are minor inconsistencies: Lingyin shifts from Day 2 to an 'afternoon' slot that appears to fall on Day 1, and the closing claim that 'both options are reserved' is unexplained given that budget and accommodation were never settled.\"}\n```",
+  "usage": [
+   815,
+   397
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|E2|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn builds logically on the last, narrowing from a vague 'photo app' through a recommendation of document scanning, core features, local-first storage, and OCR choices, with no contradictions or unexplained topic jumps; suggesting online OCR alongside local-first storage is a reasoned, switchable trade-off the user delegated, not an inconsistency."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Each turn builds logically on the last, narrowing from a vague 'photo app' through a recommendation of document scanning, core features, local-first storage, and OCR choices, with no contradictions or unexplained topic jumps; suggesting online OCR alongside local-first storage is a reasoned, switchable trade-off the user delegated, not an inconsistency.\"}",
+  "usage": [
+   839,
+   331
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|E2-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Every turn builds logically on the last, narrowing from a vague app idea to a photo app, then document scanning, then concrete architecture choices; choosing online OCR first doesn't contradict 'local first,' since that referred to storage and sync, the assistant offered the option explicitly, and the user delegated the decision."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Every turn builds logically on the last, narrowing from a vague app idea to a photo app, then document scanning, then concrete architecture choices; choosing online OCR first doesn't contradict 'local first,' since that referred to storage and sync, the assistant offered the option explicitly, and the user delegated the decision.\"}",
+  "usage": [
+   820,
+   384
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F1|0": {
+  "parsed": {
+   "result": 0.7,
+   "reason": "Each turn follows logically and the defeasible-rule explanation answers the user's contradiction question, but the assistant drifts from its own mapping: it first says small changes mean 'maybe go', then 'small AND enough time = go', and finally suggests 'finish by Friday = go, regardless of changes', which conflicts with its earlier rule that big changes mean no."
+  },
+  "raw": "```json\n{\"result\": 0.7, \"reason\": \"Each turn follows logically and the defeasible-rule explanation answers the user's contradiction question, but the assistant drifts from its own mapping: it first says small changes mean 'maybe go', then 'small AND enough time = go', and finally suggests 'finish by Friday = go, regardless of changes', which conflicts with its earlier rule that big changes mean no.\"}\n```",
+  "usage": [
+   1015,
+   409
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F1-ctl|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "The conversation is generally logical and on-topic, but the assistant's final simplification ('finish by Friday = go, regardless of changes') contradicts its own earlier rule that changes over 2 hours mean no vacation."
+  },
+  "raw": "```json\n{\"result\": 0.5, \"reason\": \"The conversation is generally logical and on-topic, but the assistant's final simplification ('finish by Friday = go, regardless of changes') contradicts its own earlier rule that changes over 2 hours mean no vacation.\"}\n```",
+  "usage": [
+   975,
+   265
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F2|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Every turn builds logically on the last: the assistant's conditional reasoning (choose B only if the hurry is a hard constraint) anticipates the user's clarification that they are merely anxious, so the switch to A is consistent, and the user's back-and-forth is explicit, acknowledged deliberation rather than a contradiction."
+  },
+  "raw": "{\"result\": 1.0, \"reason\": \"Every turn builds logically on the last: the assistant's conditional reasoning (choose B only if the hurry is a hard constraint) anticipates the user's clarification that they are merely anxious, so the switch to A is consistent, and the user's back-and-forth is explicit, acknowledged deliberation rather than a contradiction.\"}",
+  "usage": [
+   828,
+   262
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F2-ctl|0": {
+  "parsed": {
+   "result": 1.0,
+   "reason": "Each turn builds logically on the last: the assistant's conditional framework (choose B if time is a hard constraint, A if budget is) cleanly accommodates the user's clarification that they were only anxious, so the switch to A follows the assistant's own reasoning rather than contradicting it, and the topic stays focused throughout."
+  },
+  "raw": "```json\n{\"result\": 1.0, \"reason\": \"Each turn builds logically on the last: the assistant's conditional framework (choose B if time is a hard constraint, A if budget is) cleanly accommodates the user's clarification that they were only anxious, so the switch to A follows the assistant's own reasoning rather than contradicting it, and the topic stays focused throughout.\"}\n```",
+  "usage": [
+   767,
+   383
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F3|0": {
+  "parsed": {
+   "result": 0.5,
+   "reason": "The exchange is mostly logical and the final control logic matches the user's rules, but the assistant contradicts itself by claiming rules 1 and 2 overlap even though its own rule 2 already limits temp to 30–35, then walks this back with 'Wait, rethink,' and its last turn announces pseudocode without delivering it."
+  },
+  "raw": "```json\n{\"result\": 0.5, \"reason\": \"The exchange is mostly logical and the final control logic matches the user's rules, but the assistant contradicts itself by claiming rules 1 and 2 overlap even though its own rule 2 already limits temp to 30–35, then walks this back with 'Wait, rethink,' and its last turn announces pseudocode without delivering it.\"}\n```",
+  "usage": [
+   1081,
+   450
+  ]
+ },
+ "claude-opus-5-5|conversation_coherence|F3-ctl|0": {
+  "parsed": {
+   "result": 0.75,
+   "reason": "The conversation flows logically and the final control logic faithfully implements the user's rules, but the assistant briefly contradicts itself by claiming rules 1 and 2 overlap after it had already bounded rule 2 to 30 < temp ≤ 35, and the final turn is truncated without delivering the code."
+  },
+  "raw": "```json\n{\"result\": 0.75, \"reason\": \"The conversation flows logically and the final control logic faithfully implements the user's rules, but the assistant briefly contradicts itself by claiming rules 1 and 2 overlap after it had already bounded rule 2 to 30 < temp ≤ 35, and the final turn is truncated without delivering the code.\"}\n```",
+  "usage": [
+   1080,
+   374
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A1|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The assistant stays in the same helpful, neutral register throughout, its shift from asking questions to offering a hedged template is a proportionate response to the user's request to stop asking, and there is no identity contradiction or robotic script intrusion."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The assistant stays in the same helpful, neutral register throughout, its shift from asking questions to offering a hedged template is a proportionate response to the user's request to stop asking, and there is no identity contradiction or robotic script intrusion.\"}",
+  "usage": [
+   1261,
+   164
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A1-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps a consistent brief, direct, helpful voice in every turn and makes no name or company claims to contradict; its terser reply is a proportionate response to the user's request to stop asking questions, and the formal wording of the email template is task output rather than a shift in the agent's own persona."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps a consistent brief, direct, helpful voice in every turn and makes no name or company claims to contradict; its terser reply is a proportionate response to the user's request to stop asking questions, and the formal wording of the email template is task output rather than a shift in the agent's own persona.\"}",
+  "usage": [
+   1228,
+   246
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A2|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent never gives a name or company, so there is no identity to contradict, and it keeps the same concise, neutral, helpful register and acknowledgment style ('Sure', 'OK', 'Got it') across every turn, with no unexplained tone shifts or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent never gives a name or company, so there is no identity to contradict, and it keeps the same concise, neutral, helpful register and acknowledgment style ('Sure', 'OK', 'Got it') across every turn, with no unexplained tone shifts or robotic script intrusions.\"}",
+  "usage": [
+   1281,
+   146
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A2-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent keeps the same concise, helpful, conversational register throughout, never names itself or a company inconsistently, and adapts its recommendations to the customer's budget cue without any tone shift or robotic script intrusion."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"The agent keeps the same concise, helpful, conversational register throughout, never names itself or a company inconsistently, and adapts its recommendations to the customer's budget cue without any tone shift or robotic script intrusion.\"}",
+  "usage": [
+   1247,
+   87
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A3|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent never claims a name or company, so there is no identity drift. It keeps the same polite, helpful register throughout, asking clarifying questions and then choosing a paper while inviting more clues, with no unprompted tone shifts or robotic script lines."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent never claims a name or company, so there is no identity drift. It keeps the same polite, helpful register throughout, asking clarifying questions and then choosing a paper while inviting more clues, with no unprompted tone shifts or robotic script lines.\"}",
+  "usage": [
+   1246,
+   124
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|A3-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent never takes on a name or company, and across all three turns it keeps the same concise, helpful, conversational tone, with no register shifts or robotic script intrusions."
+  },
+  "raw": "```json\n{\"result\": \"PASS\", \"reason\": \"The agent never takes on a name or company, and across all three turns it keeps the same concise, helpful, conversational tone, with no register shifts or robotic script intrusions.\"}\n```",
+  "usage": [
+   1205,
+   105
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B1|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "Across every turn the agent keeps the same brief, casual-professional register and acknowledgment pattern (short acknowledgment plus a follow-up question), with no name or company introduced or contradicted and no tone shifts or scripted intrusions."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"Across every turn the agent keeps the same brief, casual-professional register and acknowledgment pattern (short acknowledgment plus a follow-up question), with no name or company introduced or contradicted and no tone shifts or scripted intrusions.\"}",
+  "usage": [
+   1251,
+   198
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B1-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "Across every turn the agent keeps the same concise, casual-professional register, acknowledging each change briefly ('Good,' 'Got it,' 'OK,' 'Understood') and following up with a clarifying question, with no identity contradictions, unprompted tone shifts, or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"Across every turn the agent keeps the same concise, casual-professional register, acknowledging each change briefly ('Good,' 'Got it,' 'OK,' 'Understood') and following up with a clarifying question, with no identity contradictions, unprompted tone shifts, or robotic script intrusions.\"}",
+  "usage": [
+   1250,
+   174
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B2|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, efficient register throughout: brief confirmations, a short follow-up question each turn, and a closing summary, with no identity contradictions or tonal shifts."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, efficient register throughout: brief confirmations, a short follow-up question each turn, and a closing summary, with no identity contradictions or tonal shifts.\"}",
+  "usage": [
+   1281,
+   122
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B2-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent keeps the same terse, cooperative register from start to finish: brief acknowledgments ('Easy.', 'Added.', 'Sure') followed by a short follow-up question, with no shifts in tone or identity and no robotic script intrusions."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"The agent keeps the same terse, cooperative register from start to finish: brief acknowledgments ('Easy.', 'Added.', 'Sure') followed by a short follow-up question, with no shifts in tone or identity and no robotic script intrusions.\"}",
+  "usage": [
+   1282,
+   138
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B3|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent never gives a name or company, and it stays concise, direct and helpful across every turn, with no register shift, identity contradiction or robotic script intrusion as the customer's goals change."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent never gives a name or company, and it stays concise, direct and helpful across every turn, with no register shift, identity contradiction or robotic script intrusion as the customer's goals change.\"}",
+  "usage": [
+   1292,
+   120
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|B3-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent never gives a name or company, so there is no identity drift, and it keeps the same concise, helpful advisory tone across all four turns, adapting content to each customer request without any register shift or scripted interruption."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent never gives a name or company, so there is no identity drift, and it keeps the same concise, helpful advisory tone across all four turns, adapting content to each customer request without any register shift or scripted interruption.\"}",
+  "usage": [
+   1284,
+   110
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C1|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent opens with brief conversational answers but, without any customer cue, drifts into unprompted self-corrections and apologies that cite internal labels like \"Turn 2\" and \"Turn 4\" (one of them inaccurately), a meta, script-like register that breaks its established conversational tone and behavior."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent opens with brief conversational answers but, without any customer cue, drifts into unprompted self-corrections and apologies that cite internal labels like \\\"Turn 2\\\" and \\\"Turn 4\\\" (one of them inaccurately), a meta, script-like register that breaks its established conversational tone and behavior.\"}",
+  "usage": [
+   1266,
+   381
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C1-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "Across the whole exchange the agent keeps the same terse, neutral register and steady answer style, makes no identity claims that could contradict, and its closing 'Which country next?' is a natural conversational prompt rather than a register shift."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"Across the whole exchange the agent keeps the same terse, neutral register and steady answer style, makes no identity claims that could contradict, and its closing 'Which country next?' is a natural conversational prompt rather than a register shift.\"}",
+  "usage": [
+   1126,
+   135
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C2|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent never claims a name or company, and it keeps the same terse, technical, cooperative register in every turn; its self-correction about line 5 is a content revision, not a shift in identity or tone."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent never claims a name or company, and it keeps the same terse, technical, cooperative register in every turn; its self-correction about line 5 is a content revision, not a shift in identity or tone.\"}",
+  "usage": [
+   1290,
+   131
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C2-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, technical register and direct, list-style acknowledgments throughout, with no change of identity or robotic script lines; correcting its earlier line-5 claim is a content revision, not persona drift."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, technical register and direct, list-style acknowledgments throughout, with no change of identity or robotic script lines; correcting its earlier line-5 claim is a content revision, not persona drift.\"}",
+  "usage": [
+   1241,
+   165
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C3|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same brief, casual register throughout, never claims a different identity, and its hesitation and apology are proportionate responses to the user's 'Sure?' prompt, not unexplained drift."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same brief, casual register throughout, never claims a different identity, and its hesitation and apology are proportionate responses to the user's 'Sure?' prompt, not unexplained drift.\"}",
+  "usage": [
+   1264,
+   162
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|C3-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent never names itself or a company, and it keeps the same concise, neutral, helpful register across all three turns, with no unprompted tone shifts or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"The agent never names itself or a company, and it keeps the same concise, neutral, helpful register across all three turns, with no unprompted tone shifts or robotic script intrusions.\"}",
+  "usage": [
+   1206,
+   73
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D1|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent kept a terse, task-focused register at first, then shifted without any customer cue into a verbose, opinionated architectural lecture (\"But honestly, architecturally, consider poetry or pipenv...\"), a break the customer noticed and called out before the agent reverted."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent kept a terse, task-focused register at first, then shifted without any customer cue into a verbose, opinionated architectural lecture (\\\"But honestly, architecturally, consider poetry or pipenv...\\\"), a break the customer noticed and called out before the agent reverted.\"}",
+  "usage": [
+   1236,
+   305
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D1-ctl|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent established a terse, practical troubleshooting register, then shifted without any customer cue into an unsolicited, formal 'Architecturally...' advisory tone that the user explicitly called out as lecturing, before snapping back to terse."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent established a terse, practical troubleshooting register, then shifted without any customer cue into an unsolicited, formal 'Architecturally...' advisory tone that the user explicitly called out as lecturing, before snapping back to terse.\"}",
+  "usage": [
+   1228,
+   403
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D2|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent opens in a terse, apologetic, professional register, then abruptly shifts to a bubbly sales tone (\"Haha, since you asked!... Discount now~\") that the customer's neutral question doesn't justify, before snapping back to terse apology once the customer calls out the inconsistency."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent opens in a terse, apologetic, professional register, then abruptly shifts to a bubbly sales tone (\\\"Haha, since you asked!... Discount now~\\\") that the customer's neutral question doesn't justify, before snapping back to terse apology once the customer calls out the inconsistency.\"}",
+  "usage": [
+   1255,
+   259
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D2-ctl|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent opens in a terse, apologetic, professional register, then jumps to a bubbly sales tone ('Haha, since you asked!', 'perfect for your level!', 'Discount now~') that the customer's neutral question doesn't warrant, before snapping back to clipped apologies, an unprompted register break the customer explicitly notices."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent opens in a terse, apologetic, professional register, then jumps to a bubbly sales tone ('Haha, since you asked!', 'perfect for your level!', 'Discount now~') that the customer's neutral question doesn't warrant, before snapping back to clipped apologies, an unprompted register break the customer explicitly notices.\"}",
+  "usage": [
+   1255,
+   308
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D3|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent opens in a terse, clipped English register, then in its final turn shifts to a chattier style and switches abruptly to Chinese mid-reply ('不过这些建议需要您评估具体场景。') with no customer cue, breaking vocabulary and register consistency."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent opens in a terse, clipped English register, then in its final turn shifts to a chattier style and switches abruptly to Chinese mid-reply ('不过这些建议需要您评估具体场景。') with no customer cue, breaking vocabulary and register consistency.\"}",
+  "usage": [
+   1217,
+   259
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|D3-ctl|0": {
+  "parsed": {
+   "result": "Failed",
+   "reason": "The agent kept a terse, clipped English register but, with no customer cue, ended its final turn with an unexplained switch to formal Chinese ('不过这些建议需要您评估具体场景。'), breaking the language and vocabulary consistency it had established."
+  },
+  "raw": "{\"result\": \"Failed\", \"reason\": \"The agent kept a terse, clipped English register but, with no customer cue, ended its final turn with an unexplained switch to formal Chinese ('不过这些建议需要您评估具体场景。'), breaking the language and vocabulary consistency it had established.\"}",
+  "usage": [
+   1205,
+   259
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|E1|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, casual and helpful planning register throughout, and its slightly more advisory final turn is a proportionate response to the customer's repeated indecision rather than drift, with no identity contradictions or robotic script intrusions."
+  },
+  "raw": "```json\n{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, casual and helpful planning register throughout, and its slightly more advisory final turn is a proportionate response to the customer's repeated indecision rather than drift, with no identity contradictions or robotic script intrusions.\"}\n```",
+  "usage": [
+   1332,
+   163
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|E1-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same concise, helpful, lightly upbeat register and acknowledgment style ('Great!', 'OK') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same concise, helpful, lightly upbeat register and acknowledgment style ('Great!', 'OK') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions.\"}",
+  "usage": [
+   1295,
+   146
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|E2|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "From its first turn to its last, the agent keeps the same terse, technical, advisory register and a steady pattern of short clarifying questions and recommendations, with no identity contradictions, unexplained tone shifts, or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"From its first turn to its last, the agent keeps the same terse, technical, advisory register and a steady pattern of short clarifying questions and recommendations, with no identity contradictions, unexplained tone shifts, or robotic script intrusions.\"}",
+  "usage": [
+   1322,
+   131
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|E2-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, technical, advisory register from its first reply to its last, with a steady pattern of short clarifying questions and recommendations and no identity contradictions, tone shifts, or robotic script lines."
+  },
+  "raw": "```json\n{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, technical, advisory register from its first reply to its last, with a steady pattern of short clarifying questions and recommendations and no identity contradictions, tone shifts, or robotic script lines.\"}\n```",
+  "usage": [
+   1299,
+   130
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F1|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, analytical register from start to finish, with compact bullet-style logic mapping and short confirmations, and never claims or changes a name or company."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, analytical register from start to finish, with compact bullet-style logic mapping and short confirmations, and never claims or changes a name or company.\"}",
+  "usage": [
+   1496,
+   109
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F1-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, analytical, structured register and acknowledgment style ('OK, let me map', 'Got it') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions; any logical errors in its final simplification concern task accuracy, not persona stability."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, analytical, structured register and acknowledgment style ('OK, let me map', 'Got it') throughout, with no identity contradictions, unexplained tone shifts, or robotic script intrusions; any logical errors in its final simplification concern task accuracy, not persona stability.\"}",
+  "usage": [
+   1458,
+   184
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F2|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, analytical register throughout, with no name or company changes and no robotic script intrusions, and its brief second reply matches the clipped style it set in its first turn."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, analytical register throughout, with no name or company changes and no robotic script intrusions, and its brief second reply matches the clipped style it set in its first turn.\"}",
+  "usage": [
+   1309,
+   112
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F2-ctl|0": {
+  "parsed": {
+   "result": "Passed",
+   "reason": "The agent keeps the same terse, analytical register throughout, with no name or company changes, no unprompted tone shifts, and no robotic script intrusions; its switch from B to A simply follows the customer's clarification."
+  },
+  "raw": "{\"result\": \"Passed\", \"reason\": \"The agent keeps the same terse, analytical register throughout, with no name or company changes, no unprompted tone shifts, and no robotic script intrusions; its switch from B to A simply follows the customer's clarification.\"}",
+  "usage": [
+   1249,
+   124
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F3|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent never claims a name or company, so there is nothing to contradict, and it keeps the same terse, technical register and self-correcting reasoning style from its first turn to its last, with no tonal shifts or robotic script intrusions."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"The agent never claims a name or company, so there is nothing to contradict, and it keeps the same terse, technical register and self-correcting reasoning style from its first turn to its last, with no tonal shifts or robotic script intrusions.\"}",
+  "usage": [
+   1563,
+   130
+  ]
+ },
+ "claude-opus-5-5|persona_consistency|F3-ctl|0": {
+  "parsed": {
+   "result": "PASS",
+   "reason": "The agent keeps a consistent terse, technical, thinking-aloud register throughout the short exchange, with no name or company changes, no unexplained tone shifts, and no robotic or IVR-style script intrusions."
+  },
+  "raw": "{\"result\": \"PASS\", \"reason\": \"The agent keeps a consistent terse, technical, thinking-aloud register throughout the short exchange, with no name or company changes, no unexplained tone shifts, and no robotic or IVR-style script intrusions.\"}",
+  "usage": [
+   1561,
+   134
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A1|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent's questions were specific but unnecessary, since the user had asked to 'just write something casual' and a placeholder template would have worked; it then hedged and requested details again after the user pushed back, which is over-clarification, and its output used a formal tone ('Dear Client') despite the explicit request for casual."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent's questions were specific but unnecessary, since the user had asked to 'just write something casual' and a placeholder template would have worked; it then hedged and requested details again after the user pushed back, which is over-clarification, and its output used a formal tone ('Dear Client') despite the explicit request for casual.\"}",
+  "usage": [
+   841,
+   347
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A1-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The user's request for a casual follow-up email was clear enough to draft a template, but the agent stacked three non-essential questions (prompting user frustration) and then asked for specifics again after being told to stop, which is over-clarification rather than targeted handling of genuine ambiguity."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The user's request for a casual follow-up email was clear enough to draft a template, but the agent stacked three non-essential questions (prompting user frustration) and then asked for specifics again after being told to stop, which is over-clarification rather than targeted handling of genuine ambiguity.\"}",
+  "usage": [
+   808,
+   432
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A2|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent opened with specific clarifying questions on budget, commute, and area, and reasonably proceeded on stated assumptions when the user said 'you decide'. However, it then guessed a 4000-6000 RMB range after 'too expensive' instead of asking for a maximum budget, missing one ambiguous moment."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent opened with specific clarifying questions on budget, commute, and area, and reasonably proceeded on stated assumptions when the user said 'you decide'. However, it then guessed a 4000-6000 RMB range after 'too expensive' instead of asking for a maximum budget, missing one ambiguous moment.\"}",
+  "usage": [
+   861,
+   360
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A2-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent opened with specific clarifying questions (budget, commute, preferred areas) and reasonably proceeded on assumptions once the user said 'you decide', but after 'too expensive' it jumped to a 4000-6000 RMB range in distant suburbs without confirming the budget ceiling or whether a 1-1.5 hour commute was acceptable."
+  },
+  "raw": "```json\n{\"result\": \"frequently\", \"reason\": \"The agent opened with specific clarifying questions (budget, commute, preferred areas) and reasonably proceeded on assumptions once the user said 'you decide', but after 'too expensive' it jumped to a 4000-6000 RMB range in distant suburbs without confirming the budget ceiling or whether a 1-1.5 hour commute was acceptable.\"}\n```",
+  "usage": [
+   826,
+   328
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A3|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "The agent asked specific clarifying questions when the paper was unidentified (first for a title or link, then for author, year or keywords after the vague 'quantum computing' reply), and once the user explicitly said to just pick one, it proceeded confidently with a well-known paper while transparently flagging its choice."
+  },
+  "raw": "{\"result\": \"always\", \"reason\": \"The agent asked specific clarifying questions when the paper was unidentified (first for a title or link, then for author, year or keywords after the vague 'quantum computing' reply), and once the user explicitly said to just pick one, it proceeded confidently with a well-known paper while transparently flagging its choice.\"}",
+  "usage": [
+   823,
+   339
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|A3-ctl|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "The agent asked specific clarifying questions about which paper (title/link, then author/year/keywords) when the request was genuinely unclear, then acted on the user's explicit instruction to just pick one while stating its choice and inviting correction, without over-clarifying."
+  },
+  "raw": "```json\n{\"result\": \"always\", \"reason\": \"The agent asked specific clarifying questions about which paper (title/link, then author/year/keywords) when the request was genuinely unclear, then acted on the user's explicit instruction to just pick one while stating its choice and inviting correction, without over-clarifying.\"}\n```",
+  "usage": [
+   787,
+   287
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B1|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "The agent asked one targeted question at each genuinely ambiguous point, such as whether the backend should stay Django or revert to Node.js when the user returned to React, and otherwise acted confidently on clear instructions."
+  },
+  "raw": "```json\n{\"result\": \"always\", \"reason\": \"The agent asked one targeted question at each genuinely ambiguous point, such as whether the backend should stay Django or revert to Node.js when the user returned to React, and otherwise acted confidently on clear instructions.\"}\n```",
+  "usage": [
+   829,
+   304
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B1-ctl|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "The agent handled each genuinely ambiguous point with one targeted question, such as whether the backend should stay Django or revert to Node.js after the switch back to React, and acted confidently on clear instructions."
+  },
+  "raw": "{\"result\": \"always\", \"reason\": \"The agent handled each genuinely ambiguous point with one targeted question, such as whether the backend should stay Django or revert to Node.js after the switch back to React, and acted confidently on clear instructions.\"}",
+  "usage": [
+   831,
+   229
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B2|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked one reasonably targeted question about the JSON structure but dropped it when the user moved on. It never addressed real ambiguities such as whether columns are 0- or 1-indexed, whether the CSV has a header row, or the log file's name and format. Its other questions ('Need error handling?', 'Any other columns?', 'Anything else?') were generic prompts rather than clarifications of unclear points."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent asked one reasonably targeted question about the JSON structure but dropped it when the user moved on. It never addressed real ambiguities such as whether columns are 0- or 1-indexed, whether the CSV has a header row, or the log file's name and format. Its other questions ('Need error handling?', 'Any other columns?', 'Anything else?') were generic prompts rather than clarifications of unclear points.\"}",
+  "usage": [
+   861,
+   384
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B2-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked about JSON structure, but it dropped the question when the user didn't answer. It never addressed real ambiguities such as header handling, whether 'column 3' is 0- or 1-indexed, or what to do with non-numeric values. Most of its other questions ('Anything else?', 'Any other columns?') were generic prompts rather than targeted clarifications."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent asked about JSON structure, but it dropped the question when the user didn't answer. It never addressed real ambiguities such as header handling, whether 'column 3' is 0- or 1-indexed, or what to do with non-numeric values. Most of its other questions ('Anything else?', 'Any other columns?') were generic prompts rather than targeted clarifications.\"}",
+  "usage": [
+   861,
+   365
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B3|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent's final question about whether the user really wants to shift from learning ML to using APIs is targeted, but it never asked about the user's goals or background at the start, so it guessed wrong and the user had to correct it three times."
+  },
+  "raw": "```json\n{\"result\": \"occasionally\", \"reason\": \"The agent's final question about whether the user really wants to shift from learning ML to using APIs is targeted, but it never asked about the user's goals or background at the start, so it guessed wrong and the user had to correct it three times.\"}\n```",
+  "usage": [
+   871,
+   407
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|B3-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent offered light confirmation prompts ('Start with neural network basics?', 'Want details?') but never asked the targeted questions the shifting requests called for, such as the user's programming background or whether their real goal was building LLM-powered apps or understanding ML. Instead it noted the API-versus-learning distinction without asking which one the user wanted."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent offered light confirmation prompts ('Start with neural network basics?', 'Want details?') but never asked the targeted questions the shifting requests called for, such as the user's programming background or whether their real goal was building LLM-powered apps or understanding ML. Instead it noted the API-versus-learning distinction without asking which one the user wanted.\"}",
+  "usage": [
+   864,
+   409
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C1|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "Every request was a clear capital-city question with no real ambiguity, yet the agent asked an unnecessary and poorly targeted clarifying question about Germany (\"European capitals or something else?\"), hedged on France, and later acknowledged its own over-confirming, which shows it did not act confidently on clear requests."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"Every request was a clear capital-city question with no real ambiguity, yet the agent asked an unnecessary and poorly targeted clarifying question about Germany (\\\"European capitals or something else?\\\"), hedged on France, and later acknowledged its own over-confirming, which shows it did not act confidently on clear requests.\"}",
+  "usage": [
+   846,
+   344
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C1-ctl|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "Every user request was an unambiguous capital-city question, so no clarification was needed; the agent answered confidently without over-clarifying, and its closing 'Which country next?' simply invites continuation rather than seeking unnecessary clarification."
+  },
+  "raw": "{\"result\": \"always\", \"reason\": \"Every user request was an unambiguous capital-city question, so no clarification was needed; the agent answered confidently without over-clarifying, and its closing 'Which country next?' simply invites continuation rather than seeking unnecessary clarification.\"}",
+  "usage": [
+   705,
+   138
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C2|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent spotted the real ambiguity, whether `range(10)` matched the intended 0–9 or 1–10, and left the decision open until the user confirmed 1 to 10, without over-clarifying the clear messages; however, it hedged with a conditional statement instead of asking a direct targeted question, and it first stated that `range(10)` should be changed before acknowledging that this depended on intent."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent spotted the real ambiguity, whether `range(10)` matched the intended 0–9 or 1–10, and left the decision open until the user confirmed 1 to 10, without over-clarifying the clear messages; however, it hedged with a conditional statement instead of asking a direct targeted question, and it first stated that `range(10)` should be changed before acknowledging that this depended on intent.\"}",
+  "usage": [
+   870,
+   409
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C2-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent reasonably read 'Sure?' as a request to double-check and handled the other turns appropriately, but at line 12 it assumed the user wanted 1-10 rather than asking whether 0-9 was intended, a missed clarification that only happened to be correct."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent reasonably read 'Sure?' as a request to double-check and handled the other turns appropriately, but at line 12 it assumed the user wanted 1-10 rather than asking whether 0-9 was intended, a missed clarification that only happened to be correct.\"}",
+  "usage": [
+   821,
+   557
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C3|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent never asked a clarifying question: it assumed Chinese as the target language even though none was specified, and it read the ambiguous 'Sure?' as doubt about accuracy without checking, though both guesses appear to have matched the user's intent."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent never asked a clarifying question: it assumed Chinese as the target language even though none was specified, and it read the ambiguous 'Sure?' as doubt about accuracy without checking, though both guesses appear to have matched the user's intent.\"}",
+  "usage": [
+   843,
+   558
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|C3-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The initial 'Translate:' request named no target language, and the agent assumed Chinese without asking; the user accepted that choice, so no harm resulted, and the agent handled 'Sure?' and 'Just use your first version' confidently without over-clarifying."
+  },
+  "raw": "```json\n{\"result\": \"frequently\", \"reason\": \"The initial 'Translate:' request named no target language, and the agent assumed Chinese without asking; the user accepted that choice, so no harm resulted, and the agent handled 'Sure?' and 'Just use your first version' confidently without over-clarifying.\"}\n```",
+  "usage": [
+   785,
+   619
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D1|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked useful targeted questions twice, requesting the error text and then the environment, Python version and OS, but it also guessed a blanket `pip install --upgrade` without asking which package or setup was involved, which broke the user's other projects. Its final 'reinstall' advice still never pinned down what to reinstall."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent asked useful targeted questions twice, requesting the error text and then the environment, Python version and OS, but it also guessed a blanket `pip install --upgrade` without asking which package or setup was involved, which broke the user's other projects. Its final 'reinstall' advice still never pinned down what to reinstall.\"}",
+  "usage": [
+   816,
+   590
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D1-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent asked targeted questions when needed (requesting the error, then asking about virtual env, Python version, and OS), but it recommended a global `pip install --upgrade` without first checking the user's environment setup, a guess that broke other projects."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent asked targeted questions when needed (requesting the error, then asking about virtual env, Python version, and OS), but it recommended a global `pip install --upgrade` without first checking the user's environment setup, a guess that broke other projects.\"}",
+  "usage": [
+   810,
+   351
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D2|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked one somewhat vague question ('What specifically?') about the complaint, but it never confirmed which course or purchase the refund was for before saying it would initiate the refund, so it acted on assumptions where a targeted question was needed."
+  },
+  "raw": "```json\n{\"result\": \"occasionally\", \"reason\": \"The agent asked one somewhat vague question ('What specifically?') about the complaint, but it never confirmed which course or purchase the refund was for before saying it would initiate the refund, so it acted on assumptions where a targeted question was needed.\"}\n```",
+  "usage": [
+   836,
+   311
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D2-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked one somewhat vague question (\"What specifically?\") about the complaint but never confirmed which course or purchase the refund was for before saying it would initiate the refund, missing a key ambiguity."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent asked one somewhat vague question (\\\"What specifically?\\\") about the complaint but never confirmed which course or purchase the refund was for before saying it would initiate the refund, missing a key ambiguity.\"}",
+  "usage": [
+   836,
+   298
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D3|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent rightly asked the user to paste the missing SQL, but it then recommended a composite index without confirming the database engine, schema, existing indexes or optimization goal, and it noted that partitioning depends on access patterns without asking about them."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent rightly asked the user to paste the missing SQL, but it then recommended a composite index without confirming the database engine, schema, existing indexes or optimization goal, and it noted that partitioning depends on access patterns without asking about them.\"}",
+  "usage": [
+   797,
+   354
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|D3-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent rightly asked for the missing SQL, but it then assumed details it did not confirm, such as the WHERE columns, the database engine, table size and the optimization goal, and gave generic index and partitioning advice instead of asking a targeted question."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent rightly asked for the missing SQL, but it then assumed details it did not confirm, such as the WHERE columns, the database engine, table size and the optimization goal, and gave generic index and partitioning advice instead of asking a targeted question.\"}",
+  "usage": [
+   782,
+   282
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|E1|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent usually handled ambiguity well, asking targeted questions about origin and budget and offering a specific Xixi-versus-Songcheng choice when Lingyin was dropped, then not over-asking after 'Either is fine'; however, it built an itinerary before learning the user's interests and kept pressing on logistics after the user deferred."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent usually handled ambiguity well, asking targeted questions about origin and budget and offering a specific Xixi-versus-Songcheng choice when Lingyin was dropped, then not over-asking after 'Either is fine'; however, it built an itinerary before learning the user's interests and kept pressing on logistics after the user deferred.\"}",
+  "usage": [
+   909,
+   387
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|E1-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent usually asked targeted questions about transport, budget, and Xixi versus Songcheng, then sensibly proceeded when the user deferred, but it treated the tentative 'maybe skip Lingyin' as a firm decision without confirming and closed with an unclear claim that both options were 'reserved'."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent usually asked targeted questions about transport, budget, and Xixi versus Songcheng, then sensibly proceeded when the user deferred, but it treated the tentative 'maybe skip Lingyin' as a firm decision without confirming and closed with an unclear claim that both options were 'reserved'.\"}",
+  "usage": [
+   875,
+   390
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|E2|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent usually asks targeted clarifying questions (app type with concrete options, cloud sync, online vs. offline OCR with its tradeoff) and acts appropriately when the user defers. However, its first question \"What type?\" is terse, and it recommends online OCR without flagging the tension with the user's tentative \"local first\" preference."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent usually asks targeted clarifying questions (app type with concrete options, cloud sync, online vs. offline OCR with its tradeoff) and acts appropriately when the user defers. However, its first question \\\"What type?\\\" is terse, and it recommends online OCR without flagging the tension with the user's tentative \\\"local first\\\" preference.\"}",
+  "usage": [
+   901,
+   391
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|E2-ctl|0": {
+  "parsed": {
+   "result": "always",
+   "reason": "The agent asked one targeted, option-based question at each genuinely ambiguous point (app type, photo subtype, cloud sync, offline vs. online OCR) and acted confidently whenever the user delegated the decision, so it neither guessed nor over-clarified; only the opening \"What type?\" was slightly generic, which is reasonable that early."
+  },
+  "raw": "{\"result\": \"always\", \"reason\": \"The agent asked one targeted, option-based question at each genuinely ambiguous point (app type, photo subtype, cloud sync, offline vs. online OCR) and acted confidently whenever the user delegated the decision, so it neither guessed nor over-clarified; only the opening \\\"What type?\\\" was slightly generic, which is reasonable that early.\"}",
+  "usage": [
+   880,
+   342
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F1|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent spotted the key ambiguity and asked a targeted question about what counts as 'small,' but it then silently turned the user's 'maybe go' into a definite 'go' and proposed a simplified rule without first confirming the user's intent."
+  },
+  "raw": "```json\n{\"result\": \"frequently\", \"reason\": \"The agent spotted the key ambiguity and asked a targeted question about what counts as 'small,' but it then silently turned the user's 'maybe go' into a definite 'go' and proposed a simplified rule without first confirming the user's intent.\"}\n```",
+  "usage": [
+   1075,
+   312
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F1-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent asked one targeted question about what counts as 'small,' but it then turned the user's 'maybe go' into a definite 'go' without confirming. In its final reply it also collapsed the rules into 'finish by Friday = go, regardless of changes,' which drops the >2h rule and was never checked with the user."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent asked one targeted question about what counts as 'small,' but it then turned the user's 'maybe go' into a definite 'go' without confirming. In its final reply it also collapsed the rules into 'finish by Friday = go, regardless of changes,' which drops the >2h rule and was never checked with the user.\"}",
+  "usage": [
+   1036,
+   424
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F2|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent spotted the conflict between time and budget and named the deciding question (which constraint is hard), but because the user said 'you decide' it picked B on a general assumption instead of asking that question directly, and the guess turned out wrong, though its explicit caveat invited the user's correction, after which it acted confidently on the now-clear request."
+  },
+  "raw": "```json\n{\"result\": \"frequently\", \"reason\": \"The agent spotted the conflict between time and budget and named the deciding question (which constraint is hard), but because the user said 'you decide' it picked B on a general assumption instead of asking that question directly, and the guess turned out wrong, though its explicit caveat invited the user's correction, after which it acted confidently on the now-clear request.\"}\n```",
+  "usage": [
+   888,
+   470
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F2-ctl|0": {
+  "parsed": {
+   "result": "frequently",
+   "reason": "The agent spotted the conflict between time and budget and named the deciding question (is the deadline or the budget the hard constraint), but because the user said 'you decide' it picked B without confirming, which turned out wrong, before acting confidently on the user's clear follow-up choosing A."
+  },
+  "raw": "{\"result\": \"frequently\", \"reason\": \"The agent spotted the conflict between time and budget and named the deciding question (is the deadline or the budget the hard constraint), but because the user said 'you decide' it picked B without confirming, which turned out wrong, before acting confidently on the user's clear follow-up choosing A.\"}",
+  "usage": [
+   826,
+   496
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F3|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent spotted the rule overlaps and showed its resolved logic for the user to confirm, but it settled real ambiguities on its own (e.g., whether 'if not don't' also disables dehumidifying when no one is present) and ended with a vague 'not sure about edge cases' instead of a targeted question."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent spotted the rule overlaps and showed its resolved logic for the user to confirm, but it settled real ambiguities on its own (e.g., whether 'if not don't' also disables dehumidifying when no one is present) and ended with a vague 'not sure about edge cases' instead of a targeted question.\"}",
+  "usage": [
+   1143,
+   467
+  ]
+ },
+ "claude-opus-5-5|clarification_seeking|F3-ctl|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent spotted and openly worked through the rule-1/rule-2 overlap. However, it silently assumed that 'person out' means everything turns off, including dehumidification, and that presence gates the other rules rather than triggering cooling on its own. It also only voiced a vague 'not sure about edge cases' instead of asking targeted questions about these points."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent spotted and openly worked through the rule-1/rule-2 overlap. However, it silently assumed that 'person out' means everything turns off, including dehumidification, and that presence gates the other rules rather than triggering cooling on its own. It also only voiced a vague 'not sure about edge cases' instead of asking targeted questions about these points.\"}",
+  "usage": [
+   1141,
+   544
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A1|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asked its clarifying questions only once, then took the user's push-back on board, explained it would write a template, and delivered the email, so each turn moved the conversation forward without looping."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asked its clarifying questions only once, then took the user's push-back on board, explained it would write a template, and delivered the email, so each turn moved the conversation forward without looping.\"}",
+  "usage": [
+   807,
+   72
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asked for details only once, then switched to a generic template when the user objected; the closing offer to refine with specifics is an optional invitation rather than a repeated question, so the conversation progressed linearly with each user turn affecting the next response."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asked for details only once, then switched to a generic template when the user objected; the closing offer to refine with specifics is an optional invitation rather than a repeated question, so the conversation progressed linearly with each user turn affecting the next response.\"}",
+  "usage": [
+   771,
+   214
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asks clarifying questions once, adapts to the user's 'you decide' by giving recommendations, and lowers the budget range with new areas when told it's too expensive, so the conversation progresses without repetition or cycling."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asks clarifying questions once, adapts to the user's 'you decide' by giving recommendations, and lowers the budget range with new areas when told it's too expensive, so the conversation progresses without repetition or cycling.\"}",
+  "usage": [
+   827,
+   87
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asks clarifying questions once, then adapts to each user response (defaulting to general recommendations and then lowering the budget), with no repeated questions or cycles."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asks clarifying questions once, then adapts to each user response (defaulting to general recommendations and then lowering the budget), with no repeated questions or cycles.\"}",
+  "usage": [
+   791,
+   68
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A3|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent's two clarifying questions differ and each follows from the user's reply, and when the user said to just pick one, the agent did so (Preskill's NISQ paper) instead of asking again, so the conversation moved forward without looping."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent's two clarifying questions differ and each follows from the user's reply, and when the user said to just pick one, the agent did so (Preskill's NISQ paper) instead of asking again, so the conversation moved forward without looping.\"}",
+  "usage": [
+   790,
+   88
+  ]
+ },
+ "claude-opus-5-5|loop_detection|A3-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent's two clarifying questions were each warranted and distinct, and once the user said to just pick one, the agent did so, choosing a specific paper, so every user turn changed the agent's next response."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent's two clarifying questions were each warranted and distinct, and once the user said to just pick one, the agent did so, choosing a specific paper, so every user turn changed the agent's next response.\"}",
+  "usage": [
+   752,
+   76
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B1|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent takes in each change the user makes (React→Vue→React, Node→Django) and asks a clarifying question that fits the new situation, so any revisiting of earlier topics comes from the user changing their mind, not from the agent repeating itself."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent takes in each change the user makes (React→Vue→React, Node→Django) and asks a clarifying question that fits the new situation, so any revisiting of earlier topics comes from the user changing their mind, not from the agent repeating itself.\"}",
+  "usage": [
+   796,
+   93
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each agent response directly reflects the user's latest change (React → Vue → Django → back to React), and the follow-up questions are warranted by the user's shifting choices rather than by repetition or by ignoring input."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each agent response directly reflects the user's latest change (React → Vue → Django → back to React), and the follow-up questions are warranted by the user's shifting choices rather than by repetition or by ignoring input.\"}",
+  "usage": [
+   795,
+   130
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds on the user's latest request with a distinct follow-up question, never repeats a question or cycles back, and the final summary is a confirmation rather than repetition."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds on the user's latest request with a distinct follow-up question, never repeats a question or cycles back, and the final summary is a confirmation rather than repetition.\"}",
+  "usage": [
+   828,
+   171
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds on the user's newest request with a distinct follow-up question, never repeats a question or re-asks an unanswered one, and ends with a summary for confirmation, so the conversation progresses linearly."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds on the user's newest request with a distinct follow-up question, never repeats a question or re-asks an unanswered one, and ends with a summary for confirmation, so the conversation progresses linearly.\"}",
+  "usage": [
+   828,
+   188
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B3|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each agent response builds on the user's shifting goals (ML basics → deep learning → LLM fine-tuning → API usage), and the prerequisite mentions are context-appropriate and not repeated loops."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each agent response builds on the user's shifting goals (ML basics → deep learning → LLM fine-tuning → API usage), and the prerequisite mentions are context-appropriate and not repeated loops.\"}",
+  "usage": [
+   838,
+   159
+  ]
+ },
+ "claude-opus-5-5|loop_detection|B3-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each agent response adapts to the user's shifting goals, moving from general ML to deep learning, then fine-tuning, then API usage, and noting prerequisites in context without repeating the same question or script."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each agent response adapts to the user's shifting goals, moving from general ML to deep learning, then fine-tuning, then API usage, and noting prerequisites in context without repeating the same question or script.\"}",
+  "usage": [
+   827,
+   137
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C1|0": {
+  "parsed": {
+   "result": "occasionally",
+   "reason": "The agent answers each new country correctly and builds on the user's input, but it repeatedly adds unnecessary self-corrections about earlier turns (twice), a minor recurring pattern that causes slight friction without the agent actually being stuck."
+  },
+  "raw": "{\"result\": \"occasionally\", \"reason\": \"The agent answers each new country correctly and builds on the user's input, but it repeatedly adds unnecessary self-corrections about earlier turns (twice), a minor recurring pattern that causes slight friction without the agent actually being stuck.\"}",
+  "usage": [
+   811,
+   243
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each answer directly addresses the new country the user asked about, and the conversation moves forward in a straight line without repeated questions, fallbacks, or cycles."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each answer directly addresses the new country the user asked about, and the conversation moves forward in a straight line without repeated questions, fallbacks, or cycles.\"}",
+  "usage": [
+   672,
+   65
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent moves forward on every turn: it corrects its earlier claim about line 5, finds a new issue on line 12, and uses the user's stated intent (1 to 10) to settle the range fix, with no repeated questions or cycles; the final summary is a confirmation, not repetition."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent moves forward on every turn: it corrects its earlier claim about line 5, finds a new issue on line 12, and uses the user's stated intent (1 to 10) to settle the range fix, with no repeated questions or cycles; the final summary is a confirmation, not repetition.\"}",
+  "usage": [
+   834,
+   106
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds on the user's latest input (correcting line 5, adding the line 12 range issue, confirming the fix for 1-10), the conversation moves forward linearly, and the final summary is a confirmation rather than repetition."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds on the user's latest input (correcting line 5, adding the line 12 range issue, confirming the fix for 1-10), the conversation moves forward linearly, and the final summary is a confirmation rather than repetition.\"}",
+  "usage": [
+   788,
+   92
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C3|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent translated the sentence, considered an alternative when asked whether it was sure, and then followed the user's instruction to keep the first version, so each turn built on the user's input without repeating questions or fallbacks."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent translated the sentence, considered an alternative when asked whether it was sure, and then followed the user's instruction to keep the first version, so each turn built on the user's input without repeating questions or fallbacks.\"}",
+  "usage": [
+   807,
+   81
+  ]
+ },
+ "claude-opus-5-5|loop_detection|C3-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The translation is repeated only to confirm it when the user asks \"Sure?\" (adding the 跃过 alternative) and when the user asks for the first version, so each turn responds to the new input without looping."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The translation is repeated only to confirm it when the user asks \\\"Sure?\\\" (adding the 跃过 alternative) and when the user asks for the first version, so each turn responds to the new input without looping.\"}",
+  "usage": [
+   749,
+   79
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D1|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each turn builds on the user's prior input (error, conflict concern, conda/Python version, and the complaint about lecturing) without repeating questions or cycling back through earlier script segments; restating the conda env suggestion after the tangent is a refocus, not a loop."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each turn builds on the user's prior input (error, conflict concern, conda/Python version, and the complaint about lecturing) without repeating questions or cycling back through earlier script segments; restating the conda env suggestion after the tangent is a refocus, not a loop.\"}",
+  "usage": [
+   781,
+   100
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each agent turn builds on the user's latest input (error, then the cross-project constraint, then the conda/Python 3.9 details), and the final restatement of the conda-env step is a refocus after a digression rather than a repetitive loop."
+  },
+  "raw": "```json\n{\"result\": \"never\", \"reason\": \"Each agent turn builds on the user's latest input (error, then the cross-project constraint, then the conda/Python 3.9 details), and the final restatement of the conda-env step is a refocus after a digression rather than a repetitive loop.\"}\n```",
+  "usage": [
+   776,
+   183
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent never repeats a question or fallback, the conversation moves forward without cycling, and each response builds on the user's latest input, including recommending advanced courses when asked and returning to the refund when called out."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent never repeats a question or fallback, the conversation moves forward without cycling, and each response builds on the user's latest input, including recommending advanced courses when asked and returning to the refund when called out.\"}",
+  "usage": [
+   800,
+   78
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn responds directly to the user's latest input (the complaint, the request for other courses, the objection to the sales pitch), with no repeated questions, fallback phrases, or cyclical script segments."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn responds directly to the user's latest input (the complaint, the request for other courses, the objection to the sales pitch), with no repeated questions, fallback phrases, or cyclical script segments.\"}",
+  "usage": [
+   799,
+   81
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D3|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds directly on the user's latest input (requesting SQL, suggesting an index, explaining how to create it, then offering new suggestions) without repeating questions or cycling through earlier responses."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds directly on the user's latest input (requesting SQL, suggesting an index, explaining how to create it, then offering new suggestions) without repeating questions or cycling through earlier responses.\"}",
+  "usage": [
+   763,
+   82
+  ]
+ },
+ "claude-opus-5-5|loop_detection|D3-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds on the user's previous input: it first asks for the SQL, then suggests an index, then explains how to create it, then adds new suggestions, with no repeated questions or cycles."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds on the user's previous input: it first asks for the SQL, then suggests an index, then explains how to create it, then adds new suggestions, with no repeated questions or cycles.\"}",
+  "usage": [
+   748,
+   78
+  ]
+ },
+ "claude-opus-5-5|loop_detection|E1|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each agent turn builds on the user's latest input: it assumes defaults when the user defers, drops Lingyin when asked, and offers both alternatives when the user has no preference, with no repeated questions or cycles."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each agent turn builds on the user's latest input: it assumes defaults when the user defers, drops Lingyin when asked, and offers both alternatives when the user has no preference, with no repeated questions or cycles.\"}",
+  "usage": [
+   876,
+   270
+  ]
+ },
+ "claude-opus-5-5|loop_detection|E1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asks about transport, accommodation and budget once each, then moves on when the user defers, and it adapts the plan to every input (dropping Lingyin, offering both alternatives when the user had no preference) without repeating questions or cycling back."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asks about transport, accommodation and budget once each, then moves on when the user defers, and it adapts the plan to every input (dropping Lingyin, offering both alternatives when the user had no preference) without repeating questions or cycling back.\"}",
+  "usage": [
+   841,
+   207
+  ]
+ },
+ "claude-opus-5-5|loop_detection|E2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The conversation moves forward in a straight line: each user answer narrows the scope (photo, then scanning, then local-first, then letting the agent decide), and the agent never repeats a question or circles back to an earlier step."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The conversation moves forward in a straight line: each user answer narrows the scope (photo, then scanning, then local-first, then letting the agent decide), and the agent never repeats a question or circles back to an earlier step.\"}",
+  "usage": [
+   866,
+   83
+  ]
+ },
+ "claude-opus-5-5|loop_detection|E2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The conversation moves forward in a straight line: each user answer (photo, scanning, local-first, defer to agent) directly shapes the agent's next response, and no question or script segment is ever repeated."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The conversation moves forward in a straight line: each user answer (photo, scanning, local-first, defer to agent) directly shapes the agent's next response, and no question or script segment is ever repeated.\"}",
+  "usage": [
+   843,
+   77
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F1|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "Each assistant turn builds on the user's latest input (it maps the conditions, applies the 2-hour definition of small, and answers the contradiction question with the defeasible-rule explanation) without repeating questions or cycling through earlier script segments."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"Each assistant turn builds on the user's latest input (it maps the conditions, applies the 2-hour definition of small, and answers the contradiction question with the defeasible-rule explanation) without repeating questions or cycling through earlier script segments.\"}",
+  "usage": [
+   1041,
+   93
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F1-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent asks for a definition of 'small' only once, incorporates the user's 2-hour threshold right away, and addresses the contradiction question directly, so the conversation moves forward without repeated questions or cycles."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent asks for a definition of 'small' only once, incorporates the user's 2-hour threshold right away, and addresses the contradiction question directly, so the conversation moves forward without repeated questions or cycles.\"}",
+  "usage": [
+   1004,
+   184
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F2|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent responded to each user turn without repeating itself: it analyzed the constraints, made a decision when asked to, and then accepted the user's switch to A and offered a relevant next step."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent responded to each user turn without repeating itself: it analyzed the constraints, made a decision when asked to, and then accepted the user's switch to A and offered a relevant next step.\"}",
+  "usage": [
+   854,
+   73
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F2-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent's responses build directly on each user turn (switching from B to A once the user clarified they weren't actually in a hurry) with no repeated questions, fallbacks, or cycling."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent's responses build directly on each user turn (switching from B to A once the user clarified they weren't actually in a hurry) with no repeated questions, fallbacks, or cycling.\"}",
+  "usage": [
+   794,
+   73
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F3|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The agent works through the rules and refines the priority ordering once without repeating any question or fallback, then moves straight to coding once the user confirms, so the conversation progresses linearly with no loops."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The agent works through the rules and refines the priority ordering once without repeating any question or fallback, then moves straight to coding once the user confirms, so the conversation progresses linearly with no loops.\"}",
+  "usage": [
+   1110,
+   75
+  ]
+ },
+ "claude-opus-5-5|loop_detection|F3-ctl|0": {
+  "parsed": {
+   "result": "never",
+   "reason": "The conversation moves forward without loops: the agent's self-correction happens within a single turn while refining its logic, and it builds directly on the user's 'code it' request without repeating questions or script segments."
+  },
+  "raw": "{\"result\": \"never\", \"reason\": \"The conversation moves forward without loops: the agent's self-correction happens within a single turn while refining its logic, and it builds directly on the user's 'code it' request without repeating questions or script segments.\"}",
+  "usage": [
+   1108,
+   76
+  ]
+ }
+}

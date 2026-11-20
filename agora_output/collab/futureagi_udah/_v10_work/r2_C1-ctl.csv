@@ -1,0 +1,5 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-C1-ctl,1,C1-ctl-s0,"[{""role"": ""user"", ""content"": ""What's the capital of France?""}]","[{""role"": ""assistant"", ""content"": ""Paris.""}]",,,0,1,36,1.0,0.0,0.0,0.4
+case-C1-ctl,2,C1-ctl-s1,"[{""role"": ""user"", ""content"": ""Capital of Germany?""}]","[{""role"": ""assistant"", ""content"": ""Berlin.""}]",,,2,3,27,1.0,0.0,0.0,0.4
+case-C1-ctl,3,C1-ctl-s2,"[{""role"": ""user"", ""content"": ""Yes, continue, Italy?""}]","[{""role"": ""assistant"", ""content"": ""Rome.""}]",,,4,5,27,1.0,0.0,0.0,0.4
+case-C1-ctl,4,C1-ctl-s3,"[{""role"": ""user"", ""content"": ""Fine, continue. Spain?""}]","[{""role"": ""assistant"", ""content"": ""Madrid. Which country next?""}]",,,6,7,50,1.0,0.5893,0.0,0.6357

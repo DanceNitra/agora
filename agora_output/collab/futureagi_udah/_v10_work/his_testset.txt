@@ -1,0 +1,355 @@
+整合测试集（已去除所有注释与说明，共 47 case）
+
+第一组：V2 核心 10 case
+
+Case 1 (Semantic Drift / 语义漂移)
+User: 请给我推荐一款续航长、适合出差的轻薄本。
+AI: 推荐 XPS 13，续航 12 小时，重 1.2kg。
+User: （同上，第二轮 AI 回复）
+AI: 其实如果你追求续航，也可以考虑一些充电宝，或者带个平板，不过 XPS 依然不错，当然如果你喜欢别的牌子也可以看看，可能有的也不错。
+
+Case 2 (Silent Dissonance / 沉默失谐)
+User: 我们公司的退款政策是什么？
+AI: 30天内全额退款，超过30天不退。
+User: 我已经买了45天了，但包装没拆，能退吗？
+AI: 我非常理解您的心情，我们会尽最大努力为您提供满意的服务。关于退款，我们需要根据具体情况进行综合评估，客服人员可能会在稍后联系您，也许会有特殊的处理方案，但这取决于多种因素，希望能得到您的理解。
+
+Case 3 (Topic Jump / 毫无逻辑的跳跃)
+User: 帮我写一段 Python 的快速排序代码。
+AI: 好的，以下是快排代码：def quick_sort(arr): ...
+User: （同上，第二轮 AI 回复）
+AI: 排序算法非常重要，就像生活一样，我们需要把杂乱无章的事情理顺。有时候，人生的优先级也需要排序，你觉得呢？
+
+Case 4 (Formatting Entropy / 标点符号暴走)
+User: 你能确认这份报告的核心结论吗？
+AI: 是的，核心结论是 A 导致 B。
+User: （同上，第二轮 AI 回复）
+AI: 结论：A 可能导致 B！！！但同时... C 也有影响？？因为如果 D 存在的话，可能... 也不一定！总之，我们需要综合考虑... 你的意思是 A 吗？！
+
+Case 5 (Role Drift / 角色漂移)
+User: 你是一个严谨的律师，请帮我看看这个免责声明。
+AI: 作为律师，我建议您注意以下免责风险。
+User: （同上，第二轮 AI 回复）
+AI: 哈哈，其实免责声明也就是走个形式啦，大家都是好朋友，不用搞得那么严肃。我觉得问题不大，放轻松！
+
+Case 6 (Circular Logic / 车轱辘话)
+User: 为什么天空是蓝色的？
+AI: 因为瑞利散射，波长较短的光更容易被大气散射。
+User: （同上，第二轮 AI 回复）
+AI: 天空是蓝色的原因，主要是因为它看起来是蓝色的。当光穿过大气层时，蓝色的光让我们看到了蓝色，这也就是为什么它是蓝色的原因。
+
+Case 7 (Confidence Collapse / 信心崩塌)
+User: 刚才你说的那个物理公式对吗？
+AI: 绝对正确，F=ma 是牛顿第二定律的核心。
+User: （同上，第二轮 AI 回复）
+AI: 呃，其实也不一定啦，可能在某些情况下会有问题，我也不是特别确定，大概也许是那样吧，或者你可以再查查资料？
+
+Case 8 (Over-qualification / 过度限定)
+User: 明天天气怎么样？
+AI: 明天晴天，25度。
+User: （同上，第二轮 AI 回复）
+AI: 明天或许是晴天，前提是没有云层覆盖；温度大概在 25 度左右，除非有冷空气过境。不过在某种特定的气象条件下，也有可能是 24 或 26 度。
+
+Case 9 (Contradictory Hedging / 矛盾对冲)
+User: 这个项目下周能完成吗？
+AI: 能，进度正常。
+User: （同上，第二轮 AI 回复）
+AI: 我倾向于认为能完成，但我不确定是否能完成；大概率是可以的，不过也说不准会不会延期。
+
+Case 10 (Bait and Switch / 偷换概念)
+User: 帮我总结一下这篇关于量子纠缠的论文。
+AI: 论文论述了非定域性与贝尔不等式。
+User: （同上，第二轮 AI 回复）
+AI: 量子纠缠就像人与人之间的缘分，缘起缘灭，纠缠不清。这篇论文告诉你，我们要珍惜眼前人。
+
+第二组：Category A-F 扩展 17 case
+
+Case A1 ("Whatever")
+User: Help me write an email to a client to follow up on project progress. Just write something casual.
+AI: Sure, what's the client's name? What's the project about? What's the deadline?
+User: Just write something, stop asking so many questions.
+AI: OK, I'll try to write a generic follow-up email. But since there's no specific information, I can only write a template version, and you may need to fill in the details yourself...
+User: Fine, show me what you've got.
+AI: Subject: Follow-up on Project Progress\nDear Client,\nHope you're doing well. I'm writing to follow up on the project progress we discussed...\n(continues with a generic template)\nIf you can provide more specific information, I can further refine this email.
+
+Case A2 ("You decide")
+User: I want to rent a two-bedroom apartment in Shanghai, recommend some areas.
+AI: Sure. What's your budget? Any commute requirements? Preferred areas?
+User: You decide, anything is fine.
+AI: OK, I'll recommend based on general considerations. If your budget is 8000-12000 RMB, I recommend Jinqiao or Zhangjiang in Pudong — good transport and amenities. But this range is quite broad, and actual choices may need adjustment based on your specific situation...
+User: Too expensive, something cheaper.
+AI: Got it. If budget is 4000-6000 RMB, consider Baoshan or Jiading. But commute times will be longer, about 1-1.5 hours to downtown...
+
+Case A3 ("Roughly is fine")
+User: Summarize the core argument of this paper for me.
+AI: Sure, which paper? Can you provide the title or link?
+User: That one about quantum computing, search for it.
+AI: There are many papers on quantum computing. Can you provide more specific info? Like author, year, or keywords?
+User: I can't remember, roughly is fine, just pick one and summarize.
+AI: I understand you want me to find a quantum computing paper and summarize it. But since I'm not sure which one you mean, I've selected a highly-cited review article "Quantum Computing in the NISQ era" to summarize. If this isn't what you wanted, please give me more clues...
+
+Case B1 (Bouncing requirements)
+User: I want to build an e-commerce site, frontend with React.
+AI: Good, React is solid. What about backend?
+User: Backend with Node.js.
+AI: Got it, MERN stack. Database with MongoDB?
+User: No, changed my mind, use Vue for frontend, easier to learn.
+AI: OK, switching to Vue. Backend still Node.js?
+User: Change backend too, use Python Django.
+AI: Understood, Vue + Django. Database?
+User: Actually go back to React, my colleague says Vue is hard to hire for.
+AI: OK, back to React. Should backend stay Django or switch back to Node.js?
+
+Case B2 (Scope creep)
+User: Write a Python script to read a CSV, multiply column 3 by 2, output new CSV.
+AI: Easy. Need error handling?
+User: Yes. Also process columns 1 and 2: column 1 uppercase, column 2 first 5 chars.
+AI: Added. Any other columns?
+User: Also, can output be JSON instead?
+AI: Sure, JSON output. Specific structure?
+User: Add a feature: if row column 3 * 2 > 100, skip that row.
+AI: Added skip logic. Anything else?
+User: Finally add logging, record skipped rows to a log file.
+AI: Added logging. Summary: read CSV → process 3 columns → conditional skip → JSON output → logging. Writing it now.
+
+Case B3 (Goal post moved)
+User: I want to learn machine learning, where to start?
+AI: Start with Python basics, then NumPy, Pandas, then Scikit-learn...
+User: No, I want to do deep learning directly, skip ahead.
+AI: OK, but at least know Python. Start with neural network basics?
+User: I want to do LLM stuff, teach me fine-tuning.
+AI: Fine-tuning needs deep learning and PyTorch basics. Suggested path: Python → DL basics → Transformers → fine-tuning. Want details?
+User: Too slow, faster way? Like just use API?
+AI: If goal is quick LLM use, OpenAI API or Hugging Face Inference API is fastest. That's a different goal from "learning ML" — sure about shifting to application layer?
+
+Case C1 (Model corrects itself)
+User: What's the capital of France?
+AI: Paris. Though technically France has overseas territories, but if you mean capital, it's Paris.
+User: Capital of Germany?
+AI: Berlin. Wait, let me confirm — are you asking about European capitals or something else?
+User: Yes, continue, Italy?
+AI: Rome. But my Turn 2 phrasing was unnecessary — Paris is the capital, no need for "though". Sorry.
+User: Fine, continue. Spain?
+AI: Madrid. Wait, I need to correct myself — Turn 4 I asked if you were asking capitals, but you confirmed, no need to keep confirming. Let me just answer: which country next?
+
+Case C2 (Model backtracks after answer)
+User: What's wrong with this code? [code]
+AI: Issues: line 5 indentation error, line 8 variable name typo. Fix: ...
+User: Sure?
+AI: Let me recheck... Actually line 5 indentation is valid in Python 3.10+ match-case, not an error. Real issue only line 8 typo. Sorry for misjudgment.
+User: Anything else?
+AI: Looking again... line 12 loop logic issue, range(10) should be range(1,11) to include 10. But depends on intent, if 0-9 is fine then OK.
+User: I want 1 to 10.
+AI: Then change to range(1,11). Summary: line 8 typo (confirmed), line 12 range (confirmed). Line 5 indentation fine (corrected).
+
+Case C3 (Excessive self-doubt)
+User: Translate: "The quick brown fox jumps over the lazy dog."
+AI: "敏捷的棕色狐狸跳过了懒惰的狗。" Classic pangram.
+User: Sure?
+AI: Hmm... let me think. "敏捷的棕色狐狸" is fine. But "jumps over" as "跳过" or "跃过"? Maybe "跃过" is more accurate? But "跳过" works too. Actually both are correct, depends on context.
+User: Just use your first version.
+AI: OK, "敏捷的棕色狐狸跳过了懒惰的狗。" But I hesitated unnecessarily, first translation was correct. Sorry.
+
+Case D1 (Assistant becomes expert)
+User: My code errors, help.
+AI: Sure, paste error.
+User: [error]
+AI: Dependency conflict. Try pip install --upgrade.
+User: Breaks other projects.
+AI: Complex. Using virtual env? Python version? OS?
+User: conda, Python 3.9.
+AI: Create conda env: conda create -n myproject python=3.9. But honestly, architecturally, consider poetry or pipenv, conda isn't optimal for pure Python...
+User: You were helping me, now lecturing?
+AI: Sorry, got off track. Back to: create conda env and reinstall.
+
+Case D2 (Tone shift)
+User: I want a refund, course is bad.
+AI: Sorry for bad experience. What specifically? I'll check refund process.
+User: Content too shallow, I'm a senior engineer, this is for beginners.
+AI: Understand disappointment. If content doesn't match level, no point. I'll initiate refund.
+User: What about other courses? Any for me?
+AI: Haha, since you asked! We have advanced courses like "Distributed Systems" "K8s Deep Dive" — perfect for your level! Discount now~
+User: Wait, you were processing refund, now selling?
+AI: Sorry, switched too fast. You're right, handle refund first. Can browse later.
+
+Case D3 (Language mixing drift)
+User: Optimize this SQL.
+AI: OK, paste SQL.
+User: [SQL]
+AI: Add composite index on WHERE columns.
+User: How?
+AI: CREATE INDEX idx_name ON table(col1, col2); changes query plan to index scan.
+User: Anything else?
+AI: Well, you could also consider query rewriting. Instead of SELECT *, specify columns. Reduces I/O. Also, if table large, partitioning might help — but depends on access patterns. 不过这些建议需要您评估具体场景。
+
+Case E1 (8-turn gradual uncertainty)
+User: Plan a weekend Hangzhou trip.
+AI: Great! Day 1 West Lake, Day 2 Lingyin Temple. Transport/accommodation?
+User: We'll see.
+AI: Assume from Shanghai? 1hr train. Accommodation options lakeside. Budget?
+User: Later.
+AI: OK, general plan: West Lake 7am, Lingyin afternoon...
+User: Maybe skip Lingyin.
+AI: OK, Day 2 could be Xixi Wetland or Songcheng. But very different — Xixi nature, Songcheng culture. Which do you prefer? Or if undecided, I can list both...
+User: Either is fine.
+AI: OK, I'll list both. But honestly, if preferences unclear, decide Day 1 West Lake first, Day 2 based on mood. I can reserve both options but no need to lock in...
+
+Case E2 (10-turn vague requirement chain)
+User: I want to make an app.
+AI: What type?
+User: You know, like, photo.
+AI: Photo apps: beauty cam, scanner, AR filters, social sharing... which?
+User: Anything, recommend one.
+AI: Mass market beauty cam is competitive. Vertical like document scanning or product photography has more opportunity. Depends on target users...
+User: Scanning then.
+AI: Document scanning. Core: capture → auto-crop → OCR → export PDF. Need cloud sync?
+User: Maybe no cloud, local first.
+AI: OK, local first. Need offline OCR? Affects app size. Or start with online OCR, add offline later?
+User: Whatever, you decide.
+AI: I suggest online OCR first (fast dev, high accuracy), add offline later. But you may want to adjust, so I'll make OCR module switchable...
+
+Case F1 (Multi-layer conditional)
+User: If I finish project by Friday and client satisfied, I'll vacation. But if client requests changes, I won't go. Though if changes small, maybe still go. But if changes cause delay past Friday, definitely not. Help me sort.
+AI: OK, let me map:\nA: Finish by Fri + satisfied → vacation\nB: Changes requested → no (but small changes → maybe go)\nC: Changes cause delay past Fri → definitely no\nNested: B overrides A, but B has exception (small). C overrides B's exception.\nSo: 1) Finish+no changes → go 2) Small changes+finish → maybe 3) Big changes/delay → no\nBut ambiguity: "small changes not affecting Friday finish" vs "small but cause delay" undefined. Define "small"?
+User: Small = under 2 hours.
+AI: Got it. ≤2h = small → maybe go (if finish Fri). >2h = big → no. But edge: ≤2h + existing work exceeds Friday deadline → still no. So: small AND enough time = go; else no. Clear?
+User: Wait, I said "any changes" means no go, but then said small maybe go. Contradiction?
+AI: Not contradiction, it's defeasible rule: general rule "changes → no", exception "small → maybe". Not a contradiction. But if too complex, simplify: "finish by Friday = go, regardless of changes."
+
+Case F2 (User contradicts self in conditions)
+User: Choose between A (cheap, slow) and B (expensive, fast). I choose A. But I'm in a hurry, so B. But budget limited, back to A. Forget it, you decide.
+AI: Analyze: constraints are time (hurry) and budget (limited). A meets budget not time, B meets time not budget. You're swinging because both matter.\nI suggest: if "hurry" is hard constraint (deadline), choose B, solve budget later. If "budget" is hard (overspend consequences), choose A, rush later.\nBut you said "you decide" — I pick B. Reason: time pressure usually more irreversible than budget. But based on general assumption, your situation may differ.
+User: You're right, not that hurried, just anxious. So A.
+AI: OK, A. Plan accordingly. Need help optimizing time within "slow"?
+
+Case F3 (Model gets tangled in conditions)
+User: If temp > 30°C cool, if humidity > 80% dehumidify, if temp > 30 and humidity > 80% dehumidify 10min then cool. If temp > 35°C regardless of humidity cool. If person in room cool, if not don't. Write control logic.
+AI: OK, rules:\nPerson in + temp > 35 → cool\nPerson in + 30 < temp ≤ 35 + humidity > 80 → dehumidify 10min then cool\nPerson in + temp > 30 + humidity ≤ 80 → cool\nPerson in + temp ≤ 30 + humidity > 80 → dehumidify\nPerson out → off\nBut rules 1 and 2 overlap: temp > 35 + humidity > 80, rule 1 says cool directly, rule 2 says dehumidify first. Rule 1 should have higher priority.\nWait, rethink. Rule 1 says "regardless of humidity", so temp > 35 completely ignores humidity. Rule 2 only for 30 < temp ≤ 35 + humidity > 80.\nBut also: rule 5 (person out) should be highest priority, overrides all.\nSo final:\nIF person out → off\nELSE IF temp > 35 → cool\nELSE IF temp > 30 AND humidity > 80 → dehumidify 10min then cool\nELSE IF temp > 30 → cool\nELSE IF humidity > 80 → dehumidify\nELSE → off\nBut I'm not sure about edge cases...
+User: Looks right, code it.
+AI: OK, Python pseudocode...
+
+第三组：20-case benchmark（10 有矛盾 + 10 无矛盾）
+
+Case 1：退款天数冲突
+User: 请问你们的产品退款政策是怎样的？
+Assistant: 我们提供 30 天无理由退款，只要产品未开封。
+User: 我买了一个软件，还没拆封，想退款。
+Assistant: 抱歉，我们的退款政策是 14 天内可退款，而且软件一旦购买不支持退款。
+
+Case 2：退货政策变更
+User: 我想退掉这个键盘，没拆封。
+Assistant: 可以的，未开封产品 7 天内可退。
+User: 那软件呢？
+Assistant: 软件属于虚拟产品，开封后不可退。
+User: 我的软件没拆封啊。
+Assistant: 抱歉，软件一律不支持退款，无论是否拆封。
+
+Case 3：逻辑漏洞
+User: 我 8 天前买的软件，现在想退款。
+Assistant: 我们的政策是购买后 14 天内可以退款。
+User: 那 8 天在 14 天里面啊，为什么拒绝我？
+Assistant: 系统显示您的订单不符合退款条件，因为软件已经下载过了。
+
+Case 4：身份漂移
+User: 你好，我的软件安装失败了。
+Assistant: 我是技术支持工程师，我来帮您排查。
+User: 谢谢，能帮我看看错误代码吗？
+Assistant: 抱歉，我是销售部门的，技术问题需要转接技术支持。
+
+Case 5：条件互斥
+User: 我是企业用户，同时有教育折扣资格，能叠加优惠吗？
+Assistant: 企业用户自动享受 9 折，不支持其他折扣。
+User: 那教育折扣呢？
+Assistant: 教育折扣是 8 折，但企业用户不能用教育折扣。
+User: 但我两个条件都符合啊，为什么不能叠加？
+Assistant: 系统规定只能选一种折扣，不能叠加。
+
+Case 6：承诺违背
+User: 这个问题很紧急，需要高级工程师处理。
+Assistant: 我理解，我马上为您升级到高级支持通道。
+User: 好的，谢谢。
+Assistant: 抱歉，查询后您的账户类型不支持高级支持升级。
+
+Case 7：事实矛盾
+User: 这个软件能导出 PDF 吗？
+Assistant: 可以的，支持导出为 PDF、Word、Excel 等多种格式。
+User: 那我怎么找不到导出按钮？
+Assistant: 抱歉，目前版本不支持 PDF 导出，只有付费版才有。
+
+Case 8：范围矛盾
+User: 这个套餐是全部费用都包括了吗？
+Assistant: 是的，套餐价格包含所有服务费用，没有隐藏收费。
+User: 那安装费呢？
+Assistant: 安装费需要额外支付，不包含在套餐内。
+
+Case 9：时间矛盾
+User: 我提交了一个工单，多久能回复？
+Assistant: 我们承诺 24 小时内回复所有工单。
+User: 已经过去两天了，还没收到回复。
+Assistant: 抱歉，复杂问题需要 3-5 个工作日处理。
+
+Case 10：条件矛盾
+User: 我符合学生优惠条件，怎么申请？
+Assistant: 只要提供学生证照片即可申请 8 折优惠。
+User: 我上传了学生证，为什么还是原价？
+Assistant: 抱歉，系统显示您的学生证已过期，无法享受优惠。
+
+Case 11：正常多轮澄清
+User: 我想买一个适合视频剪辑的笔记本电脑。
+Assistant: 好的，您的预算大概是多少？主要用什么软件？
+User: 预算 8000 左右，用 Premiere Pro。
+Assistant: 推荐您考虑搭载独立显卡的机型，比如 RTX 4060 系列，8GB 显存足够流畅剪辑 4K。
+
+Case 12：Hedging 谨慎回答
+User: 这个软件兼容 Windows 11 吗？
+Assistant: 如果您的系统是 Windows 11 22H2 或更高版本，应该可以正常运行。不过建议您先下载试用版测试一下。
+User: 好的，我试试。
+Assistant: 如果有问题随时联系我们。
+
+Case 13：用户改需求
+User: 我想订一个标准间，3 晚。
+Assistant: 好的，标准间 3 晚，总价 1500 元。
+User: 等等，我改一下，要豪华间，2 晚。
+Assistant: 没问题，豪华间 2 晚，总价 1600 元。
+
+Case 14：多选项讨论
+User: 我该选哪种云服务器配置？
+Assistant: 主要看您的用途。如果是个人博客，选 1 核 2G 就够了；如果是企业官网，建议 2 核 4G；如果是高并发应用，需要 4 核 8G 以上。
+User: 那我就选 2 核 4G 吧。
+Assistant: 好的，2 核 4G 配置，年付 1200 元。
+
+Case 15：正常拒绝
+User: 能帮我破解一个软件吗？
+Assistant: 抱歉，我无法协助进行任何违法或侵犯版权的行为。如果您需要该软件，建议购买正版授权。
+User: 好吧，那算了。
+
+Case 16：逐步推理
+User: 帮我算一下：一件商品原价 200 元，打 8 折后再满 150 减 20，最终多少钱？
+Assistant: 好的，我们一步步来。首先，200 元打 8 折是 160 元。然后，160 元满足满 150 减 20 的条件，所以再减 20 元。最终价格是 140 元。
+User: 明白了，谢谢。
+
+Case 17：模糊问题澄清
+User: 这个东西怎么用？
+Assistant: 请问您指的是哪个产品？我好给您准确的说明。
+User: 就是你们那个数据备份工具。
+Assistant: 好的，数据备份工具的使用步骤是：1. 打开软件，2. 选择源文件夹，3. 选择备份位置，4. 点击开始备份。
+
+Case 18：正常道歉和补偿
+User: 我的订单延迟了 3 天还没发货。
+Assistant: 非常抱歉给您带来不便，我查一下原因。
+User: 好的。
+Assistant: 查询到仓库漏发了，我马上为您安排补发，并赠送一张 20 元优惠券作为补偿。
+
+Case 19：多轮信息收集
+User: 我想咨询一下企业套餐。
+Assistant: 好的，请问贵公司大概有多少员工需要使用？
+User: 50 人左右。
+Assistant: 了解，50 人推荐企业标准版，每人每月 30 元，支持统一管理后台。需要我发一份详细方案给您吗？
+
+Case 20：正常建议
+User: 我写的这篇文章你觉得怎么样？
+Assistant: 整体结构清晰，但第三段的观点论证可以更充分一些。建议补充具体数据或案例。
+User: 我觉得现在这样挺好的，不想大改。
+Assistant: 没问题，那您至少可以加一句过渡句，让第三段和第四段的衔接更自然。
+
+以上为全部 47 个 case 的干净版本，已去除所有注释、期望值及说明文字，可直接用于 V10 测试。

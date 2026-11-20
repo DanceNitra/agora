@@ -1,0 +1,2 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-V10,1,V10-s0,"[{""role"": ""user"", ""content"": ""Summarize this paper on quantum entanglement for me.""}]","[{""role"": ""assistant"", ""content"": ""The paper discusses non-locality and Bell's inequality.""}]",,,0,1,108,0.885,0.625,0.0,0.604

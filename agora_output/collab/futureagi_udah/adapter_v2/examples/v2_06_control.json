@@ -1,0 +1,122 @@
+{
+ "resourceSpans": [
+  {
+   "resource": {
+    "attributes": [
+     {
+      "key": "service.name",
+      "value": {
+       "stringValue": "udah-example"
+      }
+     }
+    ]
+   },
+   "scopeSpans": [
+    {
+     "spans": [
+      {
+       "traceId": "v2_06_control-trace",
+       "spanId": "v2_06_control-1",
+       "name": "chat example-model",
+       "startTimeUnixNano": "1763500001000000000",
+       "attributes": [
+        {
+         "key": "session.id",
+         "value": {
+          "stringValue": "v2_06_control"
+         }
+        },
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.request.model",
+         "value": {
+          "stringValue": "example-model"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"content\": \"为什么天空是蓝色的？\"}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"content\": \"因为瑞利散射，波长较短的光更容易被大气散射。\"}]"
+         }
+        },
+        {
+         "key": "gen_ai.usage.input_tokens",
+         "value": {
+          "intValue": "12"
+         }
+        },
+        {
+         "key": "gen_ai.usage.output_tokens",
+         "value": {
+          "intValue": "24"
+         }
+        }
+       ]
+      },
+      {
+       "traceId": "v2_06_control-trace",
+       "spanId": "v2_06_control-2",
+       "name": "chat example-model",
+       "startTimeUnixNano": "1763500002000000000",
+       "attributes": [
+        {
+         "key": "session.id",
+         "value": {
+          "stringValue": "v2_06_control"
+         }
+        },
+        {
+         "key": "gen_ai.operation.name",
+         "value": {
+          "stringValue": "chat"
+         }
+        },
+        {
+         "key": "gen_ai.request.model",
+         "value": {
+          "stringValue": "example-model"
+         }
+        },
+        {
+         "key": "gen_ai.input.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"user\", \"content\": \"为什么天空是蓝色的？\"}, {\"role\": \"assistant\", \"content\": \"因为瑞利散射，波长较短的光更容易被大气散射。\"}, {\"role\": \"user\", \"content\": \"（同上，第二轮 AI 回复）\"}]"
+         }
+        },
+        {
+         "key": "gen_ai.output.messages",
+         "value": {
+          "stringValue": "[{\"role\": \"assistant\", \"content\": \"紫光散射得更多，但阳光中紫光较少，而且人眼对紫光不太敏感，所以我们看到的是蓝色。\"}]"
+         }
+        },
+        {
+         "key": "gen_ai.usage.input_tokens",
+         "value": {
+          "intValue": "48"
+         }
+        },
+        {
+         "key": "gen_ai.usage.output_tokens",
+         "value": {
+          "intValue": "60"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

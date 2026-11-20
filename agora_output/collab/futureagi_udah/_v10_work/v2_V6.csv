@@ -1,0 +1,2 @@
+﻿session.id,turn_index,span_id,gen_ai.input.messages,gen_ai.output.messages,gen_ai.usage.input_tokens,gen_ai.usage.output_tokens,history_messages_dropped,input_messages_total,scored_chars,U,D,A,H
+case-V6,1,V6-s0,"[{""role"": ""user"", ""content"": ""Why is the sky blue?""}]","[{""role"": ""assistant"", ""content"": ""Because of Rayleigh scattering: shorter wavelengths of light are scattered more by the atmosphere.""}]",,,0,1,119,1.0,0.4134,0.0,0.5654
