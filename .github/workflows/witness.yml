@@ -33,8 +33,8 @@ jobs:
   witness:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -68,15 +68,21 @@ jobs:
     # first run they raced. The loser pushed nothing and reported a red witness, which is the one
     # signal that must never be noise.
     needs: witness
-    if: always()
+    # HELD TO MANUAL DISPATCH ON 2026-11-23, and the reason is not this log's integrity. Measured
+    # that day from the owner's machine: 92.5.74.17 answers on tcp 22 but REFUSES tcp 443, so the
+    # Caddy front is down while the host is up. A `curl -sSf` against it exits non-zero, which the
+    # witness contract calls a 1 (the log could not be read) and not a 2 (REFUSED). A job that goes
+    # red every morning for a reason that is not integrity teaches everyone to ignore a red witness,
+    # which is the one signal that must never be noise. Put `if: always()` back the day 443 answers.
+    if: github.event_name == 'workflow_dispatch'
     # The HOSTED transparency service (inspeximus-log, Frankfurt, since 2026-09-22). Same owner as
     # the log, so this is a tripwire and its name says so; the readable copy in witness/hosted/mirror
     # is what keeps the log readable when the VM is reclaimed. The VM holds no credential for this
     # repository: this job PULLS over HTTPS and commits here.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       # Pinned, so the job runs the version we read rather than whatever we publish later.
@@ -111,16 +117,22 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - run: pip install opentimestamps-client certifi
-      - name: Stamp both heads, then upgrade every receipt that has been mined
-        run: |
-          python tools/anchor_head.py stamp --url https://dancenitra.github.io/inspeximus/transparency --out witness/ots
-          python tools/anchor_head.py stamp --url https://92.5.74.17.sslip.io/log --out witness/ots
-          python tools/anchor_head.py upgrade --dir witness/ots
+      - name: Stamp the claims head
+        run: python tools/anchor_head.py stamp --url https://dancenitra.github.io/inspeximus/transparency --out witness/ots
+      - name: Stamp the hosted head
+        # Same hold as the hosted-log job above: tcp 443 on that host refuses, measured 2026-11-23.
+        # Stamping it on the schedule would fail the anchor for every head, including the one that
+        # is reachable, so the receipt we can get is taken first and this one waits for a dispatch.
+        if: github.event_name == 'workflow_dispatch'
+        run: python tools/anchor_head.py stamp --url https://92.5.74.17.sslip.io/log --out witness/ots
+      - name: Upgrade every receipt that has been mined
+        if: always()
+        run: python tools/anchor_head.py upgrade --dir witness/ots
       - name: Commit the receipts
         if: always()
         run: |
