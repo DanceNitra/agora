@@ -68,13 +68,23 @@ jobs:
     # first run they raced. The loser pushed nothing and reported a red witness, which is the one
     # signal that must never be noise.
     needs: witness
-    # HELD TO MANUAL DISPATCH ON 2026-11-23, and the reason is not this log's integrity. Measured
-    # that day from the owner's machine: 92.5.74.17 answers on tcp 22 but REFUSES tcp 443, so the
-    # Caddy front is down while the host is up. A `curl -sSf` against it exits non-zero, which the
-    # witness contract calls a 1 (the log could not be read) and not a 2 (REFUSED). A job that goes
-    # red every morning for a reason that is not integrity teaches everyone to ignore a red witness,
-    # which is the one signal that must never be noise. Put `if: always()` back the day 443 answers.
-    if: github.event_name == 'workflow_dispatch'
+    # READ FROM THE PAGES MIRROR, NOT FROM THE HOST. Diagnosed 2026-11-23: the host answers on tcp
+    # 22 and refuses tcp 443, because the Caddy container stopped on a SIGTERM on 2026-09-23 at
+    # 06:07 UTC with exit 0 and a restart policy of `no`. The host itself never stopped: the service
+    # answers on 127.0.0.1:9800, the hourly self-verify passes on 117 entries, and the daily
+    # publisher pushed a 117-entry snapshot that same morning. So the log stayed readable and this
+    # job was reading an address that no longer serves it.
+    #
+    # The mirror is the right address on principle too: the host publishes nothing to the internet
+    # itself, and a witness that depends on one TLS container cannot tell a stopped proxy from a
+    # rewritten log.
+    #
+    # THE LIVE LOG IS AT THE SITE ROOT. `/log` under it is the FIRST log, frozen at 10 entries since
+    # 2026-09-23 and kept on purpose: publish.yml copies `incoming/current` to the root and
+    # `incoming/log` to `log/`. This job pointed at the frozen one, which is why its memory stood at
+    # 9 entries. The URL is the state file's key, so this starts a new baseline under the new key
+    # and the first run after it is the one that can catch a rewrite.
+    if: always()
     # The HOSTED transparency service (inspeximus-log, Frankfurt, since 2026-09-22). Same owner as
     # the log, so this is a tripwire and its name says so; the readable copy in witness/hosted/mirror
     # is what keeps the log readable when the VM is reclaimed. The VM holds no credential for this
@@ -91,14 +101,14 @@ jobs:
         run: |
           mkdir -p witness/hosted/mirror
           for f in head.json log.jsonl keys.json keys.cbor verify.py index.html; do
-            curl -sSf "https://92.5.74.17.sslip.io/log/$f" -o "witness/hosted/mirror/$f"
+            curl -sSf "https://dancenitra.github.io/inspeximus-log/$f" -o "witness/hosted/mirror/$f"
           done
           (cd witness/hosted/mirror && python verify.py)
       - name: Look at the hosted log and refuse it if the history changed
         env:
           INSPEXIMUS_WITNESS_SECRET: ${{ secrets.INSPEXIMUS_WITNESS_SECRET }}
         run: |
-          inspeximus witness watch             --url https://92.5.74.17.sslip.io/log             --state witness/hosted/state.json             --out witness/hosted/cosignatures             --name "agora CI (SAME OWNER as the hosted log, not an independent witness)"
+          inspeximus witness watch             --url https://dancenitra.github.io/inspeximus-log             --state witness/hosted/state.json             --out witness/hosted/cosignatures             --name "agora CI (SAME OWNER as the hosted log, not an independent witness)"
       - name: Commit what this witness saw
         if: always()
         run: |
@@ -125,11 +135,9 @@ jobs:
       - name: Stamp the claims head
         run: python tools/anchor_head.py stamp --url https://dancenitra.github.io/inspeximus/transparency --out witness/ots
       - name: Stamp the hosted head
-        # Same hold as the hosted-log job above: tcp 443 on that host refuses, measured 2026-11-23.
-        # Stamping it on the schedule would fail the anchor for every head, including the one that
-        # is reachable, so the receipt we can get is taken first and this one waits for a dispatch.
-        if: github.event_name == 'workflow_dispatch'
-        run: python tools/anchor_head.py stamp --url https://92.5.74.17.sslip.io/log --out witness/ots
+        # The Pages mirror, for the reasons in the hosted-log job above, at the site ROOT, which is
+        # where the live log is published.
+        run: python tools/anchor_head.py stamp --url https://dancenitra.github.io/inspeximus-log --out witness/ots
       - name: Upgrade every receipt that has been mined
         if: always()
         run: python tools/anchor_head.py upgrade --dir witness/ots
