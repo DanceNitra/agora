@@ -119,3 +119,46 @@ jobs:
           # succeeds; reruns always work). error_count default is 10, timeout 600000ms.
           error_count: 30
           timeout: 900000
+
+      - name: Tell IndexNow what we just published
+        # Bing reported IndexNow as "not set up" on 2026-11-24 although the key files have been live
+        # at https://dancenitra.github.io/<key>.txt since 2026-10-06: the key was hosted and nothing
+        # ever submitted. A key without a submitter is not a setup, it is a file.
+        #
+        # AFTER the deploy, never before. A step that ran first would announce URLs that this run
+        # had not published yet, and would announce them even when the deploy then failed.
+        #
+        # The key lives in the OTHER repository (DanceNitra/dancenitra.github.io), because IndexNow
+        # reads it from the HOST root while this project is served from a path. So assert the file
+        # is live and holds its own name before submitting: if that repository ever drops it, every
+        # submission is rejected and a step that only POSTed would still report success.
+        #
+        # Submits the sitemap of the artifact THIS run published, never a checked-in copy, so the
+        # list can never describe a site that was not deployed.
+        run: |
+          python3 - <<'PY'
+          import json, sys, urllib.error, urllib.request, xml.etree.ElementTree as ET
+          HOST = "dancenitra.github.io"
+          KEY = "bd2d2d56e10706a5c2e2707b4ccd0bad"
+          loc = "https://%s/%s.txt" % (HOST, KEY)
+
+          live = urllib.request.urlopen(loc, timeout=30).read().decode().strip()
+          assert live == KEY, "key file at %s does not hold its own name" % loc
+
+          ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          root = ET.parse("_site/sitemap.xml").getroot()
+          urls = sorted({u.find("s:loc", ns).text for u in root.findall("s:url", ns)})
+          assert urls, "the published sitemap carries no urls"
+
+          body = json.dumps({"host": HOST, "key": KEY, "keyLocation": loc,
+                             "urlList": urls}).encode()
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", body,
+                                       {"Content-Type": "application/json; charset=utf-8"})
+          try:
+              code = urllib.request.urlopen(req, timeout=60).status
+          except urllib.error.HTTPError as e:
+              print(len(urls), "urls ->", e.code, e.read()[:300])
+              sys.exit(1)
+          print(len(urls), "urls ->", code)
+          sys.exit(0 if code in (200, 202) else 1)
+          PY
