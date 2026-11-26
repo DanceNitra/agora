@@ -25,6 +25,18 @@
       "writes_tip": "70c9ee1ea657984fa0e6fd9c80e80e82d53b4ec112098ad91b8dc9e11479c4e9"
     },
     {
+      "head_sha256": "81b94ff44a091a97790f4e97825747fb3c2335eb50fced9775668a7d818f3c72",
+      "log": "https://dancenitra.github.io/inspeximus-log",
+      "n_writes": 121,
+      "receipt": "scitt_1c109c1a502791ea/121-8d9fdfa3468231f3.head.json.ots",
+      "scope": "Proves these head bytes existed before the Bitcoin block named once upgraded. Says nothing about whether any entry is true, and cannot see a history shown to somebody else.",
+      "stamped_utc": "2026-11-26T15:47:33Z",
+      "status": "PENDING",
+      "sth_hash": "94825f8d39f45c3e200ea0659043a743cba671eb8a91ef6e0b44f0b26c0b8a97",
+      "store_id": "scitt:1c109c1a502791ea",
+      "writes_tip": "8d9fdfa3468231f36119515cf14a25bf4a5f03cee5c1e28215fdb63e8af7a867"
+    },
+    {
       "head_sha256": "bd3fea123957f2774f9a2522fd4b628d27464581fd3b85a0ae903a367a4a47ac",
       "log": "https://dancenitra.github.io/inspeximus/transparency",
       "n_writes": 281,
