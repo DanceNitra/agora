@@ -2,7 +2,7 @@
   "kind": "static-log-cosignature",
   "log_url": "https://dancenitra.github.io/inspeximus/transparency",
   "n_writes": 308,
-  "observed_utc": "2026-11-25T16:02:57Z",
+  "observed_utc": "2026-11-26T15:46:52Z",
   "scope": "This says one witness saw this exact head and that it extends what the same witness saw before. It does NOT say any entry is true, and it cannot see a different history shown to somebody else between visits.",
   "signature": "6b0b701cc6f57d54ca7726074ff45cf008a9b84479767e133ca03e8662850e512702b137b418b0bb35e83925c32d93602d87874b46a01f561981c6d41f453809",
   "sth_hash": "c30b191d76a538261c41830ca9a4724a9d4bef4164bb2a5f345522cd93d5d631",
