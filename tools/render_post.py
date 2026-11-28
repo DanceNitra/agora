@@ -496,6 +496,32 @@ def md_to_html(md: str):
     return title, "\n".join(out), foot_html, words
 
 
+# The <title> tag is a different surface from the headline (headline-craft skill): the tag carries the
+# search query and must stay under 70 characters, the H1 and the share card carry the full fact. Bing
+# Webmaster Tools reported 96 "Title too long" warnings on this site, every one a tag over 70. Only the
+# <title> is overridden here -- og:title, the share card and the JSON-LD headline keep the full title,
+# and the on-page H1 is untouched. A slug missing from this table renders exactly as before.
+# slug -> (short EN title, short SK title); None means that language keeps its full title.
+SEO_TITLE: dict[str, tuple[str | None, str | None]] = {
+    'a-green-suite-that-never-ran': (None, 'Zelená suita, ktorá 156 testov nikdy nespustila'),
+    'a-guard-stamped-after-the-read': ('9 of 2,880 records lost, all reported as stored', '9 z 2 880 záznamov stratených, všetky hlásené ako uložené'),
+    'a-status-nobody-earned': ('Our claims table certified five rows it never ran', 'Naša tabuľka tvrdení certifikovala päť nespustených riadkov'),
+    'agent-memory-outside-outcomes-not-ranking': (None, 'Lekcie pomohli, keď ich písali výsledky, nie ranker'),
+    'agent-memory-poisoning-influence-gate': ('One sentence hijacks AI-agent memory retrieval', 'Jedna veta unesie retrieval pamäte AI agenta'),
+    'agent-memory-poisoning-layered-defense-residual': ('Agent-memory poisoning: you price the residual', 'Obrany proti otrave pamäte: rezíduum oceníš, nezavrieš'),
+    'agent-memory-retrieval-bm25-vector-hybrid': ('Agent-memory retrieval: a vector DB ties BM25', 'Retrieval pre agent memory: vector DB len remizuje s BM25'),
+    'causal-inference-phase-diagram': ('Spillovers change the estimand, not the bias', None),
+    'chatbot-arena-style-not-skill': ('How much of Chatbot Arena is style, not skill?', 'Koľko z Chatbot Areny je štýl, nie schopnosť?'),
+    'defenses-that-failed-their-own-control': ('Four memory-poisoning defenses that failed', 'Štyri obrany proti otrave pamäte, ktoré zlyhali'),
+    'food-nudges-publication-bias': ("Food nudges aren't 2.5x better: small-study bias", 'Food nudge nie je 2,5× účinnejší: doména malých štúdií'),
+    'founder-led-survivorship-null': ("Founder-led firms' 3.1x edge: survivorship or real?", 'Náskok 3,1× founder firiem: survivorship, či reálny?'),
+    'labels-failed-more-than-measurements': ('Labels failed more than measurements: 32 findings', 'Labely zlyhali viac než merania: 32 zistení našej AI'),
+    'llm-as-judge-length-confound': ('LLM-as-judge and length: our control refuted us', 'LLM-as-judge a dĺžka: náš vlastný test nás vyvrátil'),
+    'provenance-field-one-value': ('A provenance field at 0.99 that resolves to nothing', 'Provenance pole na 0,99, ktoré nevedie nikam'),
+    'reality-check-ai-memory-method-wins': ("AI-memory 'method wins': four were resource confounds", '„Method wins“ v AI pamäti: štyri boli resource confoundy'),
+    'verify-agent-memory-deletion': (None, 'Zmazali sme záznam z piatich AI úložísk. Dve ho mali.'),
+}
+
 _MANIFEST = ROOT / "public" / "posts" / "posts.json"
 
 
@@ -560,6 +586,10 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     # the fact (headline-craft skill). Without an explicit h1 the two stay identical, as before.
     h1 = m.get("h1") or m["title"]
     h1_sk = m.get("h1_sk") or m.get("title_sk") or h1
+    # The <title> tag may be shorter than both: see SEO_TITLE.
+    _seo_en, _seo_sk = SEO_TITLE.get(m["slug"], (None, None))
+    seo_title = _seo_en or m["title"]
+    seo_title_sk = _seo_sk or title_sk
     desc_sk = m.get("desc_sk") or m["desc"]
     tags_sk = m.get("tags_sk") or m["tags"]
     kicker_sk = m.get("kicker_sk") or m["kicker"]
@@ -595,6 +625,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     out = TEMPLATE.format(
         mono="" if bilingual else " data-mono",
         title=html.escape(m["title"]), title_sk=html.escape(title_sk),
+        seo_title=html.escape(seo_title),
         h1=html.escape(h1), h1_sk=html.escape(h1_sk),
         desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld, ogimage=_og_image(m["slug"]),
         kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, datehuman_sk=datehuman_sk, read=read,
@@ -611,7 +642,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     if bilingual:
         try:
             import split_languages
-            split_languages.split_one(dest)
+            split_languages.split_one(dest, sk_seo_title=seo_title_sk)
         except Exception as e:                                    # never fail a render over the mirror
             print(f"  [warn] SK mirror not written for {m['slug']}: {type(e).__name__}: {e}")
     _upsert_manifest({"slug": m["slug"], "title": m["title"], "title_sk": title_sk,
@@ -678,7 +709,7 @@ TEMPLATE = """<!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} · Agora</title>
+<title>{seo_title} · Agora</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{site}/posts/{slug}.html">
 <link rel="alternate" hreflang="en" href="{site}/posts/{slug}.html">

@@ -269,7 +269,8 @@ def _page_entity(data):
     return None
 
 
-def _localise_head(soup: BeautifulSoup, keep: str, self_url: str, en_url: str, mirrored: set | None = None) -> None:
+def _localise_head(soup: BeautifulSoup, keep: str, self_url: str, en_url: str, mirrored: set | None = None,
+                   sk_seo_title: str | None = None) -> None:
     """Give the Slovak document Slovak <title>, description and headline.
 
     Those three live in <head> as plain text, outside the language wrappers, so stripping `.en` left the
@@ -288,7 +289,9 @@ def _localise_head(soup: BeautifulSoup, keep: str, self_url: str, en_url: str, m
     if sk_title:
         suffix = " · Agora"
         if soup.title:
-            soup.title.string = sk_title + suffix
+            # The <title> tag is the search surface and has a length budget; og:title and the headline
+            # below are the share card and the article headline, so they keep the full Slovak h1.
+            soup.title.string = (sk_seo_title or sk_title) + suffix
         for m in soup.find_all("meta", property="og:title"):
             m["content"] = sk_title + suffix
         _set_on_page_entity(soup, "headline", sk_title)
@@ -406,7 +409,8 @@ def _text(html: str, keep: str | None = None) -> str:
     return re.sub(r"\s+", " ", body.get_text(" ")).strip()
 
 
-def split_one(page: pathlib.Path, mirrored: set[str] | None = None) -> bool:
+def split_one(page: pathlib.Path, mirrored: set[str] | None = None,
+              sk_seo_title: str | None = None) -> bool:
     """Split ONE freshly-rendered page in place. Called by render_post.py so a new post never lands as a
     bilingual document again. Returns False (and writes nothing) if the text check fails."""
     original = page.read_text(encoding="utf-8", errors="replace")
@@ -426,7 +430,8 @@ def split_one(page: pathlib.Path, mirrored: set[str] | None = None) -> bool:
         soup = BeautifulSoup(original, "html.parser")
         _strip_other_language(soup, keep)
         _set_head(soup, keep, en_url, sk_url)
-        _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored)
+        _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored,
+                       sk_seo_title=sk_seo_title)
         _toggle_to_links(soup, keep, en_url, sk_url)
         _strip_lang_script(soup)
         if keep == "sk":
